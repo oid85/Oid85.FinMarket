@@ -1,0 +1,226 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DaGroup.WPAnalyst.Api.WebHost</name>
+    </assembly>
+    <members>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.ConfigureServices.ConfigureServicesDependencyInjection.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            ConfigureServices
+            </summary>
+            <param name="services"></param>
+            <param name="configuration"></param>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.ConfigureServices.ConfigureServicesLogger.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            ConfigureServices
+            </summary>
+            <param name="services"></param>
+            <param name="configuration"></param>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.ConfigureServices.ConfigureServicesSwagger.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            ConfigureServices
+            </summary>
+            <param name="services"></param>
+            <param name="configuration"></param>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController">
+            <summary>
+            BlockController
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController.GetBlockByBlockIdAndByParameterById(System.Guid,System.Guid)">
+            <summary>
+            Получить блок по его id и по id параметра
+            </summary>
+            <param name="parameterId">ID параметра, в котором находится блок</param>
+            <param name="blockId">ID блока</param>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController.GetBlockById(System.Guid)">
+            <summary>
+            Получить блок по его id
+            </summary>
+            <param name="id">ID блока</param>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController.CreateDataSourceBlock(System.Guid)">
+            <summary>
+            Создать блок источник
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController.CreateCalculateBlock(System.Guid)">
+            <summary>
+            Создать блок расчета
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController.CreateDataSenderBlock(System.Guid)">
+            <summary>
+            Создать блок назначения
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController.UpdateBlock(System.Guid,DaGroup.WPAnalyst.Models.Models.Block)">
+            <summary>
+            Обновить блок
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockController.DeleteBlockById(System.Guid)">
+            <summary>
+            Удалить блок по его id
+            </summary>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockLocalTypeController">
+            <summary>
+            BlockLocalTypeController
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockLocalTypeController.GetBlockLocalTypes">
+            <summary>
+            Получить все локальные типы блоков (подтипы)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockLocalTypeController.GetBlockLocalTypeById(System.Guid)">
+            <summary>
+            Получить локальный тип блока (подтип) по id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockLocalTypeController.UpdateBlockLocalType(System.Guid,DaGroup.WPAnalyst.Models.Models.BlockLocalType)">
+            <summary>
+            Обновить локальный тип блока (подтип) по id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockTypeController">
+            <summary>
+            BlockTypeController
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockTypeController.GetBlockTypes">
+            <summary>
+            Получить все типы блоков
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockTypeController.GetBlockTypeById(System.Guid)">
+            <summary>
+            Получить тип блока по id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.BlockTypeController.UpdateBlockType(System.Guid,DaGroup.WPAnalyst.Models.Models.BlockType)">
+            <summary>
+            Обновить тип блока по id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.FolderController">
+            <summary>
+            FolderController
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.FolderController.GetAllShortFolders">
+            <summary>
+            Получить все папки (в кратком формате)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.FolderController.GetRootFolders">
+            <summary>
+            Получить список всех корневых папок
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.FolderController.GetFolderById(System.Guid)">
+            <summary>
+            Получить папку по id
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.FolderController.CreateFolder(DaGroup.WPAnalyst.Models.Models.Folder)">
+            <summary>
+            Создать папку
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.FolderController.UpdateFolder(System.Guid,DaGroup.WPAnalyst.Models.Models.Folder)">
+            <summary>
+            Обновить папку по id
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.FolderController.DeleteFolderById(System.Guid)">
+            <summary>
+            Удалить папку по ее id
+            </summary>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.FrequencyController">
+            <summary>
+            PeriodController
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.FrequencyController.GetFrequencies">
+            <summary>
+            Получить частоты
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.ParameterController">
+             <summary>
+             ParameterController
+             </summary>
+            
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.ParameterController.GetActiveShortParameters">
+            <summary>
+            Получить все активные параметры (в кратком формате)
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.ParameterController.GetParameterById(System.Guid)">
+            <summary>
+            Получить параметр по его id
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.ParameterController.CreateParameter(DaGroup.WPAnalyst.Models.Models.Parameter)">
+            <summary>
+            Создать параметр
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.ParameterController.UpdateParameter(System.Guid,DaGroup.WPAnalyst.Models.Models.Parameter)">
+            <summary>
+            Обновить параметр
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.ParameterController.DeleteParameterById(System.Guid)">
+            <summary>
+            Удалить параметр по его id
+            </summary>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.PeriodController">
+            <summary>
+            PeriodController
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.PeriodController.GetPeriods">
+            <summary>
+            Получить периоды
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DaGroup.WPAnalyst.Api.WebHost.Controllers.TestController">
+            <summary>
+            Для тестирования
+            </summary>
+        </member>
+        <member name="M:DaGroup.WPAnalyst.Api.WebHost.Controllers.TestController.Get">
+            <summary>
+            Заполнить БД тестовыми данными
+            </summary>
+        </member>
+        <member name="P:DaGroup.WPAnalyst.Api.WebHost.Startup.Configuration">
+            <summary>
+            Configuration
+            </summary>
+        </member>
+    </members>
+</doc>
