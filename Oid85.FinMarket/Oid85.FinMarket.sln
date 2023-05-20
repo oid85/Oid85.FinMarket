@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.Api.WebHost", "Oid85.FinMarket.Api.WebHost\Oid85.FinMarket.Api.WebHost.csproj", "{6F126E03-4A01-4709-9DEF-9DEAA512CF1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.DAL", "Oid85.FinMarket.DAL\Oid85.FinMarket.DAL.csproj", "{C8258B8C-BC27-406E-B2DB-623204A5326D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.Models", "Oid85.FinMarket.Models\Oid85.FinMarket.Models.csproj", "{476A3293-07BD-4446-9F55-7A7601555E29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.Configuration", "Oid85.FinMarket.Configuration\Oid85.FinMarket.Configuration.csproj", "{61C6CCEB-F928-4E31-B1A7-3BF68A19787D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F126E03-4A01-4709-9DEF-9DEAA512CF1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F126E03-4A01-4709-9DEF-9DEAA512CF1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F126E03-4A01-4709-9DEF-9DEAA512CF1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F126E03-4A01-4709-9DEF-9DEAA512CF1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8258B8C-BC27-406E-B2DB-623204A5326D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8258B8C-BC27-406E-B2DB-623204A5326D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8258B8C-BC27-406E-B2DB-623204A5326D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8258B8C-BC27-406E-B2DB-623204A5326D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{476A3293-07BD-4446-9F55-7A7601555E29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{476A3293-07BD-4446-9F55-7A7601555E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{476A3293-07BD-4446-9F55-7A7601555E29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{476A3293-07BD-4446-9F55-7A7601555E29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61C6CCEB-F928-4E31-B1A7-3BF68A19787D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61C6CCEB-F928-4E31-B1A7-3BF68A19787D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61C6CCEB-F928-4E31-B1A7-3BF68A19787D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61C6CCEB-F928-4E31-B1A7-3BF68A19787D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
