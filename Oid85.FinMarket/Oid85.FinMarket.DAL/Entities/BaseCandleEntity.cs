@@ -9,10 +9,7 @@ public class BaseCandleEntity
     [Column("id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
-    
-    [Column("finance_instrument_id")]
-    public long FinanceInstrumentId { get; set; }
-    
+
     [Column("datetime")]
     public DateTime DateTime { get; set; }
     
@@ -31,6 +28,6 @@ public class BaseCandleEntity
     [Column("volume")]
     public decimal Volume { get; set; }
     
-    [ForeignKey("FinanceInstrumentId")]
-    public FinanceInstrumentEntity FinanceInstrumentEntity { get; set; }
+    [Column("ticker")]
+    public string Ticker { get; set; }
 }

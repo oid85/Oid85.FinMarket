@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Oid85.FinMarket.Configuration.Common;
+using Oid85.FinMarket.Configuration.Data;
 using Oid85.FinMarket.DAL.Entities;
 
 namespace Oid85.FinMarket.DAL
@@ -17,15 +20,18 @@ namespace Oid85.FinMarket.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
+            var configuration = new ConfigurationBuilder()
+                .AddDataBase("c:\\temp\\wpanalyst_configuration.db")
+                .Build();
+            
+            var connectionString = configuration.GetValue<string>(ConfigParameterNames.ConnectionStringStorage);
+            optionsBuilder.UseNpgsql(connectionString);
         }
-        
-        public DbSet<FinanceInstrumentEntity> FinanceInstrumentEntities { get; set; } = null!;
-        
-        public DbSet<OneMinuteCandleEntity> OneMinuteCandleEntities { get; set; } = null!;
-        
-        public DbSet<OneDayCandleEntity> OneDayCandleEntities { get; set; } = null!;
 
+        public DbSet<CandleOneDayEntity> CandleOneDayEntities { get; set; } = null!;
+
+        public DbSet<CandleOneMinuteEntity> CandleOneMinuteEntities { get; set; } = null!;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

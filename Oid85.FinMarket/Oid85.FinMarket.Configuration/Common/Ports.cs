@@ -2,6 +2,7 @@
 {
     public class Ports
     {
-        public const int ApiPort = 10100;
+        public const int StoragePort = 10100;
+        public const int ComputationPort = 10200;
     }
 }

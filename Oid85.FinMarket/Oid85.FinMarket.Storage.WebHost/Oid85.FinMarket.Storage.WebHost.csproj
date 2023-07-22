@@ -13,13 +13,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MediatR" Version="12.0.1" />
-        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
-        <PackageReference Include="NLog" Version="5.1.4" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.3" />
+        <PackageReference Include="NLog" Version="5.2.2" />
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
-        <PackageReference Include="Microsoft.OpenApi" Version="1.6.4" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.1" />
+        <PackageReference Include="Microsoft.OpenApi" Version="1.6.5" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.5.0" />
     </ItemGroup>

@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Storage.WebHost.HostedServices;
 
-public class LoadOneDayCandlesHostedService : IHostedService
+public class LoadCandlesHostedService : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {

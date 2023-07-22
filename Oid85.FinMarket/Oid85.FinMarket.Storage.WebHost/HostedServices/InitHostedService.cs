@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Oid85.FinMarket.Configuration.Common;
 using Oid85.FinMarket.DAL;
 using ILogger = NLog.ILogger;
@@ -39,13 +40,8 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
             using (var scope = _scopeFactory.CreateScope())
             {
                 var dataBaseContext = scope.ServiceProvider.GetRequiredService<StorageDataBaseContext>();
-               
-                bool databaseExists = await dataBaseContext.Database.EnsureCreatedAsync(cancellationToken);
-
-                if (databaseExists) // true - БД только что была создана
-                {
-                    _logger.Info("БД не обнаружена. БД будет создана");
-                }
+                
+                await dataBaseContext.Database.MigrateAsync(cancellationToken);
             }
             
             _logger.Info($"Конфигурация: {JsonConvert.SerializeObject(_configuration.GetChildren())}");
