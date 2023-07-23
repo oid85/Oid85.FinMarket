@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oid85.FinMarket.DAL;
@@ -11,9 +12,11 @@ using Oid85.FinMarket.DAL;
 namespace Oid85.FinMarket.DAL.Migrations
 {
     [DbContext(typeof(StorageDataBaseContext))]
-    partial class StorageDataBaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230723015634_AddMarketEventsAndMarketEventTypes")]
+    partial class AddMarketEventsAndMarketEventTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

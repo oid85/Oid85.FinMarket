@@ -32,6 +32,10 @@ namespace Oid85.FinMarket.DAL
 
         public DbSet<CandleOneMinuteEntity> CandleOneMinuteEntities { get; set; } = null!;
         
+        public DbSet<MarketEventTypeEntity> MarketEventTypeEntities { get; set; } = null!;
+        
+        public DbSet<MarketEventEntity> MarketEventEntities { get; set; } = null!;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

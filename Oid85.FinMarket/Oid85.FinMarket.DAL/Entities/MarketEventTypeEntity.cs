@@ -10,4 +10,10 @@ public class MarketEventTypeEntity
     [Column("id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
+    
+    [Column("name")]
+    public string Name { get; set; }
+    
+    [Column("description")]
+    public string Description { get; set; }
 }
