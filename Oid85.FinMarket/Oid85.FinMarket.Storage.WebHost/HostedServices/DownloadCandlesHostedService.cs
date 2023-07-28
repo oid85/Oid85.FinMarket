@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Storage.WebHost.HostedServices;
 
-public class LoadCandlesHostedService : IHostedService
+public class DownloadCandlesHostedService : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {

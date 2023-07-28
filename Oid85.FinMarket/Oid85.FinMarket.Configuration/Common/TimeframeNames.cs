@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Configuration.Common
 {
-    public class Timeframes
+    public class TimeframeNames
     {
         public const string M1 = "M1";
         public const string M5 = "M5";
