@@ -36,9 +36,18 @@ namespace Oid85.FinMarket.DAL
         
         public DbSet<MarketEventEntity> MarketEventEntities { get; set; } = null!;
         
+        public DbSet<AssetEntity> AssetEntities { get; set; } = null!;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.Entity<AssetEntity>(b =>
+            {
+                b.HasKey(a => a.Id);
+                
+                b.HasData(
+                    new AssetEntity() { Id = 1, Ticker = "SBER", Figi = "BBG004730N97" }
+                );
+            });
         }
     }
 }

@@ -1,1 +1,1 @@
-﻿dotnet ef migrations add AddMarketEventsAndMarketEventTypes
+﻿dotnet ef migrations add AddAssetsTable

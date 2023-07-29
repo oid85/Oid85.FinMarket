@@ -85,15 +85,6 @@ namespace Oid85.FinMarket.Configuration.Data
                     }
                 );
             });
-            
-            modelBuilder.Entity<Asset>(b =>
-            {
-                b.HasKey(a => a.Id);
-                
-                b.HasData(
-                    new Asset() { Id = 1, Ticker = "SBER", Figi = "BBG004730N97" }
-                );
-            });
         }
     }
 }
