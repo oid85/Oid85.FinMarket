@@ -17,6 +17,11 @@ public class DownloadCandlesService
         _translateModelHelper = translateModelHelper;
     }
 
+    public async Task ProcessAssets()
+    {
+        
+    }
+    
     public async Task<List<Candle>> DownloadCandles(DownloadRequest downloadRequest)
     {
         var getCandlesRequest = _translateModelHelper.DownloadRequestToGetCandlesRequest(downloadRequest);
