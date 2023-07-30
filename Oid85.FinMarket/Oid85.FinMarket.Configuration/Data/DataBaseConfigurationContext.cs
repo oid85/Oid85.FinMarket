@@ -33,7 +33,7 @@ namespace Oid85.FinMarket.Configuration.Data
                     {
                         Order = 1, 
                         Key = ConfigParameterNames.TinkoffApiToken, 
-                        Value = "",
+                        Value = "t.U1XUi__xUJkh_1wjKtvhUV-FdN7XWb6ahZzeoQqVMmliIg7i9NbiTGv5F7lrt4oFGXJfrBtCGnieUNUaveG87w",
                         Description = "Токен доступа к API"
                     },                    
                     
@@ -52,7 +52,15 @@ namespace Oid85.FinMarket.Configuration.Data
                         Value = "5000",
                         Description = "Интервал для повторного запроса к API (по-умолчанию 5000 миллисекунд)"
                     },
-
+                    
+                    new Settings()
+                    {
+                        Order = 4, 
+                        Key = ConfigParameterNames.LoadOneMinuteCandlesCronExpression, 
+                        Value = "* * * * *",
+                        Description = "CRON-строка для периода загрузки 1-минутных свечей в хранилище (по-умолчанию '* * * * *' - каждую минуту)"
+                    },
+                    
                     new Settings()
                     {
                         Order = 4, 

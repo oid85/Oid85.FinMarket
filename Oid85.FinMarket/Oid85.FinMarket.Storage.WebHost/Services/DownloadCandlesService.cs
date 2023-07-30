@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Models;
 using Oid85.FinMarket.Storage.WebHost.Helpers;
+using Oid85.FinMarket.Storage.WebHost.Repositories;
 using Tinkoff.InvestApi;
 using Candle = Oid85.FinMarket.Models.Candle;
 
@@ -9,15 +10,22 @@ public class DownloadCandlesService
 {
     private readonly InvestApiClient _investApiClient;
     private readonly TranslateModelHelper _translateModelHelper;
+    private readonly AssetRepository _assetRepository;
+    private readonly CandleRepository _candleRepository;
+    
     public DownloadCandlesService(
         InvestApiClient investApiClient, 
-        TranslateModelHelper translateModelHelper)
+        TranslateModelHelper translateModelHelper, 
+        AssetRepository assetRepository, 
+        CandleRepository candleRepository)
     {
         _investApiClient = investApiClient;
         _translateModelHelper = translateModelHelper;
+        _assetRepository = assetRepository;
+        _candleRepository = candleRepository;
     }
 
-    public async Task ProcessAssets()
+    public async Task ProcessAssets(string timeframeName)
     {
         
     }
