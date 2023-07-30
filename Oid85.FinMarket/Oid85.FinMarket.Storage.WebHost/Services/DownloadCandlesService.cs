@@ -27,7 +27,12 @@ public class DownloadCandlesService
 
     public async Task ProcessAssets(string timeframeName)
     {
-        
+        var assets = await _assetRepository.GetAllAssetsAsync();
+
+        for (int i = 0; i < assets.Count; i++)
+        {
+            
+        }
     }
     
     public async Task<List<Candle>> DownloadCandles(DownloadRequest downloadRequest)

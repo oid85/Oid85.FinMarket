@@ -4,12 +4,12 @@ namespace Oid85.FinMarket.Storage.WebHost.Repositories;
 
 public class CandleRepository
 {
-    public async Task<Candle> GetLastOneDayCandleByAsset()
+    public async Task<Candle> GetLastOneDayCandleByAssetAsync()
     {
         return new Candle();
     }
     
-    public async Task<Candle> GetLastOneMinuteCandleByAsset()
+    public async Task<Candle> GetLastOneMinuteCandleByAssetAsync()
     {
         return new Candle();
     }

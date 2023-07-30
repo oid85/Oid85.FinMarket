@@ -13,7 +13,7 @@ public class AssetRepository
         _context = context;
     }
 
-    public async Task<List<Asset>> GetAllAssets()
+    public async Task<List<Asset>> GetAllAssetsAsync()
     {
         var assets = new List<Asset>();
 
@@ -25,6 +25,7 @@ public class AssetRepository
             {
                 Id = assetEntities[i].Id,
                 Ticker = assetEntities[i].Ticker,
+                Name = assetEntities[i].Name,
                 Figi = assetEntities[i].Figi
             };
 

@@ -9,10 +9,13 @@ public class AssetEntity
     [Key]
     [Column("id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
+    public Guid Id { get; set; }
     
     [Column("ticker")]
     public string Ticker { get; set; }
+    
+    [Column("name")]
+    public string Name { get; set; }    
     
     [Column("figi")]
     public string Figi { get; set; }    

@@ -1,1 +1,1 @@
-﻿dotnet ef migrations add AddAssetsTable
+﻿dotnet ef migrations add Initial
