@@ -11,6 +11,13 @@
             <param name="services"></param>
             <param name="configuration"></param>
         </member>
+        <member name="M:Oid85.FinMarket.Storage.WebHost.ConfigureServices.ConfigureServicesHangFire.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            ConfigureServices
+            </summary>
+            <param name="services"></param>
+            <param name="configuration"></param>
+        </member>
         <member name="M:Oid85.FinMarket.Storage.WebHost.ConfigureServices.ConfigureServicesInvestApi.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             ConfigureServices

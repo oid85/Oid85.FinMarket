@@ -24,10 +24,12 @@ namespace Oid85.FinMarket.DAL.Migrations
 
             modelBuilder.Entity("Oid85.FinMarket.DAL.Entities.AssetEntity", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Figi")
                         .IsRequired()
@@ -52,48 +54,6 @@ namespace Oid85.FinMarket.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("assets", "public");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("da48943a-eed9-42ce-b0d6-c7a6ccdf3fc2"),
-                            Figi = "BBG002W2FT78",
-                            Name = "Абрау-Дюрсо, акция обыкновенная",
-                            Sector = "Агропром и Пищепром",
-                            Ticker = "ABRD"
-                        },
-                        new
-                        {
-                            Id = new Guid("84072df0-85d8-4135-be2d-f508cd5c01eb"),
-                            Figi = "BBG004S683X6",
-                            Name = "Аэрофлот, акция обыкновенная",
-                            Sector = "Транспорт",
-                            Ticker = "AFLT"
-                        },
-                        new
-                        {
-                            Id = new Guid("007dad9d-9dd6-4f5c-8cba-ee634db20be4"),
-                            Figi = "BBG004S688H3",
-                            Name = "Акрон, акция обыкновенная",
-                            Sector = "Химия, удобрения",
-                            Ticker = "AKRN"
-                        },
-                        new
-                        {
-                            Id = new Guid("a4df3b20-a222-43cf-851e-bd3b705c0bd4"),
-                            Figi = "BBG004S68B40",
-                            Name = "Алроса, акция обыкновенная",
-                            Sector = "Горнодобывающие",
-                            Ticker = "ALRS"
-                        },
-                        new
-                        {
-                            Id = new Guid("bf5d3d04-bfaa-4623-9a65-7431d00b2a86"),
-                            Figi = "BBG004730N97",
-                            Name = "Сбербанк, акция обыкновенная",
-                            Sector = "Банки",
-                            Ticker = "SBER"
-                        });
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DAL.Entities._1D_CandleEntity", b =>

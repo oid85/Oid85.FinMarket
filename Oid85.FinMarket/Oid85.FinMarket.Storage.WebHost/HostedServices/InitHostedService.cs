@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Oid85.FinMarket.Configuration.Common;
 using Oid85.FinMarket.DAL;
+using Oid85.FinMarket.Storage.WebHost.Repositories;
 using Oid85.FinMarket.Storage.WebHost.Services;
+using Tinkoff.InvestApi;
+using Tinkoff.InvestApi.V1;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.Storage.WebHost.HostedServices
@@ -13,17 +17,23 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly DownloadCandlesService _downloadCandlesService;
+        private readonly InvestApiClient _investApiClient;
+        private readonly AssetRepository _assetRepository;
 
         public InitHostedService(
             ILogger logger,
-            IConfiguration configuration,
+            IConfiguration configuration, 
             IServiceScopeFactory scopeFactory, 
-            DownloadCandlesService downloadCandlesService)
+            DownloadCandlesService downloadCandlesService, 
+            InvestApiClient investApiClient, 
+            AssetRepository assetRepository)
         {
             _logger = logger;
             _configuration = configuration;
             _scopeFactory = scopeFactory;
             _downloadCandlesService = downloadCandlesService;
+            _investApiClient = investApiClient;
+            _assetRepository = assetRepository;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -47,14 +57,32 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
                 
                 await dataBaseContext.Database.MigrateAsync(cancellationToken);
             }
+
+            var response = await _investApiClient.Instruments.SharesAsync();
             
-            _logger.Info($"Конфигурация: {JsonConvert.SerializeObject(_configuration.GetChildren())}");
+            var instruments = response.Instruments
+                .Where(item => item.RealExchange == RealExchange.Moex)
+                .ToList();
+                
+            for (int i = 0; i < instruments.Count; i++)
+            {
+                var asset = new Oid85.FinMarket.Models.Asset()
+                {
+                    Ticker = instruments[i].Ticker,
+                    Name = instruments[i].Name,
+                    Figi = instruments[i].Figi,
+                    Sector = instruments[i].Sector
+                };
+
+                await _assetRepository.CreateOrUpdateAsync(asset);
+            }
 
             await _downloadCandlesService.ProcessAssets(TimeframeNames.D);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
+            
         }
     }
 }

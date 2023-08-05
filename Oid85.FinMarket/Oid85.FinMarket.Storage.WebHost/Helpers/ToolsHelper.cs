@@ -14,7 +14,7 @@ public class ToolsHelper
 
         if (lastCandle != null)
         {
-            result = lastCandle.DateTime;
+            result = lastCandle.DateTime.AddSeconds(30); // Чтобы не "захватить" при чтении свечу, которая уже в БД
             return result;
         }
         
@@ -42,29 +42,29 @@ public class ToolsHelper
 
         if (timeframeName == TimeframeNames.M1)
         {
-            result = result.AddHours(6);
+            result = beginDateTime.AddHours(6);
             
             if (beginDateTime.DayOfWeek == DayOfWeek.Friday)
-                result = result.AddDays(3);
+                result = beginDateTime.AddDays(3);
             
             if (beginDateTime.DayOfWeek == DayOfWeek.Saturday)
-                result = result.AddDays(2);
+                result = beginDateTime.AddDays(2);
         }
         
         else if (timeframeName == TimeframeNames.H)
         {
-            result = result.AddDays(1);
+            result = beginDateTime.AddDays(1);
             
             if (beginDateTime.DayOfWeek == DayOfWeek.Friday)
-                result = result.AddDays(3);
+                result = beginDateTime.AddDays(3);
             
             if (beginDateTime.DayOfWeek == DayOfWeek.Saturday)
-                result = result.AddDays(2);
+                result = beginDateTime.AddDays(2);
         }
         
         else if (timeframeName == TimeframeNames.D)
         {
-            result = result.AddDays(5);
+            result = beginDateTime.AddDays(5);
         }
         
         return result;

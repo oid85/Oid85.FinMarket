@@ -23,7 +23,7 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
             RecurringJob.AddOrUpdate($"download-_1D_candles", () => DownloadCandlesAsync(), cron);
         }
 
-        private async Task DownloadCandlesAsync()
+        public async Task DownloadCandlesAsync()
         {
             // await _downloadCandlesService.ProcessAssets(TimeframeNames.D);
         }

@@ -10,14 +10,13 @@ public class TranslateModelHelper
 {
     public GetCandlesRequest DownloadRequestToGetCandlesRequest(DownloadRequest downloadRequest)
     {
-        var getCandlesRequest = new GetCandlesRequest
-        {
-            From = Timestamp.FromDateTime(downloadRequest.From),
-            To = Timestamp.FromDateTime(downloadRequest.To),
-            InstrumentId = downloadRequest.Figi,
-            Interval = TimeframeToCandleInterval(downloadRequest.Timeframe)
-        };
-        
+        var getCandlesRequest = new GetCandlesRequest();
+
+        getCandlesRequest.From = Timestamp.FromDateTime(downloadRequest.From.ToUniversalTime());
+        getCandlesRequest.To = Timestamp.FromDateTime(downloadRequest.To.ToUniversalTime());
+        getCandlesRequest.InstrumentId = downloadRequest.Figi;
+        getCandlesRequest.Interval = TimeframeToCandleInterval(downloadRequest.Timeframe);
+
         return getCandlesRequest;
     }
 
@@ -49,15 +48,31 @@ public class TranslateModelHelper
         return String.Empty;
     }
     
-    public Candle HistoricCandleToCandle(HistoricCandle historicCandle)
+    public string TableNameToTimeframe(string tableName)
+    {
+        if (tableName == TableNames.M1)
+            return TimeframeNames.M1;
+               
+        if (tableName == TableNames.H)
+            return TimeframeNames.H;
+        
+        if (tableName == TableNames.D)
+            return TimeframeNames.D;
+
+        return String.Empty;
+    }    
+    
+    public Candle HistoricCandleToCandle(HistoricCandle historicCandle, string ticker)
     {
         var candle = new Candle
         {
+            DateTime = historicCandle.Time.ToDateTime(),
             Open = QuotationToDouble(historicCandle.Open),
             Close = QuotationToDouble(historicCandle.Close),
             High = QuotationToDouble(historicCandle.High),
             Low = QuotationToDouble(historicCandle.Low),
-            Volume = historicCandle.Volume
+            Volume = historicCandle.Volume,
+            Ticker = ticker
         };
 
         return candle;

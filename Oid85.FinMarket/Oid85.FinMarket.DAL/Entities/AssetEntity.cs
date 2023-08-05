@@ -9,7 +9,7 @@ public class AssetEntity
     [Key]
     [Column("id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set; }
+    public long Id { get; set; }
     
     [Column("ticker")]
     public string Ticker { get; set; }

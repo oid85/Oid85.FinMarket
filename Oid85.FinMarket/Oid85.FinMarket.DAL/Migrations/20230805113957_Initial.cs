@@ -4,8 +4,6 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace Oid85.FinMarket.DAL.Migrations
 {
     /// <inheritdoc />
@@ -82,7 +80,8 @@ namespace Oid85.FinMarket.DAL.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ticker = table.Column<string>(type: "text", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     figi = table.Column<string>(type: "text", nullable: false),
@@ -91,19 +90,6 @@ namespace Oid85.FinMarket.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_assets", x => x.id);
-                });
-
-            migrationBuilder.InsertData(
-                schema: "public",
-                table: "assets",
-                columns: new[] { "id", "figi", "name", "sector", "ticker" },
-                values: new object[,]
-                {
-                    { new Guid("007dad9d-9dd6-4f5c-8cba-ee634db20be4"), "BBG004S688H3", "Акрон, акция обыкновенная", "Химия, удобрения", "AKRN" },
-                    { new Guid("84072df0-85d8-4135-be2d-f508cd5c01eb"), "BBG004S683X6", "Аэрофлот, акция обыкновенная", "Транспорт", "AFLT" },
-                    { new Guid("a4df3b20-a222-43cf-851e-bd3b705c0bd4"), "BBG004S68B40", "Алроса, акция обыкновенная", "Горнодобывающие", "ALRS" },
-                    { new Guid("bf5d3d04-bfaa-4623-9a65-7431d00b2a86"), "BBG004730N97", "Сбербанк, акция обыкновенная", "Банки", "SBER" },
-                    { new Guid("da48943a-eed9-42ce-b0d6-c7a6ccdf3fc2"), "BBG002W2FT78", "Абрау-Дюрсо, акция обыкновенная", "Агропром и Пищепром", "ABRD" }
                 });
         }
 

@@ -6,4 +6,5 @@ public class DownloadRequest
     public DateTime From { get; set; }
     public DateTime To { get; set; }
     public string Timeframe { get; set; }
+    public string Ticker { get; set; }
 }

@@ -22,9 +22,9 @@ namespace Oid85.FinMarket.Storage.WebHost
             services.AddControllers();
             services.AddMemoryCache();
 
+            ConfigureServicesDependencyInjection.ConfigureServices(services, Configuration);
             ConfigureServicesDAL.ConfigureServices(services, Configuration);
             ConfigureServicesModels.ConfigureServices(services, Configuration);
-            ConfigureServicesDependencyInjection.ConfigureServices(services, Configuration);
             ConfigureServicesLogger.ConfigureServices(services, Configuration);
             ConfigureServicesInvestApi.ConfigureServices(services, Configuration);
             ConfigureServicesHangFire.ConfigureServices(services, Configuration);
