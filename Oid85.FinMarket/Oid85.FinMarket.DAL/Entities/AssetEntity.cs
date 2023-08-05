@@ -19,4 +19,7 @@ public class AssetEntity
     
     [Column("figi")]
     public string Figi { get; set; }    
+    
+    [Column("sector")]
+    public string Sector { get; set; }
 }

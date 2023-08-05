@@ -8,5 +8,7 @@ public class Asset
     
     public string Name { get; set; }   
     
-    public string Figi { get; set; }    
+    public string Figi { get; set; }  
+    
+    public string Sector { get; set; }
 }

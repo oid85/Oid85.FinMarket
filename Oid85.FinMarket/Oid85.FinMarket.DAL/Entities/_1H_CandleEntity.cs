@@ -2,8 +2,8 @@
 
 namespace Oid85.FinMarket.DAL.Entities;
 
-[Table("_1D", Schema = "public")]
-public class _1D_CandleEntity : BaseCandleEntity
+[Table("_1H", Schema = "public")]
+public class _1H_CandleEntity : BaseCandleEntity
 {
 
 }

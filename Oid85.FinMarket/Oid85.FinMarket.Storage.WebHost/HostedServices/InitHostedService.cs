@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Oid85.FinMarket.Configuration.Common;
 using Oid85.FinMarket.DAL;
+using Oid85.FinMarket.Storage.WebHost.Services;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.Storage.WebHost.HostedServices
@@ -11,15 +12,18 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly DownloadCandlesService _downloadCandlesService;
 
         public InitHostedService(
             ILogger logger,
             IConfiguration configuration,
-            IServiceScopeFactory scopeFactory)
+            IServiceScopeFactory scopeFactory, 
+            DownloadCandlesService downloadCandlesService)
         {
             _logger = logger;
             _configuration = configuration;
             _scopeFactory = scopeFactory;
+            _downloadCandlesService = downloadCandlesService;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -45,6 +49,8 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
             }
             
             _logger.Info($"Конфигурация: {JsonConvert.SerializeObject(_configuration.GetChildren())}");
+
+            await _downloadCandlesService.ProcessAssets(TimeframeNames.D);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

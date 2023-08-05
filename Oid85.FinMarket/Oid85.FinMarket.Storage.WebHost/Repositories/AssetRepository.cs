@@ -26,7 +26,8 @@ public class AssetRepository
                 Id = assetEntities[i].Id,
                 Ticker = assetEntities[i].Ticker,
                 Name = assetEntities[i].Name,
-                Figi = assetEntities[i].Figi
+                Figi = assetEntities[i].Figi,
+                Sector = assetEntities[i].Sector
             };
 
             assets.Add(asset);

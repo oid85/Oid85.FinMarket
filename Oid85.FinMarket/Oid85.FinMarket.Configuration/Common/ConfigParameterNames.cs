@@ -5,8 +5,8 @@
         public const string TinkoffApiToken = "TinkoffApiToken";
         public const string ConnectionStringStorage = "ConnectionStringStorage";
         public const string RepeatedApiRequestPeriodInMilliseconds = "RepeatedApiRequestPeriodInMilliseconds";
-        public const string LoadOneMinuteCandlesCronExpression = "LoadOneMinuteCandlesCronExpression";
-        public const string LoadOneDayCandlesCronExpression = "LoadOneDayCandlesCronExpression";
-        public const string DeepStorage = "DeepStorage";
+        public const string Load_1M_CandlesCronExpression = "Load_1M_CandlesCronExpression";
+        public const string Load_1H_CandlesCronExpression = "Load_1H_CandlesCronExpression";
+        public const string Load_1D_CandlesCronExpression = "Load_1D_CandlesCronExpression";
     }
 }

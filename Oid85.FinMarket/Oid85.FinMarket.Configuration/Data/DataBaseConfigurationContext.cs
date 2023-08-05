@@ -56,25 +56,25 @@ namespace Oid85.FinMarket.Configuration.Data
                     new Settings()
                     {
                         Order = 4, 
-                        Key = ConfigParameterNames.LoadOneMinuteCandlesCronExpression, 
+                        Key = ConfigParameterNames.Load_1M_CandlesCronExpression, 
                         Value = "* * * * *",
-                        Description = "CRON-строка для периода загрузки 1-минутных свечей в хранилище (по-умолчанию '* * * * *' - каждую минуту)"
+                        Description = "CRON-строка для периода загрузки 1M свечей в хранилище (по-умолчанию '* * * * *' - каждую минуту)"
                     },
                     
                     new Settings()
                     {
-                        Order = 4, 
-                        Key = ConfigParameterNames.LoadOneDayCandlesCronExpression, 
-                        Value = "0 * * * *",
-                        Description = "CRON-строка для периода загрузки 1-дневных свечей в хранилище (по-умолчанию '0 * * * *' - каждый час в 0 минут)"
+                        Order = 5, 
+                        Key = ConfigParameterNames.Load_1H_CandlesCronExpression, 
+                        Value = "1,16,31,46 * * * *",
+                        Description = "CRON-строка для периода загрузки 1H свечей в хранилище (по-умолчанию '1,16,31,46 * * * *' в 1,16,31,46 минут)"
                     },
-
+                    
                     new Settings()
                     {
-                        Order = 5, 
-                        Key = ConfigParameterNames.DeepStorage, 
-                        Value = "365",
-                        Description = "Глубина хранения данных (по-умолчанию 365 суток)"
+                        Order = 6, 
+                        Key = ConfigParameterNames.Load_1D_CandlesCronExpression, 
+                        Value = "1 * * * *",
+                        Description = "CRON-строка для периода загрузки 1D свечей в хранилище (по-умолчанию '1 * * * *' - каждый час в 1 минуту)"
                     }
                 );
             });

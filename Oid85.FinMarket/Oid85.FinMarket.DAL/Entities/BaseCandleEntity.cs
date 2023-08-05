@@ -14,19 +14,19 @@ public class BaseCandleEntity
     public DateTime DateTime { get; set; }
     
     [Column("open")]
-    public decimal Open { get; set; }
+    public double Open { get; set; }
     
     [Column("close")]
-    public decimal Close { get; set; }
+    public double Close { get; set; }
     
     [Column("high")]
-    public decimal High { get; set; }
+    public double High { get; set; }
     
     [Column("low")]
-    public decimal Low { get; set; }
+    public double Low { get; set; }
     
     [Column("volume")]
-    public decimal Volume { get; set; }
+    public long Volume { get; set; }
     
     [Column("ticker")]
     public string Ticker { get; set; }
