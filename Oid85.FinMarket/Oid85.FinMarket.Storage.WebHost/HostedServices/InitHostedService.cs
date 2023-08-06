@@ -1,6 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Configuration.Common;
 using Oid85.FinMarket.DAL;
 using Oid85.FinMarket.Storage.WebHost.Repositories;

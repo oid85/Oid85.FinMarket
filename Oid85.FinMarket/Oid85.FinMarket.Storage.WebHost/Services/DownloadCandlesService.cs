@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.Models;
+﻿using Oid85.FinMarket.Configuration.Common;
+using Oid85.FinMarket.Models;
 using Oid85.FinMarket.Storage.WebHost.Helpers;
 using Oid85.FinMarket.Storage.WebHost.Repositories;
 using Tinkoff.InvestApi;
@@ -35,6 +36,8 @@ public class DownloadCandlesService
 
     public async Task ProcessAssets(string timeframeName)
     {
+        var now = DateTime.UtcNow;
+        
         string tableName = _translateModelHelper.TimeframeToTableName(timeframeName);
         
         var assets = await _assetRepository.GetAllAssetsAsync();
@@ -43,6 +46,25 @@ public class DownloadCandlesService
         {
             var lastCandle = await _candleRepository.GetLastCandleAsync(assets[i], tableName);
 
+            // Проверяем, нужно ли докачивать
+            if (lastCandle != null)
+            {
+                if (timeframeName == TimeframeNames.M1)
+                {
+                    
+                }
+                
+                if (timeframeName == TimeframeNames.H)
+                {
+                    
+                }
+                
+                if (timeframeName == TimeframeNames.D)
+                {
+                    
+                }
+            }
+            
             var beginDateTime = _toolsHelper.GetBeginDateTimeFor(timeframeName, lastCandle);
 
             var endDateTime = _toolsHelper.GetEndDateTimeFor(timeframeName, beginDateTime);

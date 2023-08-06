@@ -40,20 +40,14 @@ public class CandleRepository
 
     public async Task SaveCandlesAsync(List<Candle> candles, string table)
     {
-        if (table == TableNames.M1)
-        {
+        if (table == TableNames.M1) 
             await Save_1M_CandlesAsync(candles);
-        }
 
-        if (table == TableNames.H)
-        {
+        if (table == TableNames.H) 
             await Save_1H_CandlesAsync(candles);
-        }
 
-        if (table == TableNames.D)
-        {
+        if (table == TableNames.D) 
             await Save_1D_CandlesAsync(candles);
-        }
     }
 
     private async Task<Candle?> GetLast_1M_CandleAsync(Asset asset)

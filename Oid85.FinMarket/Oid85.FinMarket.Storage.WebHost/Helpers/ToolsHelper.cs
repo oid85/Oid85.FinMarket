@@ -1,7 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Oid85.FinMarket.Configuration.Common;
-using Oid85.FinMarket.Models;
-using Tinkoff.InvestApi.V1;
+﻿using Oid85.FinMarket.Configuration.Common;
 using Candle = Oid85.FinMarket.Models.Candle;
 
 namespace Oid85.FinMarket.Storage.WebHost.Helpers;
@@ -10,7 +7,7 @@ public class ToolsHelper
 {
     public DateTime GetBeginDateTimeFor(string timeframeName, Candle? lastCandle)
     {
-        var result = DateTime.Now;
+        var result = DateTime.UtcNow;
 
         if (lastCandle != null)
         {
@@ -20,17 +17,17 @@ public class ToolsHelper
         
         if (timeframeName == TimeframeNames.M1)
         {
-            result = DateTime.Now.AddDays(-10);
+            result = DateTime.UtcNow.AddDays(-10);
         }
         
         else if (timeframeName == TimeframeNames.H)
         {
-            result = DateTime.Now.AddDays(-30);
+            result = DateTime.UtcNow.AddDays(-30);
         }
         
         else if (timeframeName == TimeframeNames.D)
         {
-            result = DateTime.Now.AddDays(-365 * 5);
+            result = DateTime.UtcNow.AddDays(-365 * 5);
         }        
         
         return result;
@@ -38,7 +35,7 @@ public class ToolsHelper
 
     public DateTime GetEndDateTimeFor(string timeframeName, DateTime beginDateTime)
     {
-        var result = DateTime.Now;
+        var result = DateTime.UtcNow;
 
         if (timeframeName == TimeframeNames.M1)
         {
