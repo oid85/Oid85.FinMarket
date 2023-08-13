@@ -41,6 +41,8 @@ public class DownloadCandlesService
         string tableName = _translateModelHelper.TimeframeToTableName(timeframeName);
         
         var assets = await _assetRepository.GetAllAssetsAsync();
+
+        var candlesForSave = new List<Candle>();
         
         for (int i = 0; i < assets.Count; i++)
         {
@@ -49,19 +51,25 @@ public class DownloadCandlesService
             // Проверяем, нужно ли докачивать
             if (lastCandle != null)
             {
-                if (timeframeName == TimeframeNames.M1)
-                {
-                    
-                }
-                
                 if (timeframeName == TimeframeNames.H)
                 {
-                    
+                    if (lastCandle.DateTime.Year == now.Year &&
+                        lastCandle.DateTime.Month == now.Month &&
+                        lastCandle.DateTime.Day == now.Day &&
+                        lastCandle.DateTime.Hour == now.Hour - 1)
+                    {
+                        continue;
+                    }
                 }
                 
                 if (timeframeName == TimeframeNames.D)
                 {
-                    
+                    if (lastCandle.DateTime.Year == now.Year &&
+                        lastCandle.DateTime.Month == now.Month &&
+                        lastCandle.DateTime.Day == now.Day - 1)
+                    {
+                        continue;
+                    }
                 }
             }
             
@@ -77,11 +85,13 @@ public class DownloadCandlesService
                 Figi = assets[i].Figi,
                 Ticker = assets[i].Ticker
             };
-
+            
             var candles = await DownloadCandlesAsync(downloadRequest);
 
-            await _candleRepository.SaveCandlesAsync(candles, tableName);
+            candlesForSave.AddRange(candles);
         }
+        
+        await _candleRepository.SaveCandlesAsync(candlesForSave, tableName);
     }
 
     private async Task<List<Candle>> DownloadCandlesAsync(DownloadRequest downloadRequest)

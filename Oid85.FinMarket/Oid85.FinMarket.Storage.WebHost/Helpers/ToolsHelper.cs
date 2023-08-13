@@ -9,25 +9,26 @@ public class ToolsHelper
     {
         var result = DateTime.UtcNow;
 
-        if (lastCandle != null)
+        if (timeframeName == TimeframeNames.H)
         {
-            result = lastCandle.DateTime.AddSeconds(30); // Чтобы не "захватить" при чтении свечу, которая уже в БД
-            return result;
-        }
-        
-        if (timeframeName == TimeframeNames.M1)
-        {
-            result = DateTime.UtcNow.AddDays(-10);
-        }
-        
-        else if (timeframeName == TimeframeNames.H)
-        {
-            result = DateTime.UtcNow.AddDays(-30);
+            if (lastCandle != null)
+            {
+                result = lastCandle.DateTime.AddHours(1);
+                return result;
+            }
+            
+            result = DateTime.UtcNow.AddMonths(-1);
         }
         
         else if (timeframeName == TimeframeNames.D)
         {
-            result = DateTime.UtcNow.AddDays(-365 * 5);
+            if (lastCandle != null)
+            {
+                result = lastCandle.DateTime.AddDays(1);
+                return result;
+            }
+            
+            result = DateTime.UtcNow.AddYears(-5);
         }        
         
         return result;
@@ -37,20 +38,9 @@ public class ToolsHelper
     {
         var result = DateTime.UtcNow;
 
-        if (timeframeName == TimeframeNames.M1)
+        if (timeframeName == TimeframeNames.H)
         {
-            result = beginDateTime.AddHours(6);
-            
-            if (beginDateTime.DayOfWeek == DayOfWeek.Friday)
-                result = beginDateTime.AddDays(3);
-            
-            if (beginDateTime.DayOfWeek == DayOfWeek.Saturday)
-                result = beginDateTime.AddDays(2);
-        }
-        
-        else if (timeframeName == TimeframeNames.H)
-        {
-            result = beginDateTime.AddDays(1);
+            result = beginDateTime.AddHours(100);
             
             if (beginDateTime.DayOfWeek == DayOfWeek.Friday)
                 result = beginDateTime.AddDays(3);
@@ -61,7 +51,7 @@ public class ToolsHelper
         
         else if (timeframeName == TimeframeNames.D)
         {
-            result = beginDateTime.AddDays(5);
+            result = beginDateTime.AddDays(100);
         }
         
         return result;

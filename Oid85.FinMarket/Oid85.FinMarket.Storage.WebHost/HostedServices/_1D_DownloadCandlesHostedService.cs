@@ -25,7 +25,7 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
 
         public async Task DownloadCandlesAsync()
         {
-            // await _downloadCandlesService.ProcessAssets(TimeframeNames.D);
+            await _downloadCandlesService.ProcessAssets(TimeframeNames.D);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

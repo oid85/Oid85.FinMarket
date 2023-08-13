@@ -78,6 +78,22 @@ public class TranslateModelHelper
         return candle;
     }
 
+    public Candle CandleToCandle(Tinkoff.InvestApi.V1.Candle operativeCandle, string ticker)
+    {
+        var candle = new Candle
+        {
+            DateTime = operativeCandle.Time.ToDateTime(),
+            Open = QuotationToDouble(operativeCandle.Open),
+            Close = QuotationToDouble(operativeCandle.Close),
+            High = QuotationToDouble(operativeCandle.High),
+            Low = QuotationToDouble(operativeCandle.Low),
+            Volume = operativeCandle.Volume,
+            Ticker = ticker
+        };
+
+        return candle;
+    }
+    
     public double QuotationToDouble(Quotation quotation)
     {
         double result = (double) quotation.Units + (double) quotation.Nano / 1_000_000_000;
