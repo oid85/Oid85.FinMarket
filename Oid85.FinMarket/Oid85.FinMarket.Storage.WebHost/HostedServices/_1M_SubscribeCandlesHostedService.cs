@@ -6,6 +6,7 @@ using Oid85.FinMarket.Storage.WebHost.Repositories;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Models.Candle;
+using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.Storage.WebHost.HostedServices
 {

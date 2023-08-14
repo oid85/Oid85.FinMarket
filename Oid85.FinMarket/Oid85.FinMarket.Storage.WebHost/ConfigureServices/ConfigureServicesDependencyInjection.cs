@@ -24,7 +24,7 @@ namespace Oid85.FinMarket.Storage.WebHost.ConfigureServices
             services.AddTransient<DownloadCandlesService>();
 
             services.AddHostedService<InitHostedService>();
-            services.AddHostedService<_1M_SubscribeCandlesHostedService>();
+            // services.AddHostedService<_1M_SubscribeCandlesHostedService>();
             services.AddHostedService<_1H_DownloadCandlesHostedService>();
             services.AddHostedService<_1D_DownloadCandlesHostedService>();
         }
