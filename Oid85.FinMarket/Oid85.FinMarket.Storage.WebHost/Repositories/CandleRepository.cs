@@ -1,18 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Oid85.FinMarket.Configuration.Common;
 using Oid85.FinMarket.DAL;
 using Oid85.FinMarket.DAL.Entities;
 using Oid85.FinMarket.Models;
+using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.Storage.WebHost.Repositories;
 
 public class CandleRepository
 {
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger _logger;
 
-    public CandleRepository(IServiceScopeFactory scopeFactory)
+    public CandleRepository(
+        IServiceScopeFactory scopeFactory, 
+        ILogger logger)
     {
         _scopeFactory = scopeFactory;
+        _logger = logger;
     }
 
     public async Task<Candle?> GetLastCandleAsync(Asset asset, string table)
@@ -161,6 +167,8 @@ public class CandleRepository
                 candlesEntity.Ticker = candles[i].Ticker;
 
                 candlesEntities.Add(candlesEntity);
+                
+                _logger.Trace(@$"Save_1M_CandlesAsync: {JsonConvert.SerializeObject(candles[i])}");
             }
 
             await context._1M_CandleEntities.AddRangeAsync(candlesEntities);
@@ -189,6 +197,8 @@ public class CandleRepository
                 candlesEntity.Ticker = candles[i].Ticker;
 
                 candlesEntities.Add(candlesEntity);
+                
+                _logger.Trace(@$"Save_1H_CandlesAsync: {JsonConvert.SerializeObject(candles[i])}");
             }
 
             await context._1H_CandleEntities.AddRangeAsync(candlesEntities);
@@ -217,6 +227,8 @@ public class CandleRepository
                 candlesEntity.Ticker = candles[i].Ticker;
 
                 candlesEntities.Add(candlesEntity);
+                
+                _logger.Trace(@$"Save_1D_CandlesAsync: {JsonConvert.SerializeObject(candles[i])}");
             }
 
             await context._1D_CandleEntities.AddRangeAsync(candlesEntities);
