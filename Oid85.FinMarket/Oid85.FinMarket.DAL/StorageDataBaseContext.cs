@@ -29,9 +29,7 @@ namespace Oid85.FinMarket.DAL
         }
 
         public DbSet<AssetEntity> AssetEntities { get; set; } = null!;
-        
-        public DbSet<_1M_CandleEntity> _1M_CandleEntities { get; set; } = null!;
-        
+
         public DbSet<_1H_CandleEntity> _1H_CandleEntities { get; set; } = null!;
         
         public DbSet<_1D_CandleEntity> _1D_CandleEntities { get; set; } = null!;

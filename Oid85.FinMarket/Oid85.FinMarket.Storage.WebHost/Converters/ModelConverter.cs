@@ -4,9 +4,9 @@ using Oid85.FinMarket.Models;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Models.Candle;
 
-namespace Oid85.FinMarket.Storage.WebHost.Helpers;
+namespace Oid85.FinMarket.Storage.WebHost.Converters;
 
-public class TranslateModelHelper
+public class ModelConverter
 {
     public GetCandlesRequest DownloadRequestToGetCandlesRequest(DownloadRequest downloadRequest)
     {
@@ -22,9 +22,6 @@ public class TranslateModelHelper
 
     public CandleInterval TimeframeToCandleInterval(string timeframeName)
     {
-        if (timeframeName == TimeframeNames.M1)
-            return CandleInterval._1Min;
-               
         if (timeframeName == TimeframeNames.H)
             return CandleInterval.Hour;
         
@@ -33,35 +30,7 @@ public class TranslateModelHelper
 
         return CandleInterval.Unspecified;
     }
-    
-    public string TimeframeToTableName(string timeframeName)
-    {
-        if (timeframeName == TimeframeNames.M1)
-            return TableNames.M1;
-               
-        if (timeframeName == TimeframeNames.H)
-            return TableNames.H;
-        
-        if (timeframeName == TimeframeNames.D)
-            return TableNames.D;
 
-        return String.Empty;
-    }
-    
-    public string TableNameToTimeframe(string tableName)
-    {
-        if (tableName == TableNames.M1)
-            return TimeframeNames.M1;
-               
-        if (tableName == TableNames.H)
-            return TimeframeNames.H;
-        
-        if (tableName == TableNames.D)
-            return TimeframeNames.D;
-
-        return String.Empty;
-    }    
-    
     public Candle HistoricCandleToCandle(HistoricCandle historicCandle, string ticker)
     {
         var candle = new Candle
@@ -78,25 +47,9 @@ public class TranslateModelHelper
         return candle;
     }
 
-    public Candle CandleToCandle(Tinkoff.InvestApi.V1.Candle operativeCandle, string ticker)
-    {
-        var candle = new Candle
-        {
-            DateTime = operativeCandle.Time.ToDateTime(),
-            Open = QuotationToDouble(operativeCandle.Open),
-            Close = QuotationToDouble(operativeCandle.Close),
-            High = QuotationToDouble(operativeCandle.High),
-            Low = QuotationToDouble(operativeCandle.Low),
-            Volume = operativeCandle.Volume,
-            Ticker = ticker
-        };
-
-        return candle;
-    }
-    
     public double QuotationToDouble(Quotation quotation)
     {
-        double result = (double) quotation.Units + (double) quotation.Nano / 1_000_000_000;
+        double result = quotation.Units + quotation.Nano / 1_000_000_000.0;
         
         return result;
     }

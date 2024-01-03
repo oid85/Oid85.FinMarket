@@ -20,12 +20,12 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             string cron = _configuration.GetValue<string>(ConfigParameterNames.Load_1D_CandlesCronExpression)!;
-            RecurringJob.AddOrUpdate($"download-_1D_candles", () => DownloadCandlesAsync(), cron);
+            RecurringJob.AddOrUpdate($"_1D_DownloadCandles", () => DownloadCandlesAsync(), cron);
         }
 
         public async Task DownloadCandlesAsync()
         {
-            await _downloadCandlesService.ProcessAssets(TimeframeNames.D);
+            await _downloadCandlesService._1D_DownloadCandles();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

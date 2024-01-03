@@ -141,49 +141,6 @@ namespace Oid85.FinMarket.DAL.Migrations
 
                     b.ToTable("_1H", "public");
                 });
-
-            modelBuilder.Entity("Oid85.FinMarket.DAL.Entities._1M_CandleEntity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<double>("Close")
-                        .HasColumnType("double precision")
-                        .HasColumnName("close");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("datetime");
-
-                    b.Property<double>("High")
-                        .HasColumnType("double precision")
-                        .HasColumnName("high");
-
-                    b.Property<double>("Low")
-                        .HasColumnType("double precision")
-                        .HasColumnName("low");
-
-                    b.Property<double>("Open")
-                        .HasColumnType("double precision")
-                        .HasColumnName("open");
-
-                    b.Property<string>("Ticker")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("ticker");
-
-                    b.Property<long>("Volume")
-                        .HasColumnType("bigint")
-                        .HasColumnName("volume");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("_1M", "public");
-                });
 #pragma warning restore 612, 618
         }
     }

@@ -57,24 +57,24 @@ namespace Oid85.FinMarket.Configuration.Data
                     {
                         Order = 4, 
                         Key = ConfigParameterNames.Load_1M_CandlesCronExpression, 
-                        Value = "* * * * *",
-                        Description = "CRON-строка для периода загрузки 1M свечей в хранилище (по-умолчанию '* * * * *' - каждую минуту)"
+                        Value = "0/5 * * * *",
+                        Description = "CRON-строка для периода загрузки 1M свечей в хранилище (по-умолчанию '0/5 * * * *' - каждые 5 минут)"
                     },
                     
                     new Settings()
                     {
                         Order = 5, 
                         Key = ConfigParameterNames.Load_1H_CandlesCronExpression, 
-                        Value = "1,16,31,46 * * * *",
-                        Description = "CRON-строка для периода загрузки 1H свечей в хранилище (по-умолчанию '1,16,31,46 * * * *' в 1,16,31,46 минут)"
+                        Value = "0/5 * * * *",
+                        Description = "CRON-строка для периода загрузки 1M свечей в хранилище (по-умолчанию '0/5 * * * *' - каждые 5 минут)"
                     },
                     
                     new Settings()
                     {
                         Order = 6, 
                         Key = ConfigParameterNames.Load_1D_CandlesCronExpression, 
-                        Value = "1 * * * *",
-                        Description = "CRON-строка для периода загрузки 1D свечей в хранилище (по-умолчанию '1 * * * *' - каждый час в 1 минуту)"
+                        Value = "0/5 * * * *",
+                        Description = "CRON-строка для периода загрузки 1M свечей в хранилище (по-умолчанию '0/5 * * * *' - каждые 5 минут)"
                     }
                 );
             });

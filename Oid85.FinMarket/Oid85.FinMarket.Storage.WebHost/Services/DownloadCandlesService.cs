@@ -1,6 +1,6 @@
 ﻿using Oid85.FinMarket.Configuration.Common;
 using Oid85.FinMarket.Models;
-using Oid85.FinMarket.Storage.WebHost.Helpers;
+using Oid85.FinMarket.Storage.WebHost.Converters;
 using Oid85.FinMarket.Storage.WebHost.Repositories;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
@@ -12,33 +12,32 @@ namespace Oid85.FinMarket.Storage.WebHost.Services;
 public class DownloadCandlesService
 {
     private readonly InvestApiClient _investApiClient;
-    private readonly TranslateModelHelper _translateModelHelper;
-    private readonly ToolsHelper _toolsHelper;
+    private readonly ModelConverter _modelConverter;
     private readonly AssetRepository _assetRepository;
     private readonly CandleRepository _candleRepository;
     private readonly ILogger _logger;
     
     public DownloadCandlesService(
         InvestApiClient investApiClient, 
-        TranslateModelHelper translateModelHelper, 
-        ToolsHelper toolsHelper, 
+        ModelConverter modelConverter,
         AssetRepository assetRepository, 
         CandleRepository candleRepository, 
         ILogger logger)
     {
         _investApiClient = investApiClient;
-        _translateModelHelper = translateModelHelper;
-        _toolsHelper = toolsHelper;
+        _modelConverter = modelConverter;
         _assetRepository = assetRepository;
         _candleRepository = candleRepository;
         _logger = logger;
     }
 
-    public async Task ProcessAssets(string timeframeName)
+    public async Task _1D_DownloadCandles()
     {
+        int countDays = 100;
+        
         var now = DateTime.UtcNow;
         
-        string tableName = _translateModelHelper.TimeframeToTableName(timeframeName);
+        string tableName = TableNames.D;
         
         var assets = await _assetRepository.GetAllAssetsAsync();
 
@@ -48,44 +47,21 @@ public class DownloadCandlesService
         {
             var lastCandle = await _candleRepository.GetLastCandleAsync(assets[i], tableName);
 
-            // Проверяем, нужно ли докачивать
-            if (lastCandle != null)
-            {
-                if (timeframeName == TimeframeNames.H)
-                {
-                    if (lastCandle.DateTime.Year == now.Year &&
-                        lastCandle.DateTime.Month == now.Month &&
-                        lastCandle.DateTime.Day == now.Day &&
-                        lastCandle.DateTime.Hour == now.Hour - 1)
-                    {
-                        continue;
-                    }
-                }
-                
-                if (timeframeName == TimeframeNames.D)
-                {
-                    if (lastCandle.DateTime.Year == now.Year &&
-                        lastCandle.DateTime.Month == now.Month &&
-                        lastCandle.DateTime.Day == now.Day - 1)
-                    {
-                        continue;
-                    }
-                }
-            }
+            DateTime from = now.Date.AddDays(-1 * countDays);
+            DateTime to = now.Date;
             
-            var beginDateTime = _toolsHelper.GetBeginDateTimeFor(timeframeName, lastCandle);
-
-            var endDateTime = _toolsHelper.GetEndDateTimeFor(timeframeName, beginDateTime);
+            if (lastCandle != null) 
+                from = lastCandle.DateTime;
 
             var downloadRequest = new DownloadRequest()
             {
-                From = beginDateTime,
-                To = endDateTime,
-                Timeframe = timeframeName,
+                From = from,
+                To = to,
+                Timeframe = TimeframeNames.D,
                 Figi = assets[i].Figi,
                 Ticker = assets[i].Ticker
             };
-            
+
             var candles = await DownloadCandlesAsync(downloadRequest);
 
             candlesForSave.AddRange(candles);
@@ -96,7 +72,7 @@ public class DownloadCandlesService
 
     private async Task<List<Candle>> DownloadCandlesAsync(DownloadRequest downloadRequest)
     {
-        var getCandlesRequest = _translateModelHelper.DownloadRequestToGetCandlesRequest(downloadRequest);
+        var getCandlesRequest = _modelConverter.DownloadRequestToGetCandlesRequest(downloadRequest);
 
         GetCandlesResponse? getCandlesResponse = null;
 
@@ -125,7 +101,7 @@ public class DownloadCandlesService
         {
             if (getCandlesResponse.Candles[i].IsComplete)
             {
-                var candle = _translateModelHelper.HistoricCandleToCandle(getCandlesResponse.Candles[i], downloadRequest.Ticker);
+                var candle = _modelConverter.HistoricCandleToCandle(getCandlesResponse.Candles[i], downloadRequest.Ticker);
                 
                 candles.Add(candle);
             }
