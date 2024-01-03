@@ -51,7 +51,7 @@ public class DownloadCandlesService
             DateTime to = now.Date;
             
             if (lastCandle != null) 
-                from = lastCandle.DateTime;
+                from = lastCandle.DateTime.Date;
 
             var downloadRequest = new DownloadRequest()
             {

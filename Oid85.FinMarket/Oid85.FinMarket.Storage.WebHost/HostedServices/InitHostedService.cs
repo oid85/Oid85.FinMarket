@@ -74,8 +74,6 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
 
                 await _assetRepository.CreateOrUpdateAsync(asset);
             }
-
-            // await _downloadCandlesService.ProcessAssets(TimeframeNames.D);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

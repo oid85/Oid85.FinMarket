@@ -43,6 +43,13 @@ namespace Oid85.FinMarket.Storage.WebHost
 
             app.UseCors("CorsPolicy");
             
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.RoutePrefix = "";
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1");
+            });
+            
             app.UseHangfireDashboard("/dashboard");
             
             app.UseEndpoints(endpoints =>
