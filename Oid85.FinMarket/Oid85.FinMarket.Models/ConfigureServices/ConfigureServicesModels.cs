@@ -13,7 +13,7 @@ namespace Oid85.FinMarket.Models.ConfigureServices
         /// <param name="configuration"></param>
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<Asset>();
+            services.AddTransient<Stock>();
             services.AddTransient<Candle>();
             services.AddTransient<DownloadRequest>();
         }

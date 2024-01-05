@@ -22,7 +22,7 @@ namespace Oid85.FinMarket.DAL.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Oid85.FinMarket.DAL.Entities.AssetEntity", b =>
+            modelBuilder.Entity("Oid85.FinMarket.DAL.Entities.StockEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,6 +35,10 @@ namespace Oid85.FinMarket.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("figi");
+
+                    b.Property<bool>("InWatchList")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_watch_list");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -53,7 +57,7 @@ namespace Oid85.FinMarket.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("assets", "public");
+                    b.ToTable("stocks", "public");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DAL.Entities._1D_CandleEntity", b =>

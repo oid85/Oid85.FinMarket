@@ -7,12 +7,12 @@ namespace Oid85.FinMarket.Storage.WebHost.Controllers;
 
 [Route("api")]
 [ApiController]
-public class AssetController : ControllerBase
+public class StockController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly DownloadCandlesService _downloadCandlesService;
 
-    public AssetController(
+    public StockController(
         ILogger logger, 
         DownloadCandlesService downloadCandlesService)
     {

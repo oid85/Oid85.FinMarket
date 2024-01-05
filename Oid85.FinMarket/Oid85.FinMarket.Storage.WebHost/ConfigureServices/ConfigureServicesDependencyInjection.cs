@@ -18,7 +18,7 @@ namespace Oid85.FinMarket.Storage.WebHost.ConfigureServices
             services.AddTransient<ModelConverter>();
             services.AddTransient<ValidateHelper>();
             
-            services.AddTransient<AssetRepository>();
+            services.AddTransient<StockRepository>();
             services.AddTransient<CandleRepository>();
             
             services.AddTransient<DownloadCandlesService>();

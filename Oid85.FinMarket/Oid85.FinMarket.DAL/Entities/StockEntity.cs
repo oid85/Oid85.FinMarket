@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Oid85.FinMarket.DAL.Entities;
 
-[Table("assets", Schema = "public")]
-public class AssetEntity
+[Table("stocks", Schema = "public")]
+public class StockEntity
 {
     [Key]
     [Column("id")]
@@ -22,4 +22,7 @@ public class AssetEntity
     
     [Column("sector")]
     public string Sector { get; set; }
+    
+    [Column("in_watch_list")]
+    public bool InWatchList { get; set; }
 }

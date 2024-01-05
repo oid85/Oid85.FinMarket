@@ -39,7 +39,7 @@
             <param name="services"></param>
             <param name="configuration"></param>
         </member>
-        <member name="M:Oid85.FinMarket.Storage.WebHost.Controllers.AssetController.GetDailyCandles">
+        <member name="M:Oid85.FinMarket.Storage.WebHost.Controllers.StockController.GetDailyCandles">
             <summary>
             Загрузить дневные свечи
             </summary>

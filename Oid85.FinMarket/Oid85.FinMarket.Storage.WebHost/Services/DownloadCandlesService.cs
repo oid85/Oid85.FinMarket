@@ -13,39 +13,39 @@ public class DownloadCandlesService
 {
     private readonly InvestApiClient _investApiClient;
     private readonly ModelConverter _modelConverter;
-    private readonly AssetRepository _assetRepository;
+    private readonly StockRepository _stockRepository;
     private readonly CandleRepository _candleRepository;
     private readonly ILogger _logger;
     
     public DownloadCandlesService(
         InvestApiClient investApiClient, 
         ModelConverter modelConverter,
-        AssetRepository assetRepository, 
+        StockRepository stockRepository, 
         CandleRepository candleRepository, 
         ILogger logger)
     {
         _investApiClient = investApiClient;
         _modelConverter = modelConverter;
-        _assetRepository = assetRepository;
+        _stockRepository = stockRepository;
         _candleRepository = candleRepository;
         _logger = logger;
     }
 
     public async Task _1D_DownloadCandles()
     {
-        int countDays = 100;
+        int countDays = 365;
         
         var now = DateTime.UtcNow;
         
         string tableName = TableNames.D;
         
-        var assets = await _assetRepository.GetAllAssetsAsync();
+        var stocks = await _stockRepository.GetAllStocksAsync();
 
         var candlesForSave = new List<Candle>();
         
-        for (int i = 0; i < assets.Count; i++)
+        for (int i = 0; i < stocks.Count; i++)
         {
-            var lastCandle = await _candleRepository.GetLastCandleAsync(assets[i], tableName);
+            var lastCandle = await _candleRepository.GetLastCandleAsync(stocks[i], tableName);
 
             DateTime from = now.Date.AddDays(-1 * countDays);
             DateTime to = now.Date;
@@ -58,8 +58,8 @@ public class DownloadCandlesService
                 From = from,
                 To = to,
                 Timeframe = TimeframeNames.D,
-                Figi = assets[i].Figi,
-                Ticker = assets[i].Ticker
+                Figi = stocks[i].Figi,
+                Ticker = stocks[i].Ticker
             };
 
             var candles = await DownloadCandlesAsync(downloadRequest);

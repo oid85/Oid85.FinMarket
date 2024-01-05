@@ -28,7 +28,7 @@ namespace Oid85.FinMarket.DAL
             optionsBuilder.UseNpgsql(connectionString);
         }
 
-        public DbSet<AssetEntity> AssetEntities { get; set; } = null!;
+        public DbSet<StockEntity> StockEntities { get; set; } = null!;
 
         public DbSet<_1H_CandleEntity> _1H_CandleEntities { get; set; } = null!;
         

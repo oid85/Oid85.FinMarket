@@ -56,7 +56,7 @@ namespace Oid85.FinMarket.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "assets",
+                name: "stocks",
                 schema: "public",
                 columns: table => new
                 {
@@ -65,11 +65,12 @@ namespace Oid85.FinMarket.DAL.Migrations
                     ticker = table.Column<string>(type: "text", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     figi = table.Column<string>(type: "text", nullable: false),
-                    sector = table.Column<string>(type: "text", nullable: false)
+                    sector = table.Column<string>(type: "text", nullable: false),
+                    in_watch_list = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_assets", x => x.id);
+                    table.PrimaryKey("PK_stocks", x => x.id);
                 });
         }
 
@@ -85,7 +86,7 @@ namespace Oid85.FinMarket.DAL.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "assets",
+                name: "stocks",
                 schema: "public");
         }
     }

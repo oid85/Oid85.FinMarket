@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DaGroup.WPAnalyst.Models.ConfigureServices
+namespace Oid85.FinMarket.Models.ConfigureServices
 {
     public static class ServiceCollectionExtensions
     {
@@ -9,7 +9,7 @@ namespace DaGroup.WPAnalyst.Models.ConfigureServices
             where TImplementation : class, TService
         {
             services.AddTransient<TService, TImplementation>();
-            services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>());
+            services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>()!);
         }
     }
 }

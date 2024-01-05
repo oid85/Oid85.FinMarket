@@ -21,17 +21,17 @@ public class CandleRepository
         _logger = logger;
     }
 
-    public async Task<Candle?> GetLastCandleAsync(Asset asset, string table)
+    public async Task<Candle?> GetLastCandleAsync(Stock stock, string table)
     {
         if (table == TableNames.H) 
         {
-            var candle = await GetLast_1H_CandleAsync(asset);
+            var candle = await GetLast_1H_CandleAsync(stock);
             return candle;
         }
 
         if (table == TableNames.D) 
         {
-            var candle = await GetLast_1D_CandleAsync(asset);
+            var candle = await GetLast_1D_CandleAsync(stock);
             return candle;
         }
 
@@ -47,13 +47,13 @@ public class CandleRepository
             await Save_1D_CandlesAsync(candles);
     }
     
-    private async Task<Candle?> GetLast_1H_CandleAsync(Asset asset)
+    private async Task<Candle?> GetLast_1H_CandleAsync(Stock stock)
     {
         using var scope = _scopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<StorageDataBaseContext>();
 
         var candleEntity = await context._1H_CandleEntities
-            .Where(entity => entity.Ticker == asset.Ticker)
+            .Where(entity => entity.Ticker == stock.Ticker)
             .OrderByDescending(entity => entity.DateTime)
             .FirstOrDefaultAsync();
 
@@ -75,13 +75,13 @@ public class CandleRepository
         return candle;
     }
     
-    private async Task<Candle?> GetLast_1D_CandleAsync(Asset asset)
+    private async Task<Candle?> GetLast_1D_CandleAsync(Stock stock)
     {
         using var scope = _scopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<StorageDataBaseContext>();
 
         var candleEntity = await context._1D_CandleEntities
-            .Where(entity => entity.Ticker == asset.Ticker)
+            .Where(entity => entity.Ticker == stock.Ticker)
             .OrderByDescending(entity => entity.DateTime)
             .FirstOrDefaultAsync();
 
