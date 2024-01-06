@@ -29,6 +29,8 @@ namespace Oid85.FinMarket.DAL
         }
 
         public DbSet<StockEntity> StockEntities { get; set; } = null!;
+        
+        public DbSet<CatalogLiquidTickerEntity> CatalogLiquidTickers { get; set; } = null!;
 
         public DbSet<_1H_CandleEntity> _1H_CandleEntities { get; set; } = null!;
         

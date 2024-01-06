@@ -32,7 +32,6 @@ public class StockRepository
                     Ticker = stockEntities[i].Ticker,
                     Name = stockEntities[i].Name,
                     Figi = stockEntities[i].Figi,
-                    Sector = stockEntities[i].Sector,
                     InWatchList = stockEntities[i].InWatchList
                 };
 
@@ -57,7 +56,6 @@ public class StockRepository
                 Ticker = stock.Ticker,
                 Name = stock.Name,
                 Figi = stock.Figi,
-                Sector = stock.Sector,
                 InWatchList = stock.InWatchList
             };
 
@@ -70,8 +68,7 @@ public class StockRepository
             stockEntity.Ticker = stock.Ticker;
             stockEntity.Name = stock.Name;
             stockEntity.Figi = stock.Figi;
-            stockEntity.Sector = stock.Sector;
-                
+
             await context.SaveChangesAsync();
         }
     }

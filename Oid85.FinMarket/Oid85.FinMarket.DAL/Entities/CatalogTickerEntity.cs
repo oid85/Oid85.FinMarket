@@ -3,8 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Oid85.FinMarket.DAL.Entities;
 
-[Table("stocks", Schema = "public")]
-public class StockEntity
+public class CatalogTickerEntity
 {
     [Key]
     [Column("id")]
@@ -13,13 +12,4 @@ public class StockEntity
     
     [Column("ticker")]
     public string Ticker { get; set; }
-    
-    [Column("name")]
-    public string Name { get; set; }    
-    
-    [Column("figi")]
-    public string Figi { get; set; }
-
-    [Column("in_watch_list")]
-    public bool InWatchList { get; set; }
 }

@@ -10,7 +10,5 @@ public class Stock
     
     public string Figi { get; set; }
     
-    public string Sector { get; set; }
-    
     public bool InWatchList { get; set; }
 }

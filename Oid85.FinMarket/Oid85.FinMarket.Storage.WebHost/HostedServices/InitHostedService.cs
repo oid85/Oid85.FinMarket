@@ -66,7 +66,6 @@ namespace Oid85.FinMarket.Storage.WebHost.HostedServices
                     Ticker = instruments[i].Ticker,
                     Name = instruments[i].Name,
                     Figi = instruments[i].Figi,
-                    Sector = instruments[i].Sector,
                     InWatchList = true
                 };
 
