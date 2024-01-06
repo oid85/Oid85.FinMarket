@@ -51,7 +51,10 @@ public class DownloadCandlesService
             DateTime to = now.Date;
             
             if (lastCandle != null) 
-                from = lastCandle.DateTime.Date;
+                from = lastCandle.DateTime.Date.AddDays(1);
+            
+            if (from > to)
+                continue;
 
             var downloadRequest = new DownloadRequest()
             {
