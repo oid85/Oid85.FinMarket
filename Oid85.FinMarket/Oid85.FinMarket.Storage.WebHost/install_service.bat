@@ -1,1 +1,0 @@
-sc create "DaGroup.WPAnalyst.Api" binPath="%cd%\DaGroup.WPAnalyst.Api.WebHost.exe"
