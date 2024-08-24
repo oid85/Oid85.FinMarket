@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Oid85.FinMarket.Common.Extensions
 {
-    internal class ServiceCollectionExtensions
+    public class ServiceCollectionExtensions
     {
     }
 }
