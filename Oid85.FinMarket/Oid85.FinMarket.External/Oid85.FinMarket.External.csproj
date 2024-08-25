@@ -7,11 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+	<PackageReference Include="NLog" Version="4.7.11" />
+	<PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />	  
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Oid85.FinMarket.Domain\Oid85.FinMarket.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SQLite\" />
   </ItemGroup>
 
 </Project>
