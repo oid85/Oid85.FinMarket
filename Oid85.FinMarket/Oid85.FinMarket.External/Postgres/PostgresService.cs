@@ -9,12 +9,12 @@ namespace Oid85.FinMarket.External.Postgres
     /// <inheritdoc />
     public class PostgresService : IPostgresService
     {
-        private readonly SqlHelper _sqlHelper;
+        private readonly PostgresSqlHelper _sqlHelper;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
 
         public PostgresService(
-            SqlHelper sqlHelper,
+            PostgresSqlHelper sqlHelper,
             ILogger logger,
             IConfiguration configuration)
         {
@@ -152,6 +152,5 @@ namespace Oid85.FinMarket.External.Postgres
                 return null;
             }
         }
-
     }
 }

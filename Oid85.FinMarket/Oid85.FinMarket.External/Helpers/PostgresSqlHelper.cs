@@ -4,11 +4,11 @@ using Npgsql;
 
 namespace Oid85.FinMarket.External.Helpers
 {
-    public class SqlHelper
+    public class PostgresSqlHelper
     {
         private readonly ILogger _logger;
 
-        public SqlHelper(ILogger logger)
+        public PostgresSqlHelper(ILogger logger)
         {
             _logger = logger;
         }
