@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Oid85.FinMarket.External.Settings
+﻿namespace Oid85.FinMarket.External.Settings
 {
+    /// <summary>
+    /// Сервис работы с настройками приложения
+    /// </summary>
     public interface ISettingsService
     {
+        /// <summary>
+        /// Получить значение параметра настройки
+        /// </summary>
+        public Task<T> GetValueAsync<T>(string key);
     }
 }

@@ -11,7 +11,7 @@ namespace Oid85.FinMarket.External.Extensions
     {
         public static void AddExternalServices(this IServiceCollection services)
         {
-            services.AddTransient<SqlHelper>();
+            services.AddTransient<PostgresSqlHelper>();
             services.AddTransient<IPostgresService, PostgresService>();
             services.AddTransient<ICatalogService, CatalogService>();
             services.AddTransient<ISettingsService, SettingsService>();
