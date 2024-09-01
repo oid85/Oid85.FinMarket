@@ -28,7 +28,7 @@
         /// <summary>
         /// Объем
         /// </summary>
-        public int Volume { get; set; }
+        public long Volume { get; set; }
 
         /// <summary>
         /// Дата
