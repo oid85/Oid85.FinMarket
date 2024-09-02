@@ -1,3 +1,5 @@
+DROP TABLE items;
+
 CREATE TABLE items (
     id          INTEGER PRIMARY KEY
                         UNIQUE

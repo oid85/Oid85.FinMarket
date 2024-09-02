@@ -1,3 +1,5 @@
+DROP TABLE stocks;
+
 CREATE TABLE stocks (
     id          INTEGER PRIMARY KEY
                         UNIQUE
@@ -25,3 +27,18 @@ VALUES ('MOEX', 'BBG004730JK3', 'ПАО Московская биржа', 1);
 
 INSERT INTO stocks (ticker, figi, description, is_active)
 VALUES ('NVTK', 'BBG00475KKZ7', 'ПАО Новатэк', 1);
+
+INSERT INTO stocks (ticker, figi, description, is_active)
+VALUES ('BSPB', 'BBG000QJW1G4', 'ПАО БСП а.о.', 1);
+
+INSERT INTO stocks (ticker, figi, description, is_active)
+VALUES ('BSPBP', 'BBG00Z197566', 'ПАО БСП а.п.', 1);
+
+INSERT INTO stocks (ticker, figi, description, is_active)
+VALUES ('SNGS', 'BBG0047315F8', 'ПАО Сургутнефтегаз а.о.', 1);
+
+INSERT INTO stocks (ticker, figi, description, is_active)
+VALUES ('SNGSP', 'BBG004S681N1', 'ПАО Сургутнефтегаз а.п.', 1);
+
+INSERT INTO stocks (ticker, figi, description, is_active)
+VALUES ('ROSN', 'BBG004731363', 'ПАО Роснефть', 1);
