@@ -8,10 +8,10 @@ namespace Oid85.FinMarket.External.Catalogs
     public interface ICatalogService
     {
         /// <summary>
-        /// ПОлучить финансовый инструмент
+        /// Получить финансовый инструмент
         /// </summary>
         /// <param name="tableName">Имя таблицы</param>
         /// <param name="ticker">Тикер</param>
-        public Task<FinancicalInstrument> GetFinancicalInstrumentAsync(string tableName, string ticker);
+        public Task<FinancicalInstrument?> GetFinancicalInstrumentAsync(string tableName, string ticker);
     }
 }

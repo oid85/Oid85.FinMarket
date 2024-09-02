@@ -19,8 +19,8 @@ namespace Oid85.FinMarket.External.Tinkoff
             InvestApiClient client
             )
         {
-            _logger = logger;
-            _client = client;            
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         /// <inheritdoc />
@@ -30,18 +30,19 @@ namespace Oid85.FinMarket.External.Tinkoff
             {
                 var (start, end) = GetDataRange(timeframe);
 
-                var request = new GetCandlesRequest();
-
-                request.InstrumentId = instrument.Figi;
-                request.From = start;
-                request.To = end;
+                var request = new GetCandlesRequest
+                {
+                    InstrumentId = instrument.Figi,
+                    From = start,
+                    To = end
+                };
 
                 var interval = GetCandleInterval(timeframe);
 
                 if (interval == CandleInterval.Unspecified)
                 {
                     _logger.Error("Неизвестный интервал. interval = CandleInterval.Unspecified");
-                    return new List<Candle>() { };
+                    return [];
                 }
 
                 request.Interval = interval;
@@ -52,14 +53,15 @@ namespace Oid85.FinMarket.External.Tinkoff
 
                 for ( var i = 0; i < response.Candles.Count; i++)
                 {
-                    var candle = new Candle();
-
-                    candle.Open = ConvertToDouble(response.Candles[i].Open);
-                    candle.Close = ConvertToDouble(response.Candles[i].Close);
-                    candle.High = ConvertToDouble(response.Candles[i].High);
-                    candle.Low = ConvertToDouble(response.Candles[i].Low);
-                    candle.Volume = response.Candles[i].Volume;
-                    candle.Date = response.Candles[i].Time.ToDateTime();
+                    var candle = new Candle
+                    {
+                        Open = ConvertToDouble(response.Candles[i].Open),
+                        Close = ConvertToDouble(response.Candles[i].Close),
+                        High = ConvertToDouble(response.Candles[i].High),
+                        Low = ConvertToDouble(response.Candles[i].Low),
+                        Volume = response.Candles[i].Volume,
+                        Date = response.Candles[i].Time.ToDateTime()
+                    };
 
                     candles.Add(candle);
                 }
@@ -70,13 +72,13 @@ namespace Oid85.FinMarket.External.Tinkoff
             catch (Exception exception)
             {
                 _logger.Error(exception);
-                return new List<Candle>() { };
+                return [];
             }
         }
 
-        private (Timestamp start, Timestamp end) GetDataRange(string timeframe)
+        private static (Timestamp start, Timestamp end) GetDataRange(string timeframe)
         {
-            const int buffer = 300; // Минимум свечей
+            const int buffer = 300; // Минимум свечей за один запрос
 
             var startDate = DateTime.Now;
             var endDate = DateTime.Now;
@@ -96,7 +98,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             return (Timestamp.FromDateTime(startDate), Timestamp.FromDateTime(endDate));
         }
 
-        private CandleInterval GetCandleInterval(string timeframe) 
+        private static CandleInterval GetCandleInterval(string timeframe) 
         { 
             if (timeframe == KnownTimeframes.Daily)
                 return CandleInterval.Day;
@@ -113,7 +115,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             return CandleInterval.Unspecified;
         }
 
-        private double ConvertToDouble(Quotation quotation)
+        private static double ConvertToDouble(Quotation quotation)
         {
             return quotation.Units + quotation.Nano / 1_000_000_000.0;
         }

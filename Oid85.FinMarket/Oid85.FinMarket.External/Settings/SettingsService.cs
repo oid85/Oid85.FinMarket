@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System.Data;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using NLog;
 
@@ -13,45 +14,50 @@ namespace Oid85.FinMarket.External.Settings
             ILogger logger,
             IConfiguration configuration)
         {
-            _logger = logger;
-            _configuration = configuration;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         /// <inheritdoc />
-        public async Task<T> GetValueAsync<T>(string key)
+        public async Task<T?> GetValueAsync<T>(string key)
         {
             try
             {
-                await using (var connection = GetSqliteConnection())
+                await using var connection = GetSqliteConnection();
+
+                if (connection == null)
                 {
-                    await connection!.OpenAsync();
-
-                    var selectCommand = new SqliteCommand($"select value from items where key = '{key}'", connection);
-
-                    object value = new();
-
-                    using (SqliteDataReader reader = selectCommand.ExecuteReader())
-                        if (reader.HasRows)
-                            while (reader.Read())
-                                value = reader.GetValue(0);
-
-                        else
-                        {
-                            string message = $"В таблице items нет параметра '{key}'";                            
-                            _logger.Error(message);
-                            throw new Exception(message);
-                        }
-
-                    await connection.CloseAsync();
-
-                    return (T) value;
+                    _logger.Error("Не удалось установить соединение с БД settings.db");
+                    return default;
                 }
+
+                var selectCommand = new SqliteCommand(
+                    $"select value " +
+                    $"from items " +
+                    $"where key = '{key}'", connection);
+
+                object value = new();
+
+                using (SqliteDataReader reader = selectCommand.ExecuteReader())
+                    if (reader.HasRows)
+                        while (reader.Read())
+                            value = reader.GetValue("value");
+
+                    else
+                    {
+                        _logger.Error($"В таблице items нет параметра '{key}'");
+                        return default;
+                    }
+
+                await connection.CloseAsync();
+
+                return (T)value;
             }
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
-                throw new Exception(exception.Message);
+                _logger.Error($"Не удалось прочитать данные из БД settings.db. {exception}");
+                return default;
             }
         }
 
@@ -70,7 +76,7 @@ namespace Oid85.FinMarket.External.Settings
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                _logger.Error($"Не удалось установить соединение с БД settings.db. {exception}");
                 return null;
             }
         }

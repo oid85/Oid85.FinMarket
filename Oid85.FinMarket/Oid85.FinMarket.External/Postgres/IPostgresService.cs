@@ -13,7 +13,7 @@ namespace Oid85.FinMarket.External.Postgres
         /// <param name="tableName">Имя таблицы</param>
         /// <param name="candles">Свечи фин. инструмента</param>
         /// <returns></returns>
-        public Task<int> SaveCandlesAsync(string tableName, IList<Candle> candles);
+        public Task<int?> SaveCandlesAsync(string tableName, IList<Candle> candles);
 
         /// <summary>
         /// Получить свечи из хранилища
@@ -21,6 +21,6 @@ namespace Oid85.FinMarket.External.Postgres
         /// <param name="tableName">Имя таблицы</param>
         /// <param name="count">Кол-во последних свечей</param>
         /// <returns></returns>
-        public Task<IList<Candle>> GetCandlesAsync(string tableName, int count);
+        public Task<IList<Candle>?> GetCandlesAsync(string tableName, int count);
     }
 }

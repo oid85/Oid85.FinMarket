@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System.Data;
+using Microsoft.Data.Sqlite;
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
@@ -15,51 +16,58 @@ namespace Oid85.FinMarket.External.Catalogs
             ILogger logger,
             ISettingsService settingsService)
         {
-            _logger = logger;
-            _settingsService = settingsService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         }
 
         /// <inheritdoc />
-        public async Task<FinancicalInstrument> GetFinancicalInstrumentAsync(string tableName, string ticker)
+        public async Task<FinancicalInstrument?> GetFinancicalInstrumentAsync(string tableName, string ticker)
         {
             try
             {
-                await using (var connection = await GetSqliteConnectionAsync())
+                await using var connection = await GetSqliteConnectionAsync();
+
+                if (connection == null)
                 {
-                    await connection!.OpenAsync();
+                    _logger.Error("Не удалось установить соединение с БД catalogs.db");
+                    return null;
+                }
 
-                    var selectCommand = new SqliteCommand($"select id, ticker, figi, description, is_active from {tableName.ToLower()} where ticker = '{ticker}'", connection);
+                await connection.OpenAsync();
 
-                    var financicalInstrument = new FinancicalInstrument();
+                var selectCommand = new SqliteCommand(
+                    $"select id, ticker, figi, description, is_active " +
+                    $"from {tableName.ToLower()} " +
+                    $"where ticker = '{ticker}'", connection);
 
-                    using (SqliteDataReader reader = selectCommand.ExecuteReader())
-                        if (reader.HasRows)
-                            while (reader.Read())
-                            {
-                                financicalInstrument.Id = reader.GetInt32(0);
-                                financicalInstrument.Ticker = reader.GetString(1);
-                                financicalInstrument.Figi = reader.GetString(2);
-                                financicalInstrument.Description = reader.GetString(3);
-                                financicalInstrument.IsActive = reader.GetInt32(4);
-                            }
+                var financicalInstrument = new FinancicalInstrument();
 
-                        else
+                using (SqliteDataReader reader = selectCommand.ExecuteReader())
+                    if (reader.HasRows)
+                        while (reader.Read())
                         {
-                            string message = $"В таблице {tableName.ToLower()} нет инструмента '{ticker}'";
-                            _logger.Error(message);
-                            throw new Exception(message);
+                            financicalInstrument.Id = reader.GetInt32("id");
+                            financicalInstrument.Ticker = reader.GetString("ticker");
+                            financicalInstrument.Figi = reader.GetString("figi");
+                            financicalInstrument.Description = reader.GetString("description");
+                            financicalInstrument.IsActive = reader.GetInt32("is_active");
                         }
 
-                    await connection.CloseAsync();
+                    else
+                    {                        
+                        _logger.Error($"В таблице {tableName.ToLower()} нет инструмента '{ticker}'");
+                        return null;
+                    }
 
-                    return financicalInstrument;
-                }
+                await connection.CloseAsync();
+
+                return financicalInstrument;
             }
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
-                throw new Exception(exception.Message);
+                _logger.Error($"Не удалось прочитать данные из БД catalogs.db. {exception}");
+                return null;
             }
         }
 
@@ -78,7 +86,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                _logger.Error($"Не удалось установить соединение с БД catalogs.db. {exception}");
                 return null;
             }
         }
