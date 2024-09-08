@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="SQLite\**" />
-    <EmbeddedResource Remove="SQLite\**" />
-    <None Remove="SQLite\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="Npgsql" Version="8.0.3" />
@@ -25,6 +18,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Oid85.FinMarket.Common\Oid85.FinMarket.Common.csproj" />
     <ProjectReference Include="..\Oid85.FinMarket.Domain\Oid85.FinMarket.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="sqlite_scripts\" />
   </ItemGroup>
 
 </Project>

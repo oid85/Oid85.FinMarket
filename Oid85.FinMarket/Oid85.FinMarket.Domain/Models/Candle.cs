@@ -34,5 +34,10 @@
         /// Дата
         /// </summary>
         public DateTime Date { get; set; }
+
+        /// <summary>
+        /// Свеча сформирована
+        /// </summary>
+        public int IsComplete { get; set; }
     }
 }

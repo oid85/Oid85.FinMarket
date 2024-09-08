@@ -1,11 +1,11 @@
 ﻿using Oid85.FinMarket.Domain.Models;
 
-namespace Oid85.FinMarket.External.Postgres
+namespace Oid85.FinMarket.External.Storage
 {
     /// <summary>
     /// Сервис работы с хранилищем свечей
     /// </summary>
-    public interface IPostgresService
+    public interface IStorageService
     {
         /// <summary>
         /// Добавить свечи в хранилище

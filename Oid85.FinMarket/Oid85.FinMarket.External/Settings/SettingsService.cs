@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using NLog;
 
@@ -9,13 +10,16 @@ namespace Oid85.FinMarket.External.Settings
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _cache;
 
         public SettingsService(
             ILogger logger,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IMemoryCache cache)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
         /// <inheritdoc />
@@ -23,17 +27,24 @@ namespace Oid85.FinMarket.External.Settings
         {
             try
             {
-                await using var connection = GetSqliteConnection();
+                var cachedValue = _cache.Get(key);
 
+                if (cachedValue != null)
+                    return (T) cachedValue;
+
+                await using var connection = GetSqliteConnection();
+                
                 if (connection == null)
                 {
-                    _logger.Error("Не удалось установить соединение с БД settings.db");
+                    _logger.Error("Не удалось установить соединение с БД data.db");
                     return default;
                 }
 
+                await connection.OpenAsync();
+
                 var selectCommand = new SqliteCommand(
                     $"select value " +
-                    $"from items " +
+                    $"from settings " +
                     $"where key = '{key}'", connection);
 
                 object value = new();
@@ -45,18 +56,23 @@ namespace Oid85.FinMarket.External.Settings
 
                     else
                     {
-                        _logger.Error($"В таблице items нет параметра '{key}'");
+                        _logger.Error($"В таблице settings нет параметра '{key}'");
                         return default;
                     }
 
                 await connection.CloseAsync();
 
-                return (T)value;
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                            .SetSlidingExpiration(TimeSpan.FromHours(3));
+
+                _cache.Set(key, value, cacheEntryOptions);
+
+                return (T) value;
             }
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось прочитать данные из БД settings.db. {exception}");
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
                 return default;
             }
         }
@@ -76,7 +92,7 @@ namespace Oid85.FinMarket.External.Settings
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось установить соединение с БД settings.db. {exception}");
+                _logger.Error($"Не удалось установить соединение с БД data.db. {exception}");
                 return null;
             }
         }

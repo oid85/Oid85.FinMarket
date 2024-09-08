@@ -3,24 +3,29 @@ using Oid85.FinMarket.External.Helpers;
 using NLog;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using Oid85.FinMarket.External.Settings;
+using Oid85.FinMarket.Common.KnownConstants;
 
-namespace Oid85.FinMarket.External.Postgres
+namespace Oid85.FinMarket.External.Storage
 {
     /// <inheritdoc />
-    public class PostgresService : IPostgresService
+    public class StorageService : IStorageService
     {
         private readonly PostgresSqlHelper _sqlHelper;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
+        private readonly ISettingsService _settingsService;
 
-        public PostgresService(
+        public StorageService(
             PostgresSqlHelper sqlHelper,
             ILogger logger,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ISettingsService settingsService)
         {
             _sqlHelper = sqlHelper ?? throw new ArgumentNullException(nameof(sqlHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         }
 
         /// <inheritdoc />
@@ -30,7 +35,7 @@ namespace Oid85.FinMarket.External.Postgres
             {
                 int inserted = 0;
 
-                await using var connection = GetPostgresConnection();
+                await using var connection = await GetPostgresConnectionAsync();
 
                 if (connection == null)
                 {
@@ -41,7 +46,17 @@ namespace Oid85.FinMarket.External.Postgres
                 await connection.OpenAsync();
 
                 // Если нет таблицы - создаем ее
-                await _sqlHelper.NonQueryCommandAsync($"create table {tableName} if not exists", connection);
+                await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
+                    $"id bigserial NOT NULL, " +
+                    $"\"open\" double precision NULL, " +
+                    $"\"close\" double precision NULL, " +
+                    $"high double precision NULL, " +
+                    $"low double precision NULL, " +
+                    $"volume bigint NULL, " +
+                    $"\"date\" date NULL, " +
+                    $"is_complete int NULL, " +
+                    $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
+                    connection);
 
                 for (var i = 0; i > candles.Count(); i++)
                 {
@@ -49,28 +64,32 @@ namespace Oid85.FinMarket.External.Postgres
 
                     // Если свеча уже записана в хранилище
                     var alreadyExistCandleTable = _sqlHelper.Select(
-                        $"select date " +
+                        $"select date, is_complete " +
                         $"from {tableName} " +
                         $"where date = '{candles[i].Date}'", connection);
 
                     if (alreadyExistCandleTable!.Rows.Count > 0)
                     {
-                        await _sqlHelper.NonQueryCommandAsync(
-                            $"update finmarket " +
-                            $"set open = {open}, close = {close}, high = {high}, low = {low}, volume = {candles[i].Volume} " +
-                            $"where date = '{candles[i].Date}')",
-                            connection);
+                        bool isComplete = Convert.ToInt32(alreadyExistCandleTable.Rows[0]["is_complete"]) == 1;
 
-                        inserted++;
-
-                        continue;
+                        // Ессли свеча не полная, то обновляем ее
+                        if (!isComplete)
+                            await _sqlHelper.NonQueryCommandAsync(
+                                $"update finmarket " +
+                                $"set open = {open}, close = {close}, high = {high}, low = {low}, " +
+                                $"volume = {candles[i].Volume}, is_complete = {candles[i].IsComplete} " +
+                                $"where date = '{candles[i].Date}')",
+                                connection);
                     }
 
-                    await _sqlHelper.NonQueryCommandAsync(
-                        $"insert into finmarket " +
-                        $"(open, close, high, volume, date) " +
-                        $"values ({open}, {close}, {high}, {low}, {candles[i].Volume}, '{candles[i].Date}')",
-                        connection);
+                    else
+                    {
+                        // Если свеча еще не записана в хранилище
+                        await _sqlHelper.NonQueryCommandAsync(
+                            $"insert into {tableName} (open, close, high, low, volume, date, is_complete) " +
+                            $"values ({open}, {close}, {high}, {low}, {candles[i].Volume}, '{candles[i].Date}', {candles[i].IsComplete})",
+                            connection);
+                    }
 
                     inserted++;
                 }
@@ -92,7 +111,8 @@ namespace Oid85.FinMarket.External.Postgres
         {
             try
             {
-                await using var connection = GetPostgresConnection();
+                await using var connection = await GetPostgresConnectionAsync();
+
                 if (connection == null)
                 {
                     _logger.Error("Не удалось установить соединение с БД finmarket");
@@ -156,11 +176,11 @@ namespace Oid85.FinMarket.External.Postgres
         /// <summary>
         /// Получить соединение с БД
         /// </summary>
-        private NpgsqlConnection? GetPostgresConnection()
+        private async Task<NpgsqlConnection?> GetPostgresConnectionAsync()
         {
             try
             {
-                var connectionString = _configuration.GetValue<string>("Postgres:ConnectionString");
+                var connectionString = await _settingsService.GetValueAsync<string>(KnownSettingsKeys.Postgres_ConnectionString);
                 var connection = new NpgsqlConnection(connectionString);
 
                 return connection;

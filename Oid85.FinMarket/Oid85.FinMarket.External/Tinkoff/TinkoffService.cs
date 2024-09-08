@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using System.Diagnostics.Metrics;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -24,7 +25,8 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public async Task<IList<Candle>> GetCandlesAsync(FinancicalInstrument instrument, string timeframe)
+        public async Task<List<Candle>> GetCandlesAsync(
+            FinancicalInstrument instrument, string timeframe)
         {
             try
             {
@@ -60,13 +62,51 @@ namespace Oid85.FinMarket.External.Tinkoff
                         High = ConvertToDouble(response.Candles[i].High),
                         Low = ConvertToDouble(response.Candles[i].Low),
                         Volume = response.Candles[i].Volume,
-                        Date = response.Candles[i].Time.ToDateTime()
+                        Date = response.Candles[i].Time.ToDateTime(),
+                        IsComplete = response.Candles[i].IsComplete == true ? 1 : 0
                     };
 
                     candles.Add(candle);
                 }
 
                 return candles;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetStocks()
+        {
+            try
+            {
+                var shares = _client.Instruments
+                    .Shares().Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList(); 
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var share in shares)
+                {
+                    
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = share.Ticker,
+                        Figi = share.Figi,
+                        Description = share.Name,
+                        Sector = share.Sector,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
             }
 
             catch (Exception exception)
@@ -95,7 +135,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             if (timeframe == KnownTimeframes.OneMinutes)
                 startDate = DateTime.Now.AddMinutes(-1 * buffer); // 300 минуток
 
-            return (Timestamp.FromDateTime(startDate), Timestamp.FromDateTime(endDate));
+            return (Timestamp.FromDateTime(startDate.ToUniversalTime()), Timestamp.FromDateTime(endDate.ToUniversalTime()));
         }
 
         private static CandleInterval GetCandleInterval(string timeframe) 

@@ -1,5 +1,7 @@
 ﻿using System.Data;
+using System.Net;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
@@ -10,13 +12,16 @@ namespace Oid85.FinMarket.External.Catalogs
     public class CatalogService : ICatalogService
     {
         private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
         private readonly ISettingsService _settingsService;
 
         public CatalogService(
             ILogger logger,
+            IConfiguration configuration,
             ISettingsService settingsService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         }
 
@@ -29,14 +34,14 @@ namespace Oid85.FinMarket.External.Catalogs
 
                 if (connection == null)
                 {
-                    _logger.Error("Не удалось установить соединение с БД catalogs.db");
+                    _logger.Error("Не удалось установить соединение с БД data.db");
                     return null;
                 }
 
                 await connection.OpenAsync();
 
                 var selectCommand = new SqliteCommand(
-                    $"select id, ticker, figi, description, is_active " +
+                    $"select id, ticker, figi, description, sector, is_active " +
                     $"from {tableName.ToLower()} " +
                     $"where ticker = '{ticker}'", connection);
 
@@ -50,6 +55,7 @@ namespace Oid85.FinMarket.External.Catalogs
                             financicalInstrument.Ticker = reader.GetString("ticker");
                             financicalInstrument.Figi = reader.GetString("figi");
                             financicalInstrument.Description = reader.GetString("description");
+                            financicalInstrument.Sector = reader.GetString("sector");
                             financicalInstrument.IsActive = reader.GetInt32("is_active");
                         }
 
@@ -66,8 +72,101 @@ namespace Oid85.FinMarket.External.Catalogs
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось прочитать данные из БД catalogs.db. {exception}");
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
                 return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<FinancicalInstrument>> GetActiveFinancicalInstrumentsAsync(string tableName)
+        {
+            try
+            {
+                await using var connection = await GetSqliteConnectionAsync();
+
+                if (connection == null)
+                {
+                    _logger.Error("Не удалось установить соединение с БД data.db");
+                    return [];
+                }
+
+                await connection.OpenAsync();
+
+                var selectCommand = new SqliteCommand(
+                    $"select id, ticker, figi, description, is_active " +
+                    $"from {tableName.ToLower()} " +
+                    $"where is_active = 1", connection);
+
+                var financicalInstruments = new List<FinancicalInstrument>();
+                
+                using (SqliteDataReader reader = selectCommand.ExecuteReader())
+                    if (reader.HasRows)
+                        while (reader.Read())
+                        {
+                            var financicalInstrument = new FinancicalInstrument
+                            {
+                                Id = reader.GetInt32("id"),
+                                Ticker = reader.GetString("ticker"),
+                                Figi = reader.GetString("figi"),
+                                Description = reader.GetString("description"),
+                                IsActive = reader.GetInt32("is_active")
+                            };
+
+                            financicalInstruments.Add(financicalInstrument);
+                        }
+
+                    else
+                    {
+                        _logger.Error($"В таблице {tableName.ToLower()} нет активных инструментов");
+                        return [];
+                    }
+
+                await connection.CloseAsync();
+
+                return financicalInstruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task LoadFinancicalInstrumentsAsync(string tableName, List<FinancicalInstrument> instruments)
+        {
+            try
+            {
+                await using var connection = await GetSqliteConnectionAsync();
+
+                if (connection == null)
+                {
+                    _logger.Error("Не удалось установить соединение с БД data.db");
+                    return;
+                }
+
+                await connection.OpenAsync();
+
+                foreach (var instrument in instruments) 
+                {
+                    string description = instrument.Description.Replace("'", "");
+
+                    var command = new SqliteCommand(
+                        $"insert into {tableName.ToLower()} (ticker, figi, description, sector, is_active) " +
+                        $"values ('{instrument.Ticker}', '{instrument.Figi}', '{description}', " +
+                        $"'{instrument.Sector}', {instrument.IsActive})", connection);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                await connection.CloseAsync();
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return;
             }
         }
 
@@ -78,7 +177,7 @@ namespace Oid85.FinMarket.External.Catalogs
         {
             try
             {
-                var connectionString = await _settingsService.GetValueAsync<string>(KnownSettingsKeys.SQLite_Catalogs_ConnectionString);
+                var connectionString = _configuration.GetValue<string>("SQLite:Settings:ConnectionString");
                 var connection = new SqliteConnection(connectionString);
 
                 return connection;
@@ -86,7 +185,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось установить соединение с БД catalogs.db. {exception}");
+                _logger.Error($"Не удалось установить соединение с БД data.db. {exception}");
                 return null;
             }
         }
