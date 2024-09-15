@@ -32,12 +32,6 @@ namespace Oid85.FinMarket.External.Catalogs
             {
                 await using var connection = await GetSqliteConnectionAsync();
 
-                if (connection == null)
-                {
-                    _logger.Error("Не удалось установить соединение с БД data.db");
-                    return null;
-                }
-
                 await connection.OpenAsync();
 
                 var selectCommand = new SqliteCommand(
@@ -84,16 +78,10 @@ namespace Oid85.FinMarket.External.Catalogs
             {
                 await using var connection = await GetSqliteConnectionAsync();
 
-                if (connection == null)
-                {
-                    _logger.Error("Не удалось установить соединение с БД data.db");
-                    return [];
-                }
-
                 await connection.OpenAsync();
 
                 var selectCommand = new SqliteCommand(
-                    $"select id, ticker, figi, description, is_active " +
+                    $"select id, ticker, figi, description, sector, is_active " +
                     $"from {tableName.ToLower()} " +
                     $"where is_active = 1", connection);
 
@@ -109,6 +97,7 @@ namespace Oid85.FinMarket.External.Catalogs
                                 Ticker = reader.GetString("ticker"),
                                 Figi = reader.GetString("figi"),
                                 Description = reader.GetString("description"),
+                                Sector = reader.GetString("sector"),
                                 IsActive = reader.GetInt32("is_active")
                             };
 
@@ -140,24 +129,41 @@ namespace Oid85.FinMarket.External.Catalogs
             {
                 await using var connection = await GetSqliteConnectionAsync();
 
-                if (connection == null)
-                {
-                    _logger.Error("Не удалось установить соединение с БД data.db");
-                    return;
-                }
-
                 await connection.OpenAsync();
 
                 foreach (var instrument in instruments) 
                 {
                     string description = instrument.Description.Replace("'", "");
 
-                    var command = new SqliteCommand(
-                        $"insert into {tableName.ToLower()} (ticker, figi, description, sector, is_active) " +
-                        $"values ('{instrument.Ticker}', '{instrument.Figi}', '{description}', " +
-                        $"'{instrument.Sector}', {instrument.IsActive})", connection);
+                    var selectCommand = new SqliteCommand(
+                        $"select ticker from {tableName.ToLower()} " +
+                        $"where ticker = '{instrument.Ticker}'", connection);
 
-                    await command.ExecuteNonQueryAsync();
+                    var reader = await selectCommand.ExecuteReaderAsync();
+
+                    if (reader.HasRows)
+                    {
+                        var updateCommand = new SqliteCommand(
+                            $"update {tableName.ToLower()} " +
+                            $"set " +
+                            $"figi = '{instrument.Figi}', " +
+                            $"description = '{description}', " +
+                            $"sector = '{instrument.Sector}', " +
+                            $"is_active = '{instrument.IsActive}' " +
+                            $"where ticker = '{instrument.Ticker}'", connection);
+
+                        await updateCommand.ExecuteNonQueryAsync();
+                    }
+
+                    else
+                    {
+                        var insertCommand = new SqliteCommand(
+                            $"insert into {tableName.ToLower()} (ticker, figi, description, sector, is_active) " +
+                            $"values ('{instrument.Ticker}', '{instrument.Figi}', '{description}', " +
+                            $"'{instrument.Sector}', {instrument.IsActive})", connection);
+
+                        await insertCommand.ExecuteNonQueryAsync();
+                    }
                 }
 
                 await connection.CloseAsync();
@@ -173,7 +179,7 @@ namespace Oid85.FinMarket.External.Catalogs
         /// <summary>
         /// Получить соединение с БД
         /// </summary>
-        private async Task<SqliteConnection?> GetSqliteConnectionAsync()
+        private async Task<SqliteConnection> GetSqliteConnectionAsync()
         {
             try
             {
@@ -186,7 +192,7 @@ namespace Oid85.FinMarket.External.Catalogs
             catch (Exception exception)
             {
                 _logger.Error($"Не удалось установить соединение с БД data.db. {exception}");
-                return null;
+                throw new Exception($"Не удалось установить соединение с БД data.db. {exception}");
             }
         }
     }

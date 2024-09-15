@@ -19,6 +19,33 @@ CREATE TABLE bonds (
     ticker TEXT,
     figi TEXT,
     description TEXT,
+    sector TEXT, 
+    is_active INTEGER
+);
+
+---------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS futures;
+
+CREATE TABLE futures (
+    id INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    ticker TEXT,
+    figi TEXT,
+    description TEXT,
+    sector TEXT, 
+    is_active INTEGER
+);
+
+---------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS currencies;
+
+CREATE TABLE currencies (
+    id INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    ticker TEXT,
+    figi TEXT,
+    description TEXT,
+    sector TEXT, 
     is_active INTEGER
 );
 
@@ -38,6 +65,9 @@ VALUES ('Postgres:ConnectionString', 'User ID=postgres;Password=postgres;Host=lo
 
 INSERT INTO settings (key, value, description)
 VALUES ('Tinkoff:Token', 't.szzlPYKzuUTNxiVrNJPRlueboUd1eQm1MceHyb6LB-yDZ7DrHV4gN-NWkDvPvFIHAArGZHXrcDzUCJJSkqtBog', '“окен доступа к Tinkoff API');
+
+INSERT INTO settings (key, value, description)
+VALUES ('ApplicationSettings:Buffer', '300', 'ћинимум свечей за один запрос');
 
 INSERT INTO settings (key, value, description)
 VALUES ('Quartz:DowloadDaily:Cron', '0 5 * * * ? *', 'Cron-строка дл€ скачивани€ дневных свечей');

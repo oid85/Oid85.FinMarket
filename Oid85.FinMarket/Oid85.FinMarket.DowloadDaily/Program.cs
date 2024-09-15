@@ -1,4 +1,5 @@
 using Oid85.FinMarket.DowloadDaily.Extensions;
+using Oid85.FinMarket.DowloadDaily.HostedServices;
 using Oid85.FinMarket.External.Extensions;
 
 namespace Oid85.FinMarket.DowloadDaily
@@ -14,8 +15,11 @@ namespace Oid85.FinMarket.DowloadDaily
 
             builder.Services.ConfigureLogger();
             builder.Services.ConfigureSwagger(builder.Configuration);
-            builder.Services.ConfigureCors(builder.Configuration);
+            builder.Services.ConfigureCors(builder.Configuration);            
             builder.Services.ConfigureExternalServices();
+            builder.Services.ConfigureQuartz(builder.Configuration);
+
+            builder.Services.AddHostedService<InitHostedService>();
 
             var app = builder.Build();
 

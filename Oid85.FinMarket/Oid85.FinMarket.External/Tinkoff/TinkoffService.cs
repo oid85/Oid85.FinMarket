@@ -2,7 +2,8 @@
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using System.Diagnostics.Metrics;
+using Oid85.FinMarket.External.Settings;
+using System.Xml.Linq;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -14,14 +15,17 @@ namespace Oid85.FinMarket.External.Tinkoff
     {
         private readonly ILogger _logger;
         private readonly InvestApiClient _client;
+        private readonly ISettingsService _settingsService;
 
         public TinkoffService(
             ILogger logger,
-            InvestApiClient client
+            InvestApiClient client,
+            ISettingsService settingsService
             )
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         }
 
         /// <inheritdoc />
@@ -30,7 +34,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         {
             try
             {
-                var (start, end) = GetDataRange(timeframe);
+                var (start, end) = await GetDataRange(timeframe);
 
                 var request = new GetCandlesRequest
                 {
@@ -116,24 +120,130 @@ namespace Oid85.FinMarket.External.Tinkoff
             }
         }
 
-        private static (Timestamp start, Timestamp end) GetDataRange(string timeframe)
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetBonds()
         {
-            const int buffer = 300; // Минимум свечей за один запрос
+            try
+            {
+                var bonds = _client.Instruments
+                    .Bonds().Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList();
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var bond in bonds)
+                {
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = bond.Ticker,
+                        Figi = bond.Figi,
+                        Description = bond.Name,
+                        Sector = bond.Sector,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetFutures()
+        {
+            try
+            {
+                var futures = _client.Instruments
+                    .Futures().Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList();
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var future in futures)
+                {
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = future.Ticker,
+                        Figi = future.Figi,
+                        Description = future.Name,
+                        Sector = future.Sector,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetCurrencies()
+        {
+            try
+            {
+                var currencies = _client.Instruments
+                    .Currencies().Instruments
+                    .ToList();
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var currencie in currencies)
+                {
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = currencie.Ticker,
+                        Figi = currencie.Figi,
+                        Description = currencie.Name,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        private async Task<(Timestamp start, Timestamp end)> GetDataRange(string timeframe)
+        {           
+            var buffer = await _settingsService.GetValueAsync<int>(KnownSettingsKeys.ApplicationSettings_Buffer);
 
             var startDate = DateTime.Now;
             var endDate = DateTime.Now;
 
             if (timeframe == KnownTimeframes.Daily)
-                startDate = DateTime.Now.AddDays(-1 * buffer); // 300 дневок
+                startDate = DateTime.Now.AddDays(-1 * buffer);
 
-            if (timeframe == KnownTimeframes.Hourly)
-                startDate = DateTime.Now.AddHours(-1 * buffer); // 300 часовок
+            else if (timeframe == KnownTimeframes.Hourly)
+                startDate = DateTime.Now.AddHours(-1 * buffer);
 
-            if (timeframe == KnownTimeframes.FiveMinutes)
-                startDate = DateTime.Now.AddMinutes(-5 * buffer); // 300 пятиминуток
+            else if (timeframe == KnownTimeframes.FiveMinutes)
+                startDate = DateTime.Now.AddMinutes(-5 * buffer);
 
-            if (timeframe == KnownTimeframes.OneMinutes)
-                startDate = DateTime.Now.AddMinutes(-1 * buffer); // 300 минуток
+            else if (timeframe == KnownTimeframes.OneMinutes)
+                startDate = DateTime.Now.AddMinutes(-1 * buffer);
 
             return (Timestamp.FromDateTime(startDate.ToUniversalTime()), Timestamp.FromDateTime(endDate.ToUniversalTime()));
         }

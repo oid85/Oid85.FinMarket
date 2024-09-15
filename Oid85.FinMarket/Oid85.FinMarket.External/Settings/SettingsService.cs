@@ -23,7 +23,7 @@ namespace Oid85.FinMarket.External.Settings
         }
 
         /// <inheritdoc />
-        public async Task<T?> GetValueAsync<T>(string key)
+        public async Task<T> GetValueAsync<T>(string key)
         {
             try
             {
@@ -33,12 +33,6 @@ namespace Oid85.FinMarket.External.Settings
                     return (T) cachedValue;
 
                 await using var connection = GetSqliteConnection();
-                
-                if (connection == null)
-                {
-                    _logger.Error("Не удалось установить соединение с БД data.db");
-                    return default;
-                }
 
                 await connection.OpenAsync();
 
@@ -57,7 +51,7 @@ namespace Oid85.FinMarket.External.Settings
                     else
                     {
                         _logger.Error($"В таблице settings нет параметра '{key}'");
-                        return default;
+                        throw new InvalidOperationException($"{nameof(key)} - В таблице settings нет параметра '{key}'");
                     }
 
                 await connection.CloseAsync();
@@ -73,14 +67,14 @@ namespace Oid85.FinMarket.External.Settings
             catch (Exception exception)
             {
                 _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
-                return default;
+                throw new InvalidOperationException($"Не удалось прочитать данные из БД data.db. {exception}");
             }
         }
 
         /// <summary>
         /// Получить соединение с БД
         /// </summary>
-        private SqliteConnection? GetSqliteConnection()
+        private SqliteConnection GetSqliteConnection()
         {
             try
             {
@@ -93,7 +87,7 @@ namespace Oid85.FinMarket.External.Settings
             catch (Exception exception)
             {
                 _logger.Error($"Не удалось установить соединение с БД data.db. {exception}");
-                return null;
+                throw new Exception($"Не удалось установить соединение с БД data.db. {exception}");
             }
         }
     }

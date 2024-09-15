@@ -8,6 +8,6 @@
         /// <summary>
         /// Получить значение параметра настройки
         /// </summary>
-        public Task<T?> GetValueAsync<T>(string key);
+        public Task<T> GetValueAsync<T>(string key);
     }
 }

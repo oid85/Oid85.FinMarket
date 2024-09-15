@@ -1,5 +1,12 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using DaGroup.Mfsb.Computation.WebHost.Jobs;
+using Microsoft.OpenApi.Models;
 using NLog;
+using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.DowloadDaily.HostedServices;
+using Oid85.FinMarket.External.Settings;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.DowloadDaily.Extensions
@@ -8,11 +15,9 @@ namespace Oid85.FinMarket.DowloadDaily.Extensions
     {
         public static void ConfigureLogger(this IServiceCollection services)
         {
-            string nlogConfigFile = "nlog.config";            
-
             LogManager
                 .Setup()
-                .LoadConfigurationFromFile(nlogConfigFile);
+                .LoadConfigurationFromFile("nlog.config");
 
             services.AddTransient(typeof(ILogger), factory =>
             {
@@ -51,6 +56,36 @@ namespace Oid85.FinMarket.DowloadDaily.Extensions
                     builder.AllowCredentials();
                 });
             });
+        }
+
+        public static void ConfigureQuartz(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddFactory<IJobFactory, JobFactory>();
+            services.AddFactory<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddHostedService<QuartzHostedService>();
+
+            services.AddSingleton<Job>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            var settingsService = serviceProvider.GetRequiredService<ISettingsService>();
+
+            if (settingsService == null)
+                throw new NullReferenceException(nameof(settingsService));
+
+            string cron = settingsService
+                .GetValueAsync<string>(KnownSettingsKeys.Quartz_DowloadDaily_Cron)
+                .GetAwaiter()
+                .GetResult();
+
+            services.AddSingleton(new JobSchedule(typeof(Job), cron));
+        }
+
+        public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            services.AddTransient<TService, TImplementation>();
+            services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>());
         }
 
         private static string GetXmlCommentsPath()

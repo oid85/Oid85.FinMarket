@@ -19,5 +19,20 @@ namespace Oid85.FinMarket.External.Tinkoff
         /// Получить список акций
         /// </summary>
         public List<FinancicalInstrument> GetStocks();
+
+        /// <summary>
+        /// Получить список облигаций
+        /// </summary>
+        public List<FinancicalInstrument> GetBonds();
+
+        /// <summary>
+        /// Получить список фьючерсов
+        /// </summary>
+        public List<FinancicalInstrument> GetFutures();
+
+        /// <summary>
+        /// Получить список валют
+        /// </summary>
+        public List<FinancicalInstrument> GetCurrencies();
     }
 }

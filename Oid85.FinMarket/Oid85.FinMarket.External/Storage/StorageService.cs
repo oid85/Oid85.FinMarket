@@ -29,19 +29,13 @@ namespace Oid85.FinMarket.External.Storage
         }
 
         /// <inheritdoc />
-        public async Task<int?> SaveCandlesAsync(string tableName, IList<Candle> candles)
+        public async Task<int> SaveCandlesAsync(string tableName, IList<Candle> candles)
         {
             try
             {
                 int inserted = 0;
 
                 await using var connection = await GetPostgresConnectionAsync();
-
-                if (connection == null)
-                {
-                    _logger.Error("Не удалось установить соединение с БД finmarket");
-                    return null;
-                }
 
                 await connection.OpenAsync();
 
@@ -102,22 +96,16 @@ namespace Oid85.FinMarket.External.Storage
             catch (Exception exception)
             {
                 _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
-                return null;
+                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }
 
         /// <inheritdoc />
-        public async Task<IList<Candle>?> GetCandlesAsync(string tableName, int count)
+        public async Task<List<Candle>> GetCandlesAsync(string tableName, int count)
         {
             try
             {
                 await using var connection = await GetPostgresConnectionAsync();
-
-                if (connection == null)
-                {
-                    _logger.Error("Не удалось установить соединение с БД finmarket");
-                    return null;
-                }
 
                 await connection.OpenAsync();
 
@@ -159,7 +147,7 @@ namespace Oid85.FinMarket.External.Storage
             catch (Exception exception)
             {
                 _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
-                return null;
+                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }
 
@@ -176,7 +164,7 @@ namespace Oid85.FinMarket.External.Storage
         /// <summary>
         /// Получить соединение с БД
         /// </summary>
-        private async Task<NpgsqlConnection?> GetPostgresConnectionAsync()
+        private async Task<NpgsqlConnection> GetPostgresConnectionAsync()
         {
             try
             {
@@ -189,7 +177,7 @@ namespace Oid85.FinMarket.External.Storage
             catch (Exception exception)
             {
                 _logger.Error($"Не удалось установить соединение с БД finmarket. {exception}");
-                return null;
+                throw new Exception($"Не удалось установить соединение с БД finmarket. {exception}");
             }
         }
     }

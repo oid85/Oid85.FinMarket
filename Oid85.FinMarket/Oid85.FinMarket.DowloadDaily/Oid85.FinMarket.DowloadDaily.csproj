@@ -7,9 +7,11 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
-		<PackageReference Include="NLog" Version="5.3.3" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.12" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
+		<PackageReference Include="NLog" Version="5.3.4" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.13" />
+		<PackageReference Include="Quartz" Version="3.13.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.7.3" />
 	</ItemGroup>
 
 	<ItemGroup>
