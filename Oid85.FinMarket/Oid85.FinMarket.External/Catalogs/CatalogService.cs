@@ -135,9 +135,13 @@ namespace Oid85.FinMarket.External.Catalogs
                 {
                     string description = instrument.Description.Replace("'", "");
 
+                    string ticker = instrument.Ticker
+                        .Replace("-", "_")
+                        .Replace("@", "_");
+
                     var selectCommand = new SqliteCommand(
                         $"select ticker from {tableName.ToLower()} " +
-                        $"where ticker = '{instrument.Ticker}'", connection);
+                        $"where ticker = '{ticker}'", connection);
 
                     var reader = await selectCommand.ExecuteReaderAsync();
 
@@ -150,7 +154,7 @@ namespace Oid85.FinMarket.External.Catalogs
                             $"description = '{description}', " +
                             $"sector = '{instrument.Sector}', " +
                             $"is_active = '{instrument.IsActive}' " +
-                            $"where ticker = '{instrument.Ticker}'", connection);
+                            $"where ticker = '{ticker}'", connection);
 
                         await updateCommand.ExecuteNonQueryAsync();
                     }
@@ -159,7 +163,7 @@ namespace Oid85.FinMarket.External.Catalogs
                     {
                         var insertCommand = new SqliteCommand(
                             $"insert into {tableName.ToLower()} (ticker, figi, description, sector, is_active) " +
-                            $"values ('{instrument.Ticker}', '{instrument.Figi}', '{description}', " +
+                            $"values ('{ticker}', '{instrument.Figi}', '{description}', " +
                             $"'{instrument.Sector}', {instrument.IsActive})", connection);
 
                         await insertCommand.ExecuteNonQueryAsync();

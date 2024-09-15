@@ -61,7 +61,7 @@ CREATE TABLE settings (
 );
 
 INSERT INTO settings (key, value, description)
-VALUES ('Postgres:ConnectionString', 'User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=finmarket;Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;', 'Строка связи к БД со свечами');
+VALUES ('Postgres:ConnectionString', 'User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=finmarket;', 'Строка связи к БД со свечами');
 
 INSERT INTO settings (key, value, description)
 VALUES ('Tinkoff:Token', 't.szzlPYKzuUTNxiVrNJPRlueboUd1eQm1MceHyb6LB-yDZ7DrHV4gN-NWkDvPvFIHAArGZHXrcDzUCJJSkqtBog', 'Токен доступа к Tinkoff API');

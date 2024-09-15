@@ -37,7 +37,7 @@ namespace DaGroup.Mfsb.Computation.WebHost.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            var enabled = await _settingsService.GetValueAsync<bool>(KnownSettingsKeys.Quartz_DowloadDaily_Enable);
+            var enabled = await _settingsService.GetBoolValueAsync(KnownSettingsKeys.Quartz_DowloadDaily_Enable);
 
             if (!enabled)
                 return;

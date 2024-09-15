@@ -23,14 +23,45 @@ namespace Oid85.FinMarket.External.Settings
         }
 
         /// <inheritdoc />
-        public async Task<T> GetValueAsync<T>(string key)
+        public async Task<string> GetStringValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return value.ToString()!;
+        }
+
+        /// <inheritdoc />
+        public async Task<int> GetIntValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return Convert.ToInt32(value);
+        }
+
+        /// <inheritdoc />
+        public async Task<double> GetDoubleValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return Convert.ToDouble(value);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> GetBoolValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return Convert.ToBoolean(value);
+        }
+
+        private async Task<object> GetValueAsync(string key)
         {
             try
             {
                 var cachedValue = _cache.Get(key);
 
                 if (cachedValue != null)
-                    return (T) cachedValue;
+                    return cachedValue;
 
                 await using var connection = GetSqliteConnection();
 
@@ -56,12 +87,15 @@ namespace Oid85.FinMarket.External.Settings
 
                 await connection.CloseAsync();
 
+                if (value == null)
+                    throw new InvalidOperationException($"{nameof(key)} - В таблице settings нет параметра '{key}'");
+
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                             .SetSlidingExpiration(TimeSpan.FromHours(3));
 
                 _cache.Set(key, value, cacheEntryOptions);
 
-                return (T) value;
+                return value;
             }
 
             catch (Exception exception)

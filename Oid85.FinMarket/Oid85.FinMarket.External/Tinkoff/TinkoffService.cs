@@ -228,7 +228,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         private async Task<(Timestamp start, Timestamp end)> GetDataRange(string timeframe)
         {           
-            var buffer = await _settingsService.GetValueAsync<int>(KnownSettingsKeys.ApplicationSettings_Buffer);
+            var buffer = await _settingsService.GetIntValueAsync(KnownSettingsKeys.ApplicationSettings_Buffer);
 
             var startDate = DateTime.Now;
             var endDate = DateTime.Now;

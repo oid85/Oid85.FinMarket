@@ -33,6 +33,8 @@ namespace Oid85.FinMarket.External.Storage
         {
             try
             {
+                tableName = tableName.ToLower();
+
                 int inserted = 0;
 
                 await using var connection = await GetPostgresConnectionAsync();
@@ -47,12 +49,12 @@ namespace Oid85.FinMarket.External.Storage
                     $"high double precision NULL, " +
                     $"low double precision NULL, " +
                     $"volume bigint NULL, " +
-                    $"\"date\" date NULL, " +
+                    $"\"date\" timestamp with time zone NULL, " +
                     $"is_complete int NULL, " +
                     $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
                     connection);
 
-                for (var i = 0; i > candles.Count(); i++)
+                for (var i = 0; i < candles.Count; i++)
                 {
                     var (open, close, high, low) = FormatCandle(candles[i]);
 
@@ -168,7 +170,7 @@ namespace Oid85.FinMarket.External.Storage
         {
             try
             {
-                var connectionString = await _settingsService.GetValueAsync<string>(KnownSettingsKeys.Postgres_ConnectionString);
+                var connectionString = await _settingsService.GetStringValueAsync(KnownSettingsKeys.Postgres_ConnectionString);
                 var connection = new NpgsqlConnection(connectionString);
 
                 return connection;

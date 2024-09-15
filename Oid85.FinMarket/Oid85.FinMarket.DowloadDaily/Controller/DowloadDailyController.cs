@@ -29,28 +29,6 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             _storageService = storageService;
         }
 
-        [HttpGet("load-daily-candles")]
-        public async Task LoadDailyCandlesAsync()
-        {
-            _logger.Trace($"Request - /api/load-daily-candles");
-            
-            try
-            {
-                var instrument = new FinancicalInstrument() 
-                { 
-                    Ticker = "SBER",
-                    Figi = "BBG004730N88"
-                };
-
-                var candles = await _tinkoffService.GetCandlesAsync(instrument, KnownTimeframes.Daily);
-            }
-            
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-            }
-        }
-
         [HttpGet("load-stocks-catalog")]
         public async Task LoadStocksCatalogAsync()
         {
@@ -127,10 +105,10 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
-        [HttpGet("save_daily-stocks")]
-        public async Task SaveDailyStocksAsync()
+        [HttpGet("load-stocks-daily-candles")]
+        public async Task LoadStocksDailyCandlesAsync()
         {
-            _logger.Trace($"Request - /api/save_daily-stocks");
+            _logger.Trace($"Request - /api/load-stocks-daily-candles");
 
             try
             {

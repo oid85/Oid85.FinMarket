@@ -25,7 +25,7 @@ namespace Oid85.FinMarket.External.Extensions
                 throw new NullReferenceException(nameof(settingsService));
 
             string? token = settingsService
-                .GetValueAsync<string>(KnownSettingsKeys.Tinkoff_Token)
+                .GetStringValueAsync(KnownSettingsKeys.Tinkoff_Token)
                 .GetAwaiter()
                 .GetResult() ?? throw new InvalidOperationException("Tinkoff token is not set");
 

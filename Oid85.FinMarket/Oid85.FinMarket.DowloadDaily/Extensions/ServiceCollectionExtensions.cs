@@ -73,7 +73,7 @@ namespace Oid85.FinMarket.DowloadDaily.Extensions
                 throw new NullReferenceException(nameof(settingsService));
 
             string cron = settingsService
-                .GetValueAsync<string>(KnownSettingsKeys.Quartz_DowloadDaily_Cron)
+                .GetStringValueAsync(KnownSettingsKeys.Quartz_DowloadDaily_Cron)
                 .GetAwaiter()
                 .GetResult();
 
