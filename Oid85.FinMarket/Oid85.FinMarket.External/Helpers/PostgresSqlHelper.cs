@@ -49,8 +49,6 @@ namespace Oid85.FinMarket.External.Helpers
                 var command = new NpgsqlCommand(commandText, connection);
                 await command.ExecuteNonQueryAsync();
                 await command.DisposeAsync();
-
-                _logger.Trace($"PostgresSqlHelper.NonQueryCommandAsync: commandText - '{commandText}'");
             }
 
             catch (Exception exception)
