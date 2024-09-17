@@ -115,12 +115,15 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
                 var stocks = await _catalogService
                     .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
 
+                var data = new List<Tuple<string, List<Candle>>>();
+
                 foreach (var stock in stocks)
                 {
                     var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily);
-                    int result = await _storageService.SaveCandlesAsync(
-                        $"{stock.Ticker}_{KnownTimeframes.Daily}", candles);
+                    data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
                 }
+
+                await _storageService.SaveCandlesAsync(data);
             }
 
             catch (Exception exception)

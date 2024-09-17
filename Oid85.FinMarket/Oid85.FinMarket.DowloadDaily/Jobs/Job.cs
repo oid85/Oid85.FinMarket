@@ -1,4 +1,5 @@
 ﻿using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.External.Storage;
@@ -42,15 +43,26 @@ namespace DaGroup.Mfsb.Computation.WebHost.Jobs
             if (!enabled)
                 return;
 
-            var stocks = await _catalogService
-                .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
-
-            foreach (var stock in stocks) 
+            try
             {
-                var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily);
-                int result = await _storageService.SaveCandlesAsync(
-                    $"{stock.Ticker}_{KnownTimeframes.Daily}", candles);
-            }            
+                var stocks = await _catalogService
+                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
+
+                var data = new List<Tuple<string, List<Candle>>>();
+
+                foreach (var stock in stocks)
+                {
+                    var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily);
+                    data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
+                }
+
+                await _storageService.SaveCandlesAsync(data);
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+            }
         }
     }
 }

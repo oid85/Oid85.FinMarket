@@ -29,70 +29,18 @@ namespace Oid85.FinMarket.External.Storage
         }
 
         /// <inheritdoc />
-        public async Task<int> SaveCandlesAsync(string tableName, IList<Candle> candles)
+        public async Task SaveCandlesAsync(List<Tuple<string, List<Candle>>> data)
         {
             try
             {
-                tableName = tableName.ToLower();
-
-                int inserted = 0;
-
                 await using var connection = await GetPostgresConnectionAsync();
 
                 await connection.OpenAsync();
 
-                // Если нет таблицы - создаем ее
-                await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
-                    $"id bigserial NOT NULL, " +
-                    $"\"open\" double precision NULL, " +
-                    $"\"close\" double precision NULL, " +
-                    $"high double precision NULL, " +
-                    $"low double precision NULL, " +
-                    $"volume bigint NULL, " +
-                    $"\"date\" timestamp with time zone NULL, " +
-                    $"is_complete int NULL, " +
-                    $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
-                    connection);
-
-                for (var i = 0; i < candles.Count; i++)
-                {
-                    var (open, close, high, low) = FormatCandle(candles[i]);
-
-                    // Если свеча уже записана в хранилище
-                    var alreadyExistCandleTable = _sqlHelper.Select(
-                        $"select date, is_complete " +
-                        $"from {tableName} " +
-                        $"where date = '{candles[i].Date}'", connection);
-
-                    if (alreadyExistCandleTable!.Rows.Count > 0)
-                    {
-                        bool isComplete = Convert.ToInt32(alreadyExistCandleTable.Rows[0]["is_complete"]) == 1;
-
-                        // Ессли свеча не полная, то обновляем ее
-                        if (!isComplete)
-                            await _sqlHelper.NonQueryCommandAsync(
-                                $"update finmarket " +
-                                $"set open = {open}, close = {close}, high = {high}, low = {low}, " +
-                                $"volume = {candles[i].Volume}, is_complete = {candles[i].IsComplete} " +
-                                $"where date = '{candles[i].Date}')",
-                                connection);
-                    }
-
-                    else
-                    {
-                        // Если свеча еще не записана в хранилище
-                        await _sqlHelper.NonQueryCommandAsync(
-                            $"insert into {tableName} (open, close, high, low, volume, date, is_complete) " +
-                            $"values ({open}, {close}, {high}, {low}, {candles[i].Volume}, '{candles[i].Date}', {candles[i].IsComplete})",
-                            connection);
-                    }
-
-                    inserted++;
-                }
+                foreach (var item in data)
+                    await SaveCandlesAsync(item.Item1, item.Item2, connection);
 
                 await connection.CloseAsync();
-
-                return inserted;
             }
 
             catch (Exception exception)
@@ -161,6 +109,84 @@ namespace Oid85.FinMarket.External.Storage
             string low = candle.Low.ToString().Replace(',', '.');
 
             return (open, close, high, low);
+        }
+
+        /// <summary>
+        /// Сохранить свечи по одному инструменту
+        /// </summary>
+        private async Task<int> SaveCandlesAsync(
+            string tableName, 
+            List<Candle> candles, 
+            NpgsqlConnection connection)
+        {
+            try
+            {
+                tableName = tableName.ToLower();
+
+                int inserted = 0;
+
+                // Если нет таблицы - создаем ее
+                await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
+                    $"id bigserial NOT NULL, " +
+                    $"\"open\" double precision NULL, " +
+                    $"\"close\" double precision NULL, " +
+                    $"high double precision NULL, " +
+                    $"low double precision NULL, " +
+                    $"volume bigint NULL, " +
+                    $"\"date\" timestamp with time zone NULL, " +
+                    $"is_complete int NULL, " +
+                    $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
+                    connection);
+
+                for (var i = 0; i < candles.Count; i++)
+                {
+                    var (open, close, high, low) = FormatCandle(candles[i]);
+
+                    // Если свеча уже записана в хранилище
+                    var existedCandleTable = _sqlHelper.Select(
+                        $"select id, open, close, high, low, volume, date, is_complete " +
+                        $"from {tableName} " +
+                        $"where date = '{candles[i].Date}'", connection);
+
+                    if (existedCandleTable!.Rows.Count > 0)
+                    {
+                        bool isComplete = Convert.ToInt32(existedCandleTable.Rows[0]["is_complete"]) == 1;
+                        long id = Convert.ToInt64(existedCandleTable.Rows[0]["id"]);
+
+                        // Если свеча не полная, то обновляем ее
+                        if (!isComplete)
+                            await _sqlHelper.NonQueryCommandAsync(
+                                $"update {tableName} " +
+                                $"set open = {open}, " +
+                                $"close = {close}, " +
+                                $"high = {high}, " +
+                                $"low = {low}, " +
+                                $"volume = {candles[i].Volume}, " +
+                                $"is_complete = {candles[i].IsComplete} " +
+                                $"where id = '{id}'",
+                                connection);
+                    }
+
+                    else
+                    {
+                        // Если свеча еще не записана в хранилище
+                        await _sqlHelper.NonQueryCommandAsync(
+                            $"insert into {tableName} (open, close, high, low, volume, date, is_complete) " +
+                            $"values ({open}, {close}, {high}, {low}, {candles[i].Volume}, '{candles[i].Date}', {candles[i].IsComplete})",
+                            connection);
+                    }
+
+                    inserted++;
+                }
+
+                return inserted;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                return -1;
+            }
         }
 
         /// <summary>

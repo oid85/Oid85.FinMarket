@@ -10,17 +10,14 @@ namespace Oid85.FinMarket.External.Storage
         /// <summary>
         /// Добавить свечи в хранилище
         /// </summary>
-        /// <param name="tableName">Имя таблицы</param>
-        /// <param name="candles">Свечи фин. инструмента</param>
-        /// <returns></returns>
-        public Task<int> SaveCandlesAsync(string tableName, IList<Candle> candles);
+        /// <param name="data">Таблциы, свечи</param>        
+        public Task SaveCandlesAsync(List<Tuple<string, List<Candle>>> data);
 
         /// <summary>
         /// Получить свечи из хранилища
         /// </summary>
         /// <param name="tableName">Имя таблицы</param>
-        /// <param name="count">Кол-во последних свечей</param>
-        /// <returns></returns>
+        /// <param name="count">Кол-во последних свечей</param>       
         public Task<List<Candle>> GetCandlesAsync(string tableName, int count);
     }
 }
