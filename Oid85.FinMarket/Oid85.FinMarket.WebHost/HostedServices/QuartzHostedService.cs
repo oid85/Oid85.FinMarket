@@ -6,7 +6,7 @@ using Quartz;
 using Quartz.Logging;
 using Quartz.Spi;
 
-namespace Oid85.FinMarket.DowloadDaily.HostedServices
+namespace Oid85.FinMarket.WebHost.HostedServices
 {
     public class QuartzHostedService : IHostedService
     {

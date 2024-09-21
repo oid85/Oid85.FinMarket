@@ -2,14 +2,14 @@
 using Microsoft.OpenApi.Models;
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.DowloadDaily.HostedServices;
+using Oid85.FinMarket.WebHost.HostedServices;
 using Oid85.FinMarket.External.Settings;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
 using ILogger = NLog.ILogger;
 
-namespace Oid85.FinMarket.DowloadDaily.Extensions
+namespace Oid85.FinMarket.WebHost.Extensions
 {
     public static class ServiceCollectionExtensions
     {

@@ -3,7 +3,7 @@ using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.Tinkoff;
 
-namespace Oid85.FinMarket.DowloadDaily.HostedServices
+namespace Oid85.FinMarket.WebHost.HostedServices
 {
     public class InitHostedService : IHostedService
     {

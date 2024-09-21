@@ -1,8 +1,8 @@
-using Oid85.FinMarket.DowloadDaily.Extensions;
-using Oid85.FinMarket.DowloadDaily.HostedServices;
+using Oid85.FinMarket.WebHost.Extensions;
+using Oid85.FinMarket.WebHost.HostedServices;
 using Oid85.FinMarket.External.Extensions;
 
-namespace Oid85.FinMarket.DowloadDaily
+namespace Oid85.FinMarket.WebHost
 {
     public class Program
     {
