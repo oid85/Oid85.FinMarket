@@ -1,4 +1,6 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System.Data;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using NLog;
 
@@ -8,57 +10,105 @@ namespace Oid85.FinMarket.External.Settings
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _cache;
 
         public SettingsService(
             ILogger logger,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IMemoryCache cache)
         {
-            _logger = logger;
-            _configuration = configuration;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
         /// <inheritdoc />
-        public async Task<T> GetValueAsync<T>(string key)
+        public async Task<string> GetStringValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return value.ToString()!;
+        }
+
+        /// <inheritdoc />
+        public async Task<int> GetIntValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return Convert.ToInt32(value);
+        }
+
+        /// <inheritdoc />
+        public async Task<double> GetDoubleValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return Convert.ToDouble(value);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> GetBoolValueAsync(string key)
+        {
+            object value = await GetValueAsync(key);
+
+            return Convert.ToBoolean(value);
+        }
+
+        private async Task<object> GetValueAsync(string key)
         {
             try
             {
-                await using (var connection = GetSqliteConnection())
-                {
-                    await connection!.OpenAsync();
+                var cachedValue = _cache.Get(key);
 
-                    var selectCommand = new SqliteCommand($"select value from items where key = '{key}'", connection);
+                if (cachedValue != null)
+                    return cachedValue;
 
-                    object value = new();
+                await using var connection = GetSqliteConnection();
 
-                    using (SqliteDataReader reader = selectCommand.ExecuteReader())
-                        if (reader.HasRows)
-                            while (reader.Read())
-                                value = reader.GetValue(0);
+                await connection.OpenAsync();
 
-                        else
-                        {
-                            string message = $"В таблице items нет параметра '{key}'";                            
-                            _logger.Error(message);
-                            throw new Exception(message);
-                        }
+                var selectCommand = new SqliteCommand(
+                    $"select value " +
+                    $"from settings " +
+                    $"where key = '{key}'", connection);
 
-                    await connection.CloseAsync();
+                object value = new();
 
-                    return (T) value;
-                }
+                using (SqliteDataReader reader = selectCommand.ExecuteReader())
+                    if (reader.HasRows)
+                        while (reader.Read())
+                            value = reader.GetValue("value");
+
+                    else
+                    {
+                        _logger.Error($"В таблице settings нет параметра '{key}'");
+                        throw new InvalidOperationException($"{nameof(key)} - В таблице settings нет параметра '{key}'");
+                    }
+
+                await connection.CloseAsync();
+
+                if (value == null)
+                    throw new InvalidOperationException($"{nameof(key)} - В таблице settings нет параметра '{key}'");
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                            .SetSlidingExpiration(TimeSpan.FromHours(3));
+
+                _cache.Set(key, value, cacheEntryOptions);
+
+                return value;
             }
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
-                throw new Exception(exception.Message);
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                throw new InvalidOperationException($"Не удалось прочитать данные из БД data.db. {exception}");
             }
         }
 
         /// <summary>
         /// Получить соединение с БД
         /// </summary>
-        private SqliteConnection? GetSqliteConnection()
+        private SqliteConnection GetSqliteConnection()
         {
             try
             {
@@ -70,8 +120,8 @@ namespace Oid85.FinMarket.External.Settings
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
-                return null;
+                _logger.Error($"Не удалось установить соединение с БД data.db. {exception}");
+                throw new Exception($"Не удалось установить соединение с БД data.db. {exception}");
             }
         }
     }

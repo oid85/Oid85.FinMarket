@@ -34,7 +34,7 @@ namespace Oid85.FinMarket.External.Helpers
 
             catch (Exception exception)
             {
-                _logger.Error($"SqlHelper.Select: exception - '{exception}'. commandText - '{commandText}'");
+                _logger.Error($"PostgresSqlHelper.Select: exception - '{exception}'. commandText - '{commandText}'");
                 return null;
             }
         }
@@ -53,7 +53,7 @@ namespace Oid85.FinMarket.External.Helpers
 
             catch (Exception exception)
             {
-                _logger.Error($"SqlHelper.NonQueryCommandAsync: exception - '{exception}'. commandText - '{commandText}'");
+                _logger.Error($"PostgresSqlHelper.NonQueryCommandAsync: exception - '{exception}'. commandText - '{commandText}'");
             }
         }
 
@@ -73,7 +73,7 @@ namespace Oid85.FinMarket.External.Helpers
 
             catch (Exception exception)
             {
-                _logger.Error($"SqlHelper.ScalarCommandAsync: exception - '{exception}'. commandText - '{commandText}'");
+                _logger.Error($"PostgresSqlHelper.ScalarCommandAsync: exception - '{exception}'. commandText - '{commandText}'");
                 return null;
             }
         }

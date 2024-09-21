@@ -2,6 +2,8 @@
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.Settings;
+using System.Xml.Linq;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -13,35 +15,40 @@ namespace Oid85.FinMarket.External.Tinkoff
     {
         private readonly ILogger _logger;
         private readonly InvestApiClient _client;
+        private readonly ISettingsService _settingsService;
 
         public TinkoffService(
             ILogger logger,
-            InvestApiClient client
+            InvestApiClient client,
+            ISettingsService settingsService
             )
         {
-            _logger = logger;
-            _client = client;            
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         }
 
         /// <inheritdoc />
-        public async Task<IList<Candle>> GetCandlesAsync(FinancicalInstrument instrument, string timeframe)
+        public async Task<List<Candle>> GetCandlesAsync(
+            FinancicalInstrument instrument, string timeframe)
         {
             try
             {
-                var (start, end) = GetDataRange(timeframe);
+                var (start, end) = await GetDataRange(timeframe);
 
-                var request = new GetCandlesRequest();
-
-                request.InstrumentId = instrument.Figi;
-                request.From = start;
-                request.To = end;
+                var request = new GetCandlesRequest
+                {
+                    InstrumentId = instrument.Figi,
+                    From = start,
+                    To = end
+                };
 
                 var interval = GetCandleInterval(timeframe);
 
                 if (interval == CandleInterval.Unspecified)
                 {
                     _logger.Error("Неизвестный интервал. interval = CandleInterval.Unspecified");
-                    return new List<Candle>() { };
+                    return [];
                 }
 
                 request.Interval = interval;
@@ -52,14 +59,16 @@ namespace Oid85.FinMarket.External.Tinkoff
 
                 for ( var i = 0; i < response.Candles.Count; i++)
                 {
-                    var candle = new Candle();
-
-                    candle.Open = ConvertToDouble(response.Candles[i].Open);
-                    candle.Close = ConvertToDouble(response.Candles[i].Close);
-                    candle.High = ConvertToDouble(response.Candles[i].High);
-                    candle.Low = ConvertToDouble(response.Candles[i].Low);
-                    candle.Volume = response.Candles[i].Volume;
-                    candle.Date = response.Candles[i].Time.ToDateTime();
+                    var candle = new Candle
+                    {
+                        Open = ConvertToDouble(response.Candles[i].Open),
+                        Close = ConvertToDouble(response.Candles[i].Close),
+                        High = ConvertToDouble(response.Candles[i].High),
+                        Low = ConvertToDouble(response.Candles[i].Low),
+                        Volume = response.Candles[i].Volume,
+                        Date = response.Candles[i].Time.ToDateTime(),
+                        IsComplete = response.Candles[i].IsComplete == true ? 1 : 0
+                    };
 
                     candles.Add(candle);
                 }
@@ -70,33 +79,176 @@ namespace Oid85.FinMarket.External.Tinkoff
             catch (Exception exception)
             {
                 _logger.Error(exception);
-                return new List<Candle>() { };
+                return [];
             }
         }
 
-        private (Timestamp start, Timestamp end) GetDataRange(string timeframe)
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetStocks()
         {
-            const int buffer = 300; // Минимум свечей
+            try
+            {
+                var shares = _client.Instruments
+                    .Shares().Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList(); 
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var share in shares)
+                {
+                    
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = share.Ticker,
+                        Figi = share.Figi,
+                        Description = share.Name,
+                        Sector = share.Sector,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetBonds()
+        {
+            try
+            {
+                var bonds = _client.Instruments
+                    .Bonds().Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList();
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var bond in bonds)
+                {
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = bond.Ticker,
+                        Figi = bond.Figi,
+                        Description = bond.Name,
+                        Sector = bond.Sector,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetFutures()
+        {
+            try
+            {
+                var futures = _client.Instruments
+                    .Futures().Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList();
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var future in futures)
+                {
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = future.Ticker,
+                        Figi = future.Figi,
+                        Description = future.Name,
+                        Sector = future.Sector,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public List<FinancicalInstrument> GetCurrencies()
+        {
+            try
+            {
+                var currencies = _client.Instruments
+                    .Currencies().Instruments
+                    .ToList();
+
+                var instruments = new List<FinancicalInstrument>() { };
+
+                foreach (var currencie in currencies)
+                {
+                    var instrument = new FinancicalInstrument
+                    {
+                        Ticker = currencie.Ticker,
+                        Figi = currencie.Figi,
+                        Description = currencie.Name,
+                        IsActive = 1
+                    };
+
+                    instruments.Add(instrument);
+                }
+
+                return instruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        private async Task<(Timestamp start, Timestamp end)> GetDataRange(string timeframe)
+        {           
+            var buffer = await _settingsService.GetIntValueAsync(KnownSettingsKeys.ApplicationSettings_Buffer);
 
             var startDate = DateTime.Now;
             var endDate = DateTime.Now;
 
             if (timeframe == KnownTimeframes.Daily)
-                startDate = DateTime.Now.AddDays(-1 * buffer); // 300 дневок
+                startDate = DateTime.Now.AddDays(-1 * buffer);
 
-            if (timeframe == KnownTimeframes.Hourly)
-                startDate = DateTime.Now.AddHours(-1 * buffer); // 300 часовок
+            else if (timeframe == KnownTimeframes.Hourly)
+                startDate = DateTime.Now.AddHours(-1 * buffer);
 
-            if (timeframe == KnownTimeframes.FiveMinutes)
-                startDate = DateTime.Now.AddMinutes(-5 * buffer); // 300 пятиминуток
+            else if (timeframe == KnownTimeframes.FiveMinutes)
+                startDate = DateTime.Now.AddMinutes(-5 * buffer);
 
-            if (timeframe == KnownTimeframes.OneMinutes)
-                startDate = DateTime.Now.AddMinutes(-1 * buffer); // 300 минуток
+            else if (timeframe == KnownTimeframes.OneMinutes)
+                startDate = DateTime.Now.AddMinutes(-1 * buffer);
 
-            return (Timestamp.FromDateTime(startDate), Timestamp.FromDateTime(endDate));
+            return (Timestamp.FromDateTime(startDate.ToUniversalTime()), Timestamp.FromDateTime(endDate.ToUniversalTime()));
         }
 
-        private CandleInterval GetCandleInterval(string timeframe) 
+        private static CandleInterval GetCandleInterval(string timeframe) 
         { 
             if (timeframe == KnownTimeframes.Daily)
                 return CandleInterval.Day;
@@ -113,7 +265,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             return CandleInterval.Unspecified;
         }
 
-        private double ConvertToDouble(Quotation quotation)
+        private static double ConvertToDouble(Quotation quotation)
         {
             return quotation.Units + quotation.Nano / 1_000_000_000.0;
         }
