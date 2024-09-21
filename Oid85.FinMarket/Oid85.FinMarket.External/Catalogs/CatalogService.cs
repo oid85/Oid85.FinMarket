@@ -1,4 +1,7 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System.Data;
+using System.Net;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
@@ -9,68 +12,182 @@ namespace Oid85.FinMarket.External.Catalogs
     public class CatalogService : ICatalogService
     {
         private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
         private readonly ISettingsService _settingsService;
 
         public CatalogService(
             ILogger logger,
+            IConfiguration configuration,
             ISettingsService settingsService)
         {
-            _logger = logger;
-            _settingsService = settingsService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         }
 
         /// <inheritdoc />
-        public async Task<FinancicalInstrument> GetFinancicalInstrumentAsync(string tableName, string ticker)
+        public async Task<FinancicalInstrument?> GetFinancicalInstrumentAsync(string tableName, string ticker)
         {
             try
             {
-                await using (var connection = await GetSqliteConnectionAsync())
-                {
-                    await connection!.OpenAsync();
+                await using var connection = await GetSqliteConnectionAsync();
 
-                    var selectCommand = new SqliteCommand($"select id, ticker, figi, description, is_active from {tableName.ToLower()} where ticker = '{ticker}'", connection);
+                await connection.OpenAsync();
 
-                    var financicalInstrument = new FinancicalInstrument();
+                var selectCommand = new SqliteCommand(
+                    $"select id, ticker, figi, description, sector, is_active " +
+                    $"from {tableName.ToLower()} " +
+                    $"where ticker = '{ticker}'", connection);
 
-                    using (SqliteDataReader reader = selectCommand.ExecuteReader())
-                        if (reader.HasRows)
-                            while (reader.Read())
-                            {
-                                financicalInstrument.Id = reader.GetInt32(0);
-                                financicalInstrument.Ticker = reader.GetString(1);
-                                financicalInstrument.Figi = reader.GetString(2);
-                                financicalInstrument.Description = reader.GetString(3);
-                                financicalInstrument.IsActive = reader.GetInt32(4);
-                            }
+                var financicalInstrument = new FinancicalInstrument();
 
-                        else
+                using (SqliteDataReader reader = selectCommand.ExecuteReader())
+                    if (reader.HasRows)
+                        while (reader.Read())
                         {
-                            string message = $"В таблице {tableName.ToLower()} нет инструмента '{ticker}'";
-                            _logger.Error(message);
-                            throw new Exception(message);
+                            financicalInstrument.Id = reader.GetInt32("id");
+                            financicalInstrument.Ticker = reader.GetString("ticker");
+                            financicalInstrument.Figi = reader.GetString("figi");
+                            financicalInstrument.Description = reader.GetString("description");
+                            financicalInstrument.Sector = reader.GetString("sector");
+                            financicalInstrument.IsActive = reader.GetInt32("is_active");
                         }
 
-                    await connection.CloseAsync();
+                    else
+                    {                        
+                        _logger.Error($"В таблице {tableName.ToLower()} нет инструмента '{ticker}'");
+                        return null;
+                    }
 
-                    return financicalInstrument;
-                }
+                await connection.CloseAsync();
+
+                return financicalInstrument;
             }
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
-                throw new Exception(exception.Message);
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<FinancicalInstrument>> GetActiveFinancicalInstrumentsAsync(string tableName)
+        {
+            try
+            {
+                await using var connection = await GetSqliteConnectionAsync();
+
+                await connection.OpenAsync();
+
+                var selectCommand = new SqliteCommand(
+                    $"select id, ticker, figi, description, sector, is_active " +
+                    $"from {tableName.ToLower()} " +
+                    $"where is_active = 1", connection);
+
+                var financicalInstruments = new List<FinancicalInstrument>();
+                
+                using (SqliteDataReader reader = selectCommand.ExecuteReader())
+                    if (reader.HasRows)
+                        while (reader.Read())
+                        {
+                            var financicalInstrument = new FinancicalInstrument
+                            {
+                                Id = reader.GetInt32("id"),
+                                Ticker = reader.GetString("ticker"),
+                                Figi = reader.GetString("figi"),
+                                Description = reader.GetString("description"),
+                                Sector = reader.GetString("sector"),
+                                IsActive = reader.GetInt32("is_active")
+                            };
+
+                            financicalInstruments.Add(financicalInstrument);
+                        }
+
+                    else
+                    {
+                        _logger.Error($"В таблице {tableName.ToLower()} нет активных инструментов");
+                        return [];
+                    }
+
+                await connection.CloseAsync();
+
+                return financicalInstruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task LoadFinancicalInstrumentsAsync(string tableName, List<FinancicalInstrument> instruments)
+        {
+            try
+            {
+                await using var connection = await GetSqliteConnectionAsync();
+
+                await connection.OpenAsync();
+
+                foreach (var instrument in instruments) 
+                {
+                    string description = instrument.Description.Replace("'", "");
+
+                    string ticker = instrument.Ticker
+                        .Replace("-", "_")
+                        .Replace("@", "_");
+
+                    var selectCommand = new SqliteCommand(
+                        $"select ticker from {tableName.ToLower()} " +
+                        $"where ticker = '{ticker}'", connection);
+
+                    var reader = await selectCommand.ExecuteReaderAsync();
+
+                    if (reader.HasRows)
+                    {
+                        var updateCommand = new SqliteCommand(
+                            $"update {tableName.ToLower()} " +
+                            $"set " +
+                            $"figi = '{instrument.Figi}', " +
+                            $"description = '{description}', " +
+                            $"sector = '{instrument.Sector}', " +
+                            $"is_active = '{instrument.IsActive}' " +
+                            $"where ticker = '{ticker}'", connection);
+
+                        await updateCommand.ExecuteNonQueryAsync();
+                    }
+
+                    else
+                    {
+                        var insertCommand = new SqliteCommand(
+                            $"insert into {tableName.ToLower()} (ticker, figi, description, sector, is_active) " +
+                            $"values ('{ticker}', '{instrument.Figi}', '{description}', " +
+                            $"'{instrument.Sector}', {instrument.IsActive})", connection);
+
+                        await insertCommand.ExecuteNonQueryAsync();
+                    }
+                }
+
+                await connection.CloseAsync();
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return;
             }
         }
 
         /// <summary>
         /// Получить соединение с БД
         /// </summary>
-        private async Task<SqliteConnection?> GetSqliteConnectionAsync()
+        private async Task<SqliteConnection> GetSqliteConnectionAsync()
         {
             try
             {
-                var connectionString = await _settingsService.GetValueAsync<string>(KnownSettingsKeys.SQLite_Catalogs_ConnectionString);
+                var connectionString = _configuration.GetValue<string>("SQLite:Settings:ConnectionString");
                 var connection = new SqliteConnection(connectionString);
 
                 return connection;
@@ -78,8 +195,8 @@ namespace Oid85.FinMarket.External.Catalogs
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
-                return null;
+                _logger.Error($"Не удалось установить соединение с БД data.db. {exception}");
+                throw new Exception($"Не удалось установить соединение с БД data.db. {exception}");
             }
         }
     }

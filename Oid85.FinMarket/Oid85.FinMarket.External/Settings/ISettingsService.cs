@@ -6,8 +6,23 @@
     public interface ISettingsService
     {
         /// <summary>
-        /// Получить значение параметра настройки
+        /// Получить значение параметра настройки (string)
         /// </summary>
-        public Task<T> GetValueAsync<T>(string key);
+        public Task<string> GetStringValueAsync(string key);
+
+        /// <summary>
+        /// Получить значение параметра настройки (int)
+        /// </summary>
+        public Task<int> GetIntValueAsync(string key);
+
+        /// <summary>
+        /// Получить значение параметра настройки (double)
+        /// </summary>
+        public Task<double> GetDoubleValueAsync(string key);
+
+        /// <summary>
+        /// Получить значение параметра настройки (bool)
+        /// </summary>
+        public Task<bool> GetBoolValueAsync(string key);
     }
 }
