@@ -8,20 +8,17 @@ namespace Oid85.FinMarket.WebHost.HostedServices
     public class InitHostedService : IHostedService
     {
         private readonly ILogger _logger;
-        private readonly IConfiguration _configuration;
         private readonly ITinkoffService _tinkoffService;
         private readonly ICatalogService _catalogService;
 
         public InitHostedService(
             ILogger logger,
-            IConfiguration configuration,
             ITinkoffService tinkoffService,
             ICatalogService catalogService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
-            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
             _tinkoffService = tinkoffService ?? throw new ArgumentNullException(nameof(tinkoffService));
+            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));            
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.Domain.AnalyseResults;
 
 namespace Oid85.FinMarket.External.Storage
 {
@@ -41,6 +42,56 @@ namespace Oid85.FinMarket.External.Storage
                     await SaveCandlesAsync(item.Item1, item.Item2, connection);
 
                 await connection.CloseAsync();
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<Candle>> GetCandlesAsync(string tableName)
+        {
+            try
+            {
+                await using var connection = await GetPostgresConnectionAsync();
+
+                await connection.OpenAsync();
+
+                var table = _sqlHelper.Select(
+                    $"select open, close, high, low, volume, date " +
+                    $"from {tableName} " +
+                    $"order by date", connection);
+
+                await connection.CloseAsync();
+
+                var candles = new List<Candle>();
+
+                for (int i = 0; i < table!.Rows.Count; i++)
+                {
+                    var open = Convert.ToDouble(table.Rows[i][0]);
+                    var close = Convert.ToDouble(table.Rows[i][1]);
+                    var high = Convert.ToDouble(table.Rows[i][2]);
+                    var low = Convert.ToDouble(table.Rows[i][3]);
+                    var volume = Convert.ToInt32(table.Rows[i][4]);
+                    var date = Convert.ToDateTime(table.Rows[i][5]);
+
+                    var candle = new Candle()
+                    {
+                        Open = open,
+                        Close = close,
+                        High = high,
+                        Low = low,
+                        Volume = volume,
+                        Date = date
+                    };
+
+                    candles.Add(candle);
+                }
+
+                return candles;
             }
 
             catch (Exception exception)
@@ -101,6 +152,83 @@ namespace Oid85.FinMarket.External.Storage
             }
         }
 
+        /// <inheritdoc />
+        public async Task<List<Candle>> GetCandlesAsync(string tableName, int count, DateTime dateTime)
+        {
+            try
+            {
+                await using var connection = await GetPostgresConnectionAsync();
+
+                await connection.OpenAsync();
+
+                var table = _sqlHelper.Select(
+                    $"select open, close, high, low, volume, date " +
+                    $"from {tableName} " +
+                    $"where date <= '{dateTime}' " + 
+                    $"order by date " +
+                    $"limit {count}", connection);
+
+                await connection.CloseAsync();
+
+                var candles = new List<Candle>();
+
+                for (int i = 0; i < table!.Rows.Count; i++)
+                {
+                    var open = Convert.ToDouble(table.Rows[i][0]);
+                    var close = Convert.ToDouble(table.Rows[i][1]);
+                    var high = Convert.ToDouble(table.Rows[i][2]);
+                    var low = Convert.ToDouble(table.Rows[i][3]);
+                    var volume = Convert.ToInt32(table.Rows[i][4]);
+                    var date = Convert.ToDateTime(table.Rows[i][5]);
+
+                    var candle = new Candle()
+                    {
+                        Open = open,
+                        Close = close,
+                        High = high,
+                        Low = low,
+                        Volume = volume,
+                        Date = date
+                    };
+
+                    candles.Add(candle);
+                }
+
+                return candles;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task SaveAnalyseResultsAsync(string tableName, List<AnalyseResult> results)
+        {
+            try
+            {
+                await using var connection = await GetPostgresConnectionAsync();
+
+                await connection.OpenAsync();
+
+                // Если нет таблицы - создаем ее
+                await CreateAnalyseTableIfNotExistsAsync(tableName, connection);
+
+                foreach (var item in results)
+                    await SaveAnalyseResultAsync(tableName, item, connection);
+
+                await connection.CloseAsync();
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
+            }
+        }
+
         private (string, string, string, string) FormatCandle(Candle candle)
         {
             string open = candle.Open.ToString().Replace(',', '.');
@@ -112,31 +240,76 @@ namespace Oid85.FinMarket.External.Storage
         }
 
         /// <summary>
-        /// Сохранить свечи по одному инструменту
+        /// Сохранить один аналитический результат
         /// </summary>
-        private async Task<int> SaveCandlesAsync(
-            string tableName, 
-            List<Candle> candles, 
+        private async Task<int> SaveAnalyseResultAsync(
+            string tableName,
+            AnalyseResult result, 
             NpgsqlConnection connection)
         {
             try
             {
-                tableName = tableName.ToLower();
+                tableName = tableName.ToLower();                
 
                 int inserted = 0;
 
+                // Если аналитический результат уже записан в хранилище
+                var existedAnalyseResultTable = _sqlHelper.Select(
+                    $"select id, ticker, timeframe, trend_direction, data, date " +
+                    $"from {tableName} " +
+                    $"where date = '{result.Date}'", connection);
+
+                if (existedAnalyseResultTable!.Rows.Count > 0)
+                {
+                    long id = Convert.ToInt64(existedAnalyseResultTable.Rows[0]["id"]);
+
+                    // Обновляем результат
+                    await _sqlHelper.NonQueryCommandAsync(
+                        $"update {tableName} " +
+                        $"set ticker = '{result.Ticker}', " +
+                        $"timeframe = '{result.Timeframe}', " +
+                        $"trend_direction = '{result.TrendDirection}', " +
+                        $"data = '{result.Data}', " +
+                        $"date = '{result.Date}', " +
+                        $"where id = {id}",
+                        connection);
+                }
+
+                else
+                {
+                    // Если результат еще не записан в хранилище
+                    await _sqlHelper.NonQueryCommandAsync(
+                        $"insert into {tableName} (ticker, timeframe, trend_direction, data, date) " +
+                        $"values ('{result.Ticker}', '{result.Timeframe}', '{result.TrendDirection}', '{result.Data}', '{result.Date}')",
+                        connection);
+                }
+
+                inserted++;
+
+                return inserted;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// Сохранить свечи по одному инструменту
+        /// </summary>
+        private async Task<int> SaveCandlesAsync(
+            string tableName,
+            List<Candle> candles,
+            NpgsqlConnection connection)
+        {
+            try
+            {
                 // Если нет таблицы - создаем ее
-                await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
-                    $"id bigserial NOT NULL, " +
-                    $"\"open\" double precision NULL, " +
-                    $"\"close\" double precision NULL, " +
-                    $"high double precision NULL, " +
-                    $"low double precision NULL, " +
-                    $"volume bigint NULL, " +
-                    $"\"date\" timestamp with time zone NULL, " +
-                    $"is_complete int NULL, " +
-                    $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
-                    connection);
+                await CreateCandlesTableIfNotExistsAsync(tableName, connection);
+
+                int inserted = 0;
 
                 for (var i = 0; i < candles.Count; i++)
                 {
@@ -163,7 +336,7 @@ namespace Oid85.FinMarket.External.Storage
                                 $"low = {low}, " +
                                 $"volume = {candles[i].Volume}, " +
                                 $"is_complete = {candles[i].IsComplete} " +
-                                $"where id = '{id}'",
+                                $"where id = {id}",
                                 connection);
                     }
 
@@ -207,6 +380,40 @@ namespace Oid85.FinMarket.External.Storage
                 _logger.Error($"Не удалось установить соединение с БД finmarket. {exception}");
                 throw new Exception($"Не удалось установить соединение с БД finmarket. {exception}");
             }
+        }
+
+        private async Task CreateCandlesTableIfNotExistsAsync(
+            string tableName, NpgsqlConnection connection)
+        {
+            tableName = tableName.ToLower();
+
+            await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
+                $"id bigserial NOT NULL, " +
+                $"\"open\" double precision NULL, " +
+                $"\"close\" double precision NULL, " +
+                $"high double precision NULL, " +
+                $"low double precision NULL, " +
+                $"volume bigint NULL, " +
+                $"\"date\" timestamp with time zone NULL, " +
+                $"is_complete int NULL, " +
+                $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
+                connection);
+        }
+
+        private async Task CreateAnalyseTableIfNotExistsAsync(
+            string tableName, NpgsqlConnection connection)
+        {
+            tableName = tableName.ToLower();
+
+            await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
+                $"id bigserial NOT NULL, " +
+                $"ticker text NULL, " +
+                $"timeframe text NULL, " +
+                $"trend_direction text NULL, " +
+                $"data text NULL, " +
+                $"\"date\" timestamp with time zone NULL, " +
+                $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
+                connection);
         }
     }
 }

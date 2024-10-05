@@ -25,6 +25,7 @@ namespace Oid85.FinMarket.WebHost.HostedServices
 
             LogProvider.IsDisabled = true;
         }
+
         public IScheduler Scheduler { get; set; }
 
         public async Task StartAsync(CancellationToken cancellationToken)

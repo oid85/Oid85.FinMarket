@@ -1,6 +1,7 @@
 using Oid85.FinMarket.WebHost.Extensions;
 using Oid85.FinMarket.WebHost.HostedServices;
 using Oid85.FinMarket.External.Extensions;
+using Oid85.FinMarket.Application.Extensions;
 
 namespace Oid85.FinMarket.WebHost
 {
@@ -12,13 +13,12 @@ namespace Oid85.FinMarket.WebHost
 
             builder.Services.AddControllers();
             builder.Services.AddMemoryCache();
-
             builder.Services.ConfigureLogger();
             builder.Services.ConfigureSwagger(builder.Configuration);
             builder.Services.ConfigureCors(builder.Configuration);            
+            builder.Services.ConfigureApplicationServices();
             builder.Services.ConfigureExternalServices();
             builder.Services.ConfigureQuartz(builder.Configuration);
-
             builder.Services.AddHostedService<InitHostedService>();
 
             var app = builder.Build();
