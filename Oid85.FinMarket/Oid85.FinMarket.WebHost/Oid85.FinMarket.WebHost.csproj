@@ -15,6 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Oid85.FinMarket.Application\Oid85.FinMarket.Application.csproj" />
 	  <ProjectReference Include="..\Oid85.FinMarket.External\Oid85.FinMarket.External.csproj" />
 	</ItemGroup>
 

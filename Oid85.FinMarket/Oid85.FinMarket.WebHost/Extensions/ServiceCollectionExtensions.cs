@@ -2,14 +2,14 @@
 using Microsoft.OpenApi.Models;
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.DowloadDaily.HostedServices;
+using Oid85.FinMarket.WebHost.HostedServices;
 using Oid85.FinMarket.External.Settings;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
 using ILogger = NLog.ILogger;
 
-namespace Oid85.FinMarket.DowloadDaily.Extensions
+namespace Oid85.FinMarket.WebHost.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -64,7 +64,7 @@ namespace Oid85.FinMarket.DowloadDaily.Extensions
             services.AddFactory<ISchedulerFactory, StdSchedulerFactory>();
             services.AddHostedService<QuartzHostedService>();
 
-            services.AddSingleton<Job>();
+            services.AddSingleton<DownloadDailyJob>();
 
             var serviceProvider = services.BuildServiceProvider();
             var settingsService = serviceProvider.GetRequiredService<ISettingsService>();
@@ -77,7 +77,7 @@ namespace Oid85.FinMarket.DowloadDaily.Extensions
                 .GetAwaiter()
                 .GetResult();
 
-            services.AddSingleton(new JobSchedule(typeof(Job), cron));
+            services.AddSingleton(new JobSchedule(typeof(DownloadDailyJob), cron));
         }
 
         public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
@@ -85,7 +85,7 @@ namespace Oid85.FinMarket.DowloadDaily.Extensions
             where TImplementation : class, TService
         {
             services.AddTransient<TService, TImplementation>();
-            services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>());
+            services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>()!);
         }
 
         private static string GetXmlCommentsPath()

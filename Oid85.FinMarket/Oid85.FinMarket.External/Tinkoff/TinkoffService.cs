@@ -34,46 +34,8 @@ namespace Oid85.FinMarket.External.Tinkoff
         {
             try
             {
-                var (start, end) = await GetDataRange(timeframe);
-
-                var request = new GetCandlesRequest
-                {
-                    InstrumentId = instrument.Figi,
-                    From = start,
-                    To = end
-                };
-
-                var interval = GetCandleInterval(timeframe);
-
-                if (interval == CandleInterval.Unspecified)
-                {
-                    _logger.Error("Неизвестный интервал. interval = CandleInterval.Unspecified");
-                    return [];
-                }
-
-                request.Interval = interval;
-
-                var response = await _client.MarketData.GetCandlesAsync(request);
-
-                var candles = new List<Candle>() { };
-
-                for ( var i = 0; i < response.Candles.Count; i++)
-                {
-                    var candle = new Candle
-                    {
-                        Open = ConvertToDouble(response.Candles[i].Open),
-                        Close = ConvertToDouble(response.Candles[i].Close),
-                        High = ConvertToDouble(response.Candles[i].High),
-                        Low = ConvertToDouble(response.Candles[i].Low),
-                        Volume = response.Candles[i].Volume,
-                        Date = response.Candles[i].Time.ToDateTime(),
-                        IsComplete = response.Candles[i].IsComplete == true ? 1 : 0
-                    };
-
-                    candles.Add(candle);
-                }
-
-                return candles;
+                var (from, to) = await GetDataRange(timeframe);
+                return await GetCandlesAsync(instrument, timeframe, from, to);
             }
 
             catch (Exception exception)
@@ -81,6 +43,70 @@ namespace Oid85.FinMarket.External.Tinkoff
                 _logger.Error(exception);
                 return [];
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<Candle>> GetCandlesAsync(
+            FinancicalInstrument instrument, string timeframe, int year)
+        {
+            try
+            {
+                return await GetCandlesAsync(
+                    instrument, 
+                    timeframe,
+                    Timestamp.FromDateTime(new DateTime(year, 1, 1, 0, 0, 0).ToUniversalTime()),
+                    Timestamp.FromDateTime(new DateTime(year, 12, 31, 23, 59, 59).ToUniversalTime()));
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+                return [];
+            }
+        }
+
+        private async Task<List<Candle>> GetCandlesAsync(
+                    FinancicalInstrument instrument, string timeframe,
+                    Timestamp from, Timestamp to)
+        {
+            var request = new GetCandlesRequest
+            {
+                InstrumentId = instrument.Figi,
+                From = from,
+                To = to
+            };
+
+            var interval = GetCandleInterval(timeframe);
+
+            if (interval == CandleInterval.Unspecified)
+            {
+                _logger.Error("Неизвестный интервал. interval = CandleInterval.Unspecified");
+                return [];
+            }
+
+            request.Interval = interval;
+
+            var response = await _client.MarketData.GetCandlesAsync(request);
+
+            var candles = new List<Candle>() { };
+
+            for (var i = 0; i < response.Candles.Count; i++)
+            {
+                var candle = new Candle
+                {
+                    Open = ConvertToDouble(response.Candles[i].Open),
+                    Close = ConvertToDouble(response.Candles[i].Close),
+                    High = ConvertToDouble(response.Candles[i].High),
+                    Low = ConvertToDouble(response.Candles[i].Low),
+                    Volume = response.Candles[i].Volume,
+                    Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
+                    IsComplete = response.Candles[i].IsComplete == true ? 1 : 0
+                };
+
+                candles.Add(candle);
+            }
+
+            return candles;
         }
 
         /// <inheritdoc />
@@ -226,7 +252,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             }
         }
 
-        private async Task<(Timestamp start, Timestamp end)> GetDataRange(string timeframe)
+        private async Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
         {           
             var buffer = await _settingsService.GetIntValueAsync(KnownSettingsKeys.ApplicationSettings_Buffer);
 

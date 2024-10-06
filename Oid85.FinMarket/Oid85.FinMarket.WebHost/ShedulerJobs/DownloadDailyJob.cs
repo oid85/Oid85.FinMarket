@@ -11,7 +11,7 @@ namespace DaGroup.Mfsb.Computation.WebHost.Jobs
 {
     [DisallowConcurrentExecution]
     [PersistJobDataAfterExecution]
-    public class Job : IJob
+    public class DownloadDailyJob : IJob
     {
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
@@ -20,7 +20,7 @@ namespace DaGroup.Mfsb.Computation.WebHost.Jobs
         private readonly IStorageService _storageService;
         private readonly ICatalogService _catalogService;
 
-        public Job(
+        public DownloadDailyJob(
             ILogger logger, 
             IServiceProvider serviceProvider,
             ISettingsService settingsService,

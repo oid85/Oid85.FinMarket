@@ -6,18 +6,18 @@ using Oid85.FinMarket.External.Storage;
 using Oid85.FinMarket.External.Tinkoff;
 using ILogger = NLog.ILogger;
 
-namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
+namespace Oid85.FinMarket.WebHost.Controller
 {
     [Route("api")]
     [ApiController]
-    public class DowloadDailyController : ControllerBase
+    public class LoadController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly ITinkoffService _tinkoffService;
         private readonly ICatalogService _catalogService;
         private readonly IStorageService _storageService;
 
-        public DowloadDailyController(
+        public LoadController(
             ILogger logger,
             ITinkoffService tinkoffService,
             ICatalogService catalogService,
@@ -29,6 +29,9 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             _storageService = storageService;
         }
 
+        /// <summary>
+        /// Загрузить справочник акций
+        /// </summary>
         [HttpGet("load-stocks-catalog")]
         public async Task LoadStocksCatalogAsync()
         {
@@ -48,6 +51,9 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Загрузить справочник облигаций
+        /// </summary>
         [HttpGet("load-bonds-catalog")]
         public async Task LoadBondsCatalogAsync()
         {
@@ -67,6 +73,9 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Загрузить справочник фьючерсов
+        /// </summary>
         [HttpGet("load-futures-catalog")]
         public async Task LoadFuturesCatalogAsync()
         {
@@ -86,6 +95,9 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Загрузить справочник валют
+        /// </summary>
         [HttpGet("load-currencies-catalog")]
         public async Task LoadCurrenciesCatalogAsync()
         {
@@ -105,6 +117,9 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Подгрузить последние свечи
+        /// </summary>
         [HttpGet("load-stocks-daily-candles")]
         public async Task LoadStocksDailyCandlesAsync()
         {
@@ -120,6 +135,38 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
                 foreach (var stock in stocks)
                 {
                     var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily);
+                    data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
+                }
+
+                await _storageService.SaveCandlesAsync(data);
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+            }
+        }
+
+        /// <summary>
+        /// Загрузить свечи за конкретный год
+        /// </summary>
+        /// <param name="year">Год</param>
+        [HttpGet("load-stocks-daily-candles-for-year/{year}")]
+        public async Task LoadStocksDailyCandlesForYearAsync(int year)
+        {
+            _logger.Trace($"Request - /api/load-stocks-daily-candles-for-year");
+
+            try
+            {
+                var stocks = await _catalogService
+                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
+
+                var data = new List<Tuple<string, List<Candle>>>();
+
+                foreach (var stock in stocks)
+                {
+                    _logger.Trace($"Load '{stock.Ticker}'");
+                    var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily, year);
                     data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
                 }
 

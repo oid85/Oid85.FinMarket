@@ -30,7 +30,7 @@ namespace Oid85.FinMarket.External.Catalogs
         {
             try
             {
-                await using var connection = await GetSqliteConnectionAsync();
+                await using var connection = GetSqliteConnection();
 
                 await connection.OpenAsync();
 
@@ -76,7 +76,7 @@ namespace Oid85.FinMarket.External.Catalogs
         {
             try
             {
-                await using var connection = await GetSqliteConnectionAsync();
+                await using var connection = GetSqliteConnection();
 
                 await connection.OpenAsync();
 
@@ -127,7 +127,7 @@ namespace Oid85.FinMarket.External.Catalogs
         {
             try
             {
-                await using var connection = await GetSqliteConnectionAsync();
+                await using var connection = GetSqliteConnection();
 
                 await connection.OpenAsync();
 
@@ -152,8 +152,7 @@ namespace Oid85.FinMarket.External.Catalogs
                             $"set " +
                             $"figi = '{instrument.Figi}', " +
                             $"description = '{description}', " +
-                            $"sector = '{instrument.Sector}', " +
-                            $"is_active = '{instrument.IsActive}' " +
+                            $"sector = '{instrument.Sector}' " +                            
                             $"where ticker = '{ticker}'", connection);
 
                         await updateCommand.ExecuteNonQueryAsync();
@@ -183,7 +182,7 @@ namespace Oid85.FinMarket.External.Catalogs
         /// <summary>
         /// Получить соединение с БД
         /// </summary>
-        private async Task<SqliteConnection> GetSqliteConnectionAsync()
+        private SqliteConnection GetSqliteConnection()
         {
             try
             {

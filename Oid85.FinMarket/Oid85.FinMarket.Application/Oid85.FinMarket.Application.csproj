@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Skender.Stock.Indicators" Version="2.5.0" />
+	<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+	<PackageReference Include="Npgsql" Version="8.0.4" />
+	<PackageReference Include="NLog" Version="5.3.4" />
+	<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Oid85.FinMarket.Common\Oid85.FinMarket.Common.csproj" />
+    <ProjectReference Include="..\Oid85.FinMarket.Domain\Oid85.FinMarket.Domain.csproj" />
+    <ProjectReference Include="..\Oid85.FinMarket.External\Oid85.FinMarket.External.csproj" />
+  </ItemGroup>
+
+</Project>
