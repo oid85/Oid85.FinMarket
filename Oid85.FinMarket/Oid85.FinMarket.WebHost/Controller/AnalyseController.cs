@@ -37,6 +37,7 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 foreach (var stock in stocks)
                 {
+                    _logger.Trace($"Analyse '{stock.Ticker}'");
                     await _analyseService.SupertrendAnalyseAsync(stock, KnownTimeframes.Daily);
                 }                
             }

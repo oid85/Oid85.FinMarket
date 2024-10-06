@@ -62,7 +62,7 @@ namespace Oid85.FinMarket.Application.Services
                         Close = Convert.ToDecimal(x.Close),
                         High = Convert.ToDecimal(x.High),
                         Low = Convert.ToDecimal(x.Low),
-                        Date = x.Date
+                        Date = x.Date.ToUniversalTime()
                     })
                     .ToList();
 
@@ -71,10 +71,10 @@ namespace Oid85.FinMarket.Application.Services
                 var results = superTrendResults
                     .Select(x => new AnalyseResult()
                     {
-                        Date = x.Date,
+                        Date = x.Date.ToUniversalTime(),
                         Ticker = stock.Ticker,
                         Timeframe = timeframe,
-                        TrendDirection = GetTrendDirection(x.Date, x.SuperTrend, candles),
+                        TrendDirection = GetTrendDirection(x),
                         Data = JsonSerializer.Serialize(x)
                     })
                     .ToList();
@@ -93,25 +93,16 @@ namespace Oid85.FinMarket.Application.Services
             }
         }
 
-        private string GetTrendDirection(DateTime date, decimal? superTrend, List<Candle> candles)
+        private string GetTrendDirection(SuperTrendResult result)
         {
-            if (superTrend == null)
+            if (result.SuperTrend == null)
                 return string.Empty;
 
-            var candle = candles.FirstOrDefault(x => x.Date == date);
-
-            if (candle == null)
-                return string.Empty;
-
-            var minPrice = Math.Min(candle.Open, candle.Close);
-
-            if (Convert.ToDouble((decimal) superTrend) < minPrice)
-                return TrendDirectionConstants.Down;
-
-            var maxPrice = Math.Max(candle.Open, candle.Close);
-
-            if (Convert.ToDouble((decimal) superTrend) < maxPrice)
+            if (result.UpperBand == null && result.LowerBand != null)
                 return TrendDirectionConstants.Up;
+
+            if (result.UpperBand != null && result.LowerBand == null)
+                return TrendDirectionConstants.Down;
 
             return string.Empty;
         }

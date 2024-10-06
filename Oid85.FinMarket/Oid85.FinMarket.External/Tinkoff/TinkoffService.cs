@@ -99,7 +99,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                     High = ConvertToDouble(response.Candles[i].High),
                     Low = ConvertToDouble(response.Candles[i].Low),
                     Volume = response.Candles[i].Volume,
-                    Date = response.Candles[i].Time.ToDateTime(),
+                    Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
                     IsComplete = response.Candles[i].IsComplete == true ? 1 : 0
                 };
 

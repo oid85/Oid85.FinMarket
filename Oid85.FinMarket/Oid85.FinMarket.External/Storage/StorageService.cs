@@ -75,7 +75,7 @@ namespace Oid85.FinMarket.External.Storage
                     var close = Convert.ToDouble(table.Rows[i][1]);
                     var high = Convert.ToDouble(table.Rows[i][2]);
                     var low = Convert.ToDouble(table.Rows[i][3]);
-                    var volume = Convert.ToInt32(table.Rows[i][4]);
+                    var volume = Convert.ToInt64(table.Rows[i][4]);
                     var date = Convert.ToDateTime(table.Rows[i][5]);
 
                     var candle = new Candle()
@@ -85,7 +85,7 @@ namespace Oid85.FinMarket.External.Storage
                         High = high,
                         Low = low,
                         Volume = volume,
-                        Date = date
+                        Date = date.ToUniversalTime()
                     };
 
                     candles.Add(candle);
@@ -126,7 +126,7 @@ namespace Oid85.FinMarket.External.Storage
                     var close = Convert.ToDouble(table.Rows[i][1]);
                     var high = Convert.ToDouble(table.Rows[i][2]);
                     var low = Convert.ToDouble(table.Rows[i][3]);
-                    var volume = Convert.ToInt32(table.Rows[i][4]);
+                    var volume = Convert.ToInt64(table.Rows[i][4]);
                     var date = Convert.ToDateTime(table.Rows[i][5]);
 
                     var candle = new Candle()
@@ -136,7 +136,7 @@ namespace Oid85.FinMarket.External.Storage
                         High = high,
                         Low = low,
                         Volume = volume,
-                        Date = date
+                        Date = date.ToUniversalTime()
                     };
 
                     candles.Add(candle);
@@ -178,7 +178,7 @@ namespace Oid85.FinMarket.External.Storage
                     var close = Convert.ToDouble(table.Rows[i][1]);
                     var high = Convert.ToDouble(table.Rows[i][2]);
                     var low = Convert.ToDouble(table.Rows[i][3]);
-                    var volume = Convert.ToInt32(table.Rows[i][4]);
+                    var volume = Convert.ToInt64(table.Rows[i][4]);
                     var date = Convert.ToDateTime(table.Rows[i][5]);
 
                     var candle = new Candle()
@@ -188,7 +188,7 @@ namespace Oid85.FinMarket.External.Storage
                         High = high,
                         Low = low,
                         Volume = volume,
-                        Date = date
+                        Date = date.ToUniversalTime()
                     };
 
                     candles.Add(candle);
@@ -216,8 +216,8 @@ namespace Oid85.FinMarket.External.Storage
                 // Если нет таблицы - создаем ее
                 await CreateAnalyseTableIfNotExistsAsync(tableName, connection);
 
-                foreach (var item in results)
-                    await SaveAnalyseResultAsync(tableName, item, connection);
+                foreach (var result in results)
+                    await SaveAnalyseResultAsync(tableName, result, connection);
 
                 await connection.CloseAsync();
             }
@@ -270,7 +270,7 @@ namespace Oid85.FinMarket.External.Storage
                         $"timeframe = '{result.Timeframe}', " +
                         $"trend_direction = '{result.TrendDirection}', " +
                         $"data = '{result.Data}', " +
-                        $"date = '{result.Date}', " +
+                        $"date = '{result.Date}' " +
                         $"where id = {id}",
                         connection);
                 }

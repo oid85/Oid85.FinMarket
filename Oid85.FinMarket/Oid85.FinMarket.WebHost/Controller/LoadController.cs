@@ -165,6 +165,7 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 foreach (var stock in stocks)
                 {
+                    _logger.Trace($"Load '{stock.Ticker}'");
                     var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily, year);
                     data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
                 }
