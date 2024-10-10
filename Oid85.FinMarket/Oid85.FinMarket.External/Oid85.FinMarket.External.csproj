@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Oid85.FinMarket.Domain\Oid85.FinMarket.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="sqlite_scripts\" />
-  </ItemGroup>
-
 </Project>
