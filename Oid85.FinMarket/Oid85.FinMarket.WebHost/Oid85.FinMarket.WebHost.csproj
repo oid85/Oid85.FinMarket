@@ -12,13 +12,21 @@
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.13" />
 		<PackageReference Include="Quartz" Version="3.13.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.7.3" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Oid85.FinMarket.Application\Oid85.FinMarket.Application.csproj" />
 	  <ProjectReference Include="..\Oid85.FinMarket.External\Oid85.FinMarket.External.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="install_service.bat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="uninstall_service.bat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="SwaggerTest.XML">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

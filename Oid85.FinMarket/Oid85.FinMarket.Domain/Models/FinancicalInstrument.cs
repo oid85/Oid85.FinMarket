@@ -8,7 +8,7 @@
         /// <summary>
         /// Идентификатор в справочнике
         /// </summary>
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// Тикер

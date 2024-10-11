@@ -6,18 +6,18 @@ using Oid85.FinMarket.External.Storage;
 using Oid85.FinMarket.External.Tinkoff;
 using ILogger = NLog.ILogger;
 
-namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
+namespace Oid85.FinMarket.WebHost.Controller
 {
     [Route("api")]
     [ApiController]
-    public class DowloadDailyController : ControllerBase
+    public class LoadController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly ITinkoffService _tinkoffService;
         private readonly ICatalogService _catalogService;
         private readonly IStorageService _storageService;
 
-        public DowloadDailyController(
+        public LoadController(
             ILogger logger,
             ITinkoffService tinkoffService,
             ICatalogService catalogService,
@@ -29,7 +29,13 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             _storageService = storageService;
         }
 
+        /// <summary>
+        /// Загрузить справочник акций
+        /// </summary>
         [HttpGet("load-stocks-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadStocksCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-stocks-catalog");
@@ -38,7 +44,7 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             {
                 var stocks = _tinkoffService.GetStocks();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Stocks, stocks);
             }
 
@@ -48,7 +54,13 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Загрузить справочник облигаций
+        /// </summary>
         [HttpGet("load-bonds-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadBondsCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-bonds-catalog");
@@ -57,7 +69,7 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             {
                 var bonds = _tinkoffService.GetBonds();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Bonds, bonds);
             }
 
@@ -67,7 +79,13 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Загрузить справочник фьючерсов
+        /// </summary>
         [HttpGet("load-futures-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadFuturesCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-futures-catalog");
@@ -76,7 +94,7 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             {
                 var futures = _tinkoffService.GetFutures();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Futures, futures);
             }
 
@@ -86,7 +104,13 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Загрузить справочник валют
+        /// </summary>
         [HttpGet("load-currencies-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadCurrenciesCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-currencies-catalog");
@@ -95,7 +119,7 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             {
                 var currencies = _tinkoffService.GetCurrencies();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Currencies, currencies);
             }
 
@@ -105,7 +129,13 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
             }
         }
 
+        /// <summary>
+        /// Подгрузить последние свечи
+        /// </summary>
         [HttpGet("load-stocks-daily-candles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadStocksDailyCandlesAsync()
         {
             _logger.Trace($"Request - /api/load-stocks-daily-candles");
@@ -120,6 +150,41 @@ namespace DaGroup.WPAnalyst.DataLake.WebHost.Controllers
                 foreach (var stock in stocks)
                 {
                     var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily);
+                    data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
+                }
+
+                await _storageService.SaveCandlesAsync(data);
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+            }
+        }
+
+        /// <summary>
+        /// Загрузить свечи за конкретный год
+        /// </summary>
+        /// <param name="year">Год</param>
+        [HttpGet("load-stocks-daily-candles-for-year/{year}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task LoadStocksDailyCandlesForYearAsync(int year)
+        {
+            _logger.Trace($"Request - /api/load-stocks-daily-candles-for-year");
+
+            try
+            {
+                var stocks = await _catalogService
+                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
+
+                var data = new List<Tuple<string, List<Candle>>>();
+
+                foreach (var stock in stocks)
+                {
+                    _logger.Trace($"Load '{stock.Ticker}'");
+                    var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily, year);
                     data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
                 }
 

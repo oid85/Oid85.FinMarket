@@ -6,6 +6,11 @@
     public class Candle
     {
         /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// Цена открытия
         /// </summary>
         public double Open { get; set; }
