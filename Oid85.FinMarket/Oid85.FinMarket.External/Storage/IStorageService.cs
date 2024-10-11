@@ -1,5 +1,4 @@
-﻿using Oid85.FinMarket.Domain.AnalyseResults;
-using Oid85.FinMarket.Domain.Models;
+﻿using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.External.Storage
 {
@@ -33,7 +32,15 @@ namespace Oid85.FinMarket.External.Storage
         /// <param name="tableName">Имя таблицы</param>
         /// <param name="count">Кол-во последних свечей</param>       
         /// <param name="dateTime">Дата последней запрашиваемой свечи</param>  
-        public Task<List<Candle>> GetCandlesAsync(string tableName, int count, DateTime dateTime);
+        public Task<List<Candle>> GetCandlesAsync(
+            string tableName, int count, DateTime dateTime);
+
+        /// <summary>
+        /// Получить результаты анализа
+        /// </summary>
+        /// <param name="tableName">Имя таблицы</param>    
+        public Task<List<AnalyseResult>> GetAnalyseResultsAsync(
+            string tableName, DateTime from, DateTime to);
 
         /// <summary>
         /// Сохранить результаты анализа

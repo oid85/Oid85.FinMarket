@@ -1,29 +1,25 @@
 ﻿using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Helpers;
 using NLog;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.AnalyseResults;
+using Dapper;
 
 namespace Oid85.FinMarket.External.Storage
 {
     /// <inheritdoc />
     public class StorageService : IStorageService
     {
-        private readonly PostgresSqlHelper _sqlHelper;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
         private readonly ISettingsService _settingsService;
 
         public StorageService(
-            PostgresSqlHelper sqlHelper,
             ILogger logger,
             IConfiguration configuration,
             ISettingsService settingsService)
         {
-            _sqlHelper = sqlHelper ?? throw new ArgumentNullException(nameof(sqlHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
@@ -60,36 +56,14 @@ namespace Oid85.FinMarket.External.Storage
 
                 await connection.OpenAsync();
 
-                var table = _sqlHelper.Select(
-                    $"select open, close, high, low, volume, date " +
-                    $"from {tableName} " +
-                    $"order by date", connection);
+                var candles = (await connection
+                    .QueryAsync<Candle>(
+                        $"select open, close, high, low, volume, date " +
+                        $"from {tableName} " +
+                        $"order by date"))
+                    .ToList();
 
                 await connection.CloseAsync();
-
-                var candles = new List<Candle>();
-
-                for (int i = 0; i < table!.Rows.Count; i++)
-                {
-                    var open = Convert.ToDouble(table.Rows[i][0]);
-                    var close = Convert.ToDouble(table.Rows[i][1]);
-                    var high = Convert.ToDouble(table.Rows[i][2]);
-                    var low = Convert.ToDouble(table.Rows[i][3]);
-                    var volume = Convert.ToInt64(table.Rows[i][4]);
-                    var date = Convert.ToDateTime(table.Rows[i][5]);
-
-                    var candle = new Candle()
-                    {
-                        Open = open,
-                        Close = close,
-                        High = high,
-                        Low = low,
-                        Volume = volume,
-                        Date = date.ToUniversalTime()
-                    };
-
-                    candles.Add(candle);
-                }
 
                 return candles;
             }
@@ -110,37 +84,15 @@ namespace Oid85.FinMarket.External.Storage
 
                 await connection.OpenAsync();
 
-                var table = _sqlHelper.Select(
-                    $"select open, close, high, low, volume, date " +
-                    $"from {tableName} " +
-                    $"order by date " +
-                    $"limit {count}", connection);
+                var candles = (await connection
+                    .QueryAsync<Candle>(
+                        $"select open, close, high, low, volume, date " +
+                        $"from {tableName} " +
+                        $"order by date " + 
+                        $"limit {count}"))
+                    .ToList();
 
                 await connection.CloseAsync();
-
-                var candles = new List<Candle>();
-
-                for (int i = 0; i < table!.Rows.Count; i++)
-                {
-                    var open = Convert.ToDouble(table.Rows[i][0]);
-                    var close = Convert.ToDouble(table.Rows[i][1]);
-                    var high = Convert.ToDouble(table.Rows[i][2]);
-                    var low = Convert.ToDouble(table.Rows[i][3]);
-                    var volume = Convert.ToInt64(table.Rows[i][4]);
-                    var date = Convert.ToDateTime(table.Rows[i][5]);
-
-                    var candle = new Candle()
-                    {
-                        Open = open,
-                        Close = close,
-                        High = high,
-                        Low = low,
-                        Volume = volume,
-                        Date = date.ToUniversalTime()
-                    };
-
-                    candles.Add(candle);
-                }
 
                 return candles;
             }
@@ -153,7 +105,8 @@ namespace Oid85.FinMarket.External.Storage
         }
 
         /// <inheritdoc />
-        public async Task<List<Candle>> GetCandlesAsync(string tableName, int count, DateTime dateTime)
+        public async Task<List<Candle>> GetCandlesAsync(
+            string tableName, int count, DateTime dateTime)
         {
             try
             {
@@ -161,38 +114,16 @@ namespace Oid85.FinMarket.External.Storage
 
                 await connection.OpenAsync();
 
-                var table = _sqlHelper.Select(
-                    $"select open, close, high, low, volume, date " +
-                    $"from {tableName} " +
-                    $"where date <= '{dateTime}' " + 
-                    $"order by date " +
-                    $"limit {count}", connection);
+                var candles = (await connection
+                    .QueryAsync<Candle>(
+                        $"select open, close, high, low, volume, date " +
+                        $"from {tableName} " +
+                        $"where date <= '{dateTime}' " +
+                        $"order by date " +
+                        $"limit {count}"))
+                    .ToList();
 
                 await connection.CloseAsync();
-
-                var candles = new List<Candle>();
-
-                for (int i = 0; i < table!.Rows.Count; i++)
-                {
-                    var open = Convert.ToDouble(table.Rows[i][0]);
-                    var close = Convert.ToDouble(table.Rows[i][1]);
-                    var high = Convert.ToDouble(table.Rows[i][2]);
-                    var low = Convert.ToDouble(table.Rows[i][3]);
-                    var volume = Convert.ToInt64(table.Rows[i][4]);
-                    var date = Convert.ToDateTime(table.Rows[i][5]);
-
-                    var candle = new Candle()
-                    {
-                        Open = open,
-                        Close = close,
-                        High = high,
-                        Low = low,
-                        Volume = volume,
-                        Date = date.ToUniversalTime()
-                    };
-
-                    candles.Add(candle);
-                }
 
                 return candles;
             }
@@ -205,7 +136,39 @@ namespace Oid85.FinMarket.External.Storage
         }
 
         /// <inheritdoc />
-        public async Task SaveAnalyseResultsAsync(string tableName, List<AnalyseResult> results)
+        public async Task<List<AnalyseResult>> GetAnalyseResultsAsync(
+            string tableName, DateTime from, DateTime to)
+        {
+            try
+            {
+                await using var connection = await GetPostgresConnectionAsync();
+
+                await connection.OpenAsync();
+
+                var analyseResults = (await connection
+                    .QueryAsync<AnalyseResult>(
+                        $"select id, ticker, timeframe, trend_direction as trenddirection, data, date " +
+                        $"from {tableName} " +
+                        $"where date >= '{from}' " +
+                        $"and date <= '{to}' " +
+                        $"order by date"))
+                    .ToList();
+
+                await connection.CloseAsync();
+
+                return analyseResults;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task SaveAnalyseResultsAsync(
+            string tableName, List<AnalyseResult> results)
         {
             try
             {
@@ -253,35 +216,25 @@ namespace Oid85.FinMarket.External.Storage
 
                 int inserted = 0;
 
+                DateTime date = result.Date;
+
                 // Если аналитический результат уже записан в хранилище
-                var existedAnalyseResultTable = _sqlHelper.Select(
-                    $"select id, ticker, timeframe, trend_direction, data, date " +
-                    $"from {tableName} " +
-                    $"where date = '{result.Date}'", connection);
+                var existedAnalyseResult = (await connection
+                    .QueryAsync<AnalyseResult>(
+                        $"select id, ticker, timeframe, trend_direction, data, date " +
+                        $"from {tableName} " +
+                        $"where date = '{date}' "))
+                    .FirstOrDefault();
 
-                if (existedAnalyseResultTable!.Rows.Count > 0)
-                {
-                    long id = Convert.ToInt64(existedAnalyseResultTable.Rows[0]["id"]);
-
-                    // Обновляем результат
-                    await _sqlHelper.NonQueryCommandAsync(
-                        $"update {tableName} " +
-                        $"set ticker = '{result.Ticker}', " +
-                        $"timeframe = '{result.Timeframe}', " +
-                        $"trend_direction = '{result.TrendDirection}', " +
-                        $"data = '{result.Data}', " +
-                        $"date = '{result.Date}' " +
-                        $"where id = {id}",
-                        connection);
-                }
-
-                else
+                if (existedAnalyseResult is null)
                 {
                     // Если результат еще не записан в хранилище
-                    await _sqlHelper.NonQueryCommandAsync(
-                        $"insert into {tableName} (ticker, timeframe, trend_direction, data, date) " +
-                        $"values ('{result.Ticker}', '{result.Timeframe}', '{result.TrendDirection}', '{result.Data}', '{result.Date}')",
-                        connection);
+                    await connection.ExecuteAsync(
+                        $"insert into {tableName} " +
+                        $"(ticker, timeframe, trend_direction, data, date) " +
+                        $"values (" +
+                        $"'{result.Ticker}', '{result.Timeframe}', " +
+                        $"'{result.TrendDirection}', '{result.Data}', '{result.Date}')");
                 }
 
                 inserted++;
@@ -315,38 +268,46 @@ namespace Oid85.FinMarket.External.Storage
                 {
                     var (open, close, high, low) = FormatCandle(candles[i]);
 
-                    // Если свеча уже записана в хранилище
-                    var existedCandleTable = _sqlHelper.Select(
-                        $"select id, open, close, high, low, volume, date, is_complete " +
-                        $"from {tableName} " +
-                        $"where date = '{candles[i].Date}'", connection);
+                    var date = candles[i].Date;
+                    var volume = candles[i].Volume;
+                    var isComplete = candles[i].IsComplete;
 
-                    if (existedCandleTable!.Rows.Count > 0)
+                    // Если свеча уже записана в хранилище
+                    var existedCandle = (await connection
+                        .QueryAsync<Candle>(
+                            $"select id, open, close, high, low, volume, date, is_complete " +
+                            $"from {tableName} " +
+                            $"where date = '{date}'"))
+                        .FirstOrDefault();
+
+                    if (existedCandle is null)
                     {
-                        bool isComplete = Convert.ToInt32(existedCandleTable.Rows[0]["is_complete"]) == 1;
-                        long id = Convert.ToInt64(existedCandleTable.Rows[0]["id"]);
+                        // Если свеча еще не записана в хранилище
+                        await connection.ExecuteAsync(
+                            $"insert into {tableName} " +
+                            $"(open, close, high, low, volume, date, is_complete) " +
+                            $"values (" +
+                            $"{open}, {close}, {high}, {low}, " +
+                            $"{volume}, " +
+                            $"'date', " +
+                            $"{isComplete})");
+                    }
+
+                    else
+                    {
+                        long id = existedCandle.Id;
 
                         // Если свеча не полная, то обновляем ее
-                        if (!isComplete)
-                            await _sqlHelper.NonQueryCommandAsync(
+                        if (existedCandle.IsComplete == 0)
+                            await connection.ExecuteAsync(
                                 $"update {tableName} " +
                                 $"set open = {open}, " +
                                 $"close = {close}, " +
                                 $"high = {high}, " +
                                 $"low = {low}, " +
-                                $"volume = {candles[i].Volume}, " +
-                                $"is_complete = {candles[i].IsComplete} " +
-                                $"where id = {id}",
-                                connection);
-                    }
-
-                    else
-                    {
-                        // Если свеча еще не записана в хранилище
-                        await _sqlHelper.NonQueryCommandAsync(
-                            $"insert into {tableName} (open, close, high, low, volume, date, is_complete) " +
-                            $"values ({open}, {close}, {high}, {low}, {candles[i].Volume}, '{candles[i].Date}', {candles[i].IsComplete})",
-                            connection);
+                                $"volume = {volume}, " +
+                                $"is_complete = {isComplete} " +
+                                $"where id = {id}");
                     }
 
                     inserted++;
@@ -387,17 +348,17 @@ namespace Oid85.FinMarket.External.Storage
         {
             tableName = tableName.ToLower();
 
-            await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
+            await connection.ExecuteAsync(
+                $"CREATE TABLE IF NOT EXISTS {tableName} (" +
                 $"id bigserial NOT NULL, " +
-                $"\"open\" double precision NULL, " +
-                $"\"close\" double precision NULL, " +
+                $"open double precision NULL, " +
+                $"close double precision NULL, " +
                 $"high double precision NULL, " +
                 $"low double precision NULL, " +
                 $"volume bigint NULL, " +
-                $"\"date\" timestamp with time zone NULL, " +
+                $"date timestamp with time zone NULL, " +
                 $"is_complete int NULL, " +
-                $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
-                connection);
+                $"CONSTRAINT {tableName}_pk PRIMARY KEY (id))");
         }
 
         private async Task CreateAnalyseTableIfNotExistsAsync(
@@ -405,15 +366,15 @@ namespace Oid85.FinMarket.External.Storage
         {
             tableName = tableName.ToLower();
 
-            await _sqlHelper.NonQueryCommandAsync($"CREATE TABLE IF NOT EXISTS {tableName} (" +
+            await connection.ExecuteAsync(
+                $"CREATE TABLE IF NOT EXISTS {tableName} (" +
                 $"id bigserial NOT NULL, " +
                 $"ticker text NULL, " +
                 $"timeframe text NULL, " +
                 $"trend_direction text NULL, " +
                 $"data text NULL, " +
-                $"\"date\" timestamp with time zone NULL, " +
-                $"CONSTRAINT {tableName}_pk PRIMARY KEY (id));",
-                connection);
+                $"date timestamp with time zone NULL, " +
+                $"CONSTRAINT {tableName}_pk PRIMARY KEY (id))");
         }
     }
 }

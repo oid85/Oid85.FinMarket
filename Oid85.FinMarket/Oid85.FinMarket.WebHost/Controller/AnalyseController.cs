@@ -2,7 +2,6 @@
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.Catalogs;
-using Oid85.FinMarket.External.Storage;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Controller
@@ -25,7 +24,13 @@ namespace Oid85.FinMarket.WebHost.Controller
             _analyseService = analyseService;
         }
 
+        /// <summary>
+        /// Анализ при помощи индикатора Супертренд
+        /// </summary>
         [HttpGet("analyse-stocks")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task AnalyseStocksAsync()
         {
             _logger.Trace($"Request - /api/analyse-stocks");

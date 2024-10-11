@@ -4,11 +4,11 @@
     "Oid85.FinMarket.WebHost": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:1010",
+      "launchUrl": "http://localhost:1001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:1010"
+      "applicationUrl": "http://localhost:1001"
     }
   }
 }

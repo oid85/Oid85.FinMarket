@@ -1,5 +1,4 @@
-﻿using Oid85.FinMarket.Domain.AnalyseResults;
-using Oid85.FinMarket.Domain.Models;
+﻿using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.Application.Services
 {

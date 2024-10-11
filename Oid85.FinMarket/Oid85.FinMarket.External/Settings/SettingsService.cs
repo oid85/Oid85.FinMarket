@@ -1,8 +1,9 @@
-﻿using System.Data;
+﻿using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using NLog;
+using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.External.Settings
 {
@@ -25,7 +26,7 @@ namespace Oid85.FinMarket.External.Settings
         /// <inheritdoc />
         public async Task<string> GetStringValueAsync(string key)
         {
-            object value = await GetValueAsync(key);
+            var value = (await GetValueAsync(key)).Value;
 
             return value.ToString()!;
         }
@@ -33,7 +34,7 @@ namespace Oid85.FinMarket.External.Settings
         /// <inheritdoc />
         public async Task<int> GetIntValueAsync(string key)
         {
-            object value = await GetValueAsync(key);
+            var value = (await GetValueAsync(key)).Value;
 
             return Convert.ToInt32(value);
         }
@@ -41,7 +42,7 @@ namespace Oid85.FinMarket.External.Settings
         /// <inheritdoc />
         public async Task<double> GetDoubleValueAsync(string key)
         {
-            object value = await GetValueAsync(key);
+            var value = (await GetValueAsync(key)).Value;
 
             return Convert.ToDouble(value);
         }
@@ -49,16 +50,16 @@ namespace Oid85.FinMarket.External.Settings
         /// <inheritdoc />
         public async Task<bool> GetBoolValueAsync(string key)
         {
-            object value = await GetValueAsync(key);
+            var value = (await GetValueAsync(key)).Value;
 
             return Convert.ToBoolean(value);
         }
 
-        private async Task<object> GetValueAsync(string key)
+        private async Task<SettingItem> GetValueAsync(string key)
         {
             try
             {
-                var cachedValue = _cache.Get(key);
+                var cachedValue = (SettingItem?) _cache.Get(key);
 
                 if (cachedValue != null)
                     return cachedValue;
@@ -67,35 +68,24 @@ namespace Oid85.FinMarket.External.Settings
 
                 await connection.OpenAsync();
 
-                var selectCommand = new SqliteCommand(
-                    $"select value " +
-                    $"from settings " +
-                    $"where key = '{key}'", connection);
-
-                object value = new();
-
-                using (SqliteDataReader reader = selectCommand.ExecuteReader())
-                    if (reader.HasRows)
-                        while (reader.Read())
-                            value = reader.GetValue("value");
-
-                    else
-                    {
-                        _logger.Error($"В таблице settings нет параметра '{key}'");
-                        throw new InvalidOperationException($"{nameof(key)} - В таблице settings нет параметра '{key}'");
-                    }
+                var item = (await connection
+                    .QueryAsync<SettingItem>(
+                        $"select id, key, value, description " +
+                        $"from settings " +
+                        $"where key = '{key}'"))
+                    .FirstOrDefault();
 
                 await connection.CloseAsync();
 
-                if (value == null)
+                if (item == null)
                     throw new InvalidOperationException($"{nameof(key)} - В таблице settings нет параметра '{key}'");
 
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                             .SetSlidingExpiration(TimeSpan.FromHours(3));
 
-                _cache.Set(key, value, cacheEntryOptions);
+                _cache.Set(key, item, cacheEntryOptions);
 
-                return value;
+                return item;
             }
 
             catch (Exception exception)

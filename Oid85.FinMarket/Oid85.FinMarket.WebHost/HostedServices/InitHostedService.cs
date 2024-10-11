@@ -2,6 +2,7 @@
 using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.Tinkoff;
+using Oid85.FinMarket.External.Settings;
 
 namespace Oid85.FinMarket.WebHost.HostedServices
 {
@@ -10,23 +11,32 @@ namespace Oid85.FinMarket.WebHost.HostedServices
         private readonly ILogger _logger;
         private readonly ITinkoffService _tinkoffService;
         private readonly ICatalogService _catalogService;
+        private readonly ISettingsService _settingsService;
 
         public InitHostedService(
             ILogger logger,
             ITinkoffService tinkoffService,
-            ICatalogService catalogService)
+            ICatalogService catalogService,
+            ISettingsService settingsService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tinkoffService = tinkoffService ?? throw new ArgumentNullException(nameof(tinkoffService));
-            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));            
+            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await UptateStocksCatalog();
-            await UptateBondsCatalog();
-            await UptateFuturesCatalog();
-            await UptateCurrenciesCatalog();
+            var updateEnable = await _settingsService
+                .GetBoolValueAsync(KnownSettingsKeys.UpdateFinancicalInstrumentsOnStart_Enable);
+
+            if (updateEnable) 
+            {
+                await UpdateStocksCatalog();
+                await UpdateBondsCatalog();
+                await UpdateFuturesCatalog();
+                await UpdateCurrenciesCatalog();
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -34,13 +44,13 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             return Task.CompletedTask;
         }
 
-        private async Task UptateStocksCatalog()
+        private async Task UpdateStocksCatalog()
         {
             try
             {
                 var stocks = _tinkoffService.GetStocks();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Stocks, stocks);
 
                 _logger.Info($"Обновлен каталог акций");
@@ -52,13 +62,13 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             }
         }
 
-        private async Task UptateBondsCatalog()
+        private async Task UpdateBondsCatalog()
         {
             try
             {
                 var bonds = _tinkoffService.GetBonds();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Bonds, bonds);
 
                 _logger.Info($"Обновлен каталог облигаций");
@@ -70,13 +80,13 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             }
         }
 
-        private async Task UptateFuturesCatalog()
+        private async Task UpdateFuturesCatalog()
         {
             try
             {
                 var futures = _tinkoffService.GetFutures();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Futures, futures);
 
                 _logger.Info($"Обновлен каталог фьючерсов");
@@ -88,13 +98,13 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             }
         }
 
-        private async Task UptateCurrenciesCatalog()
+        private async Task UpdateCurrenciesCatalog()
         {
             try
             {
                 var currencies = _tinkoffService.GetCurrencies();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Currencies, currencies);
 
                 _logger.Info($"Обновлен каталог валют");

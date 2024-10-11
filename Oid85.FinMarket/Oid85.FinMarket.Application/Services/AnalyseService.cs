@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Npgsql;
+﻿using Npgsql;
 using Oid85.FinMarket.Application.Constants;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.AnalyseResults;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Helpers;
 using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.External.Storage;
 using Skender.Stock.Indicators;
@@ -16,22 +13,16 @@ namespace Oid85.FinMarket.Application.Services
     /// <inheritdoc />
     public class AnalyseService : IAnalyseService
     {
-        private readonly PostgresSqlHelper _sqlHelper;
         private readonly ILogger _logger;
-        private readonly IConfiguration _configuration;
         private readonly ISettingsService _settingsService;
         private readonly IStorageService _storageService;
 
         public AnalyseService(
-            PostgresSqlHelper sqlHelper,
             ILogger logger,
-            IConfiguration configuration,
             ISettingsService settingsService,
             IStorageService storageService)
         {
-            _sqlHelper = sqlHelper ?? throw new ArgumentNullException(nameof(sqlHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
         }
@@ -99,10 +90,10 @@ namespace Oid85.FinMarket.Application.Services
                 return string.Empty;
 
             if (result.UpperBand == null && result.LowerBand != null)
-                return TrendDirectionConstants.Up;
+                return KnownTrendDirections.Up;
 
             if (result.UpperBand != null && result.LowerBand == null)
-                return TrendDirectionConstants.Down;
+                return KnownTrendDirections.Down;
 
             return string.Empty;
         }

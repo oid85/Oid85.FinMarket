@@ -20,6 +20,11 @@ namespace Oid85.FinMarket.WebHost
             builder.Services.ConfigureExternalServices();
             builder.Services.ConfigureQuartz(builder.Configuration);
             builder.Services.AddHostedService<InitHostedService>();
+            builder.Services.AddHostedService<InitHostedService>();
+            builder.Services.AddWindowsService(options =>
+            {
+                options.ServiceName = "Oid85 FinMarket Service";
+            });
 
             var app = builder.Build();
 
@@ -35,6 +40,8 @@ namespace Oid85.FinMarket.WebHost
             });
 
             app.MapControllers();
+
+            app.Urls.Add("http://localhost:1001");
 
             app.Run();
         }
