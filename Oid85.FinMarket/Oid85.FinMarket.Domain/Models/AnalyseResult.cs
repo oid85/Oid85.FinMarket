@@ -1,10 +1,15 @@
-﻿namespace Oid85.FinMarket.Domain.AnalyseResults
+﻿namespace Oid85.FinMarket.Domain.Models
 {
     /// <summary>
     /// Объект результата анализа
     /// </summary>
     public class AnalyseResult
     {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// Дата
         /// </summary>

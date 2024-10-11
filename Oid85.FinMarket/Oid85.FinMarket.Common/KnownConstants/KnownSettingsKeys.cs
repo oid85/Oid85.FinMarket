@@ -9,5 +9,6 @@
         public static string Quartz_DowloadDaily_Enable = "Quartz:DowloadDaily:Enable";
         public static string Quartz_DowloadHourly_Cron = "Quartz:DowloadHourly:Cron";
         public static string Quartz_DowloadHourly_Enable = "Quartz:DowloadHourly:Enable";
+        public static string UpdateFinancicalInstrumentsOnStart_Enable = "UpdateFinancicalInstrumentsOnStart:Enable";
     }
 }

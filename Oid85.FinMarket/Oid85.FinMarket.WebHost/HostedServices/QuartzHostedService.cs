@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using DaGroup.Mfsb.Computation.WebHost.Jobs;
+﻿using DaGroup.Mfsb.Computation.WebHost.Jobs;
 using Quartz;
 using Quartz.Logging;
 using Quartz.Spi;
@@ -26,7 +23,7 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             LogProvider.IsDisabled = true;
         }
 
-        public IScheduler Scheduler { get; set; }
+        public IScheduler? Scheduler { get; set; }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {

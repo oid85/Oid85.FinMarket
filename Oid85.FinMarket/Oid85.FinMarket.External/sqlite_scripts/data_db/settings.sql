@@ -14,7 +14,7 @@ INSERT INTO settings (key, value, description)
 VALUES ('Tinkoff:Token', 't.szzlPYKzuUTNxiVrNJPRlueboUd1eQm1MceHyb6LB-yDZ7DrHV4gN-NWkDvPvFIHAArGZHXrcDzUCJJSkqtBog', 'Токен доступа к Tinkoff API');
 
 INSERT INTO settings (key, value, description)
-VALUES ('ApplicationSettings:Buffer', '300', 'Минимум свечей за один запрос');
+VALUES ('ApplicationSettings:Buffer', '50', 'Минимум свечей за один запрос');
 
 INSERT INTO settings (key, value, description)
 VALUES ('Quartz:DowloadDaily:Cron', '0 5 * * * ? *', 'Cron-строка для скачивания дневных свечей');
@@ -27,3 +27,6 @@ VALUES ('Quartz:DowloadHourly:Cron', '0 1,6,11,16,21,26,31,36,41,46,51,56 * * * 
 
 INSERT INTO settings (key, value, description)
 VALUES ('Quartz:DowloadHourly:Enable', 'false', 'Включено скачивание часовых свечей');
+
+INSERT INTO settings (key, value, description)
+VALUES ('UpdateFinancicalInstrumentsOnStart:Enable', 'true', 'Включено обновление списка финансовых инструментов при старте');

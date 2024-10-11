@@ -33,6 +33,9 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник акций
         /// </summary>
         [HttpGet("load-stocks-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadStocksCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-stocks-catalog");
@@ -41,7 +44,7 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var stocks = _tinkoffService.GetStocks();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Stocks, stocks);
             }
 
@@ -55,6 +58,9 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник облигаций
         /// </summary>
         [HttpGet("load-bonds-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadBondsCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-bonds-catalog");
@@ -63,7 +69,7 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var bonds = _tinkoffService.GetBonds();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Bonds, bonds);
             }
 
@@ -77,6 +83,9 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник фьючерсов
         /// </summary>
         [HttpGet("load-futures-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadFuturesCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-futures-catalog");
@@ -85,7 +94,7 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var futures = _tinkoffService.GetFutures();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Futures, futures);
             }
 
@@ -99,6 +108,9 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник валют
         /// </summary>
         [HttpGet("load-currencies-catalog")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadCurrenciesCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-currencies-catalog");
@@ -107,7 +119,7 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var currencies = _tinkoffService.GetCurrencies();
 
-                await _catalogService.LoadFinancicalInstrumentsAsync(
+                await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Currencies, currencies);
             }
 
@@ -121,6 +133,9 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Подгрузить последние свечи
         /// </summary>
         [HttpGet("load-stocks-daily-candles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadStocksDailyCandlesAsync()
         {
             _logger.Trace($"Request - /api/load-stocks-daily-candles");
@@ -152,6 +167,9 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// </summary>
         /// <param name="year">Год</param>
         [HttpGet("load-stocks-daily-candles-for-year/{year}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task LoadStocksDailyCandlesForYearAsync(int year)
         {
             _logger.Trace($"Request - /api/load-stocks-daily-candles-for-year");
