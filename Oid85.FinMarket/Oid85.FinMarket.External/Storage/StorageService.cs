@@ -289,7 +289,7 @@ namespace Oid85.FinMarket.External.Storage
                             $"values (" +
                             $"{open}, {close}, {high}, {low}, " +
                             $"{volume}, " +
-                            $"'date', " +
+                            $"'{date}', " +
                             $"{isComplete})");
                     }
 

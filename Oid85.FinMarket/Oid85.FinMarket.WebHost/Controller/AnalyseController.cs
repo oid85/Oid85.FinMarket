@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Oid85.FinMarket.Application.Models.Responses;
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.Catalogs;
@@ -28,10 +29,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Анализ при помощи индикатора Супертренд
         /// </summary>
         [HttpGet("analyse-stocks")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task AnalyseStocksAsync()
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AnalyseStocksAsync()
         {
             _logger.Trace($"Request - /api/analyse-stocks");
 
@@ -44,12 +45,27 @@ namespace Oid85.FinMarket.WebHost.Controller
                 {
                     _logger.Trace($"Analyse '{stock.Ticker}'");
                     await _analyseService.SupertrendAnalyseAsync(stock, KnownTimeframes.Daily);
-                }                
+                }
+
+                var response = new CommonResponse<string>("OK");
+
+                return Ok(response);
             }
 
             catch (Exception exception)
             {
                 _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    ErrorCode = 500,
+                    ErrorDescription = "Ошибка при выполнении запроса",
+                    ErrorMessage = exception.Message
+                };
+
+                var response = new CommonResponse<string>(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
     }

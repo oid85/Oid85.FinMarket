@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Oid85.FinMarket.Application.Models.Responses;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Catalogs;
@@ -33,10 +34,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник акций
         /// </summary>
         [HttpGet("load-stocks-catalog")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task LoadStocksCatalogAsync()
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoadStocksCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-stocks-catalog");
 
@@ -46,11 +47,26 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Stocks, stocks);
+
+                var response = new CommonResponse<string>("OK");
+
+                return Ok(response);
             }
 
             catch (Exception exception)
             {
                 _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    ErrorCode = 500,
+                    ErrorDescription = "Ошибка при выполнении запроса",
+                    ErrorMessage = exception.Message
+                };
+
+                var response = new CommonResponse<string>(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -58,10 +74,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник облигаций
         /// </summary>
         [HttpGet("load-bonds-catalog")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task LoadBondsCatalogAsync()
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoadBondsCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-bonds-catalog");
 
@@ -71,11 +87,26 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Bonds, bonds);
+
+                var response = new CommonResponse<string>("OK");
+
+                return Ok(response);
             }
 
             catch (Exception exception)
             {
                 _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    ErrorCode = 500,
+                    ErrorDescription = "Ошибка при выполнении запроса",
+                    ErrorMessage = exception.Message
+                };
+
+                var response = new CommonResponse<string>(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -83,10 +114,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник фьючерсов
         /// </summary>
         [HttpGet("load-futures-catalog")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task LoadFuturesCatalogAsync()
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoadFuturesCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-futures-catalog");
 
@@ -96,11 +127,26 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Futures, futures);
+
+                var response = new CommonResponse<string>("OK");
+
+                return Ok(response);
             }
 
             catch (Exception exception)
             {
                 _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    ErrorCode = 500,
+                    ErrorDescription = "Ошибка при выполнении запроса",
+                    ErrorMessage = exception.Message
+                };
+
+                var response = new CommonResponse<string>(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -108,10 +154,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Загрузить справочник валют
         /// </summary>
         [HttpGet("load-currencies-catalog")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task LoadCurrenciesCatalogAsync()
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoadCurrenciesCatalogAsync()
         {
             _logger.Trace($"Request - /api/load-currencies-catalog");
 
@@ -121,11 +167,26 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 await _catalogService.UpdateFinancicalInstrumentsAsync(
                     KnownFinancicalInstrumentTypes.Currencies, currencies);
+
+                var response = new CommonResponse<string>("OK");
+
+                return Ok(response);
             }
 
             catch (Exception exception)
             {
                 _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    ErrorCode = 500,
+                    ErrorDescription = "Ошибка при выполнении запроса",
+                    ErrorMessage = exception.Message
+                };
+
+                var response = new CommonResponse<string>(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -133,10 +194,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// Подгрузить последние свечи
         /// </summary>
         [HttpGet("load-stocks-daily-candles")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task LoadStocksDailyCandlesAsync()
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoadStocksDailyCandlesAsync()
         {
             _logger.Trace($"Request - /api/load-stocks-daily-candles");
 
@@ -154,11 +215,26 @@ namespace Oid85.FinMarket.WebHost.Controller
                 }
 
                 await _storageService.SaveCandlesAsync(data);
+
+                var response = new CommonResponse<string>("OK");
+
+                return Ok(response);
             }
 
             catch (Exception exception)
             {
                 _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    ErrorCode = 500,
+                    ErrorDescription = "Ошибка при выполнении запроса",
+                    ErrorMessage = exception.Message
+                };
+
+                var response = new CommonResponse<string>(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -167,10 +243,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// </summary>
         /// <param name="year">Год</param>
         [HttpGet("load-stocks-daily-candles-for-year/{year}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task LoadStocksDailyCandlesForYearAsync(int year)
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> LoadStocksDailyCandlesForYearAsync(int year)
         {
             _logger.Trace($"Request - /api/load-stocks-daily-candles-for-year");
 
@@ -189,12 +265,27 @@ namespace Oid85.FinMarket.WebHost.Controller
                 }
 
                 await _storageService.SaveCandlesAsync(data);
+
+                var response = new CommonResponse<string>("OK");
+
+                return Ok(response);
             }
 
             catch (Exception exception)
             {
                 _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    ErrorCode = 500,
+                    ErrorDescription = "Ошибка при выполнении запроса",
+                    ErrorMessage = exception.Message
+                };
+
+                var response = new CommonResponse<string>(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
-    }
+    }    
 }
