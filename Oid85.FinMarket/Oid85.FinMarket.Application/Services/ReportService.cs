@@ -25,16 +25,27 @@ namespace Oid85.FinMarket.Application.Services
         public async Task<ReporData> GetReportAnalyseSupertrendStocks(
             GetReportAnalyseSupertrendRequest request)
         {
+            if (request.TickerList == KnownTickerLists.AllStocks)
+            {
+                var tickers = (await _catalogService
+                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks))
+                    .OrderBy(x => x.Sector)
+                    .Select(x => x.Ticker);
+
+                var data = await GetDataAsync(tickers, request.From, request.To);
+
+                var reportData = await GetReportDataAsync(data, tickers, request.TickerList);
+
+                return reportData;
+            }
+
             if (request.TickerList == KnownTickerLists.MoexIndexStocks)
             {                
                 var tickers = (await _catalogService.GetMoexIndexItemsAsync()).Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(tickers, request.From, request.To);
 
-                var reportData = GetReportData(
-                    data, 
-                    tickers, 
-                    request.TickerList);
+                var reportData = await GetReportDataAsync(data, tickers, request.TickerList);
 
                 return reportData;
             }
@@ -45,10 +56,7 @@ namespace Oid85.FinMarket.Application.Services
 
                 var data = await GetDataAsync(tickers, request.From, request.To);
 
-                var reportData = GetReportData(
-                    data,
-                    tickers,
-                    request.TickerList);
+                var reportData = await GetReportDataAsync(data, tickers, request.TickerList);
 
                 return reportData;
             }
@@ -59,10 +67,7 @@ namespace Oid85.FinMarket.Application.Services
 
                 var data = await GetDataAsync(tickers, request.From, request.To);
 
-                var reportData = GetReportData(
-                    data,
-                    tickers,
-                    request.TickerList);
+                var reportData = await GetReportDataAsync(data, tickers, request.TickerList);
 
                 return reportData;
             }
@@ -70,7 +75,7 @@ namespace Oid85.FinMarket.Application.Services
             return new();
         }
 
-        private static ReporData GetReportData(
+        private async Task<ReporData> GetReportDataAsync(
             Dictionary<string, List<Tuple<string, string>>> data, 
             IEnumerable<string> tickers,
             string tickerList)
@@ -80,7 +85,7 @@ namespace Oid85.FinMarket.Application.Services
                 Title = $"Report Analyse Supertrend {tickerList}"
             };
 
-            reportData.Header = ["Тикер"];
+            reportData.Header = ["Тикер", "Сектор"];
 
             var dates = data.Keys
                 .Select(x => x.ToString())
@@ -91,7 +96,10 @@ namespace Oid85.FinMarket.Application.Services
 
             foreach (var ticker in tickers)
             {
-                var tickerData = new List<string>() { ticker };
+                string sector = (await _catalogService.GetFinancicalInstrumentAsync(
+                    KnownFinancicalInstrumentTypes.Stocks, ticker))!.Sector;
+
+                var tickerData = new List<string>() { ticker, sector };
 
                 foreach (var date in dates)
                 {
