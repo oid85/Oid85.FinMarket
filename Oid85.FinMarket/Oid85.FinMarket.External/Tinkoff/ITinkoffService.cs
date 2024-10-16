@@ -13,7 +13,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         /// <param name="instrument"> Финансовый инструмент</param>
         /// <param name="timeframe">Таймфрейм</param>
         public Task<List<Candle>> GetCandlesAsync(
-            FinancicalInstrument instrument, string timeframe);
+            FinInstrument instrument, string timeframe);
 
         /// <summary>
         /// Получить свечи за конкретный год
@@ -22,26 +22,26 @@ namespace Oid85.FinMarket.External.Tinkoff
         /// <param name="timeframe">Таймфрейм</param>
         /// <param name="year">Год</param>
         public Task<List<Candle>> GetCandlesAsync(
-            FinancicalInstrument instrument, string timeframe, int year);
+            FinInstrument instrument, string timeframe, int year);
 
         /// <summary>
         /// Получить список акций
         /// </summary>
-        public List<FinancicalInstrument> GetStocks();
+        public List<FinInstrument> GetStocks();
 
         /// <summary>
         /// Получить список облигаций
         /// </summary>
-        public List<FinancicalInstrument> GetBonds();
+        public List<FinInstrument> GetBonds();
 
         /// <summary>
         /// Получить список фьючерсов
         /// </summary>
-        public List<FinancicalInstrument> GetFutures();
+        public List<FinInstrument> GetFutures();
 
         /// <summary>
         /// Получить список валют
         /// </summary>
-        public List<FinancicalInstrument> GetCurrencies();
+        public List<FinInstrument> GetCurrencies();
     }
 }

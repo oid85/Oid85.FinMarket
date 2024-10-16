@@ -6,6 +6,7 @@ using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.External.Storage;
 using Skender.Stock.Indicators;
 using System.Text.Json;
+using Candle = Oid85.FinMarket.Domain.Models.Candle;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.Application.Services
@@ -29,8 +30,22 @@ namespace Oid85.FinMarket.Application.Services
 
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> SupertrendAnalyseAsync(
-            FinancicalInstrument stock, string timeframe)
+            FinInstrument stock, string timeframe)
         {
+            string GetTrendDirection(SuperTrendResult result)
+            {
+                if (result.SuperTrend == null)
+                    return string.Empty;
+
+                if (result.UpperBand == null && result.LowerBand != null)
+                    return KnownTrendDirections.Up;
+
+                if (result.UpperBand != null && result.LowerBand == null)
+                    return KnownTrendDirections.Down;
+
+                return string.Empty;
+            }
+
             try
             {
                 await using var connection = await GetPostgresConnectionAsync();
@@ -84,18 +99,83 @@ namespace Oid85.FinMarket.Application.Services
             }
         }
 
-        private string GetTrendDirection(SuperTrendResult result)
+        /// <inheritdoc />
+        public async Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
+            FinInstrument stock, string timeframe)
         {
-            if (result.SuperTrend == null)
+            string GetTrendDirection(List<Candle> candles)
+            {
+                if (candles == null)
+                    return string.Empty;
+
+                // Свечи белые
+                if (candles.All(x => x.Close > x.Open))
+                    return KnownTrendDirections.Up;
+
+                // Свечи черные
+                if (candles.All(x => x.Close < x.Open))
+                    return KnownTrendDirections.Down;
+
                 return string.Empty;
+            }
 
-            if (result.UpperBand == null && result.LowerBand != null)
-                return KnownTrendDirections.Up;
+            try
+            {
+                await using var connection = await GetPostgresConnectionAsync();
 
-            if (result.UpperBand != null && result.LowerBand == null)
-                return KnownTrendDirections.Down;
+                await connection.OpenAsync();
 
-            return string.Empty;
+                string tableName = $"{stock.Ticker}_{timeframe}".ToLower();
+
+                var candles = await _storageService.GetCandlesAsync(tableName);
+
+                await connection.CloseAsync();
+
+                var results = new List<AnalyseResult>();
+
+                for (int i = 0; i < candles.Count; i++)
+                {
+                    var result = new AnalyseResult();
+
+                    if (i < 2)
+                    {
+                        result.Date = candles[i].Date;
+                        result.Ticker = stock.Ticker;
+                        result.Timeframe = timeframe;
+                        result.TrendDirection = string.Empty;
+                        result.Data = JsonSerializer.Serialize(candles[i]);
+                    }
+
+                    else
+                    {
+                        var candlesForAnalyse = new List<Candle>()
+                        {
+                            candles[i],
+                            candles[i - 1]
+                        };
+
+                        result.Date = candles[i].Date;
+                        result.Ticker = stock.Ticker;
+                        result.Timeframe = timeframe;
+                        result.TrendDirection = GetTrendDirection(candlesForAnalyse);
+                        result.Data = JsonSerializer.Serialize(candles[i]);
+                    }                    
+
+                    results.Add(result);
+                }
+
+                await _storageService.SaveAnalyseResultsAsync(
+                    $"{stock.Ticker}_candle_sequence_{KnownTimeframes.Daily}".ToLower(),
+                    results);
+
+                return results;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
+            }
         }
 
         /// <summary>

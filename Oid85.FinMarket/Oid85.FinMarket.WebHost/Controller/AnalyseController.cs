@@ -39,12 +39,14 @@ namespace Oid85.FinMarket.WebHost.Controller
             try
             {
                 var stocks = await _catalogService
-                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
+                    .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
 
                 foreach (var stock in stocks)
                 {
                     _logger.Trace($"Analyse '{stock.Ticker}'");
+
                     await _analyseService.SupertrendAnalyseAsync(stock, KnownTimeframes.Daily);
+                    await _analyseService.CandleSequenceAnalyseAsync(stock, KnownTimeframes.Daily);
                 }
 
                 var response = new CommonResponse<string>("OK");
@@ -58,9 +60,9 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
                 var response = new CommonResponse<string>(error);

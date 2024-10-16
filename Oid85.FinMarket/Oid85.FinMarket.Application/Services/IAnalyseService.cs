@@ -3,7 +3,7 @@
 namespace Oid85.FinMarket.Application.Services
 {
     /// <summary>
-    /// Сервис анализа котировок
+    /// Сервис анализа
     /// </summary>
     public interface IAnalyseService
     {
@@ -11,6 +11,12 @@ namespace Oid85.FinMarket.Application.Services
         /// Анализ с индикатором Супертренд
         /// </summary>
         public Task<List<AnalyseResult>> SupertrendAnalyseAsync(
-            FinancicalInstrument stock, string timeframe);
+            FinInstrument stock, string timeframe);
+
+        /// <summary>
+        /// Анализ последовательности подряд идущих свечей
+        /// </summary>
+        public Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
+            FinInstrument stock, string timeframe);
     }
 }

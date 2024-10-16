@@ -22,14 +22,14 @@ namespace Oid85.FinMarket.WebHost.Controller
         }
 
         /// <summary>
-        /// Отчет по анализу Супертренд для акций
+        /// Отчет по анализу Супертренд
         /// </summary>        
         [HttpPost("report/analyse-supertrend/stocks")]
-        [ProducesResponseType(typeof(GetReportAnalyseSupertrendResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(GetReportAnalyseSupertrendResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(GetReportAnalyseSupertrendResponse), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(GetReportAnalyseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetReportAnalyseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(GetReportAnalyseResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ReportAnalyseSupertrendStocksAsync(
-            [FromBody] GetReportAnalyseSupertrendRequest request)
+            [FromBody] GetReportAnalyseRequest request)
         {
             _logger.Trace($"Request - /api/report/analyse-supertrend/stocks");
 
@@ -37,7 +37,7 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var result = await _reportService.GetReportAnalyseSupertrendStocks(request);
                 
-                var response = new GetReportAnalyseSupertrendResponse(result);
+                var response = new GetReportAnalyseResponse(result);
                 
                 return Ok(response);
             }
@@ -48,12 +48,50 @@ namespace Oid85.FinMarket.WebHost.Controller
                 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
-                var response = new GetReportAnalyseSupertrendResponse(error);
+                var response = new GetReportAnalyseResponse(error);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
+        }
+
+        /// <summary>
+        /// Отчет по анализу Последовательность свечей одного цвета
+        /// </summary>        
+        [HttpPost("report/analyse-candle-sequence/stocks")]
+        [ProducesResponseType(typeof(GetReportAnalyseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetReportAnalyseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(GetReportAnalyseResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ReportAnalyseCandleSequenceStocksAsync(
+            [FromBody] GetReportAnalyseRequest request)
+        {
+            _logger.Trace($"Request - /api/report/analyse-candle-sequence/stocks");
+
+            try
+            {
+                var result = await _reportService.GetReportAnalyseCandleSequenceStocks(request);
+
+                var response = new GetReportAnalyseResponse(result);
+
+                return Ok(response);
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error(exception);
+
+                var error = new ResponseError()
+                {
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
+                };
+
+                var response = new GetReportAnalyseResponse(error);
 
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }

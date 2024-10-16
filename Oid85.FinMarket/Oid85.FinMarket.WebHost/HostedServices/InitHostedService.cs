@@ -50,8 +50,8 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             {
                 var stocks = _tinkoffService.GetStocks();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Stocks, stocks);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Stocks, stocks);
 
                 _logger.Info($"Обновлен каталог акций");
             }
@@ -68,8 +68,8 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             {
                 var bonds = _tinkoffService.GetBonds();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Bonds, bonds);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Bonds, bonds);
 
                 _logger.Info($"Обновлен каталог облигаций");
             }
@@ -86,8 +86,8 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             {
                 var futures = _tinkoffService.GetFutures();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Futures, futures);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Futures, futures);
 
                 _logger.Info($"Обновлен каталог фьючерсов");
             }
@@ -104,8 +104,8 @@ namespace Oid85.FinMarket.WebHost.HostedServices
             {
                 var currencies = _tinkoffService.GetCurrencies();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Currencies, currencies);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Currencies, currencies);
 
                 _logger.Info($"Обновлен каталог валют");
             }

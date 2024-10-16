@@ -29,7 +29,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            FinancicalInstrument instrument, string timeframe)
+            FinInstrument instrument, string timeframe)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            FinancicalInstrument instrument, string timeframe, int year)
+            FinInstrument instrument, string timeframe, int year)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         private async Task<List<Candle>> GetCandlesAsync(
-                    FinancicalInstrument instrument, string timeframe,
+                    FinInstrument instrument, string timeframe,
                     Timestamp from, Timestamp to)
         {
             var request = new GetCandlesRequest
@@ -109,7 +109,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinancicalInstrument> GetStocks()
+        public List<FinInstrument> GetStocks()
         {
             try
             {
@@ -118,12 +118,12 @@ namespace Oid85.FinMarket.External.Tinkoff
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList(); 
 
-                var instruments = new List<FinancicalInstrument>() { };
+                var instruments = new List<FinInstrument>() { };
 
                 foreach (var share in shares)
                 {
                     
-                    var instrument = new FinancicalInstrument
+                    var instrument = new FinInstrument
                     {
                         Ticker = share.Ticker,
                         Figi = share.Figi,
@@ -146,7 +146,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinancicalInstrument> GetBonds()
+        public List<FinInstrument> GetBonds()
         {
             try
             {
@@ -155,11 +155,11 @@ namespace Oid85.FinMarket.External.Tinkoff
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList();
 
-                var instruments = new List<FinancicalInstrument>() { };
+                var instruments = new List<FinInstrument>() { };
 
                 foreach (var bond in bonds)
                 {
-                    var instrument = new FinancicalInstrument
+                    var instrument = new FinInstrument
                     {
                         Ticker = bond.Ticker,
                         Figi = bond.Figi,
@@ -182,7 +182,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinancicalInstrument> GetFutures()
+        public List<FinInstrument> GetFutures()
         {
             try
             {
@@ -191,11 +191,11 @@ namespace Oid85.FinMarket.External.Tinkoff
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList();
 
-                var instruments = new List<FinancicalInstrument>() { };
+                var instruments = new List<FinInstrument>() { };
 
                 foreach (var future in futures)
                 {
-                    var instrument = new FinancicalInstrument
+                    var instrument = new FinInstrument
                     {
                         Ticker = future.Ticker,
                         Figi = future.Figi,
@@ -218,7 +218,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinancicalInstrument> GetCurrencies()
+        public List<FinInstrument> GetCurrencies()
         {
             try
             {
@@ -226,11 +226,11 @@ namespace Oid85.FinMarket.External.Tinkoff
                     .Currencies().Instruments
                     .ToList();
 
-                var instruments = new List<FinancicalInstrument>() { };
+                var instruments = new List<FinInstrument>() { };
 
                 foreach (var currencie in currencies)
                 {
-                    var instrument = new FinancicalInstrument
+                    var instrument = new FinInstrument
                     {
                         Ticker = currencie.Ticker,
                         Figi = currencie.Figi,
