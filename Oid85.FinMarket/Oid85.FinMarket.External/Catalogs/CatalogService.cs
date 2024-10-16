@@ -69,7 +69,8 @@ namespace Oid85.FinMarket.External.Catalogs
                         $"select id, ticker, figi, description, sector, is_active " +
                         $"from {tableName.ToLower()} " +
                         $"where is_active = 1"))
-                    .ToList();
+                        .OrderBy(x => x.Sector)
+                        .ToList();
 
                 if (financicalInstruments == null || !financicalInstruments.Any())
                 {
