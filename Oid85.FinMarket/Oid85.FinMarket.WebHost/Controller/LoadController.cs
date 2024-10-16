@@ -45,8 +45,8 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var stocks = _tinkoffService.GetStocks();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Stocks, stocks);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Stocks, stocks);
 
                 var response = new CommonResponse<string>("OK");
 
@@ -59,9 +59,9 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
                 var response = new CommonResponse<string>(error);
@@ -85,8 +85,8 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var bonds = _tinkoffService.GetBonds();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Bonds, bonds);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Bonds, bonds);
 
                 var response = new CommonResponse<string>("OK");
 
@@ -99,9 +99,9 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
                 var response = new CommonResponse<string>(error);
@@ -125,8 +125,8 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var futures = _tinkoffService.GetFutures();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Futures, futures);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Futures, futures);
 
                 var response = new CommonResponse<string>("OK");
 
@@ -139,9 +139,9 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
                 var response = new CommonResponse<string>(error);
@@ -165,8 +165,8 @@ namespace Oid85.FinMarket.WebHost.Controller
             {
                 var currencies = _tinkoffService.GetCurrencies();
 
-                await _catalogService.UpdateFinancicalInstrumentsAsync(
-                    KnownFinancicalInstrumentTypes.Currencies, currencies);
+                await _catalogService.UpdateFinInstrumentsAsync(
+                    KnownFinInstrumentTypes.Currencies, currencies);
 
                 var response = new CommonResponse<string>("OK");
 
@@ -179,9 +179,9 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
                 var response = new CommonResponse<string>(error);
@@ -204,7 +204,7 @@ namespace Oid85.FinMarket.WebHost.Controller
             try
             {
                 var stocks = await _catalogService
-                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
+                    .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
 
                 var data = new List<Tuple<string, List<Candle>>>();
 
@@ -227,9 +227,9 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
                 var response = new CommonResponse<string>(error);
@@ -253,7 +253,7 @@ namespace Oid85.FinMarket.WebHost.Controller
             try
             {
                 var stocks = await _catalogService
-                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
+                    .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
 
                 var data = new List<Tuple<string, List<Candle>>>();
 
@@ -277,9 +277,9 @@ namespace Oid85.FinMarket.WebHost.Controller
 
                 var error = new ResponseError()
                 {
-                    ErrorCode = 500,
-                    ErrorDescription = "Ошибка при выполнении запроса",
-                    ErrorMessage = exception.Message
+                    Code = 500,
+                    Description = "Ошибка при выполнении запроса",
+                    Message = exception.Message
                 };
 
                 var response = new CommonResponse<string>(error);

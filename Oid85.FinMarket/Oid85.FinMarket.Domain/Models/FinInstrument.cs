@@ -3,7 +3,7 @@
     /// <summary>
     /// Финансовый инструмент
     /// </summary>
-    public class FinancicalInstrument
+    public class FinInstrument
     {
         /// <summary>
         /// Идентификатор в справочнике

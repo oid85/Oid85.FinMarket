@@ -12,21 +12,21 @@ namespace Oid85.FinMarket.External.Catalogs
         /// </summary>
         /// <param name="tableName">Имя таблицы</param>
         /// <param name="ticker">Тикер</param>
-        public Task<FinancicalInstrument?> GetFinancicalInstrumentAsync(
+        public Task<FinInstrument?> GetFinInstrumentAsync(
             string tableName, string ticker);
 
         /// <summary>
         /// Получить все активные финансовые инструменты
         /// </summary>
         /// <param name="tableName">Имя таблицы</param>
-        public Task<List<FinancicalInstrument>> GetActiveFinancicalInstrumentsAsync(
+        public Task<List<FinInstrument>> GetActiveFinInstrumentsAsync(
             string tableName);
 
         /// <summary>
         /// Обновить финансовые инструменты
         /// </summary>
-        public Task UpdateFinancicalInstrumentsAsync(
-            string tableName, List<FinancicalInstrument> instruments);
+        public Task UpdateFinInstrumentsAsync(
+            string tableName, List<FinInstrument> instruments);
 
         /// <summary>
         /// Получить тикеры из индекса Мосбиржи

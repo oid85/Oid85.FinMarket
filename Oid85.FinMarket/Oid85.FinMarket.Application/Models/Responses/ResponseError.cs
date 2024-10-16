@@ -2,8 +2,8 @@
 {
     public class ResponseError
     {
-        public string ErrorDescription { get; set; } = string.Empty;
-        public int ErrorCode { get; set; }
-        public string ErrorMessage { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public int Code { get; set; }
+        public string Message { get; set; } = string.Empty;
     }
 }

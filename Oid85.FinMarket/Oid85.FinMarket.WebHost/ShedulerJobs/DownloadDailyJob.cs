@@ -46,7 +46,7 @@ namespace DaGroup.Mfsb.Computation.WebHost.Jobs
             try
             {
                 var stocks = await _catalogService
-                    .GetActiveFinancicalInstrumentsAsync(KnownFinancicalInstrumentTypes.Stocks);
+                    .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
 
                 var data = new List<Tuple<string, List<Candle>>>();
 

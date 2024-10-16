@@ -2,14 +2,14 @@
 
 namespace Oid85.FinMarket.Application.Models.Responses
 {
-    public class GetReportAnalyseSupertrendResponse : BaseResponse<ReporData>
+    public class GetReportAnalyseResponse : BaseResponse<ReporData>
     {
-        public GetReportAnalyseSupertrendResponse(ReporData result)
+        public GetReportAnalyseResponse(ReporData result)
         {
             Result = result;
         }
 
-        public GetReportAnalyseSupertrendResponse(ResponseError error)
+        public GetReportAnalyseResponse(ResponseError error)
         {
             Error = error;
         }

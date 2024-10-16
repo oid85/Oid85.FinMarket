@@ -20,7 +20,7 @@ namespace Oid85.FinMarket.External.Catalogs
         }
 
         /// <inheritdoc />
-        public async Task<FinancicalInstrument?> GetFinancicalInstrumentAsync(
+        public async Task<FinInstrument?> GetFinInstrumentAsync(
             string tableName, string ticker)
         {
             try
@@ -30,7 +30,7 @@ namespace Oid85.FinMarket.External.Catalogs
                 await connection.OpenAsync();
 
                 var financicalInstrument = (await connection
-                    .QueryAsync<FinancicalInstrument>(
+                    .QueryAsync<FinInstrument>(
                         $"select id, ticker, figi, description, sector, is_active " +
                         $"from {tableName.ToLower()} " +
                         $"where ticker = '{ticker}'"))
@@ -55,7 +55,7 @@ namespace Oid85.FinMarket.External.Catalogs
         }
 
         /// <inheritdoc />
-        public async Task<List<FinancicalInstrument>> GetActiveFinancicalInstrumentsAsync(
+        public async Task<List<FinInstrument>> GetActiveFinInstrumentsAsync(
             string tableName)
         {
             try
@@ -65,11 +65,12 @@ namespace Oid85.FinMarket.External.Catalogs
                 await connection.OpenAsync();
 
                 var financicalInstruments = (await connection
-                    .QueryAsync<FinancicalInstrument>(
+                    .QueryAsync<FinInstrument>(
                         $"select id, ticker, figi, description, sector, is_active " +
                         $"from {tableName.ToLower()} " +
                         $"where is_active = 1"))
-                    .ToList();
+                        .OrderBy(x => x.Sector)
+                        .ToList();
 
                 if (financicalInstruments == null || !financicalInstruments.Any())
                 {
@@ -90,8 +91,8 @@ namespace Oid85.FinMarket.External.Catalogs
         }
 
         /// <inheritdoc />
-        public async Task UpdateFinancicalInstrumentsAsync(
-            string tableName, List<FinancicalInstrument> instruments)
+        public async Task UpdateFinInstrumentsAsync(
+            string tableName, List<FinInstrument> instruments)
         {
             try
             {
@@ -106,7 +107,7 @@ namespace Oid85.FinMarket.External.Catalogs
                     string ticker = normalizeInstrument.Ticker;
 
                     var exist = (await connection
-                        .QueryAsync<FinancicalInstrument>(
+                        .QueryAsync<FinInstrument>(
                             $"select id, ticker, figi, description, sector, is_active " +
                             $"from {tableName.ToLower()} " +
                             $"where ticker = '{ticker}'"))
@@ -126,7 +127,6 @@ namespace Oid85.FinMarket.External.Catalogs
                             $"set " +
                             $"figi = '{normalizeInstrument.Figi}', " +
                             $"description = '{normalizeInstrument.Description}', " +
-                            $"sector = '{normalizeInstrument.Sector}' " +
                             $"where ticker = '{normalizeInstrument.Ticker}'");
                 }
 
@@ -268,7 +268,7 @@ namespace Oid85.FinMarket.External.Catalogs
         /// <summary>
         /// Нормализировать поля
         /// </summary>
-        private FinancicalInstrument Normalize(FinancicalInstrument instrument)
+        private FinInstrument Normalize(FinInstrument instrument)
         {
             string description = instrument.Description
                 .Replace("'", "");
