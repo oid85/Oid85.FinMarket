@@ -61,7 +61,8 @@ namespace Oid85.FinMarket.External.Storage
                         $"select open, close, high, low, volume, date " +
                         $"from {tableName} " +
                         $"order by date"))
-                    .ToList();
+                        .OrderBy(x => x.Date)
+                        .ToList();
 
                 await connection.CloseAsync();
 
@@ -90,7 +91,8 @@ namespace Oid85.FinMarket.External.Storage
                         $"from {tableName} " +
                         $"order by date " + 
                         $"limit {count}"))
-                    .ToList();
+                        .OrderBy(x => x.Date)
+                        .ToList();
 
                 await connection.CloseAsync();
 
@@ -121,7 +123,8 @@ namespace Oid85.FinMarket.External.Storage
                         $"where date <= '{dateTime}' " +
                         $"order by date " +
                         $"limit {count}"))
-                    .ToList();
+                        .OrderBy(x => x.Date)
+                        .ToList();
 
                 await connection.CloseAsync();
 
@@ -152,7 +155,8 @@ namespace Oid85.FinMarket.External.Storage
                         $"where date >= '{from}' " +
                         $"and date <= '{to}' " +
                         $"order by date"))
-                    .ToList();
+                        .OrderBy(x => x.Date)
+                        .ToList();
 
                 await connection.CloseAsync();
 
