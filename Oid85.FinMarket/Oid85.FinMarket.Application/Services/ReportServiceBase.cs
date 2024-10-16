@@ -31,10 +31,10 @@ namespace Oid85.FinMarket.Application.Services
             {
                 var tickers = (await _catalogService
                     .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks))
-                    .OrderBy(x => x.Sector)
                 .Select(x => x.Ticker);
-                var data = await GetDataAsync(analyseType, tickers, from, to);
 
+                var data = await GetDataAsync(analyseType, tickers, from, to);
+                
                 var reportData = await GetReportDataByTickerListAsync(
                     analyseType, data, tickers, tickerList);
 
@@ -44,6 +44,7 @@ namespace Oid85.FinMarket.Application.Services
             if (tickerList == KnownTickerLists.MoexIndexStocks)
             {
                 var tickers = (await _catalogService.GetMoexIndexItemsAsync()).Select(x => x.Ticker);
+                
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
                 var reportData = await GetReportDataByTickerListAsync(
@@ -55,6 +56,7 @@ namespace Oid85.FinMarket.Application.Services
             if (tickerList == KnownTickerLists.PortfolioStocks)
             {
                 var tickers = (await _catalogService.GetPortfolioItemsAsync()).Select(x => x.Ticker);
+                
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
                 var reportData = await GetReportDataByTickerListAsync(
@@ -66,6 +68,7 @@ namespace Oid85.FinMarket.Application.Services
             if (tickerList == KnownTickerLists.WatchListStocks)
             {
                 var tickers = (await _catalogService.GetWatchListItemsAsync()).Select(x => x.Ticker);
+                
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
                 var reportData = await GetReportDataByTickerListAsync(
