@@ -126,7 +126,6 @@ namespace Oid85.FinMarket.External.Catalogs
                             $"set " +
                             $"figi = '{normalizeInstrument.Figi}', " +
                             $"description = '{normalizeInstrument.Description}', " +
-                            $"sector = '{normalizeInstrument.Sector}' " +
                             $"where ticker = '{normalizeInstrument.Ticker}'");
                 }
 
