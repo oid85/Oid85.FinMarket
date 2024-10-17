@@ -34,11 +34,19 @@ namespace Oid85.FinMarket.Application.Services
             var reportData = new ReportData
             {
                 Title = "Отчет по акции",
-                Header = reportDataSuperTrend.Header
+                
             };
 
-            reportData.Data.AddRange(reportDataSuperTrend.Data);
-            reportData.Data.AddRange(reportDataCandleSequence.Data);
+            reportData.Header = ["Анализ"];
+            reportData.Header.AddRange(reportDataSuperTrend.Header);
+
+            List<string> reportDataSuperTrendData = [KnownAnalyseTypes.Supertrend];
+            reportDataSuperTrendData.AddRange(reportDataSuperTrend.Data.First());
+            reportData.Data.Add(reportDataSuperTrendData);
+
+            List<string> reportDataCandleSequenceData = [KnownAnalyseTypes.CandleSequence];
+            reportDataCandleSequenceData.AddRange(reportDataCandleSequence.Data.First());
+            reportData.Data.Add(reportDataCandleSequenceData);
 
             return reportData;
         }
