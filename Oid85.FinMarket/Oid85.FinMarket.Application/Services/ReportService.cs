@@ -22,7 +22,7 @@ namespace Oid85.FinMarket.Application.Services
         }
 
         /// <inheritdoc />
-        public Task<ReporData> GetReportAnalyseSupertrendStocks(
+        public Task<ReportData> GetReportAnalyseSupertrendStocks(
             GetReportAnalyseRequest request) =>
             GetReportDataAsync(
                 request.TickerList,
@@ -31,7 +31,7 @@ namespace Oid85.FinMarket.Application.Services
                 request.To);
 
         /// <inheritdoc />
-        public Task<ReporData> GetReportAnalyseCandleSequenceStocks(
+        public Task<ReportData> GetReportAnalyseCandleSequenceStocks(
             GetReportAnalyseRequest request) =>
             GetReportDataAsync(
                 request.TickerList,

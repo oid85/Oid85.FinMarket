@@ -8,6 +8,11 @@ namespace Oid85.FinMarket.Application.Services
     public interface IAnalyseService
     {
         /// <summary>
+        /// Анализ всех акций
+        /// </summary>
+        public Task AnalyseStocksAsync();
+
+        /// <summary>
         /// Анализ с индикатором Супертренд
         /// </summary>
         public Task<List<AnalyseResult>> SupertrendAnalyseAsync(

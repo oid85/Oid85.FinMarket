@@ -11,13 +11,13 @@ namespace Oid85.FinMarket.Application.Services
         /// <summary>
         /// Получить отчет с результатами анализа Супертренд
         /// </summary>
-        Task<ReporData> GetReportAnalyseSupertrendStocks(
+        Task<ReportData> GetReportAnalyseSupertrendStocks(
             GetReportAnalyseRequest request);
 
         /// <summary>
         /// Получить отчет с результатами анализа Последовательность свечей одного цвета
         /// </summary>
-        Task<ReporData> GetReportAnalyseCandleSequenceStocks(
+        Task<ReportData> GetReportAnalyseCandleSequenceStocks(
             GetReportAnalyseRequest request);
     }
 }

@@ -7,6 +7,7 @@ namespace Oid85.FinMarket.Application.Extensions
     {
         public static void ConfigureApplicationServices(this IServiceCollection services)
         {
+            services.AddTransient<ILoadService, LoadService>();
             services.AddTransient<IAnalyseService, AnalyseService>();
             services.AddTransient<IReportService, ReportService>();
         }

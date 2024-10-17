@@ -1,291 +1,93 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Models.Responses;
+using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.External.Storage;
 using Oid85.FinMarket.External.Tinkoff;
+using Oid85.FinMarket.WebHost.Controller.Base;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Controller
 {
     [Route("api")]
     [ApiController]
-    public class LoadController : ControllerBase
+    public class LoadController : FinMarketBaseController
     {
-        private readonly ILogger _logger;
-        private readonly ITinkoffService _tinkoffService;
-        private readonly ICatalogService _catalogService;
-        private readonly IStorageService _storageService;
+        private readonly ILoadService _loadService;
 
         public LoadController(
-            ILogger logger,
-            ITinkoffService tinkoffService,
-            ICatalogService catalogService,
-            IStorageService storageService)
+            ILoadService loadService)
         {
-            _logger = logger;
-            _tinkoffService = tinkoffService;
-            _catalogService = catalogService;
-            _storageService = storageService;
+            _loadService = loadService;
         }
 
         /// <summary>
         /// Загрузить справочник акций
         /// </summary>
         [HttpGet("load-stocks-catalog")]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> LoadStocksCatalogAsync()
-        {
-            _logger.Trace($"Request - /api/load-stocks-catalog");
-
-            try
-            {
-                var stocks = _tinkoffService.GetStocks();
-
-                await _catalogService.UpdateFinInstrumentsAsync(
-                    KnownFinInstrumentTypes.Stocks, stocks);
-
-                var response = new CommonResponse<string>("OK");
-
-                return Ok(response);
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-
-                var error = new ResponseError()
-                {
-                    Code = 500,
-                    Description = "Ошибка при выполнении запроса",
-                    Message = exception.Message
-                };
-
-                var response = new CommonResponse<string>(error);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadStocksCatalogAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                _loadService.LoadStocksCatalogAsync);
 
         /// <summary>
         /// Загрузить справочник облигаций
         /// </summary>
         [HttpGet("load-bonds-catalog")]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> LoadBondsCatalogAsync()
-        {
-            _logger.Trace($"Request - /api/load-bonds-catalog");
-
-            try
-            {
-                var bonds = _tinkoffService.GetBonds();
-
-                await _catalogService.UpdateFinInstrumentsAsync(
-                    KnownFinInstrumentTypes.Bonds, bonds);
-
-                var response = new CommonResponse<string>("OK");
-
-                return Ok(response);
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-
-                var error = new ResponseError()
-                {
-                    Code = 500,
-                    Description = "Ошибка при выполнении запроса",
-                    Message = exception.Message
-                };
-
-                var response = new CommonResponse<string>(error);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadBondsCatalogAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                _loadService.LoadBondsCatalogAsync);
 
         /// <summary>
         /// Загрузить справочник фьючерсов
         /// </summary>
         [HttpGet("load-futures-catalog")]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> LoadFuturesCatalogAsync()
-        {
-            _logger.Trace($"Request - /api/load-futures-catalog");
-
-            try
-            {
-                var futures = _tinkoffService.GetFutures();
-
-                await _catalogService.UpdateFinInstrumentsAsync(
-                    KnownFinInstrumentTypes.Futures, futures);
-
-                var response = new CommonResponse<string>("OK");
-
-                return Ok(response);
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-
-                var error = new ResponseError()
-                {
-                    Code = 500,
-                    Description = "Ошибка при выполнении запроса",
-                    Message = exception.Message
-                };
-
-                var response = new CommonResponse<string>(error);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadFuturesCatalogAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                _loadService.LoadFuturesCatalogAsync);
 
         /// <summary>
         /// Загрузить справочник валют
         /// </summary>
         [HttpGet("load-currencies-catalog")]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> LoadCurrenciesCatalogAsync()
-        {
-            _logger.Trace($"Request - /api/load-currencies-catalog");
-
-            try
-            {
-                var currencies = _tinkoffService.GetCurrencies();
-
-                await _catalogService.UpdateFinInstrumentsAsync(
-                    KnownFinInstrumentTypes.Currencies, currencies);
-
-                var response = new CommonResponse<string>("OK");
-
-                return Ok(response);
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-
-                var error = new ResponseError()
-                {
-                    Code = 500,
-                    Description = "Ошибка при выполнении запроса",
-                    Message = exception.Message
-                };
-
-                var response = new CommonResponse<string>(error);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadCurrenciesCatalogAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                _loadService.LoadCurrenciesCatalogAsync);
 
         /// <summary>
         /// Подгрузить последние свечи
         /// </summary>
         [HttpGet("load-stocks-daily-candles")]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> LoadStocksDailyCandlesAsync()
-        {
-            _logger.Trace($"Request - /api/load-stocks-daily-candles");
-
-            try
-            {
-                var stocks = await _catalogService
-                    .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
-
-                var data = new List<Tuple<string, List<Candle>>>();
-
-                foreach (var stock in stocks)
-                {
-                    var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily);
-                    data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
-                }
-
-                await _storageService.SaveCandlesAsync(data);
-
-                var response = new CommonResponse<string>("OK");
-
-                return Ok(response);
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-
-                var error = new ResponseError()
-                {
-                    Code = 500,
-                    Description = "Ошибка при выполнении запроса",
-                    Message = exception.Message
-                };
-
-                var response = new CommonResponse<string>(error);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadStocksDailyCandlesAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                _loadService.LoadStocksDailyCandlesAsync);
 
         /// <summary>
         /// Загрузить свечи за конкретный год
         /// </summary>
         /// <param name="year">Год</param>
         [HttpGet("load-stocks-daily-candles-for-year/{year}")]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(CommonResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> LoadStocksDailyCandlesForYearAsync(int year)
-        {
-            _logger.Trace($"Request - /api/load-stocks-daily-candles-for-year");
-
-            try
-            {
-                var stocks = await _catalogService
-                    .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
-
-                var data = new List<Tuple<string, List<Candle>>>();
-
-                foreach (var stock in stocks)
-                {
-                    _logger.Trace($"Load '{stock.Ticker}'");
-                    var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily, year);
-                    data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
-                }
-
-                await _storageService.SaveCandlesAsync(data);
-
-                var response = new CommonResponse<string>("OK");
-
-                return Ok(response);
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-
-                var error = new ResponseError()
-                {
-                    Code = 500,
-                    Description = "Ошибка при выполнении запроса",
-                    Message = exception.Message
-                };
-
-                var response = new CommonResponse<string>(error);
-
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadStocksDailyCandlesForYearAsync(int year) =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                () => _loadService.LoadStocksDailyCandlesForYearAsync(year));
     }    
 }

@@ -21,7 +21,7 @@ namespace Oid85.FinMarket.Application.Services
             _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
         }
 
-        public async Task<ReporData> GetReportDataAsync(
+        public async Task<ReportData> GetReportDataAsync(
             string tickerList, 
             string analyseType,
             DateTime from,
@@ -80,13 +80,13 @@ namespace Oid85.FinMarket.Application.Services
             return new();
         }
 
-        private async Task<ReporData> GetReportDataByTickerListAsync(
+        private async Task<ReportData> GetReportDataByTickerListAsync(
             string analyseType, 
             Dictionary<string, List<Tuple<string, string>>> data, 
             IEnumerable<string> tickers,
             string tickerList)
         {
-            var reportData = new ReporData()
+            var reportData = new ReportData()
             {
                 Title = $"{analyseType} {tickerList}"
             };
