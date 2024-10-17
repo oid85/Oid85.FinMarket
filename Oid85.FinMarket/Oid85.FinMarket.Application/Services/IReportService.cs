@@ -9,15 +9,18 @@ namespace Oid85.FinMarket.Application.Services
     public interface IReportService
     {
         /// <summary>
+        /// Получить отчет по акции
+        /// </summary>
+        Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request);
+
+        /// <summary>
         /// Получить отчет с результатами анализа Супертренд
         /// </summary>
-        Task<ReportData> GetReportAnalyseSupertrendStocks(
-            GetReportAnalyseRequest request);
+        Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request);
 
         /// <summary>
         /// Получить отчет с результатами анализа Последовательность свечей одного цвета
         /// </summary>
-        Task<ReportData> GetReportAnalyseCandleSequenceStocks(
-            GetReportAnalyseRequest request);
+        Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request);        
     }
 }

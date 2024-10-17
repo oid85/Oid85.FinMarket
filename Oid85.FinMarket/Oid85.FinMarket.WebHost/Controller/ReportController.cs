@@ -21,6 +21,22 @@ namespace Oid85.FinMarket.WebHost.Controller
         }
 
         /// <summary>
+        /// Отчет по акции
+        /// </summary>        
+        [HttpPost("report/analyse/stocks")]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> ReportAnalyseStockAsync(
+            [FromBody] GetReportAnalyseStockRequest request) =>
+            GetResponseAsync(
+                () => _reportService.GetReportAnalyseStock(request),
+                result => new BaseResponse<ReportData>
+                {
+                    Result = result
+                });
+
+        /// <summary>
         /// Отчет по анализу Супертренд
         /// </summary>        
         [HttpPost("report/analyse-supertrend/stocks")]

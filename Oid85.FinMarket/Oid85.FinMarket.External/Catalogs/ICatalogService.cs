@@ -31,16 +31,16 @@ namespace Oid85.FinMarket.External.Catalogs
         /// <summary>
         /// Получить тикеры из индекса Мосбиржи
         /// </summary>
-        public Task<List<MoexIndexItem>> GetMoexIndexItemsAsync();
+        public Task<List<MoexIndexStock>> GetMoexIndexStocksAsync();
 
         /// <summary>
         /// Получить тикеры из портфеля
         /// </summary>
-        public Task<List<PortfolioItem>> GetPortfolioItemsAsync();
+        public Task<List<PortfolioStock>> GetPortfolioStocksAsync();
 
         /// <summary>
         /// Получить тикеры из списка наблюдения
         /// </summary>
-        public Task<List<WatchListItem>> GetWatchListItemsAsync();
+        public Task<List<WatchListStock>> GetWatchListStocksAsync();
     }
 }
