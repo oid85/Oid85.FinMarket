@@ -23,7 +23,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// <summary>
         /// Получить инструменты из листа наблюдения
         /// </summary>        
-        [HttpPost("fin-instrument/watch-list")]
+        [HttpGet("fin-instrument/watch-list")]
         [ProducesResponseType(typeof(BaseResponse<List<WatchListStock>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<List<WatchListStock>>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<List<WatchListStock>>), StatusCodes.Status500InternalServerError)]
