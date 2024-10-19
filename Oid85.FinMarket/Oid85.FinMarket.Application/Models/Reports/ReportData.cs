@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Application.Models.Results
 {
-    public class ReporData
+    public class ReportData
     {
         public string Title { get; set; } = string.Empty;
         public List<string> Header { get; set; } = [];

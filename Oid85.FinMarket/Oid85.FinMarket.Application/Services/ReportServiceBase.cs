@@ -21,7 +21,7 @@ namespace Oid85.FinMarket.Application.Services
             _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
         }
 
-        public async Task<ReporData> GetReportDataAsync(
+        public async Task<ReportData> GetReportDataAsync(
             string tickerList, 
             string analyseType,
             DateTime from,
@@ -36,62 +36,82 @@ namespace Oid85.FinMarket.Application.Services
                 var data = await GetDataAsync(analyseType, tickers, from, to);
                 
                 var reportData = await GetReportDataByTickerListAsync(
-                    analyseType, data, tickers, tickerList);
+                    analyseType, data, tickers);
+
+                reportData.Title = $"{analyseType} {tickerList}";
 
                 return reportData;
             }
 
             if (tickerList == KnownTickerLists.MoexIndexStocks)
             {
-                var tickers = (await _catalogService.GetMoexIndexItemsAsync()).Select(x => x.Ticker);
+                var tickers = (await _catalogService.GetMoexIndexStocksAsync())
+                    .Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
                 var reportData = await GetReportDataByTickerListAsync(
-                    analyseType, data, tickers, tickerList);
+                    analyseType, data, tickers);
+
+                reportData.Title = $"{analyseType} {tickerList}";
 
                 return reportData;
             }
 
             if (tickerList == KnownTickerLists.PortfolioStocks)
             {
-                var tickers = (await _catalogService.GetPortfolioItemsAsync()).Select(x => x.Ticker);
+                var tickers = (await _catalogService.GetPortfolioStocksAsync())
+                    .Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
                 var reportData = await GetReportDataByTickerListAsync(
-                    analyseType, data, tickers, tickerList);
+                    analyseType, data, tickers);
+
+                reportData.Title = $"{analyseType} {tickerList}";
 
                 return reportData;
             }
 
             if (tickerList == KnownTickerLists.WatchListStocks)
             {
-                var tickers = (await _catalogService.GetWatchListItemsAsync()).Select(x => x.Ticker);
+                var tickers = (await _catalogService.GetWatchListStocksAsync())
+                    .Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
                 var reportData = await GetReportDataByTickerListAsync(
-                    analyseType, data, tickers, tickerList);
+                    analyseType, data, tickers);
+
+                reportData.Title = $"{analyseType} {tickerList}";
 
                 return reportData;
             }
 
-            return new();
+            else
+            {
+                var tickers = new List<string> { tickerList };
+
+                var data = await GetDataAsync(analyseType, tickers, from, to);
+
+                var reportData = await GetReportDataByTickerListAsync(
+                    analyseType, data, tickers);
+
+                reportData.Title = $"{analyseType} {tickerList}";
+
+                return reportData;
+            }            
         }
 
-        private async Task<ReporData> GetReportDataByTickerListAsync(
+        private async Task<ReportData> GetReportDataByTickerListAsync(
             string analyseType, 
             Dictionary<string, List<Tuple<string, string>>> data, 
-            IEnumerable<string> tickers,
-            string tickerList)
+            IEnumerable<string> tickers)
         {
-            var reportData = new ReporData()
+            var reportData = new ReportData
             {
-                Title = $"{analyseType} {tickerList}"
+                Header = ["Тикер", "Сектор"]
             };
-
-            reportData.Header = ["Тикер", "Сектор"];
 
             var dates = data.Keys
                 .Select(x => x.ToString())

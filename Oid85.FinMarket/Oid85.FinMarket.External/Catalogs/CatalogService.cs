@@ -127,7 +127,27 @@ namespace Oid85.FinMarket.External.Catalogs
                             $"set " +
                             $"figi = '{normalizeInstrument.Figi}', " +
                             $"description = '{normalizeInstrument.Description}', " +
+                            $"sector = '{normalizeInstrument.Sector}' " +
                             $"where ticker = '{normalizeInstrument.Ticker}'");
+
+                    // Обновляем пользовательские списки
+                    await connection.ExecuteAsync(
+                        $"update moex_index_stocks " +
+                        $"set " +
+                        $"sector = '{normalizeInstrument.Sector}' " +
+                        $"where ticker = '{normalizeInstrument.Ticker}'");
+
+                    await connection.ExecuteAsync(
+                        $"update portfolio_stocks " +
+                        $"set " +
+                        $"sector = '{normalizeInstrument.Sector}' " +
+                        $"where ticker = '{normalizeInstrument.Ticker}'");
+
+                    await connection.ExecuteAsync(
+                        $"update watch_list_stocks " +
+                        $"set " +
+                        $"sector = '{normalizeInstrument.Sector}' " +
+                        $"where ticker = '{normalizeInstrument.Ticker}'");
                 }
 
                 await connection.CloseAsync();
@@ -141,7 +161,7 @@ namespace Oid85.FinMarket.External.Catalogs
         }
 
         /// <inheritdoc />
-        public async Task<List<MoexIndexItem>> GetMoexIndexItemsAsync()
+        public async Task<List<MoexIndexStock>> GetMoexIndexStocksAsync()
         {
             try
             {
@@ -152,10 +172,11 @@ namespace Oid85.FinMarket.External.Catalogs
                 await connection.OpenAsync();
 
                 var items = (await connection
-                    .QueryAsync<MoexIndexItem>(
-                        $"select id, ticker, number_shares, price, prc " +
+                    .QueryAsync<MoexIndexStock>(
+                        $"select id, ticker, sector, number_shares, price, prc " +
                         $"from {tableName}"))
-                    .ToList();
+                        .OrderBy(x => x.Sector)
+                        .ToList();
 
                 if (items == null || !items.Any())
                 {
@@ -176,7 +197,7 @@ namespace Oid85.FinMarket.External.Catalogs
         }
 
         /// <inheritdoc />
-        public async Task<List<PortfolioItem>> GetPortfolioItemsAsync()
+        public async Task<List<PortfolioStock>> GetPortfolioStocksAsync()
         {
             try
             {
@@ -187,10 +208,11 @@ namespace Oid85.FinMarket.External.Catalogs
                 await connection.OpenAsync();
 
                 var items = (await connection
-                    .QueryAsync<PortfolioItem>(
-                        $"select id, ticker, number_shares, price, prc " +
+                    .QueryAsync<PortfolioStock>(
+                        $"select id, ticker, sector, number_shares, price, prc " +
                         $"from {tableName}"))
-                    .ToList();
+                        .OrderBy(x => x.Sector)
+                        .ToList();
 
                 if (items == null || !items.Any())
                 {
@@ -211,7 +233,7 @@ namespace Oid85.FinMarket.External.Catalogs
         }
 
         /// <inheritdoc />
-        public async Task<List<WatchListItem>> GetWatchListItemsAsync()
+        public async Task<List<WatchListStock>> GetWatchListStocksAsync()
         {
             try
             {
@@ -222,10 +244,11 @@ namespace Oid85.FinMarket.External.Catalogs
                 await connection.OpenAsync();
 
                 var items = (await connection
-                    .QueryAsync<WatchListItem>(
-                        $"select id, ticker, price " +
+                    .QueryAsync<WatchListStock>(
+                        $"select id, ticker, sector, price " +
                         $"from {tableName}"))
-                    .ToList();
+                        .OrderBy(x => x.Sector)
+                        .ToList();
 
                 if (items == null || !items.Any())
                 {

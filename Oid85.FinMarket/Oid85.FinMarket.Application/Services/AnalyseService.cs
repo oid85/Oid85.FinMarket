@@ -2,6 +2,7 @@
 using Oid85.FinMarket.Application.Constants;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.External.Storage;
 using Skender.Stock.Indicators;
@@ -17,15 +18,33 @@ namespace Oid85.FinMarket.Application.Services
         private readonly ILogger _logger;
         private readonly ISettingsService _settingsService;
         private readonly IStorageService _storageService;
+        private readonly ICatalogService _catalogService;
 
         public AnalyseService(
             ILogger logger,
             ISettingsService settingsService,
-            IStorageService storageService)
+            IStorageService storageService,
+            ICatalogService catalogService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
+            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
+        }
+
+        /// <inheritdoc />
+        public async Task AnalyseStocksAsync()
+        {
+            var stocks = await _catalogService
+                .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
+
+            foreach (var stock in stocks)
+            {
+                _logger.Trace($"Analyse '{stock.Ticker}'");
+
+                await SupertrendAnalyseAsync(stock, KnownTimeframes.Daily);
+                await CandleSequenceAnalyseAsync(stock, KnownTimeframes.Daily);
+            }
         }
 
         /// <inheritdoc />
