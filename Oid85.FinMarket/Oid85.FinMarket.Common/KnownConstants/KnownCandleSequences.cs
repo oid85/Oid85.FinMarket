@@ -2,7 +2,7 @@
 {
     public class KnownCandleSequences
     {
-        public static string White = "Объем растет";
-        public static string Black = "Объем падает";
+        public static string White = "Белые свечи";
+        public static string Black = "Черные свечи";
     }
 }
