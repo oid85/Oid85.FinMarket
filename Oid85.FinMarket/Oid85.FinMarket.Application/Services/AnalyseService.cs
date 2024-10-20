@@ -268,8 +268,8 @@ namespace Oid85.FinMarket.Application.Services
         {
             string GetResult(RsiResult result)
             {
-                double upLimit = 70.0;
-                double downLimit = 30.0;
+                double upLimit = 60.0;
+                double downLimit = 40.0;
 
                 if (result.Rsi == null)
                     return string.Empty;
