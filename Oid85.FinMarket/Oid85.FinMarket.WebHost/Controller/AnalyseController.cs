@@ -20,7 +20,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         }
 
         /// <summary>
-        /// Анализ при помощи индикатора Супертренд
+        /// Выполнить анализ
         /// </summary>
         [HttpGet("analyse-stocks")]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]

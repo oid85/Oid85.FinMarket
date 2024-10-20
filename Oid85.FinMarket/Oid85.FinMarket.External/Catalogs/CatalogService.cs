@@ -104,13 +104,13 @@ namespace Oid85.FinMarket.External.Catalogs
                 {
                     var normalizeInstrument = Normalize(instrument);
 
-                    string ticker = normalizeInstrument.Ticker;
+                    string figi = normalizeInstrument.Figi;
 
                     var exist = (await connection
                         .QueryAsync<FinInstrument>(
                             $"select id, ticker, figi, description, sector, is_active " +
                             $"from {tableName.ToLower()} " +
-                            $"where ticker = '{ticker}'"))
+                            $"where figi = '{figi}'"))
                         .FirstOrDefault();
 
                     if (exist is null)
@@ -121,14 +121,6 @@ namespace Oid85.FinMarket.External.Catalogs
                             $"'{normalizeInstrument.Ticker}', '{normalizeInstrument.Figi}', " +
                             $"'{normalizeInstrument.Description}', '{normalizeInstrument.Sector}', " +
                             $"{normalizeInstrument.IsActive})");
-                    else
-                        await connection.ExecuteAsync(
-                            $"update {tableName.ToLower()} " +
-                            $"set " +
-                            $"figi = '{normalizeInstrument.Figi}', " +
-                            $"description = '{normalizeInstrument.Description}', " +
-                            $"sector = '{normalizeInstrument.Sector}' " +
-                            $"where ticker = '{normalizeInstrument.Ticker}'");
 
                     // Обновляем пользовательские списки
                     await connection.ExecuteAsync(

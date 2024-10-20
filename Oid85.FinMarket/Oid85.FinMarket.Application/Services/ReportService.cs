@@ -31,22 +31,28 @@ namespace Oid85.FinMarket.Application.Services
             var reportDataCandleSequence = await GetReportDataAsync(
                 request.Ticker, KnownAnalyseTypes.CandleSequence, request.From, request.To);
 
+            var reportDataVolume = await GetReportDataAsync(
+                request.Ticker, KnownAnalyseTypes.CandleVolume, request.From, request.To);
+
             var reportData = new ReportData
             {
-                Title = "Отчет по акции",
-                
+                Title = $"Отчет по акции {request.Ticker}",                
             };
 
             reportData.Header = ["Анализ"];
             reportData.Header.AddRange(reportDataSuperTrend.Header);
 
-            List<string> reportDataSuperTrendData = [KnownAnalyseTypes.Supertrend];
-            reportDataSuperTrendData.AddRange(reportDataSuperTrend.Data.First());
-            reportData.Data.Add(reportDataSuperTrendData);
+            List<string> reportSuperTrendData = [KnownAnalyseTypes.Supertrend];
+            reportSuperTrendData.AddRange(reportDataSuperTrend.Data.First());
+            reportData.Data.Add(reportSuperTrendData);
 
-            List<string> reportDataCandleSequenceData = [KnownAnalyseTypes.CandleSequence];
-            reportDataCandleSequenceData.AddRange(reportDataCandleSequence.Data.First());
-            reportData.Data.Add(reportDataCandleSequenceData);
+            List<string> reportCandleSequenceData = [KnownAnalyseTypes.CandleSequence];
+            reportCandleSequenceData.AddRange(reportDataCandleSequence.Data.First());
+            reportData.Data.Add(reportCandleSequenceData);
+
+            List<string> reportVolumeData = [KnownAnalyseTypes.CandleVolume];
+            reportVolumeData.AddRange(reportDataVolume.Data.First());
+            reportData.Data.Add(reportVolumeData);
 
             return reportData;
         }
@@ -62,5 +68,11 @@ namespace Oid85.FinMarket.Application.Services
             GetReportAnalyseRequest request) =>
             GetReportDataAsync(
                 request.TickerList, KnownAnalyseTypes.CandleSequence, request.From, request.To);
+
+        /// <inheritdoc />
+        public Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
+            GetReportDataAsync(
+                request.TickerList, KnownAnalyseTypes.CandleVolume, request.From, request.To);
+
     }
 }

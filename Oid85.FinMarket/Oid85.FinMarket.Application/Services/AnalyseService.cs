@@ -38,12 +38,15 @@ namespace Oid85.FinMarket.Application.Services
             var stocks = await _catalogService
                 .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
 
-            foreach (var stock in stocks)
-            {
-                _logger.Trace($"Analyse '{stock.Ticker}'");
+            for (int i = 0; i < stocks.Count; i++)
+            {                
+                await SupertrendAnalyseAsync(stocks[i], KnownTimeframes.Daily);
+                await CandleSequenceAnalyseAsync(stocks[i], KnownTimeframes.Daily);
+                await CandleVolumeAnalyseAsync(stocks[i], KnownTimeframes.Daily);
 
-                await SupertrendAnalyseAsync(stock, KnownTimeframes.Daily);
-                await CandleSequenceAnalyseAsync(stock, KnownTimeframes.Daily);
+                double percent = ((i + 1) / (double) stocks.Count) * 100;
+
+                _logger.Trace($"Analyse '{stocks[i].Ticker}'. {i + 1} of {stocks.Count}. {percent:N2} % completed");
             }
         }
 
@@ -169,8 +172,8 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         var candlesForAnalyse = new List<Candle>()
                         {
-                            candles[i],
-                            candles[i - 1]
+                            candles[i - 1],
+                            candles[i]
                         };
 
                         result.Date = candles[i].Date;
@@ -185,6 +188,83 @@ namespace Oid85.FinMarket.Application.Services
 
                 await _storageService.SaveAnalyseResultsAsync(
                     $"{stock.Ticker}_candle_sequence_{KnownTimeframes.Daily}".ToLower(),
+                    results);
+
+                return results;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(
+            FinInstrument stock, string timeframe)
+        {
+            string GetTrendDirection(List<Candle> candles)
+            {
+                if (candles == null)
+                    return string.Empty;
+
+                // Объем растет
+                if (candles[0].Volume < candles[1].Volume && 
+                    candles[1].Volume < candles[2].Volume)
+                    return KnownTrendDirections.Up;
+
+                return string.Empty;
+            }
+
+            try
+            {
+                await using var connection = await GetPostgresConnectionAsync();
+
+                await connection.OpenAsync();
+
+                string tableName = $"{stock.Ticker}_{timeframe}".ToLower();
+
+                var candles = await _storageService.GetCandlesAsync(tableName);
+
+                await connection.CloseAsync();
+
+                var results = new List<AnalyseResult>();
+
+                for (int i = 0; i < candles.Count; i++)
+                {
+                    var result = new AnalyseResult();
+
+                    if (i < 3)
+                    {
+                        result.Date = candles[i].Date;
+                        result.Ticker = stock.Ticker;
+                        result.Timeframe = timeframe;
+                        result.TrendDirection = string.Empty;
+                        result.Data = JsonSerializer.Serialize(candles[i]);
+                    }
+
+                    else
+                    {
+                        var candlesForAnalyse = new List<Candle>()
+                        {
+                            candles[i - 2], 
+                            candles[i - 1],
+                            candles[i]
+                        };
+
+                        result.Date = candles[i].Date;
+                        result.Ticker = stock.Ticker;
+                        result.Timeframe = timeframe;
+                        result.TrendDirection = GetTrendDirection(candlesForAnalyse);
+                        result.Data = JsonSerializer.Serialize(candles[i]);
+                    }
+
+                    results.Add(result);
+                }
+
+                await _storageService.SaveAnalyseResultsAsync(
+                    $"{stock.Ticker}_candle_volume_{KnownTimeframes.Daily}".ToLower(),
                     results);
 
                 return results;
