@@ -4,6 +4,6 @@
     {
         public static string Supertrend = "Supertrend";
         public static string CandleSequence = "Candle Sequence";
-        public static string Volume = "Volume";
+        public static string CandleVolume = "Candle Volume";
     }
 }

@@ -210,7 +210,8 @@ namespace Oid85.FinMarket.Application.Services
                     return string.Empty;
 
                 // Объем растет
-                if (candles[0].Volume < candles[1].Volume)
+                if (candles[0].Volume < candles[1].Volume && 
+                    candles[1].Volume < candles[2].Volume)
                     return KnownTrendDirections.Up;
 
                 return string.Empty;
@@ -234,7 +235,7 @@ namespace Oid85.FinMarket.Application.Services
                 {
                     var result = new AnalyseResult();
 
-                    if (i < 2)
+                    if (i < 3)
                     {
                         result.Date = candles[i].Date;
                         result.Ticker = stock.Ticker;
@@ -247,6 +248,7 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         var candlesForAnalyse = new List<Candle>()
                         {
+                            candles[i - 2], 
                             candles[i - 1],
                             candles[i]
                         };

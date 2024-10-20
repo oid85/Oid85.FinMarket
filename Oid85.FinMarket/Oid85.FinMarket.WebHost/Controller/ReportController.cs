@@ -71,14 +71,14 @@ namespace Oid85.FinMarket.WebHost.Controller
         /// <summary>
         /// Отчет по анализу Растущий объем
         /// </summary>        
-        [HttpPost("report/analyse-volume/stocks")]
+        [HttpPost("report/analyse-candle-volume/stocks")]
         [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-        public Task<IActionResult> ReportAnalyseVolumeStocksAsync(
+        public Task<IActionResult> ReportAnalyseCandleVolumeStocksAsync(
             [FromBody] GetReportAnalyseRequest request) =>
             GetResponseAsync(
-                () => _reportService.GetReportAnalyseVolumeStocks(request),
+                () => _reportService.GetReportAnalyseCandleVolumeStocks(request),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result

@@ -26,6 +26,6 @@ namespace Oid85.FinMarket.Application.Services
         /// <summary>
         /// Получить отчет с результатами анализа Растущий объем
         /// </summary>
-        Task<ReportData> GetReportAnalyseVolumeStocks(GetReportAnalyseRequest request);
+        Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request);
     }
 }
