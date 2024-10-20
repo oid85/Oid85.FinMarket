@@ -58,71 +58,9 @@ namespace Oid85.FinMarket.External.Storage
 
                 var candles = (await connection
                     .QueryAsync<Candle>(
-                        $"select open, close, high, low, volume, date " +
+                        $"select id, open, close, high, low, volume, date, is_complete as iscomplete " +
                         $"from {tableName} " +
                         $"order by date"))
-                        .OrderBy(x => x.Date)
-                        .ToList();
-
-                await connection.CloseAsync();
-
-                return candles;
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
-                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<List<Candle>> GetCandlesAsync(string tableName, int count)
-        {
-            try
-            {
-                await using var connection = await GetPostgresConnectionAsync();
-
-                await connection.OpenAsync();
-
-                var candles = (await connection
-                    .QueryAsync<Candle>(
-                        $"select open, close, high, low, volume, date " +
-                        $"from {tableName} " +
-                        $"order by date " + 
-                        $"limit {count}"))
-                        .OrderBy(x => x.Date)
-                        .ToList();
-
-                await connection.CloseAsync();
-
-                return candles;
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
-                throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<List<Candle>> GetCandlesAsync(
-            string tableName, int count, DateTime dateTime)
-        {
-            try
-            {
-                await using var connection = await GetPostgresConnectionAsync();
-
-                await connection.OpenAsync();
-
-                var candles = (await connection
-                    .QueryAsync<Candle>(
-                        $"select open, close, high, low, volume, date " +
-                        $"from {tableName} " +
-                        $"where date <= '{dateTime}' " +
-                        $"order by date " +
-                        $"limit {count}"))
                         .OrderBy(x => x.Date)
                         .ToList();
 
@@ -150,7 +88,7 @@ namespace Oid85.FinMarket.External.Storage
 
                 var analyseResults = (await connection
                     .QueryAsync<AnalyseResult>(
-                        $"select id, ticker, timeframe, trend_direction as trenddirection, data, date " +
+                        $"select id, ticker, timeframe, result, data, date " +
                         $"from {tableName} " +
                         $"where date >= '{from}' " +
                         $"and date <= '{to}' " +
@@ -225,7 +163,7 @@ namespace Oid85.FinMarket.External.Storage
                 // Если аналитический результат уже записан в хранилище
                 var existedAnalyseResult = (await connection
                     .QueryAsync<AnalyseResult>(
-                        $"select id, ticker, timeframe, trend_direction, data, date " +
+                        $"select id, ticker, timeframe, result, data, date " +
                         $"from {tableName} " +
                         $"where date = '{date}' "))
                     .FirstOrDefault();
@@ -235,11 +173,11 @@ namespace Oid85.FinMarket.External.Storage
                     // Если результат еще не записан в хранилище
                     await connection.ExecuteAsync(
                         $"insert into {tableName} " +
-                        $"(ticker, timeframe, trend_direction, data, date) " +
+                        $"(ticker, timeframe, result, data, date) " +
                         $"values (" +
                         $"'{result.Ticker}', " +
                         $"'{result.Timeframe}', " +
-                        $"'{result.TrendDirection}', " +
+                        $"'{result.Result}', " +
                         $"'{result.Data}', " +
                         $"'{result.Date}')");
                 }
@@ -249,7 +187,7 @@ namespace Oid85.FinMarket.External.Storage
                     await connection.ExecuteAsync(
                         $"update {tableName} " +
                         $"set timeframe = '{result.Timeframe}', " +
-                        $"trend_direction = '{result.TrendDirection}', " +
+                        $"result = '{result.Result}', " +
                         $"data = '{result.Data}', " +
                         $"date = '{result.Date}'" +
                         $"where ticker = '{result.Ticker}'");
@@ -293,7 +231,7 @@ namespace Oid85.FinMarket.External.Storage
                     // Если свеча уже записана в хранилище
                     var existedCandle = (await connection
                         .QueryAsync<Candle>(
-                            $"select id, open, close, high, low, volume, date, is_complete " +
+                            $"select id, open, close, high, low, volume, date, is_complete as iscomplete " +
                             $"from {tableName} " +
                             $"where date = '{date}'"))
                         .FirstOrDefault();
@@ -389,7 +327,7 @@ namespace Oid85.FinMarket.External.Storage
                 $"id bigserial NOT NULL, " +
                 $"ticker text NULL, " +
                 $"timeframe text NULL, " +
-                $"trend_direction text NULL, " +
+                $"result text NULL, " +
                 $"data text NULL, " +
                 $"date timestamp with time zone NULL, " +
                 $"CONSTRAINT {tableName}_pk PRIMARY KEY (id))");

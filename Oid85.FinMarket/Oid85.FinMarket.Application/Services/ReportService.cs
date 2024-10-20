@@ -74,5 +74,10 @@ namespace Oid85.FinMarket.Application.Services
             GetReportDataAsync(
                 request.TickerList, KnownAnalyseTypes.CandleVolume, request.From, request.To);
 
+        /// <inheritdoc />
+        public Task<ReportData> GetReportAnalyseRsiStocks(
+            GetReportAnalyseRequest request) =>
+            GetReportDataAsync(
+                request.TickerList, KnownAnalyseTypes.Rsi, request.From, request.To);
     }
 }

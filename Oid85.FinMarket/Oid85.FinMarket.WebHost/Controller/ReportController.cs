@@ -4,7 +4,6 @@ using Oid85.FinMarket.Application.Models.Responses;
 using Oid85.FinMarket.Application.Models.Results;
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.WebHost.Controller.Base;
-using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Controller
 {
@@ -79,6 +78,22 @@ namespace Oid85.FinMarket.WebHost.Controller
             [FromBody] GetReportAnalyseRequest request) =>
             GetResponseAsync(
                 () => _reportService.GetReportAnalyseCandleVolumeStocks(request),
+                result => new BaseResponse<ReportData>
+                {
+                    Result = result
+                });
+
+        /// <summary>
+        /// Отчет по анализу Rsi
+        /// </summary>        
+        [HttpPost("report/analyse-rsi/stocks")]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> ReportAnalyseRsiStocksAsync(
+            [FromBody] GetReportAnalyseRequest request) =>
+            GetResponseAsync(
+                () => _reportService.GetReportAnalyseRsiStocks(request),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result

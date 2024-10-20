@@ -27,5 +27,10 @@ namespace Oid85.FinMarket.Application.Services
         /// Получить отчет с результатами анализа Растущий объем
         /// </summary>
         Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request);
+
+        /// <summary>
+        /// Получить отчет с результатами анализа RSI
+        /// </summary>
+        Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request);
     }
 }
