@@ -23,5 +23,11 @@ namespace Oid85.FinMarket.Application.Services
         /// </summary>
         public Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
             FinInstrument stock, string timeframe);
+
+        /// <summary>
+        /// Анализ растущего объема
+        /// </summary>
+        public Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(
+            FinInstrument stock, string timeframe);
     }
 }

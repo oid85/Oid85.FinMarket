@@ -1,10 +1,10 @@
 ﻿using Oid85.FinMarket.Domain.Models;
-using NLog;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.Common.KnownConstants;
 using Dapper;
+using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.External.Storage
 {
@@ -237,8 +237,22 @@ namespace Oid85.FinMarket.External.Storage
                         $"insert into {tableName} " +
                         $"(ticker, timeframe, trend_direction, data, date) " +
                         $"values (" +
-                        $"'{result.Ticker}', '{result.Timeframe}', " +
-                        $"'{result.TrendDirection}', '{result.Data}', '{result.Date}')");
+                        $"'{result.Ticker}', " +
+                        $"'{result.Timeframe}', " +
+                        $"'{result.TrendDirection}', " +
+                        $"'{result.Data}', " +
+                        $"'{result.Date}')");
+                }
+
+                else
+                {
+                    await connection.ExecuteAsync(
+                        $"update {tableName} " +
+                        $"set timeframe = '{result.Timeframe}', " +
+                        $"trend_direction = '{result.TrendDirection}', " +
+                        $"data = '{result.Data}', " +
+                        $"date = '{result.Date}'" +
+                        $"where ticker = '{result.Ticker}'");
                 }
 
                 inserted++;

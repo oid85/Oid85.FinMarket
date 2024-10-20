@@ -21,6 +21,11 @@ namespace Oid85.FinMarket.Application.Services
         /// <summary>
         /// Получить отчет с результатами анализа Последовательность свечей одного цвета
         /// </summary>
-        Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request);        
+        Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request);
+
+        /// <summary>
+        /// Получить отчет с результатами анализа Растущий объем
+        /// </summary>
+        Task<ReportData> GetReportAnalyseVolumeStocks(GetReportAnalyseRequest request);
     }
 }
