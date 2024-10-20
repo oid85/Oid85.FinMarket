@@ -31,8 +31,11 @@ namespace Oid85.FinMarket.Application.Services
             var reportDataCandleSequence = await GetReportDataAsync(
                 request.Ticker, KnownAnalyseTypes.CandleSequence, request.From, request.To);
 
-            var reportDataVolume = await GetReportDataAsync(
+            var reportDataCandleVolume = await GetReportDataAsync(
                 request.Ticker, KnownAnalyseTypes.CandleVolume, request.From, request.To);
+
+            var reportDataRsi = await GetReportDataAsync(
+                request.Ticker, KnownAnalyseTypes.Rsi, request.From, request.To);
 
             var reportData = new ReportData
             {
@@ -50,9 +53,13 @@ namespace Oid85.FinMarket.Application.Services
             reportCandleSequenceData.AddRange(reportDataCandleSequence.Data.First());
             reportData.Data.Add(reportCandleSequenceData);
 
-            List<string> reportVolumeData = [KnownAnalyseTypes.CandleVolume];
-            reportVolumeData.AddRange(reportDataVolume.Data.First());
-            reportData.Data.Add(reportVolumeData);
+            List<string> reportCandleVolumeData = [KnownAnalyseTypes.CandleVolume];
+            reportCandleVolumeData.AddRange(reportDataCandleVolume.Data.First());
+            reportData.Data.Add(reportCandleVolumeData);
+
+            List<string> reportRsiData = [KnownAnalyseTypes.Rsi];
+            reportRsiData.AddRange(reportDataRsi.Data.First());
+            reportData.Data.Add(reportRsiData);
 
             return reportData;
         }
@@ -74,5 +81,10 @@ namespace Oid85.FinMarket.Application.Services
             GetReportDataAsync(
                 request.TickerList, KnownAnalyseTypes.CandleVolume, request.From, request.To);
 
+        /// <inheritdoc />
+        public Task<ReportData> GetReportAnalyseRsiStocks(
+            GetReportAnalyseRequest request) =>
+            GetReportDataAsync(
+                request.TickerList, KnownAnalyseTypes.Rsi, request.From, request.To);
     }
 }

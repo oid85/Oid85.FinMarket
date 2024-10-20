@@ -2,7 +2,7 @@
 {
     public class KnownTrendDirections
     {
-        public static string Up = "Вверх";
-        public static string Down = "Вниз";
+        public static string Up = "Тренд вверх";
+        public static string Down = "Тренд вниз";
     }
 }

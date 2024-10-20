@@ -161,10 +161,10 @@ namespace Oid85.FinMarket.Application.Services
                     string key = analyseResult.Date.ToShortDateString();
 
                     if (!data.ContainsKey(key))
-                        data[key] = [new(analyseResult.Ticker, analyseResult.TrendDirection)];
+                        data[key] = [new(analyseResult.Ticker, analyseResult.Result)];
 
                     else
-                        data[key].Add(new(analyseResult.Ticker, analyseResult.TrendDirection));
+                        data[key].Add(new(analyseResult.Ticker, analyseResult.Result));
                 }
             }
 

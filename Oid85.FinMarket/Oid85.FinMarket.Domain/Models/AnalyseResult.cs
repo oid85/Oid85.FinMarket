@@ -26,9 +26,9 @@
         public string Timeframe { get; set; } = string.Empty;
 
         /// <summary>
-        /// Направление тренда
+        /// Результат анализа
         /// </summary>
-        public string TrendDirection { get; set; } = string.Empty;
+        public string Result { get; set; } = string.Empty;
 
         /// <summary>
         /// Дополнительные данные

@@ -20,22 +20,6 @@ namespace Oid85.FinMarket.External.Storage
         public Task<List<Candle>> GetCandlesAsync(string tableName);
 
         /// <summary>
-        /// Получить последние N свечей из хранилища
-        /// </summary>
-        /// <param name="tableName">Имя таблицы</param>
-        /// <param name="count">Кол-во последних свечей</param>       
-        public Task<List<Candle>> GetCandlesAsync(string tableName, int count);
-
-        /// <summary>
-        /// Получить последние N свечей до определенной даты из хранилища
-        /// </summary>
-        /// <param name="tableName">Имя таблицы</param>
-        /// <param name="count">Кол-во последних свечей</param>       
-        /// <param name="dateTime">Дата последней запрашиваемой свечи</param>  
-        public Task<List<Candle>> GetCandlesAsync(
-            string tableName, int count, DateTime dateTime);
-
-        /// <summary>
         /// Получить результаты анализа
         /// </summary>
         /// <param name="tableName">Имя таблицы</param>    
