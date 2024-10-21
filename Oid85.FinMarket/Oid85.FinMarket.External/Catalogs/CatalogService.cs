@@ -31,7 +31,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
                 var financicalInstrument = (await connection
                     .QueryAsync<FinInstrument>(
-                        $"select id, ticker, figi, description, sector, is_active " +
+                        $"select id, ticker, figi, isin, description, sector, is_active " +
                         $"from {tableName.ToLower()} " +
                         $"where ticker = '{ticker}'"))
                     .FirstOrDefault();
@@ -66,7 +66,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
                 var financicalInstruments = (await connection
                     .QueryAsync<FinInstrument>(
-                        $"select id, ticker, figi, description, sector, is_active " +
+                        $"select id, ticker, figi, isin, description, sector, is_active " +
                         $"from {tableName.ToLower()} " +
                         $"where is_active = 1"))
                         .OrderBy(x => x.Sector)
@@ -108,7 +108,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
                     var exist = (await connection
                         .QueryAsync<FinInstrument>(
-                            $"select id, ticker, figi, description, sector, is_active " +
+                            $"select id, ticker, figi, isin, description, sector, is_active " +
                             $"from {tableName.ToLower()} " +
                             $"where figi = '{figi}'"))
                         .FirstOrDefault();
@@ -116,10 +116,13 @@ namespace Oid85.FinMarket.External.Catalogs
                     if (exist is null)
                         await connection.ExecuteAsync(
                             $"insert into {tableName.ToLower()} " +
-                            $"(ticker, figi, description, sector, is_active) " +
+                            $"(ticker, figi, isin, description, sector, is_active) " +
                             $"values (" +
-                            $"'{normalizeInstrument.Ticker}', '{normalizeInstrument.Figi}', " +
-                            $"'{normalizeInstrument.Description}', '{normalizeInstrument.Sector}', " +
+                            $"'{normalizeInstrument.Ticker}', " +
+                            $"'{normalizeInstrument.Figi}', " +
+                            $"'{normalizeInstrument.Isin}', " +
+                            $"'{normalizeInstrument.Description}', " +
+                            $"'{normalizeInstrument.Sector}', " +
                             $"{normalizeInstrument.IsActive})");
 
                     // Обновляем пользовательские списки

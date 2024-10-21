@@ -121,8 +121,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                 var instruments = new List<FinInstrument>() { };
 
                 foreach (var share in shares)
-                {
-                    
+                {                    
                     var instrument = new FinInstrument
                     {
                         Ticker = share.Ticker,
@@ -201,7 +200,6 @@ namespace Oid85.FinMarket.External.Tinkoff
                     {
                         Ticker = future.Ticker,
                         Figi = future.Figi,
-                        Isin = future.Isin,
                         Description = future.Name,
                         Sector = future.Sector,
                         IsActive = 1

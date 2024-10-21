@@ -18,7 +18,7 @@
         /// <summary>
         /// Идентификатор ISIN
         /// </summary>
-        public string Isin { get; set; }
+        public string Isin { get; set; } = string.Empty;
 
         /// <summary>
         /// Идентификатор FIGI
