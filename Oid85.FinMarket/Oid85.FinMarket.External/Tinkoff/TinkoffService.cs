@@ -109,12 +109,12 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinInstrument> GetStocks()
+        public async Task<List<FinInstrument>> GetStocksAsync()
         {
             try
             {
-                var shares = _client.Instruments
-                    .Shares().Instruments
+                var shares = (await _client.Instruments
+                    .SharesAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList(); 
 
@@ -146,12 +146,12 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinInstrument> GetBonds()
+        public async Task<List<FinInstrument>> GetBondsAsync()
         {
             try
             {
-                var bonds = _client.Instruments
-                    .Bonds().Instruments
+                var bonds = (await _client.Instruments
+                    .BondsAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList();
 
@@ -183,12 +183,12 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinInstrument> GetFutures()
+        public async Task<List<FinInstrument>> GetFuturesAsync()
         {
             try
             {
-                var futures = _client.Instruments
-                    .Futures().Instruments
+                var futures = (await _client.Instruments
+                    .FuturesAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList();
 
@@ -219,12 +219,12 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public List<FinInstrument> GetCurrencies()
+        public async Task<List<FinInstrument>> GetCurrenciesAsync()
         {
             try
             {
-                var currencies = _client.Instruments
-                    .Currencies().Instruments
+                var currencies = (await _client.Instruments
+                    .CurrenciesAsync()).Instruments
                     .ToList();
 
                 var instruments = new List<FinInstrument>() { };
@@ -251,6 +251,63 @@ namespace Oid85.FinMarket.External.Tinkoff
                 _logger.Error(exception);
                 return [];
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<DividendInfo>> GetDividendInfoAsync(
+            List<FinInstrument> instruments)
+        {
+            var dividendInfos = new List<DividendInfo>();
+            
+            var from = DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 1, 1), DateTimeKind.Utc);
+            var to = from.AddYears(2);
+
+            foreach (var instrument in instruments)
+            {
+                var request = new GetDividendsRequest
+                {
+                    InstrumentId = instrument.Figi,
+                    From = Timestamp.FromDateTime(from),
+                    To = Timestamp.FromDateTime(to)
+                };
+
+                var response = await _client.Instruments.GetDividendsAsync(request);
+
+                if (response is null)
+                    continue;
+
+                var dividends = response.Dividends.ToList();
+
+                if (dividends.Any())
+                {
+                    foreach (var dividend in dividends)
+                    {
+                        if (dividend is null)
+                            continue;
+
+                        var dividendInfo = new DividendInfo();
+
+                        dividendInfo.Ticker = instrument.Ticker;
+
+                        if (dividend.DeclaredDate is not null)
+                            dividendInfo.DividendDate = dividend.DeclaredDate.ToDateTime();
+
+                        if (dividend.DividendNet is not null)
+                            dividendInfo.Dividend = Math.Round(ConvertToDouble(new Quotation()
+                            {
+                                Units = dividend.DividendNet.Units,
+                                Nano = dividend.DividendNet.Nano
+                            }), 2);
+
+                        if (dividend.YieldValue is not null)
+                            dividendInfo.DividendPrc = Math.Round(ConvertToDouble(dividend.YieldValue), 2);
+
+                        dividendInfos.Add(dividendInfo);
+                    }                    
+                }
+            }
+
+            return dividendInfos;
         }
 
         private async Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)

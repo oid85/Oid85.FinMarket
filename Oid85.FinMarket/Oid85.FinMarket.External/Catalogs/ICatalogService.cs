@@ -29,6 +29,11 @@ namespace Oid85.FinMarket.External.Catalogs
             string tableName, List<FinInstrument> instruments);
 
         /// <summary>
+        /// Обновить информацию по дивидендам
+        /// </summary>
+        public Task UpdateDividendInfosAsync(List<DividendInfo> dividendInfos);
+
+        /// <summary>
         /// Получить тикеры из индекса Мосбиржи
         /// </summary>
         public Task<List<MoexIndexStock>> GetMoexIndexStocksAsync();

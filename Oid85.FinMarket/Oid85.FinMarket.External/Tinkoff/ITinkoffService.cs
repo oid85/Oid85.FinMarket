@@ -27,21 +27,27 @@ namespace Oid85.FinMarket.External.Tinkoff
         /// <summary>
         /// Получить список акций
         /// </summary>
-        public List<FinInstrument> GetStocks();
+        public Task<List<FinInstrument>> GetStocksAsync();
 
         /// <summary>
         /// Получить список облигаций
         /// </summary>
-        public List<FinInstrument> GetBonds();
+        public Task<List<FinInstrument>> GetBondsAsync();
 
         /// <summary>
         /// Получить список фьючерсов
         /// </summary>
-        public List<FinInstrument> GetFutures();
+        public Task<List<FinInstrument>> GetFuturesAsync();
 
         /// <summary>
         /// Получить список валют
         /// </summary>
-        public List<FinInstrument> GetCurrencies();
+        public Task<List<FinInstrument>> GetCurrenciesAsync();
+
+        /// <summary>
+        /// Получить информацию по дивидендам
+        /// </summary>
+        public Task<List<DividendInfo>> GetDividendInfoAsync(
+            List<FinInstrument> instruments);
     }
 }

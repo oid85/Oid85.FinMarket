@@ -8,5 +8,6 @@
         Task LoadCurrenciesCatalogAsync();
         Task LoadStocksDailyCandlesAsync();
         Task LoadStocksDailyCandlesForYearAsync(int year);
+        Task LoadDividendInfosAsync();
     }
 }

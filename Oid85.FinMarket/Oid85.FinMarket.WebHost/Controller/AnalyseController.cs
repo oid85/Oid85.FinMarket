@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Models.Responses;
 using Oid85.FinMarket.Application.Services;
-using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.WebHost.Controller.Base;
-using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Controller
 {

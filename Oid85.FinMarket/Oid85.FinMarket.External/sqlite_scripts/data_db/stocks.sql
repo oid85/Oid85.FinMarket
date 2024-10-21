@@ -6,5 +6,9 @@ CREATE TABLE stocks (
     figi TEXT, 
     isin TEXT, 
     description TEXT, 
-    sector TEXT, 
-    is_active INTEGER);
+    sector TEXT,     
+    dividend_date TEXT,
+    dividend REAL, 
+    dividend_prc REAL,
+    is_active INTEGER
+);

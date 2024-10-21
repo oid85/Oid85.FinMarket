@@ -28,7 +28,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadBondsCatalogAsync()
         {
-            var bonds = _tinkoffService.GetBonds();
+            var bonds = await _tinkoffService.GetBondsAsync();
 
             await _catalogService.UpdateFinInstrumentsAsync(
                 KnownFinInstrumentTypes.Bonds, bonds);
@@ -36,7 +36,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadCurrenciesCatalogAsync()
         {
-            var currencies = _tinkoffService.GetCurrencies();
+            var currencies = await _tinkoffService.GetCurrenciesAsync();
 
             await _catalogService.UpdateFinInstrumentsAsync(
                 KnownFinInstrumentTypes.Currencies, currencies);
@@ -44,7 +44,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadFuturesCatalogAsync()
         {
-            var futures = _tinkoffService.GetFutures();
+            var futures = await _tinkoffService.GetFuturesAsync();
 
             await _catalogService.UpdateFinInstrumentsAsync(
                 KnownFinInstrumentTypes.Futures, futures);
@@ -52,7 +52,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadStocksCatalogAsync()
         {
-            var stocks = _tinkoffService.GetStocks();
+            var stocks = await _tinkoffService.GetStocksAsync();
 
             await _catalogService.UpdateFinInstrumentsAsync(
                 KnownFinInstrumentTypes.Stocks, stocks);
@@ -83,12 +83,20 @@ namespace Oid85.FinMarket.Application.Services
 
             foreach (var stock in stocks)
             {
-                _logger.Trace($"Load '{stock.Ticker}'");
+                _logger.Trace($"Load candles '{stock.Ticker}'");
+                
                 var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily, year);
                 data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
             }
 
             await _storageService.SaveCandlesAsync(data);
+        }
+
+        public async Task LoadDividendInfosAsync()
+        {
+            var stocks = await _tinkoffService.GetStocksAsync();
+            var dividendInfos = await _tinkoffService.GetDividendInfoAsync(stocks);
+            await _catalogService.UpdateDividendInfosAsync(dividendInfos);
         }
     }
 }
