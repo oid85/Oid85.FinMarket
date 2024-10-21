@@ -3,7 +3,6 @@ using Oid85.FinMarket.Application.Models.Results;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.External.Storage;
-using System.Collections.Generic;
 
 namespace Oid85.FinMarket.Application.Services
 {

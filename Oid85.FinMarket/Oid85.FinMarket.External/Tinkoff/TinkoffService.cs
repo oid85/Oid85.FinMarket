@@ -127,6 +127,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                     {
                         Ticker = share.Ticker,
                         Figi = share.Figi,
+                        Isin = share.Isin,
                         Description = share.Name,
                         Sector = share.Sector,
                         IsActive = 1
@@ -163,6 +164,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                     {
                         Ticker = bond.Ticker,
                         Figi = bond.Figi,
+                        Isin = bond.Isin,
                         Description = bond.Name,
                         Sector = bond.Sector,
                         IsActive = 1
@@ -199,6 +201,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                     {
                         Ticker = future.Ticker,
                         Figi = future.Figi,
+                        Isin = future.Isin,
                         Description = future.Name,
                         Sector = future.Sector,
                         IsActive = 1
@@ -228,13 +231,14 @@ namespace Oid85.FinMarket.External.Tinkoff
 
                 var instruments = new List<FinInstrument>() { };
 
-                foreach (var currencie in currencies)
+                foreach (var currency in currencies)
                 {
                     var instrument = new FinInstrument
                     {
-                        Ticker = currencie.Ticker,
-                        Figi = currencie.Figi,
-                        Description = currencie.Name,
+                        Ticker = currency.Ticker,
+                        Figi = currency.Figi,
+                        Isin = currency.Isin,
+                        Description = currency.Name,
                         IsActive = 1
                     };
 
