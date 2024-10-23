@@ -16,6 +16,11 @@
         public string Ticker { get; set; } = string.Empty;
 
         /// <summary>
+        /// Идентификатор ISIN
+        /// </summary>
+        public string Isin { get; set; } = string.Empty;
+
+        /// <summary>
         /// Идентификатор FIGI
         /// </summary>
         public string Figi { get; set; } = string.Empty;

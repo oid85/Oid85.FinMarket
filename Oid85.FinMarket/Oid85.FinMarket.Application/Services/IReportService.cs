@@ -32,5 +32,10 @@ namespace Oid85.FinMarket.Application.Services
         /// Получить отчет с результатами анализа RSI
         /// </summary>
         Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request);
+
+        /// <summary>
+        /// Получить отчет по дивидендам
+        /// </summary>
+        Task<ReportData> GetReportDividendsStocks();
     }
 }

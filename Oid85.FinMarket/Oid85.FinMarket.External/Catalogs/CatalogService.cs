@@ -2,6 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using NLog;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.External.Catalogs
@@ -31,7 +32,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
                 var financicalInstrument = (await connection
                     .QueryAsync<FinInstrument>(
-                        $"select id, ticker, figi, description, sector, is_active " +
+                        $"select id, ticker, figi, isin, description, sector, is_active " +
                         $"from {tableName.ToLower()} " +
                         $"where ticker = '{ticker}'"))
                     .FirstOrDefault();
@@ -66,7 +67,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
                 var financicalInstruments = (await connection
                     .QueryAsync<FinInstrument>(
-                        $"select id, ticker, figi, description, sector, is_active " +
+                        $"select id, ticker, figi, isin, description, sector, is_active " +
                         $"from {tableName.ToLower()} " +
                         $"where is_active = 1"))
                         .OrderBy(x => x.Sector)
@@ -81,6 +82,40 @@ namespace Oid85.FinMarket.External.Catalogs
                 await connection.CloseAsync();
 
                 return financicalInstruments;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<DividendInfo>> GetDividendInfosAsync()
+        {
+            try
+            {
+                await using var connection = GetSqliteConnection();
+
+                await connection.OpenAsync();
+
+                var dividendInfos = (await connection
+                    .QueryAsync<DividendInfo>(
+                        $"select id, ticker, record_date as recorddate, declared_date as declareddate, dividend, dividend_prc as dividendprc " +
+                        $"from dividends"))
+                        .OrderBy(x => x.RecordDate)
+                        .ToList();
+
+                if (dividendInfos == null || !dividendInfos.Any())
+                {
+                    _logger.Error($"В таблице 'dividends' нет информации по дивидендам");
+                    return [];
+                }
+
+                await connection.CloseAsync();
+
+                return dividendInfos;
             }
 
             catch (Exception exception)
@@ -108,7 +143,7 @@ namespace Oid85.FinMarket.External.Catalogs
 
                     var exist = (await connection
                         .QueryAsync<FinInstrument>(
-                            $"select id, ticker, figi, description, sector, is_active " +
+                            $"select id, ticker, figi, isin, description, sector, is_active " +
                             $"from {tableName.ToLower()} " +
                             $"where figi = '{figi}'"))
                         .FirstOrDefault();
@@ -116,10 +151,13 @@ namespace Oid85.FinMarket.External.Catalogs
                     if (exist is null)
                         await connection.ExecuteAsync(
                             $"insert into {tableName.ToLower()} " +
-                            $"(ticker, figi, description, sector, is_active) " +
+                            $"(ticker, figi, isin, description, sector, is_active) " +
                             $"values (" +
-                            $"'{normalizeInstrument.Ticker}', '{normalizeInstrument.Figi}', " +
-                            $"'{normalizeInstrument.Description}', '{normalizeInstrument.Sector}', " +
+                            $"'{normalizeInstrument.Ticker}', " +
+                            $"'{normalizeInstrument.Figi}', " +
+                            $"'{normalizeInstrument.Isin}', " +
+                            $"'{normalizeInstrument.Description}', " +
+                            $"'{normalizeInstrument.Sector}', " +
                             $"{normalizeInstrument.IsActive})");
 
                     // Обновляем пользовательские списки
@@ -140,6 +178,86 @@ namespace Oid85.FinMarket.External.Catalogs
                         $"set " +
                         $"sector = '{normalizeInstrument.Sector}' " +
                         $"where ticker = '{normalizeInstrument.Ticker}'");
+                }
+
+                await connection.CloseAsync();
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task UpdateDividendInfosAsync(List<DividendInfo> dividendInfos)
+        {
+            try
+            {
+                await using var connection = GetSqliteConnection();
+
+                await connection.OpenAsync();
+
+                foreach (var dividendInfo in dividendInfos)
+                {
+                    var (ticker, recordDate, declaredDate, dividend, dividendPrc) = FormatDividendInfo(dividendInfo);
+
+                    var exist = (await connection
+                        .QueryAsync<DividendInfo>(
+                            $"select id, ticker, record_date as recorddate, declared_date as declareddate, dividend, dividend_prc as dividendprc " +
+                            $"from dividends " +
+                            $"where ticker = '{ticker}' " +
+                            $"and declared_date = '{declaredDate}'"))
+                        .FirstOrDefault();                    
+
+                    if (exist is null)
+                        await connection.ExecuteAsync(
+                            $"insert into dividends " +
+                            $"(ticker, record_date, declared_date, dividend, dividend_prc) " +
+                            $"values (" +
+                            $"'{ticker}', " +
+                            $"'{recordDate}', " +
+                            $"'{declaredDate}', " +
+                            $"{dividend}, " +
+                            $"{dividendPrc})");
+
+                    // Обновляем пользовательские списки
+                    await connection.ExecuteAsync(
+                        $"update stocks " +
+                        $"set " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
+                        $"dividend = {dividend}, " +
+                        $"dividend_prc = {dividendPrc} " +
+                        $"where ticker = '{dividendInfo.Ticker}'");
+
+                    await connection.ExecuteAsync(
+                        $"update moex_index_stocks " +
+                        $"set " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
+                        $"dividend = {dividend}, " +
+                        $"dividend_prc = {dividendPrc} " +
+                        $"where ticker = '{dividendInfo.Ticker}'");
+
+                    await connection.ExecuteAsync(
+                        $"update portfolio_stocks " +
+                        $"set " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
+                        $"dividend = {dividend}, " +
+                        $"dividend_prc = {dividendPrc} " +
+                        $"where ticker = '{dividendInfo.Ticker}'");
+
+                    await connection.ExecuteAsync(
+                        $"update watch_list_stocks " +
+                        $"set " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
+                        $"dividend = {dividend}, " +
+                        $"dividend_prc = {dividendPrc} " +
+                        $"where ticker = '{dividendInfo.Ticker}'");
                 }
 
                 await connection.CloseAsync();
@@ -297,6 +415,20 @@ namespace Oid85.FinMarket.External.Catalogs
             instrument.Ticker = ticker;
 
             return instrument;
+        }
+
+        private (string, string, string, string, string) FormatDividendInfo(DividendInfo dividendInfo)
+        {
+            string ticker = dividendInfo.Ticker
+                .Replace("-", "_")
+                .Replace("@", "_");
+
+            string recordDate = dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO);
+            string declaredDate = dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO);
+            string dividendPrc = dividendInfo.DividendPrc.ToString().Replace(',', '.');
+            string dividend = dividendInfo.Dividend.ToString().Replace(',', '.');
+
+            return (ticker, recordDate, declaredDate, dividend, dividendPrc);
         }
     }
 }

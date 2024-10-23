@@ -98,5 +98,20 @@ namespace Oid85.FinMarket.WebHost.Controller
                 {
                     Result = result
                 });
+
+        /// <summary>
+        /// Отчет по дивидендам
+        /// </summary>        
+        [HttpGet("report/dividends/stocks")]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> ReportDividendsStocksAsync() =>
+            GetResponseAsync(
+                () => _reportService.GetReportDividendsStocks(),
+                result => new BaseResponse<ReportData>
+                {
+                    Result = result
+                });
     }
 }

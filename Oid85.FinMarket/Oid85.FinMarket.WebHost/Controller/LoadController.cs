@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Models.Responses;
 using Oid85.FinMarket.Application.Services;
-using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Catalogs;
-using Oid85.FinMarket.External.Storage;
-using Oid85.FinMarket.External.Tinkoff;
 using Oid85.FinMarket.WebHost.Controller.Base;
-using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Controller
 {
@@ -89,5 +83,16 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> LoadStocksDailyCandlesForYearAsync(int year) =>
             GetResponseAsync<object, BaseResponse<object>>(
                 () => _loadService.LoadStocksDailyCandlesForYearAsync(year));
+
+        /// <summary>
+        /// Подгрузить данные о дивидендах
+        /// </summary>
+        [HttpGet("load-dividends-info")]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadDividendInfosAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                _loadService.LoadDividendInfosAsync);
     }    
 }

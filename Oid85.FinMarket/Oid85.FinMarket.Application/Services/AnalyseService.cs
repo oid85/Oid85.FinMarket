@@ -6,6 +6,7 @@ using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.External.Settings;
 using Oid85.FinMarket.External.Storage;
 using Skender.Stock.Indicators;
+using System.Linq;
 using System.Text.Json;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
 using ILogger = NLog.ILogger;
@@ -196,15 +197,14 @@ namespace Oid85.FinMarket.Application.Services
                 if (candles == null)
                     return string.Empty;
 
-                // Объем растет
-                if (candles[0].Volume < candles[1].Volume && 
-                    candles[1].Volume < candles[2].Volume)
-                    return KnownVolumeDirections.Up;
+                var lastVolume = candles.Last().Volume;
+                var prevVolumes = candles
+                    .Select(x => x.Volume)
+                    .Take(candles.Count - 1);
 
-                // Объем падает
-                if (candles[0].Volume < candles[1].Volume &&
-                    candles[1].Volume < candles[2].Volume)
-                    return KnownVolumeDirections.Down;
+                // Объем последней свечи выше, чем у всех предыдущих
+                if (lastVolume > prevVolumes.Max())
+                    return KnownVolumeDirections.Up;
 
                 return string.Empty;
             }
@@ -220,7 +220,7 @@ namespace Oid85.FinMarket.Application.Services
                 {
                     var result = new AnalyseResult();
 
-                    if (i < 3)
+                    if (i < 10)
                     {
                         result.Date = candles[i].Date;
                         result.Ticker = stock.Ticker;
@@ -233,7 +233,14 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         var candlesForAnalyse = new List<Candle>()
                         {
-                            candles[i - 2], 
+                            candles[i - 9],
+                            candles[i - 8],
+                            candles[i - 7],
+                            candles[i - 6],
+                            candles[i - 5],
+                            candles[i - 4],
+                            candles[i - 3],
+                            candles[i - 2],
                             candles[i - 1],
                             candles[i]
                         };

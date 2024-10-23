@@ -1,9 +1,7 @@
-﻿using Oid85.FinMarket.Application.Models.Requests;
-using Oid85.FinMarket.Application.Models.Results;
+﻿using Oid85.FinMarket.Application.Models.Results;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.External.Storage;
-using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Oid85.FinMarket.Application.Services
 {
@@ -101,6 +99,31 @@ namespace Oid85.FinMarket.Application.Services
 
                 return reportData;
             }            
+        }
+
+        public async Task<ReportData> GetReportDataDividendsAsync()
+        {
+            var reportData = new ReportData() 
+            { 
+                Title = "Dividends",
+                Header = [ "Тикер", "Дата фикс. реестра", "Дата объяв.", "Размер, руб", "Доходность, %"]
+            };
+
+            var dividendInfos = await _catalogService.GetDividendInfosAsync();
+
+            foreach (var dividendInfo in dividendInfos)
+            {
+                reportData.Data.Add(
+                    [
+                        dividendInfo.Ticker,
+                        dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO),
+                        dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO),
+                        dividendInfo.Dividend.ToString(), 
+                        dividendInfo.DividendPrc.ToString()
+                    ]);
+            }
+
+            return reportData;
         }
 
         private async Task<ReportData> GetReportDataByTickerListAsync(

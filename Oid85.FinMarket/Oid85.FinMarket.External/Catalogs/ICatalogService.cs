@@ -23,10 +23,20 @@ namespace Oid85.FinMarket.External.Catalogs
             string tableName);
 
         /// <summary>
+        /// Получить информацию по дивидендам
+        /// </summary>
+        public Task<List<DividendInfo>> GetDividendInfosAsync();
+
+        /// <summary>
         /// Обновить финансовые инструменты
         /// </summary>
         public Task UpdateFinInstrumentsAsync(
             string tableName, List<FinInstrument> instruments);
+
+        /// <summary>
+        /// Обновить информацию по дивидендам
+        /// </summary>
+        public Task UpdateDividendInfosAsync(List<DividendInfo> dividendInfos);
 
         /// <summary>
         /// Получить тикеры из индекса Мосбиржи
