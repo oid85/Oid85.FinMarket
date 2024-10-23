@@ -11,9 +11,14 @@
         public string Ticker { get; set; } = string.Empty;
 
         /// <summary>
+        /// Дата фиксации реестра
+        /// </summary>
+        public DateTime RecordDate { get; set; }
+
+        /// <summary>
         /// Дата объявления дивидендов
         /// </summary>
-        public DateTime DividendDate { get; set; }
+        public DateTime DeclaredDate { get; set; }
 
         /// <summary>
         /// Выплата, руб

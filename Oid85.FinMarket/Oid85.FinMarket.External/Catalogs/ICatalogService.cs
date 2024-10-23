@@ -23,6 +23,11 @@ namespace Oid85.FinMarket.External.Catalogs
             string tableName);
 
         /// <summary>
+        /// Получить информацию по дивидендам
+        /// </summary>
+        public Task<List<DividendInfo>> GetDividendInfosAsync();
+
+        /// <summary>
         /// Обновить финансовые инструменты
         /// </summary>
         public Task UpdateFinInstrumentsAsync(

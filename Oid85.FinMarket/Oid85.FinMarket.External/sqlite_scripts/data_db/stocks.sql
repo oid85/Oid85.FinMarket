@@ -7,7 +7,8 @@ CREATE TABLE stocks (
     isin TEXT, 
     description TEXT, 
     sector TEXT,     
-    dividend_date TEXT,
+    record_date TEXT,
+    declared_date TEXT,
     dividend REAL, 
     dividend_prc REAL,
     is_active INTEGER

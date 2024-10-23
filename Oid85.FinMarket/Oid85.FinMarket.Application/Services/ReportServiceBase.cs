@@ -101,6 +101,31 @@ namespace Oid85.FinMarket.Application.Services
             }            
         }
 
+        public async Task<ReportData> GetReportDataDividendsAsync()
+        {
+            var reportData = new ReportData() 
+            { 
+                Title = "Dividends",
+                Header = [ "Тикер", "Дата фикс. реестра", "Дата объяв.", "Размер, руб", "Доходность, %"]
+            };
+
+            var dividendInfos = await _catalogService.GetDividendInfosAsync();
+
+            foreach (var dividendInfo in dividendInfos)
+            {
+                reportData.Data.Add(
+                    [
+                        dividendInfo.Ticker,
+                        dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO),
+                        dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO),
+                        dividendInfo.Dividend.ToString(), 
+                        dividendInfo.DividendPrc.ToString()
+                    ]);
+            }
+
+            return reportData;
+        }
+
         private async Task<ReportData> GetReportDataByTickerListAsync(
             string analyseType, 
             Dictionary<string, List<Tuple<string, string>>> data, 

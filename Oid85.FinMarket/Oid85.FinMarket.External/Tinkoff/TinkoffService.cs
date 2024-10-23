@@ -290,7 +290,10 @@ namespace Oid85.FinMarket.External.Tinkoff
                         dividendInfo.Ticker = instrument.Ticker;
 
                         if (dividend.DeclaredDate is not null)
-                            dividendInfo.DividendDate = dividend.DeclaredDate.ToDateTime();
+                            dividendInfo.DeclaredDate = dividend.DeclaredDate.ToDateTime();
+
+                        if (dividend.RecordDate is not null)
+                            dividendInfo.RecordDate = dividend.RecordDate.ToDateTime();
 
                         if (dividend.DividendNet is not null)
                             dividendInfo.Dividend = Math.Round(ConvertToDouble(new Quotation()

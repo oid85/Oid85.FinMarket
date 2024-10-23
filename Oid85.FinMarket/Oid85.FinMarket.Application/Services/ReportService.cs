@@ -76,7 +76,8 @@ namespace Oid85.FinMarket.Application.Services
                 request.TickerList, KnownAnalyseTypes.CandleSequence, request.From, request.To);
 
         /// <inheritdoc />
-        public Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
+        public Task<ReportData> GetReportAnalyseCandleVolumeStocks(
+            GetReportAnalyseRequest request) =>
             GetReportDataAsync(
                 request.TickerList, KnownAnalyseTypes.CandleVolume, request.From, request.To);
 
@@ -85,5 +86,9 @@ namespace Oid85.FinMarket.Application.Services
             GetReportAnalyseRequest request) =>
             GetReportDataAsync(
                 request.TickerList, KnownAnalyseTypes.Rsi, request.From, request.To);
+
+        /// <inheritdoc />
+        public Task<ReportData> GetReportDividendsStocks() =>
+            GetReportDataDividendsAsync();
     }
 }

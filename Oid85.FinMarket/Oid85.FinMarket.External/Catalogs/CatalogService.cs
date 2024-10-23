@@ -92,6 +92,40 @@ namespace Oid85.FinMarket.External.Catalogs
         }
 
         /// <inheritdoc />
+        public async Task<List<DividendInfo>> GetDividendInfosAsync()
+        {
+            try
+            {
+                await using var connection = GetSqliteConnection();
+
+                await connection.OpenAsync();
+
+                var dividendInfos = (await connection
+                    .QueryAsync<DividendInfo>(
+                        $"select id, ticker, record_date as recorddate, declared_date as declareddate, dividend, dividend_prc as dividendprc " +
+                        $"from dividends"))
+                        .OrderBy(x => x.RecordDate)
+                        .ToList();
+
+                if (dividendInfos == null || !dividendInfos.Any())
+                {
+                    _logger.Error($"В таблице 'dividends' нет информации по дивидендам");
+                    return [];
+                }
+
+                await connection.CloseAsync();
+
+                return dividendInfos;
+            }
+
+            catch (Exception exception)
+            {
+                _logger.Error($"Не удалось прочитать данные из БД data.db. {exception}");
+                return [];
+            }
+        }
+
+        /// <inheritdoc />
         public async Task UpdateFinInstrumentsAsync(
             string tableName, List<FinInstrument> instruments)
         {
@@ -167,23 +201,24 @@ namespace Oid85.FinMarket.External.Catalogs
 
                 foreach (var dividendInfo in dividendInfos)
                 {
-                    var (ticker, dividendDate, dividend, dividendPrc) = FormatDividendInfo(dividendInfo);
+                    var (ticker, recordDate, declaredDate, dividend, dividendPrc) = FormatDividendInfo(dividendInfo);
 
                     var exist = (await connection
                         .QueryAsync<DividendInfo>(
-                            $"select id, ticker, dividend_date as dividenddate, dividend, dividend_prc as dividendprc " +
+                            $"select id, ticker, record_date as recorddate, declared_date as declareddate, dividend, dividend_prc as dividendprc " +
                             $"from dividends " +
                             $"where ticker = '{ticker}' " +
-                            $"and dividend_date = '{dividendDate}'"))
+                            $"and declared_date = '{declaredDate}'"))
                         .FirstOrDefault();                    
 
                     if (exist is null)
                         await connection.ExecuteAsync(
                             $"insert into dividends " +
-                            $"(ticker, dividend_date, dividend, dividend_prc) " +
+                            $"(ticker, record_date, declared_date, dividend, dividend_prc) " +
                             $"values (" +
                             $"'{ticker}', " +
-                            $"'{dividendDate}', " +
+                            $"'{recordDate}', " +
+                            $"'{declaredDate}', " +
                             $"{dividend}, " +
                             $"{dividendPrc})");
 
@@ -191,7 +226,8 @@ namespace Oid85.FinMarket.External.Catalogs
                     await connection.ExecuteAsync(
                         $"update stocks " +
                         $"set " +
-                        $"dividend_date = '{dividendDate}', " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
                         $"dividend = {dividend}, " +
                         $"dividend_prc = {dividendPrc} " +
                         $"where ticker = '{dividendInfo.Ticker}'");
@@ -199,7 +235,8 @@ namespace Oid85.FinMarket.External.Catalogs
                     await connection.ExecuteAsync(
                         $"update moex_index_stocks " +
                         $"set " +
-                        $"dividend_date = '{dividendDate}', " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
                         $"dividend = {dividend}, " +
                         $"dividend_prc = {dividendPrc} " +
                         $"where ticker = '{dividendInfo.Ticker}'");
@@ -207,7 +244,8 @@ namespace Oid85.FinMarket.External.Catalogs
                     await connection.ExecuteAsync(
                         $"update portfolio_stocks " +
                         $"set " +
-                        $"dividend_date = '{dividendDate}', " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
                         $"dividend = {dividend}, " +
                         $"dividend_prc = {dividendPrc} " +
                         $"where ticker = '{dividendInfo.Ticker}'");
@@ -215,7 +253,8 @@ namespace Oid85.FinMarket.External.Catalogs
                     await connection.ExecuteAsync(
                         $"update watch_list_stocks " +
                         $"set " +
-                        $"dividend_date = '{dividendDate}', " +
+                        $"record_date = '{recordDate}', " +
+                        $"declared_date = '{declaredDate}', " +
                         $"dividend = {dividend}, " +
                         $"dividend_prc = {dividendPrc} " +
                         $"where ticker = '{dividendInfo.Ticker}'");
@@ -378,17 +417,18 @@ namespace Oid85.FinMarket.External.Catalogs
             return instrument;
         }
 
-        private (string, string, string, string) FormatDividendInfo(DividendInfo dividendInfo)
+        private (string, string, string, string, string) FormatDividendInfo(DividendInfo dividendInfo)
         {
             string ticker = dividendInfo.Ticker
                 .Replace("-", "_")
                 .Replace("@", "_");
 
-            string dividendDate = dividendInfo.DividendDate.ToString(KnownDateTimeFormats.DateISO);
+            string recordDate = dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO);
+            string declaredDate = dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO);
             string dividendPrc = dividendInfo.DividendPrc.ToString().Replace(',', '.');
             string dividend = dividendInfo.Dividend.ToString().Replace(',', '.');
 
-            return (ticker, dividendDate, dividend, dividendPrc);
+            return (ticker, recordDate, declaredDate, dividend, dividendPrc);
         }
     }
 }
