@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Models.Results;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Catalogs;
 using Oid85.FinMarket.External.Storage;
 
@@ -36,7 +37,7 @@ namespace Oid85.FinMarket.Application.Services
                 var reportData = await GetReportDataByTickerListAsync(
                     analyseType, data, tickers);
 
-                reportData.Title = $"{analyseType} {tickerList}";
+                reportData.Title = $"{analyseType} {tickerList}";                
 
                 return reportData;
             }
@@ -174,21 +175,61 @@ namespace Oid85.FinMarket.Application.Services
         {
             var data = new Dictionary<string, List<Tuple<string, string>>>();
 
+            var divinendInfos = await _catalogService.GetDividendInfosAsync();
+            
             foreach (var ticker in tickers)
             {
                 var analyseResults = await _storageService.GetAnalyseResultsAsync(
                     $"{ticker.ToLower()}_{analyseType.Replace(" ", "_").ToLower()}_daily", from, to);
 
+                if (analyseResults is [])
+                    continue;
+
+                var lastDate = analyseResults.Last().Date;
+                var timeframe = analyseResults.Last().Timeframe;
+
+                var divinendInfosByTicker = divinendInfos
+                    .Where(x => x.Ticker == ticker);
+
+                // Добавляем окно для дивидендных событий
+                for (int i = 0; i < 180; i++)
+                {
+                    lastDate = lastDate.AddDays(1);
+
+                    string result = string.Empty;
+
+                    if (divinendInfosByTicker.Any())
+                    {
+                        var divinendInfo = divinendInfosByTicker.FirstOrDefault(
+                            x => x.RecordDate.ToString(KnownDateTimeFormats.DateISO) ==
+                            lastDate.ToString(KnownDateTimeFormats.DateISO));
+
+                        if (divinendInfo is not null)
+                            result = $"Dividend: {divinendInfo.DividendPrc.ToString("N0")} %";
+                    }
+
+                    var analyseResult = new AnalyseResult
+                    {
+                        Ticker = ticker,
+                        Date = lastDate,
+                        Data = string.Empty,
+                        Timeframe = timeframe,
+                        Result = result
+                    };
+
+                    analyseResults.Add(analyseResult);
+                }
+
                 foreach (var analyseResult in analyseResults)
                 {
-                    string key = analyseResult.Date.ToShortDateString();
+                    string key = analyseResult.Date.ToString(KnownDateTimeFormats.DateISO);
 
                     if (!data.ContainsKey(key))
                         data[key] = [new(analyseResult.Ticker, analyseResult.Result)];
 
                     else
                         data[key].Add(new(analyseResult.Ticker, analyseResult.Result));
-                }
+                }                
             }
 
             return data;
