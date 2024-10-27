@@ -2,6 +2,7 @@ using Oid85.FinMarket.WebHost.Extensions;
 using Oid85.FinMarket.WebHost.HostedServices;
 using Oid85.FinMarket.External.Extensions;
 using Oid85.FinMarket.Application.Extensions;
+using Oid85.FinMarket.DataAccess.Extensions;
 
 namespace Oid85.FinMarket.WebHost
 {
@@ -18,6 +19,7 @@ namespace Oid85.FinMarket.WebHost
             builder.Services.ConfigureCors(builder.Configuration);            
             builder.Services.ConfigureApplicationServices();
             builder.Services.ConfigureExternalServices();
+            builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
             builder.Services.ConfigureQuartz(builder.Configuration);
             builder.Services.AddHostedService<InitHostedService>();
             builder.Services.AddHostedService<InitHostedService>();

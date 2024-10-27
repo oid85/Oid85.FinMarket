@@ -6,7 +6,7 @@ using Oid85.FinMarket.External.Storage;
 
 namespace Oid85.FinMarket.Application.Services
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="Oid85.FinMarket.Application.Services.IReportService" />
     public class ReportService : ReportServiceBase, IReportService
     {
         private readonly IStorageService _storageService;

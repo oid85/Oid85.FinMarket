@@ -189,7 +189,8 @@ namespace Oid85.FinMarket.Application.Services
                 var timeframe = analyseResults.Last().Timeframe;
 
                 var divinendInfosByTicker = divinendInfos
-                    .Where(x => x.Ticker == ticker);
+                    .Where(x => x.Ticker == ticker)
+                    .ToList();
 
                 // Добавляем окно для дивидендных событий
                 for (int i = 0; i < 180; i++)
@@ -205,7 +206,7 @@ namespace Oid85.FinMarket.Application.Services
                             lastDate.ToString(KnownDateTimeFormats.DateISO));
 
                         if (divinendInfo is not null)
-                            result = $"Dividend: {divinendInfo.DividendPrc.ToString("N0")} %";
+                            result = $"Dividend: {divinendInfo.DividendPrc.ToString("N0")}";
                     }
 
                     var analyseResult = new AnalyseResult
