@@ -1,6 +1,6 @@
 ﻿using Oid85.FinMarket.Domain.Models;
 
-namespace Oid85.FinMarket.Application.Services
+namespace Oid85.FinMarket.Application.Interfaces.Services
 {
     /// <summary>
     /// Сервис анализа
@@ -16,24 +16,24 @@ namespace Oid85.FinMarket.Application.Services
         /// Анализ с индикатором Супертренд
         /// </summary>
         public Task<List<AnalyseResult>> SupertrendAnalyseAsync(
-            FinInstrument stock, string timeframe);
+            Share stock, Timeframe timeframe);
 
         /// <summary>
         /// Анализ последовательности подряд идущих свечей
         /// </summary>
         public Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
-            FinInstrument stock, string timeframe);
+            Share stock, Timeframe timeframe);
 
         /// <summary>
         /// Анализ растущего объема
         /// </summary>
         public Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(
-            FinInstrument stock, string timeframe);
+            Share stock, Timeframe timeframe);
 
         /// <summary>
         /// Анализ RSI
         /// </summary>
         public Task<List<AnalyseResult>> RsiAnalyseAsync(
-            FinInstrument stock, string timeframe);
+            Share stock, Timeframe timeframe);
     }
 }

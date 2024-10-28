@@ -1,23 +1,25 @@
-﻿using Oid85.FinMarket.Application.Models.Results;
+﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Models.Results;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Catalogs;
-using Oid85.FinMarket.External.Storage;
 
 namespace Oid85.FinMarket.Application.Services
 {
     /// <inheritdoc />
     public class ReportServiceBase
     {
-        private readonly IStorageService _storageService;
-        private readonly ICatalogService _catalogService;
+        private readonly IAnalyseResultRepository _analyseResultRepository;
+        private readonly IShareRepository _shareRepository;
+        private readonly IDividendInfoRepository _dividendInfoRepository;
 
         public ReportServiceBase(
-            IStorageService storageService,
-            ICatalogService catalogService)
+            IAnalyseResultRepository analyseResultRepository,
+            IShareRepository shareRepository,
+            IDividendInfoRepository dividendInfoRepository) 
         {
-            _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
-            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
+            _analyseResultRepository = analyseResultRepository ?? throw new ArgumentNullException(nameof(analyseResultRepository));
+            _shareRepository = shareRepository ?? throw new ArgumentNullException(nameof(shareRepository));
+            _dividendInfoRepository = dividendInfoRepository ?? throw new ArgumentNullException(nameof(dividendInfoRepository));
         }
 
         public async Task<ReportData> GetReportDataAsync(
@@ -28,9 +30,8 @@ namespace Oid85.FinMarket.Application.Services
         {
             if (tickerList == KnownTickerLists.AllStocks)
             {
-                var tickers = (await _catalogService
-                    .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks))
-                .Select(x => x.Ticker);
+                var shares = await _shareRepository.GetSharesAsync();
+                var tickers = shares.Select(x => x.Ticker);
 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
                 
@@ -44,8 +45,8 @@ namespace Oid85.FinMarket.Application.Services
 
             if (tickerList == KnownTickerLists.MoexIndexStocks)
             {
-                var tickers = (await _catalogService.GetMoexIndexStocksAsync())
-                    .Select(x => x.Ticker);
+                var shares = await _shareRepository.GetMoexIndexSharesAsync();
+                var tickers = shares.Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
@@ -59,8 +60,8 @@ namespace Oid85.FinMarket.Application.Services
 
             if (tickerList == KnownTickerLists.PortfolioStocks)
             {
-                var tickers = (await _catalogService.GetPortfolioStocksAsync())
-                    .Select(x => x.Ticker);
+                var shares = await _shareRepository.GetPortfolioSharesAsync();
+                var tickers = shares.Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
@@ -74,8 +75,8 @@ namespace Oid85.FinMarket.Application.Services
 
             if (tickerList == KnownTickerLists.WatchListStocks)
             {
-                var tickers = (await _catalogService.GetWatchListStocksAsync())
-                    .Select(x => x.Ticker);
+                var shares = await _shareRepository.GetWatchListSharesAsync();
+                var tickers = shares.Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
 
@@ -110,7 +111,7 @@ namespace Oid85.FinMarket.Application.Services
                 Header = [ "Тикер", "Дата фикс. реестра", "Дата объяв.", "Размер, руб", "Доходность, %"]
             };
 
-            var dividendInfos = await _catalogService.GetDividendInfosAsync();
+            var dividendInfos = await _dividendInfoRepository.GetDividendInfosAsync();
 
             foreach (var dividendInfo in dividendInfos)
             {
@@ -146,8 +147,7 @@ namespace Oid85.FinMarket.Application.Services
 
             foreach (var ticker in tickers)
             {
-                string sector = (await _catalogService.GetFinInstrumentAsync(
-                    KnownFinInstrumentTypes.Stocks, ticker))!.Sector;
+                string sector = (await _shareRepository.GetShareByTickerAsync(ticker))!.Sector;
 
                 var tickerData = new List<string>() { ticker, sector };
 
@@ -175,12 +175,11 @@ namespace Oid85.FinMarket.Application.Services
         {
             var data = new Dictionary<string, List<Tuple<string, string>>>();
 
-            var divinendInfos = await _catalogService.GetDividendInfosAsync();
+            var dividendInfos = await _dividendInfoRepository.GetDividendInfosAsync();
             
             foreach (var ticker in tickers)
             {
-                var analyseResults = await _storageService.GetAnalyseResultsAsync(
-                    $"{ticker.ToLower()}_{analyseType.Replace(" ", "_").ToLower()}_daily", from, to);
+                var analyseResults = await _analyseResultRepository.GetAnalyseResultsAsync(ticker, from, to);
 
                 if (analyseResults is [])
                     continue;
@@ -188,7 +187,7 @@ namespace Oid85.FinMarket.Application.Services
                 var lastDate = analyseResults.Last().Date;
                 var timeframe = analyseResults.Last().Timeframe;
 
-                var divinendInfosByTicker = divinendInfos
+                var divinendInfosByTicker = dividendInfos
                     .Where(x => x.Ticker == ticker)
                     .ToList();
 
@@ -213,7 +212,6 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         Ticker = ticker,
                         Date = lastDate,
-                        Data = string.Empty,
                         Timeframe = timeframe,
                         Result = result
                     };

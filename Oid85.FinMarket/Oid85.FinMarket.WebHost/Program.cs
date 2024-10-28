@@ -1,5 +1,4 @@
 using Oid85.FinMarket.WebHost.Extensions;
-using Oid85.FinMarket.WebHost.HostedServices;
 using Oid85.FinMarket.External.Extensions;
 using Oid85.FinMarket.Application.Extensions;
 using Oid85.FinMarket.DataAccess.Extensions;
@@ -11,18 +10,15 @@ namespace Oid85.FinMarket.WebHost
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             builder.Services.AddControllers();
             builder.Services.AddMemoryCache();
             builder.Services.ConfigureLogger();
             builder.Services.ConfigureSwagger(builder.Configuration);
             builder.Services.ConfigureCors(builder.Configuration);            
             builder.Services.ConfigureApplicationServices();
-            builder.Services.ConfigureExternalServices();
+            builder.Services.ConfigureExternalServices(builder.Configuration);
             builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
-            builder.Services.ConfigureQuartz(builder.Configuration);
-            builder.Services.AddHostedService<InitHostedService>();
-            builder.Services.AddHostedService<InitHostedService>();
             builder.Services.AddWindowsService(options =>
             {
                 options.ServiceName = "Oid85 FinMarket Service";

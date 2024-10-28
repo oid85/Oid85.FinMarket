@@ -21,8 +21,4 @@
     <ProjectReference Include="..\Oid85.FinMarket.External\Oid85.FinMarket.External.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\Services\" />
-  </ItemGroup>
-
 </Project>

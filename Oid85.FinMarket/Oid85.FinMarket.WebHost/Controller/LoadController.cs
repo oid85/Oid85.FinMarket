@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Responses;
-using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller
@@ -26,7 +26,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadStocksCatalogAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadStocksCatalogAsync);
+                _loadService.LoadStocksAsync);
 
         /// <summary>
         /// Загрузить справочник облигаций
@@ -37,30 +37,8 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadBondsCatalogAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadBondsCatalogAsync);
-
-        /// <summary>
-        /// Загрузить справочник фьючерсов
-        /// </summary>
-        [HttpGet("load-futures-catalog")]
-        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-        public Task<IActionResult> LoadFuturesCatalogAsync() =>
-            GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadFuturesCatalogAsync);
-
-        /// <summary>
-        /// Загрузить справочник валют
-        /// </summary>
-        [HttpGet("load-currencies-catalog")]
-        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-        public Task<IActionResult> LoadCurrenciesCatalogAsync() =>
-            GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadCurrenciesCatalogAsync);
-
+                _loadService.LoadBondsAsync);
+        
         /// <summary>
         /// Подгрузить последние свечи
         /// </summary>
@@ -70,7 +48,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadStocksDailyCandlesAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadStocksDailyCandlesAsync);
+                _loadService.LoadCandlesAsync);
 
         /// <summary>
         /// Загрузить свечи за конкретный год
@@ -82,7 +60,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadStocksDailyCandlesForYearAsync(int year) =>
             GetResponseAsync<object, BaseResponse<object>>(
-                () => _loadService.LoadStocksDailyCandlesForYearAsync(year));
+                () => _loadService.LoadCandlesAsync(year));
 
         /// <summary>
         /// Подгрузить данные о дивидендах

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Entities;
-using Oid85.FinMarket.DataAccess.Shcemas;
+using Oid85.FinMarket.DataAccess.Schemas;
 
 namespace Oid85.FinMarket.DataAccess;
 

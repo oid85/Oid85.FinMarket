@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Oid85.FinMarket.DataAccess.Entities.Base;
-using Oid85.FinMarket.DataAccess.Shcemas;
+using Oid85.FinMarket.DataAccess.Schemas;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
