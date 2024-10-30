@@ -20,7 +20,10 @@ public class BondRepository : IBondRepository
     }
     
     public async Task AddOrUpdateAsync(List<Bond> bonds)
-    {
+    {        
+        if (!bonds.Any())
+            return;
+        
         foreach (var bond in bonds)
         {
             var entity = _context.BondEntities
@@ -30,7 +33,7 @@ public class BondRepository : IBondRepository
             if (entity is null)
             {
                 entity = _mapper.Map<BondEntity>(bond);
-                await _context.AddAsync(entity);
+                await _context.BondEntities.AddAsync(entity);
             }
 
             else

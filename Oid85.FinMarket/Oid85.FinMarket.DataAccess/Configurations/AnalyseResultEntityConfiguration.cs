@@ -12,13 +12,6 @@ internal class AnalyseResultEntityConfiguration : EntityConfigurationBase<Analys
         base.Configure(builder);
         
         builder.ToTable("analyse_results", KnownDatabaseSchemas.Storage);
-        
-        builder
-            .HasOne<TimeframeEntity>(x => x.Timeframe)
-            .WithMany()
-            .HasForeignKey(x => x.TimeframeId);
-
-        builder
-            .HasIndex(x => x.Ticker);
+        builder.HasIndex(x => x.Ticker);
     }
 }

@@ -10,12 +10,12 @@ namespace Oid85.FinMarket.External.Tinkoff
         /// <summary>
         /// Получить свечи
         /// </summary>
-        public Task<List<Candle>> GetCandlesAsync(Share share, Timeframe timeframe);
+        public Task<List<Candle>> GetCandlesAsync(Share share, string timeframe);
 
         /// <summary>
         /// Получить свечи за конкретный год
         /// </summary>
-        public Task<List<Candle>> GetCandlesAsync(Share share, Timeframe timeframe, int year);
+        public Task<List<Candle>> GetCandlesAsync(Share share, string timeframe, int year);
         
         /// <summary>
         /// Получить список акций

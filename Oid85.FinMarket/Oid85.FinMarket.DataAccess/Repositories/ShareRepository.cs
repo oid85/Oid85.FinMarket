@@ -21,17 +21,19 @@ public class ShareRepository : IShareRepository
 
     public async Task AddOrUpdateAsync(List<Share> shares)
     {
+        if (!shares.Any())
+            return;
+        
         foreach (var share in shares)
         {
             var entity = _context.ShareEntities
-                .Include(x => x.DividendInfoEntities)
                 .FirstOrDefault(x => 
                     x.Ticker == share.Ticker);
 
             if (entity is null)
             {
                 entity = _mapper.Map<ShareEntity>(share);
-                await _context.AddAsync(entity);
+                await _context.ShareEntities.AddAsync(entity);
             }
 
             else
@@ -48,27 +50,23 @@ public class ShareRepository : IShareRepository
 
     public Task<List<Share>> GetSharesAsync() =>
         _context.ShareEntities
-            .Include(x => x.DividendInfoEntities)
             .Select(x => _mapper.Map<Share>(x))
             .ToListAsync();
 
     public Task<List<Share>> GetMoexIndexSharesAsync() =>
         _context.ShareEntities
-            .Include(x => x.DividendInfoEntities)
             .Where(x => x.InIrusIndex)
             .Select(x => _mapper.Map<Share>(x))
             .ToListAsync();
 
     public Task<List<Share>> GetPortfolioSharesAsync() =>
         _context.ShareEntities
-            .Include(x => x.DividendInfoEntities)
             .Where(x => x.InPortfolio)
             .Select(x => _mapper.Map<Share>(x))
             .ToListAsync();
 
     public Task<List<Share>> GetWatchListSharesAsync() =>
         _context.ShareEntities
-            .Include(x => x.DividendInfoEntities)
             .Where(x => x.InWatchList)
             .Select(x => _mapper.Map<Share>(x))
             .ToListAsync();
@@ -76,7 +74,6 @@ public class ShareRepository : IShareRepository
     public async Task<Share?> GetShareByTickerAsync(string ticker)
     {
         var entity = await _context.ShareEntities
-            .Include(x => x.DividendInfoEntities)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
         return entity is null 

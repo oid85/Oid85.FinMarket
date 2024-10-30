@@ -34,9 +34,4 @@ public class DividendInfoEntity : AuditableEntity
     /// </summary>
     [Column("dividend_prc")]
     public double DividendPrc { get; set; }
-    
-    [Column("share_id")]
-    public Guid ShareId { get; set; }
-    
-    public ShareEntity Share { get; set; } = new();
 }

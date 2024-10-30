@@ -58,6 +58,4 @@ public class ShareEntity : AuditableEntity
     /// </summary>
     [Column("in_watch_list")]
     public bool InWatchList { get; set; } = false; 
-    
-    public ICollection<DividendInfoEntity> DividendInfoEntities { get; set; } = new List<DividendInfoEntity>();
 }

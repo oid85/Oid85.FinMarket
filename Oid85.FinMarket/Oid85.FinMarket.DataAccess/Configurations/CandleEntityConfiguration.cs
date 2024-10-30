@@ -12,13 +12,6 @@ internal class CandleEntityConfiguration : EntityConfigurationBase<CandleEntity>
         base.Configure(builder);
         
         builder.ToTable("candles", KnownDatabaseSchemas.Storage);
-        
-        builder
-            .HasOne<TimeframeEntity>(x => x.Timeframe)
-            .WithMany()
-            .HasForeignKey(x => x.TimeframeId);
-        
-        builder
-            .HasIndex(x => x.Ticker);
+        builder.HasIndex(x => x.Ticker);
     }
 }

@@ -21,10 +21,12 @@ public class DividendInfoRepository : IDividendInfoRepository
 
     public async Task AddOrUpdateAsync(List<DividendInfo> dividendInfos)
     {
+        if (!dividendInfos.Any())
+            return;
+        
         foreach (var dividendInfo in dividendInfos)
         {
             var entity = _context.DividendInfoEntities
-                .Include(x => x.Share)
                 .FirstOrDefault(x => 
                     x.Ticker == dividendInfo.Ticker &&
                     x.RecordDate == dividendInfo.RecordDate &&
@@ -33,7 +35,7 @@ public class DividendInfoRepository : IDividendInfoRepository
             if (entity is null)
             {
                 entity = _mapper.Map<DividendInfoEntity>(dividendInfo);
-                await _context.AddAsync(entity);
+                await _context.DividendInfoEntities.AddAsync(entity);
             }
 
             else

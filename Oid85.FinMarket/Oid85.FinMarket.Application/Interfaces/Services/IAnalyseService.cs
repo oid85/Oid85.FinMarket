@@ -16,24 +16,24 @@ namespace Oid85.FinMarket.Application.Interfaces.Services
         /// Анализ с индикатором Супертренд
         /// </summary>
         public Task<List<AnalyseResult>> SupertrendAnalyseAsync(
-            Share stock, Timeframe timeframe);
+            Share stock, string timeframe);
 
         /// <summary>
         /// Анализ последовательности подряд идущих свечей
         /// </summary>
         public Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
-            Share stock, Timeframe timeframe);
+            Share stock, string timeframe);
 
         /// <summary>
         /// Анализ растущего объема
         /// </summary>
         public Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(
-            Share stock, Timeframe timeframe);
+            Share stock, string timeframe);
 
         /// <summary>
         /// Анализ RSI
         /// </summary>
         public Task<List<AnalyseResult>> RsiAnalyseAsync(
-            Share stock, Timeframe timeframe);
+            Share stock, string timeframe);
     }
 }

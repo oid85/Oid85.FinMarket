@@ -21,19 +21,27 @@ public class AnalyseResultRepository : IAnalyseResultRepository
     
     public async Task AddOrUpdateAsync(List<AnalyseResult> results)
     {
-        foreach (var result in results)
-        {
-            var entity = _context.AnalyseResultEntities
-                .Include(x => x.Timeframe)
-                .FirstOrDefault(x => 
-                    x.Ticker == result.Ticker &&
-                    x.Date == result.Date);
+        if (!results.Any())
+            return;
+        
+        var lastEntity = await GetLastAsync(
+            results.First().Ticker, results.First().Timeframe);
 
-            if (entity is null)
-            {
-                entity = _mapper.Map<AnalyseResultEntity>(result);
-                await _context.AddAsync(entity);
-            }
+        if (lastEntity is null)
+        {
+            var entities = results
+                .Select(x => _mapper.Map<AnalyseResultEntity>(x));
+            
+            await _context.AnalyseResultEntities.AddRangeAsync(entities);
+        }
+        
+        else
+        {
+            var entities = results
+                .Select(x => _mapper.Map<AnalyseResultEntity>(x))
+                .Where(x => x.Date > lastEntity.Date);
+                
+            await _context.AnalyseResultEntities.AddRangeAsync(entities);    
         }
 
         await _context.SaveChangesAsync();
@@ -47,4 +55,27 @@ public class AnalyseResultRepository : IAnalyseResultRepository
             .OrderBy(x => x.Date)
             .Select(x => _mapper.Map<AnalyseResult>(x))
             .ToListAsync();
+
+    private async Task<AnalyseResultEntity?> GetLastAsync(string ticker, string timeframe)
+    {
+        bool exists = await _context.AnalyseResultEntities
+            .Where(x => x.Timeframe == timeframe)
+            .Where(x => x.Ticker == ticker)
+            .AnyAsync();
+
+        if (!exists)
+            return null;
+        
+        var maxDate = await _context.AnalyseResultEntities
+            .Where(x => x.Timeframe == timeframe)
+            .Where(x => x.Ticker == ticker)
+            .MaxAsync(x => x.Date);
+
+        var entity = await _context.AnalyseResultEntities
+            .Where(x => x.Timeframe == timeframe)
+            .Where(x => x.Ticker == ticker)
+            .FirstAsync(x => x.Date == maxDate);
+        
+        return entity;
+    }
 }

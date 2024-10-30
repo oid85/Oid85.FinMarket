@@ -13,7 +13,7 @@
         /// <summary>
         /// Тикер
         /// </summary>
-        public string Ticker { get; set; }
+        public string Ticker { get; set; } = string.Empty;
         
         /// <summary>
         /// Цена открытия
@@ -53,6 +53,6 @@
         /// <summary>
         /// Таймфрейм
         /// </summary>
-        public Timeframe Timeframe { get; set; }
+        public string Timeframe { get; set; } = string.Empty;
     }
 }

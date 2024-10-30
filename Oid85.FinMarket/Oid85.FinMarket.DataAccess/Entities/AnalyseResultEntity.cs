@@ -12,6 +12,12 @@ public class AnalyseResultEntity : BaseEntity
     public string Ticker { get; set; } = string.Empty;
 
     /// <summary>
+    /// Таймфрейм
+    /// </summary>
+    [Column("timeframe")]
+    public string Timeframe { get; set; } = string.Empty;    
+    
+    /// <summary>
     /// Результат анализа
     /// </summary>
     [Column("analyse_result_type_id")]
@@ -22,9 +28,4 @@ public class AnalyseResultEntity : BaseEntity
     /// </summary>
     [Column("date", TypeName = "timestamp with time zone")]
     public DateTime Date { get; set; }    
-    
-    [Column("timeframe_id")]
-    public Guid TimeframeId { get; set; }
-    
-    public TimeframeEntity Timeframe { get; set; } = new();
 }

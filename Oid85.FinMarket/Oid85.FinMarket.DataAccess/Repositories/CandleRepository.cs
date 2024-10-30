@@ -21,42 +21,70 @@ public class CandleRepository : ICandleRepository
     
     public async Task AddOrUpdateAsync(List<Candle> candles)
     {
-        foreach (var candle in candles)
+        if (!candles.Any())
+            return;
+        
+        var lastEntity = await GetLastAsync(
+            candles.First().Ticker, candles.First().Timeframe);
+
+        if (lastEntity is null)
         {
-            var entity = _context.CandleEntities
-                .Include(x => x.Timeframe)
-                .FirstOrDefault(x => 
-                    x.Ticker == candle.Ticker &&
-                    x.Timeframe.Name == candle.Timeframe.Name &&
-                    x.Date == candle.Date);
-
-            if (entity is null)
+            var entities = _mapper.Map<List<CandleEntity>>(candles);
+            await _context.CandleEntities.AddRangeAsync(entities);
+        }
+        
+        else
+        {
+            if (!lastEntity.IsComplete)
             {
-                entity = _mapper.Map<CandleEntity>(candle);
-                await _context.AddAsync(entity);
+                var candle = candles.First(x => x.Date == lastEntity.Date);
+                
+                lastEntity.Open = candle.Open;
+                lastEntity.Close = candle.Close;
+                lastEntity.High = candle.High;
+                lastEntity.Low = candle.Low;
+                lastEntity.Volume = candle.Volume;
+                lastEntity.IsComplete = candle.IsComplete;
             }
 
-            else
-            {
-                if (!entity.IsComplete)
-                {
-                    entity.Open = candle.Open;
-                    entity.Close = candle.Close;
-                    entity.High = candle.High;
-                    entity.Low = candle.Low;         
-                    entity.Volume = candle.Volume;         
-                }
-            }
+            var entities = candles
+                .Select(x => _mapper.Map<CandleEntity>(x))
+                .Where(x => x.Date > lastEntity.Date);
+                
+            await _context.CandleEntities.AddRangeAsync(entities);  
         }
 
         await _context.SaveChangesAsync();
     }
 
-    public Task<List<Candle>> GetCandlesAsync(string ticker, Timeframe timeframe) =>
-        _context.AnalyseResultEntities
+    public Task<List<Candle>> GetCandlesAsync(string ticker, string timeframe) =>
+        _context.CandleEntities
             .Where(x => ticker == x.Ticker)
-            .Where(x => x.Timeframe.Name == timeframe.Name)
+            .Where(x => x.Timeframe == timeframe)
             .OrderBy(x => x.Date)
             .Select(x => _mapper.Map<Candle>(x))
             .ToListAsync();
+
+    private async Task<CandleEntity?> GetLastAsync(string ticker, string timeframe)
+    {
+        bool exists = await _context.CandleEntities
+            .Where(x => x.Timeframe == timeframe)
+            .Where(x => x.Ticker == ticker)
+            .AnyAsync();
+
+        if (!exists)
+            return null;
+        
+        var maxDate = await _context.CandleEntities
+            .Where(x => x.Timeframe == timeframe)
+            .Where(x => x.Ticker == ticker)
+            .MaxAsync(x => x.Date);
+
+        var entity = await _context.CandleEntities
+            .Where(x => x.Timeframe == timeframe)
+            .Where(x => x.Ticker == ticker)
+            .FirstAsync(x => x.Date == maxDate);
+        
+        return entity;
+    }
 }

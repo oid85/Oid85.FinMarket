@@ -15,6 +15,8 @@ namespace Oid85.FinMarket.DataAccess.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            services.AddSingleton<UpdateAuditableEntitiesInterceptor>();
+                
             services.AddDbContext<FinMarketContext>((serviceProvider, options) =>
             {
                 var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();

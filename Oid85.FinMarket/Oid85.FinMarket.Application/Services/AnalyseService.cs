@@ -33,7 +33,7 @@ namespace Oid85.FinMarket.Application.Services
         public async Task AnalyseStocksAsync()
         {
             var shares = await _shareRepository.GetSharesAsync();
-            var timeframe = new Timeframe() { Name = KnownTimeframes.Daily };
+            var timeframe = KnownTimeframes.Daily;
             
             for (int i = 0; i < shares.Count; i++)
             {                
@@ -50,7 +50,7 @@ namespace Oid85.FinMarket.Application.Services
         
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> SupertrendAnalyseAsync(
-            Share share, Timeframe timeframe)
+            Share share, string timeframe)
         {
             string GetResult(SuperTrendResult result)
             {
@@ -68,7 +68,9 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = await _candleRepository.GetCandlesAsync(share.Ticker, timeframe);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 int lookbackPeriods = 50;
                 double multiplier = 3.0;
@@ -91,7 +93,7 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         Date = x.Date.ToUniversalTime(),
                         Ticker = share.Ticker,
-                        Timeframe = timeframe.Name,
+                        Timeframe = timeframe,
                         Result = GetResult(x)
                     })
                     .ToList();
@@ -110,7 +112,7 @@ namespace Oid85.FinMarket.Application.Services
         
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
-            Share share, Timeframe timeframe)
+            Share share, string timeframe)
         {
             string GetResult(List<Candle> candles)
             {
@@ -130,7 +132,9 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = await _candleRepository.GetCandlesAsync(share.Ticker, timeframe);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 var results = new List<AnalyseResult>();
 
@@ -142,7 +146,7 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         result.Date = candles[i].Date;
                         result.Ticker = share.Ticker;
-                        result.Timeframe = timeframe.Name;
+                        result.Timeframe = timeframe;
                         result.Result = string.Empty;
                     }
 
@@ -156,7 +160,7 @@ namespace Oid85.FinMarket.Application.Services
 
                         result.Date = candles[i].Date;
                         result.Ticker = share.Ticker;
-                        result.Timeframe = timeframe.Name;
+                        result.Timeframe = timeframe;
                         result.Result = GetResult(candlesForAnalyse);
                     }                    
 
@@ -177,7 +181,7 @@ namespace Oid85.FinMarket.Application.Services
         
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(
-            Share share, Timeframe timeframe)
+            Share share, string timeframe)
         {
             string GetResult(List<Candle> candles)
             {
@@ -198,7 +202,9 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = await _candleRepository.GetCandlesAsync(share.Ticker, timeframe);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 var results = new List<AnalyseResult>();
 
@@ -210,7 +216,7 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         result.Date = candles[i].Date;
                         result.Ticker = share.Ticker;
-                        result.Timeframe = timeframe.Name;
+                        result.Timeframe = timeframe;
                         result.Result = string.Empty;
                     }
 
@@ -232,7 +238,7 @@ namespace Oid85.FinMarket.Application.Services
 
                         result.Date = candles[i].Date;
                         result.Ticker = share.Ticker;
-                        result.Timeframe = timeframe.Name;
+                        result.Timeframe = timeframe;
                         result.Result = GetResult(candlesForAnalyse);
                     }
 
@@ -270,11 +276,13 @@ namespace Oid85.FinMarket.Application.Services
         
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> RsiAnalyseAsync(
-            Share share, Timeframe timeframe)
+            Share share, string timeframe)
         {
             try
             {
-                var candles = await _candleRepository.GetCandlesAsync(share.Ticker, timeframe);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 int lookbackPeriods = 14;
 
@@ -296,7 +304,7 @@ namespace Oid85.FinMarket.Application.Services
                     {
                         Date = x.Date.ToUniversalTime(),
                         Ticker = share.Ticker,
-                        Timeframe = timeframe.Name,
+                        Timeframe = timeframe,
                         Result = GetRsiResult(x)
                     })
                     .ToList();

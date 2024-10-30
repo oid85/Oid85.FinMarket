@@ -50,7 +50,7 @@ namespace Oid85.FinMarket.Application.Services
 
             foreach (var share in shares)
             {
-                var timeframe = new Timeframe() { Name = KnownTimeframes.Daily };
+                var timeframe = KnownTimeframes.Daily;
                 var candles = await _tinkoffService.GetCandlesAsync(share, timeframe);
                 await _candleRepository.AddOrUpdateAsync(candles);
             }
@@ -58,13 +58,21 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadCandlesAsync(int year)
         {
-            var shares = await _shareRepository.GetSharesAsync();
+            var shares = (await _shareRepository.GetSharesAsync())
+                .OrderBy(share => share.Ticker)
+                .ToList();
 
-            foreach (var share in shares)
+            for (int i = 0; i < shares.Count; i++)
             {
-                var timeframe = new Timeframe() { Name = KnownTimeframes.Daily };
-                var candles = await _tinkoffService.GetCandlesAsync(share, timeframe, year);
+                _logger.Trace($"Loading '{shares[i].Ticker}'. {i + 1} of {shares.Count}");
+                
+                var timeframe = KnownTimeframes.Daily;
+                var candles = await _tinkoffService.GetCandlesAsync(shares[i], timeframe, year);
                 await _candleRepository.AddOrUpdateAsync(candles);
+                
+                double percent = ((i + 1) / (double) shares.Count) * 100;
+                
+                _logger.Trace($"Loaded '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
             }
         }
 

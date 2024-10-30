@@ -32,12 +32,12 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            Share share, Timeframe timeframe)
+            Share share, string timeframe)
         {
             try
             {
-                var (from, to) = await GetDataRange(timeframe.Name);
-                return await GetCandlesAsync(share, timeframe.Name, from, to);
+                var (from, to) = await GetDataRange(timeframe);
+                return await GetCandlesAsync(share, timeframe, from, to);
             }
 
             catch (Exception exception)
@@ -49,13 +49,13 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            Share share, Timeframe timeframe, int year)
+            Share share, string timeframe, int year)
         {
             try
             {
                 var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
                 var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
-                return await GetCandlesAsync(share, timeframe.Name, from, to);
+                return await GetCandlesAsync(share, timeframe, from, to);
             }
 
             catch (Exception exception)
@@ -93,6 +93,8 @@ namespace Oid85.FinMarket.External.Tinkoff
             {
                 var candle = new Candle
                 {
+                    Ticker = share.Ticker,
+                    Timeframe = timeframe,
                     Open = ConvertToDouble(response.Candles[i].Open),
                     Close = ConvertToDouble(response.Candles[i].Close),
                     High = ConvertToDouble(response.Candles[i].High),
@@ -121,14 +123,20 @@ namespace Oid85.FinMarket.External.Tinkoff
                 var result = new List<Share>();
 
                 foreach (var share in shares)
-                {                    
+                {
+                    if (share.Ticker.Contains("@"))
+                        continue;
+                    
+                    if (share.Ticker.Contains("-"))
+                        continue;
+                    
                     result.Add(new Share
                     {
                         Ticker = share.Ticker,
                         Figi = share.Figi,
                         Isin = share.Isin,
                         Description = share.Name,
-                        Sector = share.Sector,
+                        Sector = share.Sector
                     });
                 }
 

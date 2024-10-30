@@ -12,11 +12,5 @@ internal class DividendInfoEntityConfiguration : EntityConfigurationBase<ShareEn
         base.Configure(builder);
         
         builder.ToTable("dividend_info", KnownDatabaseSchemas.Default);
-        
-        builder
-            .HasMany(x => x.DividendInfoEntities)
-            .WithOne(x => x.Share)
-            .HasForeignKey(x => x.ShareId)
-            .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -14,28 +14,28 @@ namespace Oid85.FinMarket.WebHost.Controller
         public LoadController(
             ILoadService loadService)
         {
-            _loadService = loadService;
+            _loadService = loadService ?? throw new ArgumentNullException(nameof(loadService));
         }
 
         /// <summary>
         /// Загрузить справочник акций
         /// </summary>
-        [HttpGet("load-stocks-catalog")]
+        [HttpGet("load-stocks")]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-        public Task<IActionResult> LoadStocksCatalogAsync() =>
+        public Task<IActionResult> LoadStocksAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
                 _loadService.LoadStocksAsync);
 
         /// <summary>
         /// Загрузить справочник облигаций
         /// </summary>
-        [HttpGet("load-bonds-catalog")]
+        [HttpGet("load-bonds")]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-        public Task<IActionResult> LoadBondsCatalogAsync() =>
+        public Task<IActionResult> LoadBondsAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
                 _loadService.LoadBondsAsync);
         

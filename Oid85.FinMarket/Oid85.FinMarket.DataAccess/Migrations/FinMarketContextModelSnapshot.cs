@@ -45,18 +45,16 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ticker");
 
-                    b.Property<Guid>("TimeframeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("timeframe_id");
+                    b.Property<string>("Timeframe")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("timeframe");
 
                     b.HasKey("Id")
                         .HasName("pk_analyse_results");
 
                     b.HasIndex("Ticker")
                         .HasDatabaseName("ix_analyse_results_ticker");
-
-                    b.HasIndex("TimeframeId")
-                        .HasDatabaseName("ix_analyse_results_timeframe_id");
 
                     b.ToTable("analyse_results", "storage");
                 });
@@ -165,9 +163,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ticker");
 
-                    b.Property<Guid>("TimeframeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("timeframe_id");
+                    b.Property<string>("Timeframe")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("timeframe");
 
                     b.Property<long>("Volume")
                         .HasColumnType("bigint")
@@ -178,9 +177,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
 
                     b.HasIndex("Ticker")
                         .HasDatabaseName("ix_candles_ticker");
-
-                    b.HasIndex("TimeframeId")
-                        .HasDatabaseName("ix_candles_timeframe_id");
 
                     b.ToTable("candles", "storage");
                 });
@@ -220,9 +216,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("record_date");
 
-                    b.Property<Guid>("ShareId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("share_id");
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("ticker");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -230,9 +227,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_dividend_info_entities");
-
-                    b.HasIndex("ShareId")
-                        .HasDatabaseName("ix_dividend_info_entities_share_id");
 
                     b.ToTable("dividend_info_entities", "public");
                 });
@@ -306,109 +300,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasName("pk_shares");
 
                     b.ToTable("shares", "public");
-                });
-
-            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.TimeframeEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_timeframes");
-
-                    b.ToTable("timeframes", "dict");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("eaa80987-548b-474d-8882-9003a10db167"),
-                            CreatedAt = new DateTime(2024, 10, 27, 18, 51, 53, 582, DateTimeKind.Utc).AddTicks(9858),
-                            DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "1 день",
-                            IsDeleted = false,
-                            Name = "D",
-                            UpdatedAt = new DateTime(2024, 10, 27, 18, 51, 53, 582, DateTimeKind.Utc).AddTicks(9861)
-                        },
-                        new
-                        {
-                            Id = new Guid("827adf38-2f99-4066-ba5c-33a646d2767b"),
-                            CreatedAt = new DateTime(2024, 10, 27, 18, 51, 53, 582, DateTimeKind.Utc).AddTicks(9926),
-                            DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "1 час",
-                            IsDeleted = false,
-                            Name = "H",
-                            UpdatedAt = new DateTime(2024, 10, 27, 18, 51, 53, 582, DateTimeKind.Utc).AddTicks(9927)
-                        });
-                });
-
-            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.AnalyseResultEntity", b =>
-                {
-                    b.HasOne("Oid85.FinMarket.DataAccess.Entities.TimeframeEntity", "Timeframe")
-                        .WithMany()
-                        .HasForeignKey("TimeframeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_analyse_results_timeframe_entities_timeframe_id");
-
-                    b.Navigation("Timeframe");
-                });
-
-            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.CandleEntity", b =>
-                {
-                    b.HasOne("Oid85.FinMarket.DataAccess.Entities.TimeframeEntity", "Timeframe")
-                        .WithMany()
-                        .HasForeignKey("TimeframeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_candles_timeframe_entities_timeframe_id");
-
-                    b.Navigation("Timeframe");
-                });
-
-            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.DividendInfoEntity", b =>
-                {
-                    b.HasOne("Oid85.FinMarket.DataAccess.Entities.ShareEntity", "Share")
-                        .WithMany("DividendInfoEntities")
-                        .HasForeignKey("ShareId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("fk_dividend_info_entities_share_entities_share_id");
-
-                    b.Navigation("Share");
-                });
-
-            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.ShareEntity", b =>
-                {
-                    b.Navigation("DividendInfoEntities");
                 });
 #pragma warning restore 612, 618
         }

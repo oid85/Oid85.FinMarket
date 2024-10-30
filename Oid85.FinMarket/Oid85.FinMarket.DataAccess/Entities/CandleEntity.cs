@@ -12,6 +12,12 @@ public class CandleEntity : BaseEntity
     public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
+    /// Таймфрейм
+    /// </summary>
+    [Column("timeframe")]
+    public string Timeframe { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Цена открытия
     /// </summary>
     [Column("open")]
@@ -52,9 +58,4 @@ public class CandleEntity : BaseEntity
     /// </summary>
     [Column("is_complete")]
     public bool IsComplete { get; set; }
-    
-    [Column("timeframe_id")]
-    public Guid TimeframeId { get; set; }
-    
-    public TimeframeEntity Timeframe { get; set; } = new();
 }

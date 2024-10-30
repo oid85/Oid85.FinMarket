@@ -8,11 +8,19 @@ public class FinMarketMappingProfile : Profile
 {
     public FinMarketMappingProfile()
     {
-        CreateMap<AnalyseResult, AnalyseResultEntity>();
-        CreateMap<Bond, BondEntity>();
-        CreateMap<Candle, CandleEntity>();
-        CreateMap<DividendInfo, DividendInfoEntity>();
-        CreateMap<Share, ShareEntity>();
-        CreateMap<Timeframe, TimeframeEntity>();
+        CreateMap<AnalyseResultEntity, AnalyseResult>()
+            .ReverseMap();
+        
+        CreateMap<BondEntity, Bond>()
+            .ReverseMap();
+        
+        CreateMap<CandleEntity, Candle>()
+            .ReverseMap();
+        
+        CreateMap<DividendInfoEntity, DividendInfo>()
+            .ReverseMap();
+        
+        CreateMap<ShareEntity, Share>()
+            .ReverseMap();
     }
 }
