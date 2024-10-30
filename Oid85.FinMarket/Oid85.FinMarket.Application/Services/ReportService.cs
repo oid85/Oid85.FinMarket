@@ -1,24 +1,27 @@
-﻿using Oid85.FinMarket.Application.Models.Requests;
+﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Results;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.External.Catalogs;
-using Oid85.FinMarket.External.Storage;
 
 namespace Oid85.FinMarket.Application.Services
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="IReportService" />
     public class ReportService : ReportServiceBase, IReportService
     {
-        private readonly IStorageService _storageService;
-        private readonly ICatalogService _catalogService;
+        private readonly IAnalyseResultRepository _analyseResultRepository;
+        private readonly IShareRepository _shareRepository;
+        private readonly IDividendInfoRepository _dividendInfoRepository;
 
         public ReportService(
-            IStorageService storageService,
-            ICatalogService catalogService) 
-            : base(storageService, catalogService)
+            IAnalyseResultRepository analyseResultRepository,
+            IShareRepository shareRepository,
+            IDividendInfoRepository dividendInfoRepository) 
+            : base(analyseResultRepository, shareRepository, dividendInfoRepository)
         {
-            _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
-            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
+            _analyseResultRepository = analyseResultRepository ?? throw new ArgumentNullException(nameof(analyseResultRepository));
+            _shareRepository = shareRepository ?? throw new ArgumentNullException(nameof(shareRepository));
+            _dividendInfoRepository = dividendInfoRepository ?? throw new ArgumentNullException(nameof(dividendInfoRepository));
         }
 
         /// <inheritdoc />

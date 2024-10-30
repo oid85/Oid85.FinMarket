@@ -1,13 +1,9 @@
-﻿using Npgsql;
-using Oid85.FinMarket.Application.Constants;
+﻿using Oid85.FinMarket.Application.Constants;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Catalogs;
-using Oid85.FinMarket.External.Settings;
-using Oid85.FinMarket.External.Storage;
 using Skender.Stock.Indicators;
-using System.Linq;
-using System.Text.Json;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
 using ILogger = NLog.ILogger;
 
@@ -17,44 +13,44 @@ namespace Oid85.FinMarket.Application.Services
     public class AnalyseService : IAnalyseService
     {
         private readonly ILogger _logger;
-        private readonly ISettingsService _settingsService;
-        private readonly IStorageService _storageService;
-        private readonly ICatalogService _catalogService;
+        private readonly IShareRepository _shareRepository;
+        private readonly ICandleRepository _candleRepository;
+        private readonly IAnalyseResultRepository _analyseResultRepository;
 
         public AnalyseService(
-            ILogger logger,
-            ISettingsService settingsService,
-            IStorageService storageService,
-            ICatalogService catalogService)
+            ILogger logger, 
+            IShareRepository shareRepository, 
+            ICandleRepository candleRepository, 
+            IAnalyseResultRepository analyseResultRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
-            _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
-            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
+            _shareRepository = shareRepository ?? throw new ArgumentNullException(nameof(shareRepository));
+            _candleRepository = candleRepository ?? throw new ArgumentNullException(nameof(candleRepository));
+            _analyseResultRepository = analyseResultRepository ?? throw new ArgumentNullException(nameof(analyseResultRepository));
         }
 
         /// <inheritdoc />
         public async Task AnalyseStocksAsync()
         {
-            var stocks = await _catalogService
-                .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
-
-            for (int i = 0; i < stocks.Count; i++)
+            var shares = await _shareRepository.GetSharesAsync();
+            var timeframe = KnownTimeframes.Daily;
+            
+            for (int i = 0; i < shares.Count; i++)
             {                
-                await SupertrendAnalyseAsync(stocks[i], KnownTimeframes.Daily);
-                await CandleSequenceAnalyseAsync(stocks[i], KnownTimeframes.Daily);
-                await CandleVolumeAnalyseAsync(stocks[i], KnownTimeframes.Daily);
-                await RsiAnalyseAsync(stocks[i], KnownTimeframes.Daily);
+                await SupertrendAnalyseAsync(shares[i], timeframe);
+                await CandleSequenceAnalyseAsync(shares[i], timeframe);
+                await CandleVolumeAnalyseAsync(shares[i], timeframe);
+                await RsiAnalyseAsync(shares[i], timeframe);
 
-                double percent = ((i + 1) / (double) stocks.Count) * 100;
+                double percent = ((i + 1) / (double) shares.Count) * 100;
 
-                _logger.Trace($"Analyse '{stocks[i].Ticker}'. {i + 1} of {stocks.Count}. {percent:N2} % completed");
+                _logger.Trace($"Analyse '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
             }
         }
-
+        
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> SupertrendAnalyseAsync(
-            FinInstrument stock, string timeframe)
+            Share share, string timeframe)
         {
             string GetResult(SuperTrendResult result)
             {
@@ -69,11 +65,12 @@ namespace Oid85.FinMarket.Application.Services
 
                 return string.Empty;
             }
-
+            
             try
             {
-                string tableName = $"{stock.Ticker}_{timeframe}".ToLower();
-                var candles = await _storageService.GetCandlesAsync(tableName);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 int lookbackPeriods = 50;
                 double multiplier = 3.0;
@@ -95,16 +92,13 @@ namespace Oid85.FinMarket.Application.Services
                     .Select(x => new AnalyseResult()
                     {
                         Date = x.Date.ToUniversalTime(),
-                        Ticker = stock.Ticker,
+                        Ticker = share.Ticker,
                         Timeframe = timeframe,
-                        Result = GetResult(x),
-                        Data = JsonSerializer.Serialize(x)
+                        Result = GetResult(x)
                     })
                     .ToList();
 
-                await _storageService.SaveAnalyseResultsAsync(
-                    $"{stock.Ticker}_{KnownAnalyseTypes.Supertrend.Replace(" ", "_")}_{timeframe}".ToLower(), 
-                    results);
+                await _analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
@@ -115,10 +109,10 @@ namespace Oid85.FinMarket.Application.Services
                 throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }
-
+        
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
-            FinInstrument stock, string timeframe)
+            Share share, string timeframe)
         {
             string GetResult(List<Candle> candles)
             {
@@ -134,12 +128,13 @@ namespace Oid85.FinMarket.Application.Services
                     return KnownCandleSequences.Black;
 
                 return string.Empty;
-            }
-
+            } 
+            
             try
             {
-                string tableName = $"{stock.Ticker}_{timeframe}".ToLower();
-                var candles = await _storageService.GetCandlesAsync(tableName);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 var results = new List<AnalyseResult>();
 
@@ -150,10 +145,9 @@ namespace Oid85.FinMarket.Application.Services
                     if (i < 2)
                     {
                         result.Date = candles[i].Date;
-                        result.Ticker = stock.Ticker;
+                        result.Ticker = share.Ticker;
                         result.Timeframe = timeframe;
                         result.Result = string.Empty;
-                        result.Data = JsonSerializer.Serialize(candles[i]);
                     }
 
                     else
@@ -165,18 +159,15 @@ namespace Oid85.FinMarket.Application.Services
                         };
 
                         result.Date = candles[i].Date;
-                        result.Ticker = stock.Ticker;
+                        result.Ticker = share.Ticker;
                         result.Timeframe = timeframe;
                         result.Result = GetResult(candlesForAnalyse);
-                        result.Data = JsonSerializer.Serialize(candles[i]);
                     }                    
 
                     results.Add(result);
                 }
 
-                await _storageService.SaveAnalyseResultsAsync(
-                    $"{stock.Ticker}_{KnownAnalyseTypes.CandleSequence.Replace(" ", "_")}_{timeframe}".ToLower(),
-                    results);
+                await _analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
@@ -187,10 +178,10 @@ namespace Oid85.FinMarket.Application.Services
                 throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }
-
+        
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(
-            FinInstrument stock, string timeframe)
+            Share share, string timeframe)
         {
             string GetResult(List<Candle> candles)
             {
@@ -208,11 +199,12 @@ namespace Oid85.FinMarket.Application.Services
 
                 return string.Empty;
             }
-
+            
             try
             {
-                string tableName = $"{stock.Ticker}_{timeframe}".ToLower();
-                var candles = await _storageService.GetCandlesAsync(tableName);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 var results = new List<AnalyseResult>();
 
@@ -223,10 +215,9 @@ namespace Oid85.FinMarket.Application.Services
                     if (i < 10)
                     {
                         result.Date = candles[i].Date;
-                        result.Ticker = stock.Ticker;
+                        result.Ticker = share.Ticker;
                         result.Timeframe = timeframe;
                         result.Result = string.Empty;
-                        result.Data = JsonSerializer.Serialize(candles[i]);
                     }
 
                     else
@@ -246,18 +237,15 @@ namespace Oid85.FinMarket.Application.Services
                         };
 
                         result.Date = candles[i].Date;
-                        result.Ticker = stock.Ticker;
+                        result.Ticker = share.Ticker;
                         result.Timeframe = timeframe;
                         result.Result = GetResult(candlesForAnalyse);
-                        result.Data = JsonSerializer.Serialize(candles[i]);
                     }
 
                     results.Add(result);
                 }
 
-                await _storageService.SaveAnalyseResultsAsync(
-                    $"{stock.Ticker}_{KnownAnalyseTypes.CandleVolume.Replace(" ", "_")}_{timeframe}".ToLower(),
-                    results);
+                await _analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
@@ -269,31 +257,32 @@ namespace Oid85.FinMarket.Application.Services
             }
         }
 
+        private string GetRsiResult(RsiResult result)
+        {
+            double upLimit = 60.0;
+            double downLimit = 40.0;
+
+            if (result.Rsi == null)
+                return string.Empty;
+
+            if (result.Rsi >= upLimit)
+                return KnownRsiInterpretations.OverBought;
+
+            if (result.Rsi <= downLimit)
+                return KnownRsiInterpretations.OverSold;
+
+            return string.Empty;
+        }        
+        
         /// <inheritdoc />
         public async Task<List<AnalyseResult>> RsiAnalyseAsync(
-            FinInstrument stock, string timeframe)
+            Share share, string timeframe)
         {
-            string GetResult(RsiResult result)
-            {
-                double upLimit = 60.0;
-                double downLimit = 40.0;
-
-                if (result.Rsi == null)
-                    return string.Empty;
-
-                if (result.Rsi >= upLimit)
-                    return KnownRsiInterpretations.OverBought;
-
-                if (result.Rsi <= downLimit)
-                    return KnownRsiInterpretations.OverSold;
-
-                return string.Empty;
-            }
-
             try
             {
-                string tableName = $"{stock.Ticker}_{timeframe}".ToLower();
-                var candles = await _storageService.GetCandlesAsync(tableName);
+                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                    .Where(x => x.IsComplete)
+                    .ToList();
 
                 int lookbackPeriods = 14;
 
@@ -314,16 +303,13 @@ namespace Oid85.FinMarket.Application.Services
                     .Select(x => new AnalyseResult()
                     {
                         Date = x.Date.ToUniversalTime(),
-                        Ticker = stock.Ticker,
+                        Ticker = share.Ticker,
                         Timeframe = timeframe,
-                        Result = GetResult(x),
-                        Data = JsonSerializer.Serialize(x)
+                        Result = GetRsiResult(x)
                     })
                     .ToList();
 
-                await _storageService.SaveAnalyseResultsAsync(
-                    $"{stock.Ticker}_{KnownAnalyseTypes.Rsi.Replace(" ", "_")}_{timeframe}".ToLower(),
-                    results);
+                await _analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
@@ -332,28 +318,6 @@ namespace Oid85.FinMarket.Application.Services
             {
                 _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
                 throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
-            }
-        }
-
-        /// <summary>
-        /// Получить соединение с БД
-        /// </summary>
-        private async Task<NpgsqlConnection> GetPostgresConnectionAsync()
-        {
-            try
-            {
-                var connectionString = await _settingsService
-                    .GetStringValueAsync(KnownSettingsKeys.Postgres_ConnectionString);
-
-                var connection = new NpgsqlConnection(connectionString);
-
-                return connection;
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error($"Не удалось установить соединение с БД finmarket. {exception}");
-                throw new Exception($"Не удалось установить соединение с БД finmarket. {exception}");
             }
         }
     }

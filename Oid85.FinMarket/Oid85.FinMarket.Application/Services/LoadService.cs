@@ -1,8 +1,8 @@
 ﻿using NLog;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Catalogs;
-using Oid85.FinMarket.External.Storage;
 using Oid85.FinMarket.External.Tinkoff;
 
 namespace Oid85.FinMarket.Application.Services
@@ -11,92 +11,76 @@ namespace Oid85.FinMarket.Application.Services
     {
         private readonly ILogger _logger;
         private readonly ITinkoffService _tinkoffService;
-        private readonly ICatalogService _catalogService;
-        private readonly IStorageService _storageService;
+        private readonly IShareRepository _shareRepository;
+        private readonly IBondRepository _bondRepository;
+        private readonly ICandleRepository _candleRepository;
+        private readonly IDividendInfoRepository _dividendInfoRepository;
 
         public LoadService(
             ILogger logger,
-            ITinkoffService tinkoffService,
-            ICatalogService catalogService,
-            IStorageService storageService)
+            ITinkoffService tinkoffService, 
+            IShareRepository shareRepository, 
+            IBondRepository bondRepository, 
+            ICandleRepository candleRepository, 
+            IDividendInfoRepository dividendInfoRepository)
         {
             _logger = logger;
             _tinkoffService = tinkoffService;
-            _catalogService = catalogService;
-            _storageService = storageService;
+            _shareRepository = shareRepository;
+            _bondRepository = bondRepository;
+            _candleRepository = candleRepository;
+            _dividendInfoRepository = dividendInfoRepository;
         }
 
-        public async Task LoadBondsCatalogAsync()
+        public async Task LoadBondsAsync()
         {
             var bonds = await _tinkoffService.GetBondsAsync();
-
-            await _catalogService.UpdateFinInstrumentsAsync(
-                KnownFinInstrumentTypes.Bonds, bonds);
+            await _bondRepository.AddOrUpdateAsync(bonds);
         }
 
-        public async Task LoadCurrenciesCatalogAsync()
+        public async Task LoadStocksAsync()
         {
-            var currencies = await _tinkoffService.GetCurrenciesAsync();
-
-            await _catalogService.UpdateFinInstrumentsAsync(
-                KnownFinInstrumentTypes.Currencies, currencies);
+            var shares = await _tinkoffService.GetSharesAsync();
+            await _shareRepository.AddOrUpdateAsync(shares);
         }
 
-        public async Task LoadFuturesCatalogAsync()
+        public async Task LoadCandlesAsync()
         {
-            var futures = await _tinkoffService.GetFuturesAsync();
+            var shares = await _shareRepository.GetSharesAsync();
 
-            await _catalogService.UpdateFinInstrumentsAsync(
-                KnownFinInstrumentTypes.Futures, futures);
-        }
-
-        public async Task LoadStocksCatalogAsync()
-        {
-            var stocks = await _tinkoffService.GetStocksAsync();
-
-            await _catalogService.UpdateFinInstrumentsAsync(
-                KnownFinInstrumentTypes.Stocks, stocks);
-        }
-
-        public async Task LoadStocksDailyCandlesAsync()
-        {
-            var stocks = await _catalogService
-                .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
-
-            var data = new List<Tuple<string, List<Candle>>>();
-
-            foreach (var stock in stocks)
+            foreach (var share in shares)
             {
-                var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily);
-                data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
+                var timeframe = KnownTimeframes.Daily;
+                var candles = await _tinkoffService.GetCandlesAsync(share, timeframe);
+                await _candleRepository.AddOrUpdateAsync(candles);
             }
-
-            await _storageService.SaveCandlesAsync(data);
         }
 
-        public async Task LoadStocksDailyCandlesForYearAsync(int year)
+        public async Task LoadCandlesAsync(int year)
         {
-            var stocks = await _catalogService
-                .GetActiveFinInstrumentsAsync(KnownFinInstrumentTypes.Stocks);
+            var shares = (await _shareRepository.GetSharesAsync())
+                .OrderBy(share => share.Ticker)
+                .ToList();
 
-            var data = new List<Tuple<string, List<Candle>>>();
-
-            foreach (var stock in stocks)
+            for (int i = 0; i < shares.Count; i++)
             {
-                _logger.Trace($"Load candles '{stock.Ticker}'");
+                _logger.Trace($"Loading '{shares[i].Ticker}'. {i + 1} of {shares.Count}");
                 
-                var candles = await _tinkoffService.GetCandlesAsync(stock, KnownTimeframes.Daily, year);
-                data.Add(new Tuple<string, List<Candle>>($"{stock.Ticker}_{KnownTimeframes.Daily}", candles));
+                var timeframe = KnownTimeframes.Daily;
+                var candles = await _tinkoffService.GetCandlesAsync(shares[i], timeframe, year);
+                await _candleRepository.AddOrUpdateAsync(candles);
+                
+                double percent = ((i + 1) / (double) shares.Count) * 100;
+                
+                _logger.Trace($"Loaded '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
             }
-
-            await _storageService.SaveCandlesAsync(data);
         }
 
         public async Task LoadDividendInfosAsync()
         {
-            var stocks = await _tinkoffService.GetStocksAsync();
-            var dividendInfos = await _tinkoffService.GetDividendInfoAsync(stocks);
-            await _catalogService.UpdateDividendInfosAsync(dividendInfos);
+            var shares = await _shareRepository.GetSharesAsync();
+            var dividendInfos = await _tinkoffService.GetDividendInfoAsync(shares);
+            await _dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
         }
     }
 }

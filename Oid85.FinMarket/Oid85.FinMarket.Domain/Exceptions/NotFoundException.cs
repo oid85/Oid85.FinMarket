@@ -3,7 +3,7 @@
     [Serializable]
     public class NotFoundException : Exception
     {
-        public string Code { get; set; } = string.Empty;
+        public string Code { get; set; }
         
         public NotFoundException(string code, string message) : base(message)            
         {

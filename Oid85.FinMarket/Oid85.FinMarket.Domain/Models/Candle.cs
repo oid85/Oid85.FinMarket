@@ -8,8 +8,13 @@
         /// <summary>
         /// Id
         /// </summary>
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
+        /// <summary>
+        /// Тикер
+        /// </summary>
+        public string Ticker { get; set; } = string.Empty;
+        
         /// <summary>
         /// Цена открытия
         /// </summary>
@@ -43,6 +48,11 @@
         /// <summary>
         /// Свеча сформирована
         /// </summary>
-        public int IsComplete { get; set; }
+        public bool IsComplete { get; set; }
+        
+        /// <summary>
+        /// Таймфрейм
+        /// </summary>
+        public string Timeframe { get; set; } = string.Empty;
     }
 }

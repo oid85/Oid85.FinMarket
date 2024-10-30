@@ -10,44 +10,26 @@ namespace Oid85.FinMarket.External.Tinkoff
         /// <summary>
         /// Получить свечи
         /// </summary>
-        /// <param name="instrument"> Финансовый инструмент</param>
-        /// <param name="timeframe">Таймфрейм</param>
-        public Task<List<Candle>> GetCandlesAsync(
-            FinInstrument instrument, string timeframe);
+        public Task<List<Candle>> GetCandlesAsync(Share share, string timeframe);
 
         /// <summary>
         /// Получить свечи за конкретный год
         /// </summary>
-        /// <param name="instrument"> Финансовый инструмент</param>
-        /// <param name="timeframe">Таймфрейм</param>
-        /// <param name="year">Год</param>
-        public Task<List<Candle>> GetCandlesAsync(
-            FinInstrument instrument, string timeframe, int year);
-
+        public Task<List<Candle>> GetCandlesAsync(Share share, string timeframe, int year);
+        
         /// <summary>
         /// Получить список акций
         /// </summary>
-        public Task<List<FinInstrument>> GetStocksAsync();
+        public Task<List<Share>> GetSharesAsync();
 
         /// <summary>
         /// Получить список облигаций
         /// </summary>
-        public Task<List<FinInstrument>> GetBondsAsync();
-
-        /// <summary>
-        /// Получить список фьючерсов
-        /// </summary>
-        public Task<List<FinInstrument>> GetFuturesAsync();
-
-        /// <summary>
-        /// Получить список валют
-        /// </summary>
-        public Task<List<FinInstrument>> GetCurrenciesAsync();
+        public Task<List<Bond>> GetBondsAsync();
 
         /// <summary>
         /// Получить информацию по дивидендам
         /// </summary>
-        public Task<List<DividendInfo>> GetDividendInfoAsync(
-            List<FinInstrument> instruments);
+        public Task<List<DividendInfo>> GetDividendInfoAsync(List<Share> shares);
     }
 }

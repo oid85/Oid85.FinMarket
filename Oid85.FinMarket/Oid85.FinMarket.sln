@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oid85.FinMarket.WebHost", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.Application", "Oid85.FinMarket.Application\Oid85.FinMarket.Application.csproj", "{7FD03341-698C-473C-B320-774FCB706214}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.DataAccess", "Oid85.FinMarket.DataAccess\Oid85.FinMarket.DataAccess.csproj", "{A31976AA-9586-4A6F-8C52-ADF43E74C911}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7FD03341-698C-473C-B320-774FCB706214}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FD03341-698C-473C-B320-774FCB706214}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FD03341-698C-473C-B320-774FCB706214}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

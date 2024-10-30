@@ -1,11 +1,15 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Settings;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
+using Share = Oid85.FinMarket.Domain.Models.Share;
+using Bond = Oid85.FinMarket.Domain.Models.Bond;
+using TinkoffShare = Tinkoff.InvestApi.V1.Share;
+using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
 
 namespace Oid85.FinMarket.External.Tinkoff
 {
@@ -14,27 +18,26 @@ namespace Oid85.FinMarket.External.Tinkoff
     {
         private readonly ILogger _logger;
         private readonly InvestApiClient _client;
-        private readonly ISettingsService _settingsService;
+        private readonly IConfiguration _configuration;
 
         public TinkoffService(
             ILogger logger,
-            InvestApiClient client,
-            ISettingsService settingsService
-            )
+            InvestApiClient client, 
+            IConfiguration configuration)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _client = client ?? throw new ArgumentNullException(nameof(client));
-            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            FinInstrument instrument, string timeframe)
+            Share share, string timeframe)
         {
             try
             {
                 var (from, to) = await GetDataRange(timeframe);
-                return await GetCandlesAsync(instrument, timeframe, from, to);
+                return await GetCandlesAsync(share, timeframe, from, to);
             }
 
             catch (Exception exception)
@@ -46,15 +49,13 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            FinInstrument instrument, string timeframe, int year)
+            Share share, string timeframe, int year)
         {
             try
             {
-                return await GetCandlesAsync(
-                    instrument, 
-                    timeframe,
-                    Timestamp.FromDateTime(new DateTime(year, 1, 1, 0, 0, 0).ToUniversalTime()),
-                    Timestamp.FromDateTime(new DateTime(year, 12, 31, 23, 59, 59).ToUniversalTime()));
+                var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
+                var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
+                return await GetCandlesAsync(share, timeframe, from, to);
             }
 
             catch (Exception exception)
@@ -62,15 +63,14 @@ namespace Oid85.FinMarket.External.Tinkoff
                 _logger.Error(exception);
                 return [];
             }
-        }
-
+        }        
+        
         private async Task<List<Candle>> GetCandlesAsync(
-                    FinInstrument instrument, string timeframe,
-                    Timestamp from, Timestamp to)
+            Share share, string timeframe, Timestamp from, Timestamp to)
         {
             var request = new GetCandlesRequest
             {
-                InstrumentId = instrument.Figi,
+                InstrumentId = share.Figi,
                 From = from,
                 To = to
             };
@@ -93,13 +93,15 @@ namespace Oid85.FinMarket.External.Tinkoff
             {
                 var candle = new Candle
                 {
+                    Ticker = share.Ticker,
+                    Timeframe = timeframe,
                     Open = ConvertToDouble(response.Candles[i].Open),
                     Close = ConvertToDouble(response.Candles[i].Close),
                     High = ConvertToDouble(response.Candles[i].High),
                     Low = ConvertToDouble(response.Candles[i].Low),
                     Volume = response.Candles[i].Volume,
                     Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
-                    IsComplete = response.Candles[i].IsComplete == true ? 1 : 0
+                    IsComplete = response.Candles[i].IsComplete
                 };
 
                 candles.Add(candle);
@@ -109,33 +111,36 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public async Task<List<FinInstrument>> GetStocksAsync()
+        public async Task<List<Share>> GetSharesAsync()
         {
             try
             {
-                var shares = (await _client.Instruments
+                List<TinkoffShare> shares = (await _client.Instruments
                     .SharesAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList(); 
 
-                var instruments = new List<FinInstrument>() { };
+                var result = new List<Share>();
 
                 foreach (var share in shares)
-                {                    
-                    var instrument = new FinInstrument
+                {
+                    if (share.Ticker.Contains("@"))
+                        continue;
+                    
+                    if (share.Ticker.Contains("-"))
+                        continue;
+                    
+                    result.Add(new Share
                     {
                         Ticker = share.Ticker,
                         Figi = share.Figi,
                         Isin = share.Isin,
                         Description = share.Name,
-                        Sector = share.Sector,
-                        IsActive = 1
-                    };
-
-                    instruments.Add(instrument);
+                        Sector = share.Sector
+                    });
                 }
 
-                return instruments;
+                return result;
             }
 
             catch (Exception exception)
@@ -146,33 +151,32 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
 
         /// <inheritdoc />
-        public async Task<List<FinInstrument>> GetBondsAsync()
+        public async Task<List<Bond>> GetBondsAsync()
         {
             try
             {
-                var bonds = (await _client.Instruments
+                List<TinkoffBond> bonds = (await _client.Instruments
                     .BondsAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList();
 
-                var instruments = new List<FinInstrument>() { };
+                var result = new List<Bond>();
 
                 foreach (var bond in bonds)
                 {
-                    var instrument = new FinInstrument
+                    var instrument = new Bond
                     {
                         Ticker = bond.Ticker,
                         Figi = bond.Figi,
                         Isin = bond.Isin,
                         Description = bond.Name,
-                        Sector = bond.Sector,
-                        IsActive = 1
+                        Sector = bond.Sector
                     };
 
-                    instruments.Add(instrument);
+                    result.Add(instrument);
                 }
 
-                return instruments;
+                return result;
             }
 
             catch (Exception exception)
@@ -181,92 +185,21 @@ namespace Oid85.FinMarket.External.Tinkoff
                 return [];
             }
         }
-
-        /// <inheritdoc />
-        public async Task<List<FinInstrument>> GetFuturesAsync()
-        {
-            try
-            {
-                var futures = (await _client.Instruments
-                    .FuturesAsync()).Instruments
-                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
-                    .ToList();
-
-                var instruments = new List<FinInstrument>() { };
-
-                foreach (var future in futures)
-                {
-                    var instrument = new FinInstrument
-                    {
-                        Ticker = future.Ticker,
-                        Figi = future.Figi,
-                        Description = future.Name,
-                        Sector = future.Sector,
-                        IsActive = 1
-                    };
-
-                    instruments.Add(instrument);
-                }
-
-                return instruments;
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-                return [];
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<List<FinInstrument>> GetCurrenciesAsync()
-        {
-            try
-            {
-                var currencies = (await _client.Instruments
-                    .CurrenciesAsync()).Instruments
-                    .ToList();
-
-                var instruments = new List<FinInstrument>() { };
-
-                foreach (var currency in currencies)
-                {
-                    var instrument = new FinInstrument
-                    {
-                        Ticker = currency.Ticker,
-                        Figi = currency.Figi,
-                        Isin = currency.Isin,
-                        Description = currency.Name,
-                        IsActive = 1
-                    };
-
-                    instruments.Add(instrument);
-                }
-
-                return instruments;
-            }
-
-            catch (Exception exception)
-            {
-                _logger.Error(exception);
-                return [];
-            }
-        }
-
+        
         /// <inheritdoc />
         public async Task<List<DividendInfo>> GetDividendInfoAsync(
-            List<FinInstrument> instruments)
+            List<Share> shares)
         {
             var dividendInfos = new List<DividendInfo>();
             
             var from = DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 1, 1), DateTimeKind.Utc);
             var to = from.AddYears(2);
 
-            foreach (var instrument in instruments)
+            foreach (var share in shares)
             {
                 var request = new GetDividendsRequest
                 {
-                    InstrumentId = instrument.Figi,
+                    InstrumentId = share.Figi,
                     From = Timestamp.FromDateTime(from),
                     To = Timestamp.FromDateTime(to)
                 };
@@ -287,7 +220,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
                         var dividendInfo = new DividendInfo();
 
-                        dividendInfo.Ticker = instrument.Ticker;
+                        dividendInfo.Ticker = share.Ticker;
 
                         if (dividend.DeclaredDate is not null)
                             dividendInfo.DeclaredDate = dividend.DeclaredDate.ToDateTime();
@@ -313,9 +246,9 @@ namespace Oid85.FinMarket.External.Tinkoff
             return dividendInfos;
         }
 
-        private async Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
+        private Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
         {           
-            var buffer = await _settingsService.GetIntValueAsync(KnownSettingsKeys.ApplicationSettings_Buffer);
+            var buffer = _configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettings_Buffer);
 
             var startDate = DateTime.Now;
             var endDate = DateTime.Now;
@@ -332,7 +265,9 @@ namespace Oid85.FinMarket.External.Tinkoff
             else if (timeframe == KnownTimeframes.OneMinutes)
                 startDate = DateTime.Now.AddMinutes(-1 * buffer);
 
-            return (Timestamp.FromDateTime(startDate.ToUniversalTime()), Timestamp.FromDateTime(endDate.ToUniversalTime()));
+            return Task.FromResult((
+                Timestamp.FromDateTime(startDate.ToUniversalTime()), 
+                Timestamp.FromDateTime(endDate.ToUniversalTime())));
         }
 
         private static CandleInterval GetCandleInterval(string timeframe) 

@@ -6,6 +6,11 @@
     public class DividendInfo
     {
         /// <summary>
+        /// Id
+        /// </summary>
+        public Guid Id { get; set; }
+        
+        /// <summary>
         /// Тикер
         /// </summary>
         public string Ticker { get; set; } = string.Empty;
@@ -29,5 +34,10 @@
         /// Доходность, %
         /// </summary>
         public double DividendPrc { get; set; }
+        
+        /// <summary>
+        /// Акция
+        /// </summary>
+        public Share Share { get; set; } = new();
     }
 }

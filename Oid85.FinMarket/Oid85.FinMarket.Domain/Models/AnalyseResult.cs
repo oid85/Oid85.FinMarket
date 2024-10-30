@@ -8,7 +8,7 @@
         /// <summary>
         /// Id
         /// </summary>
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Дата
@@ -29,10 +29,5 @@
         /// Результат анализа
         /// </summary>
         public string Result { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Дополнительные данные
-        /// </summary>
-        public string Data { get; set; } = string.Empty;
     }
 }

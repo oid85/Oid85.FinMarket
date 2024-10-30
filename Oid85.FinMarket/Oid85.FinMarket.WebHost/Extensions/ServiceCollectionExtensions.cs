@@ -1,12 +1,5 @@
-﻿using DaGroup.Mfsb.Computation.WebHost.Jobs;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using NLog;
-using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.WebHost.HostedServices;
-using Oid85.FinMarket.External.Settings;
-using Quartz;
-using Quartz.Impl;
-using Quartz.Spi;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Extensions
@@ -56,28 +49,6 @@ namespace Oid85.FinMarket.WebHost.Extensions
                     builder.AllowCredentials();
                 });
             });
-        }
-
-        public static void ConfigureQuartz(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddFactory<IJobFactory, JobFactory>();
-            services.AddFactory<ISchedulerFactory, StdSchedulerFactory>();
-            services.AddHostedService<QuartzHostedService>();
-
-            services.AddSingleton<DownloadDailyJob>();
-
-            var serviceProvider = services.BuildServiceProvider();
-            var settingsService = serviceProvider.GetRequiredService<ISettingsService>();
-
-            if (settingsService == null)
-                throw new NullReferenceException(nameof(settingsService));
-
-            string cron = settingsService
-                .GetStringValueAsync(KnownSettingsKeys.Quartz_DowloadDaily_Cron)
-                .GetAwaiter()
-                .GetResult();
-
-            services.AddSingleton(new JobSchedule(typeof(DownloadDailyJob), cron));
         }
 
         public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
