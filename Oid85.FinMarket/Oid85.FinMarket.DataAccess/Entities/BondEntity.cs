@@ -52,4 +52,22 @@ public class BondEntity : AuditableEntity
     /// </summary>
     [Column("in_watch_list")]
     public bool InWatchList { get; set; }
+    
+    /// <summary>
+    /// Значение НКД (накопленного купонного дохода) на дату
+    /// </summary>
+    [Column("nkd")]
+    public double NKD { get; set; }
+    
+    /// <summary>
+    /// Дата погашения облигации по UTC
+    /// </summary>
+    [Column("maturity_date", TypeName = "timestamp with time zone")]
+    public DateTime MaturityDate { get; set; }
+    
+    /// <summary>
+    /// Признак облигации с плавающим купоном
+    /// </summary>
+    [Column("floating_coupon_flag")]
+    public bool FloatingCouponFlag { get; set; }
 }

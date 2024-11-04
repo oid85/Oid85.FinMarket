@@ -7,5 +7,6 @@
         Task LoadCandlesAsync();
         Task LoadCandlesAsync(int year);
         Task LoadDividendInfosAsync();
+        Task LoadBondCouponsAsync();
     }
 }

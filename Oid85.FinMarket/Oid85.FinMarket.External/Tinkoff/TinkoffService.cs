@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Configuration;
 using NLog;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Tinkoff.InvestApi;
@@ -95,10 +96,10 @@ namespace Oid85.FinMarket.External.Tinkoff
                 {
                     Ticker = share.Ticker,
                     Timeframe = timeframe,
-                    Open = ConvertToDouble(response.Candles[i].Open),
-                    Close = ConvertToDouble(response.Candles[i].Close),
-                    High = ConvertToDouble(response.Candles[i].High),
-                    Low = ConvertToDouble(response.Candles[i].Low),
+                    Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
+                    Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
+                    High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
+                    Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
                     Volume = response.Candles[i].Volume,
                     Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
                     IsComplete = response.Candles[i].IsComplete
@@ -170,7 +171,10 @@ namespace Oid85.FinMarket.External.Tinkoff
                         Figi = bond.Figi,
                         Isin = bond.Isin,
                         Description = bond.Name,
-                        Sector = bond.Sector
+                        Sector = bond.Sector,
+                        NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
+                        MaturityDate = bond.MaturityDate.ToDateTime().ToUniversalTime(),
+                        FloatingCouponFlag = bond.FloatingCouponFlag
                     };
 
                     result.Add(instrument);
@@ -192,7 +196,10 @@ namespace Oid85.FinMarket.External.Tinkoff
         {
             var dividendInfos = new List<DividendInfo>();
             
-            var from = DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 1, 1), DateTimeKind.Utc);
+            var from = DateTime.SpecifyKind(
+                new DateTime(DateTime.UtcNow.Year, 1, 1), 
+                DateTimeKind.Utc);
+            
             var to = from.AddYears(2);
 
             foreach (var share in shares)
@@ -229,14 +236,12 @@ namespace Oid85.FinMarket.External.Tinkoff
                             dividendInfo.RecordDate = dividend.RecordDate.ToDateTime();
 
                         if (dividend.DividendNet is not null)
-                            dividendInfo.Dividend = Math.Round(ConvertToDouble(new Quotation()
-                            {
-                                Units = dividend.DividendNet.Units,
-                                Nano = dividend.DividendNet.Nano
-                            }), 2);
+                            dividendInfo.Dividend = Math.Round(
+                                ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2);
 
                         if (dividend.YieldValue is not null)
-                            dividendInfo.DividendPrc = Math.Round(ConvertToDouble(dividend.YieldValue), 2);
+                            dividendInfo.DividendPrc = Math.Round(
+                                ConvertHelper.QuotationToDouble(dividend.YieldValue), 2);
 
                         dividendInfos.Add(dividendInfo);
                     }                    
@@ -244,6 +249,67 @@ namespace Oid85.FinMarket.External.Tinkoff
             }
 
             return dividendInfos;
+        }
+
+        public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
+        {
+            var bondCoupons = new List<BondCoupon>();
+            
+            var from = DateTime.SpecifyKind(
+                new DateTime(DateTime.UtcNow.Year, 1, 1), 
+                DateTimeKind.Utc);
+            
+            var to = from.AddYears(2);
+            
+            foreach (var bond in bonds)
+            {
+                var request = new GetBondCouponsRequest
+                {
+                    InstrumentId = bond.Figi,
+                    From = Timestamp.FromDateTime(from),
+                    To = Timestamp.FromDateTime(to)
+                };
+
+                var response = await _client.Instruments.GetBondCouponsAsync(request);
+
+                if (response is null)
+                    continue;
+
+                var coupons = response.Events.ToList();
+
+                if (coupons.Any())
+                {
+                    foreach (var coupon in coupons)
+                    {
+                        if (coupon is null)
+                            continue;
+
+                        var bondCoupon = new BondCoupon();
+
+                        bondCoupon.Ticker = bond.Ticker;
+                        
+                        if (coupon.CouponDate is not null)
+                            bondCoupon.CouponDate = coupon.CouponDate.ToDateTime().ToUniversalTime();
+                        
+                        bondCoupon.CouponNumber = coupon.CouponNumber;
+                        
+                        bondCoupon.CouponPeriod = coupon.CouponPeriod;
+                        
+                        if (coupon.CouponStartDate is not null)
+                            bondCoupon.CouponStartDate = coupon.CouponStartDate.ToDateTime().ToUniversalTime();
+                        
+                        if (coupon.CouponEndDate is not null)
+                            bondCoupon.CouponEndDate = coupon.CouponEndDate.ToDateTime().ToUniversalTime();
+                        
+                        if (coupon.PayOneBond is not null)
+                            bondCoupon.PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond);
+
+                        bondCoupons.Add(bondCoupon);
+                    }                    
+                }
+            }            
+            
+            return bondCoupons;
         }
 
         private Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
@@ -285,11 +351,6 @@ namespace Oid85.FinMarket.External.Tinkoff
                 return CandleInterval._1Min;
 
             return CandleInterval.Unspecified;
-        }
-
-        private static double ConvertToDouble(Quotation quotation)
-        {
-            return quotation.Units + quotation.Nano / 1_000_000_000.0;
         }
     }
 }

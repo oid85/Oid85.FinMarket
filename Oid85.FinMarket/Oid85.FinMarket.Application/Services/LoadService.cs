@@ -15,6 +15,7 @@ namespace Oid85.FinMarket.Application.Services
         private readonly IBondRepository _bondRepository;
         private readonly ICandleRepository _candleRepository;
         private readonly IDividendInfoRepository _dividendInfoRepository;
+        private readonly IBondCouponRepository _bondCouponRepository;
 
         public LoadService(
             ILogger logger,
@@ -81,6 +82,13 @@ namespace Oid85.FinMarket.Application.Services
             var shares = await _shareRepository.GetSharesAsync();
             var dividendInfos = await _tinkoffService.GetDividendInfoAsync(shares);
             await _dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
+        }
+
+        public async Task LoadBondCouponsAsync()
+        {
+            var bonds = await _bondRepository.GetBondsAsync();
+            var bondCoupons = await _tinkoffService.GetBondCouponsAsync(bonds);
+            await _bondCouponRepository.AddOrUpdateAsync(bondCoupons);
         }
     }
 }

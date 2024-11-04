@@ -31,5 +31,10 @@ namespace Oid85.FinMarket.External.Tinkoff
         /// Получить информацию по дивидендам
         /// </summary>
         public Task<List<DividendInfo>> GetDividendInfoAsync(List<Share> shares);
+        
+        /// <summary>
+        /// Запрос купонов по облигации
+        /// </summary>
+        public Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds);
     }
 }

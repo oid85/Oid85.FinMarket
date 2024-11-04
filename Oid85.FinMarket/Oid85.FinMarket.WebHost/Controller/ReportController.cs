@@ -114,5 +114,20 @@ namespace Oid85.FinMarket.WebHost.Controller
                 {
                     Result = result
                 });
+        
+        /// <summary>
+        /// Отчет по облигациям
+        /// </summary>        
+        [HttpGet("report/bonds")]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> ReportBondsAsync() =>
+            GetResponseAsync(
+                () => _reportService.GetReportBonds(),
+                result => new BaseResponse<ReportData>
+                {
+                    Result = result
+                });        
     }
 }
