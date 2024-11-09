@@ -228,7 +228,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                         var dividendInfo = new DividendInfo();
 
                         dividendInfo.Ticker = share.Ticker;
-
+                        
                         if (dividend.DeclaredDate is not null)
                             dividendInfo.DeclaredDate = dividend.DeclaredDate.ToDateTime();
 

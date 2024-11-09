@@ -3,71 +3,47 @@ using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
 
-public class BondEntity : AuditableEntity
+public class BondCouponEntity : AuditableEntity
 {
     /// <summary>
     /// Тикер
     /// </summary>
     [Column("ticker")]
     public string Ticker { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Идентификатор ISIN
-    /// </summary>
-    [Column("isin")]
-    public string Isin { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Идентификатор FIGI
-    /// </summary>
-    [Column("figi")]
-    public string Figi { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Описание
-    /// </summary>
-    [Column("description")]
-    public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Сектор
-    /// </summary>
-    [Column("sector")]
-    public string Sector { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Флаг активности
-    /// </summary>
-    [Column("is_active")]
-    public bool IsActive { get; set; } = true;
     
     /// <summary>
-    /// Находится в портфеле
+    /// Дата выплаты купона
     /// </summary>
-    [Column("in_portfolio")]
-    public bool InPortfolio { get; set; }
+    [Column("coupon_date", TypeName = "timestamp with time zone")]
+    public DateTime CouponDate { get; set; }
     
     /// <summary>
-    /// Находится в списке наблюдения
+    /// Номер купона
     /// </summary>
-    [Column("in_watch_list")]
-    public bool InWatchList { get; set; }
+    [Column("coupon_number")]
+    public long CouponNumber { get; set; }
     
     /// <summary>
-    /// Значение НКД (накопленного купонного дохода) на дату
+    /// Купонный период в днях
     /// </summary>
-    [Column("nkd")]
-    public double NKD { get; set; }
+    [Column("coupon_period")]
+    public int CouponPeriod { get; set; }
     
     /// <summary>
-    /// Дата погашения облигации по UTC
+    /// Начало купонного периода
     /// </summary>
-    [Column("maturity_date", TypeName = "timestamp with time zone")]
-    public DateTime MaturityDate { get; set; }
+    [Column("coupon_start_date", TypeName = "timestamp with time zone")]
+    public DateTime CouponStartDate { get; set; }
     
     /// <summary>
-    /// Признак облигации с плавающим купоном
+    /// Окончание купонного периода
     /// </summary>
-    [Column("floating_coupon_flag")]
-    public bool FloatingCouponFlag { get; set; }
+    [Column("coupon_end_date", TypeName = "timestamp with time zone")]
+    public DateTime CouponEndDate { get; set; }
+    
+    /// <summary>
+    /// Выплата на одну облигацию
+    /// </summary>
+    [Column("pay_one_bond")]
+    public double PayOneBond { get; set; }
 }

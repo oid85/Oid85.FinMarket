@@ -15,6 +15,7 @@ public class FinMarketContext : DbContext
     public DbSet<ShareEntity> ShareEntities { get; set; }
     public DbSet<BondEntity> BondEntities { get; set; }
     public DbSet<DividendInfoEntity> DividendInfoEntities { get; set; }
+    public DbSet<BondCouponEntity> BondCouponEntities { get; set; }
     public DbSet<CandleEntity> CandleEntities { get; set; }
     public DbSet<AnalyseResultEntity> AnalyseResultEntities { get; set; }
 

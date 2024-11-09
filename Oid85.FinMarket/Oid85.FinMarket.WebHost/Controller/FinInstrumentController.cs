@@ -20,7 +20,7 @@ namespace Oid85.FinMarket.WebHost.Controller
 
         /// <summary>
         /// Получить инструменты из листа наблюдения
-        /// </summary>        
+        /// </summary>
         [HttpGet("fin-instrument/watch-list")]
         [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status400BadRequest)]

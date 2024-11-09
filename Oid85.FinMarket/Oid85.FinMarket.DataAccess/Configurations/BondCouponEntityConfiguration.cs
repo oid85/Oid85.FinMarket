@@ -5,12 +5,12 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class BondEntityConfiguration : EntityConfigurationBase<BondEntity>
+internal class BondCouponEntityConfiguration : EntityConfigurationBase<BondCouponEntity>
 {
-    public override void Configure(EntityTypeBuilder<BondEntity> builder)
+    public override void Configure(EntityTypeBuilder<BondCouponEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("bonds", KnownDatabaseSchemas.Default);
+        builder.ToTable("bond_coupons", KnownDatabaseSchemas.Default);
     }
 }

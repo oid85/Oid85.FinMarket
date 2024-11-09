@@ -14,13 +14,13 @@ public class DividendInfoEntity : AuditableEntity
     /// <summary>
     /// Дата фиксации реестра
     /// </summary>
-    [Column("record_date")]
+    [Column("record_date", TypeName = "timestamp with time zone")]
     public DateTime RecordDate { get; set; } = DateTime.MinValue.ToUniversalTime();
 
     /// <summary>
     /// Дата объявления дивидендов
     /// </summary>
-    [Column("declared_date")]
+    [Column("declared_date", TypeName = "timestamp with time zone")]
     public DateTime DeclaredDate { get; set; } = DateTime.MinValue.ToUniversalTime();
 
     /// <summary>
