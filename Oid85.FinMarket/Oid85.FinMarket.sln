@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oid85.FinMarket.External", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oid85.FinMarket.WebHost", "Oid85.FinMarket.WebHost\Oid85.FinMarket.WebHost.csproj", "{AFD1BCE5-3318-4DB5-961A-ECF4B722F30B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.Application", "Oid85.FinMarket.Application\Oid85.FinMarket.Application.csproj", "{7FD03341-698C-473C-B320-774FCB706214}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oid85.FinMarket.Application", "Oid85.FinMarket.Application\Oid85.FinMarket.Application.csproj", "{7FD03341-698C-473C-B320-774FCB706214}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.DataAccess", "Oid85.FinMarket.DataAccess\Oid85.FinMarket.DataAccess.csproj", "{A31976AA-9586-4A6F-8C52-ADF43E74C911}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oid85.FinMarket.DataAccess", "Oid85.FinMarket.DataAccess\Oid85.FinMarket.DataAccess.csproj", "{A31976AA-9586-4A6F-8C52-ADF43E74C911}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{9AA858B6-49FC-4BD9-B399-B23B7C91A69C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AA858B6-49FC-4BD9-B399-B23B7C91A69C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA858B6-49FC-4BD9-B399-B23B7C91A69C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AA858B6-49FC-4BD9-B399-B23B7C91A69C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AA858B6-49FC-4BD9-B399-B23B7C91A69C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

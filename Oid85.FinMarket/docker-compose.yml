@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  oid85.finmarket.webhost:
+    image: ${DOCKER_REGISTRY-}oid85finmarketwebhost
+    build:
+      context: .
+      dockerfile: Oid85.FinMarket.WebHost/Dockerfile

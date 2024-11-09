@@ -7,6 +7,7 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ENV ASPNETCORE_ENVIRONMENT=Development
 WORKDIR /src
 COPY ["Oid85.FinMarket.WebHost/Oid85.FinMarket.WebHost.csproj", "Oid85.FinMarket.WebHost/"]
 COPY ["Oid85.FinMarket.Application/Oid85.FinMarket.Application.csproj", "Oid85.FinMarket.Application/"]
@@ -21,6 +22,7 @@ RUN dotnet build "./Oid85.FinMarket.WebHost.csproj" -c $BUILD_CONFIGURATION -o /
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
+ENV ASPNETCORE_ENVIRONMENT=Development
 RUN dotnet publish "./Oid85.FinMarket.WebHost.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
