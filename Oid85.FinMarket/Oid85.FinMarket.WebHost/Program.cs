@@ -39,8 +39,6 @@ namespace Oid85.FinMarket.WebHost
 
             app.MapControllers();
 
-            app.Urls.Add("http://localhost:1001");
-
             app.Run();
         }
     }

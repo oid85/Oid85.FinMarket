@@ -3,7 +3,6 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
 using Oid85.FinMarket.Application.Models.Results;
-using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller
@@ -13,13 +12,13 @@ namespace Oid85.FinMarket.WebHost.Controller
     public class ReportController : FinMarketBaseController
     {
         private readonly IReportService _reportService;        
-
+        
         public ReportController(
             IReportService reportService)
         {
             _reportService = reportService;
         }
-
+        
         /// <summary>
         /// Отчет по акции
         /// </summary>        
@@ -114,7 +113,7 @@ namespace Oid85.FinMarket.WebHost.Controller
                 {
                     Result = result
                 });
-        
+        /*
         /// <summary>
         /// Отчет по облигациям
         /// </summary>        
@@ -129,5 +128,6 @@ namespace Oid85.FinMarket.WebHost.Controller
                 {
                     Result = result
                 });        
+        */
     }
 }
