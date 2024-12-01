@@ -29,7 +29,8 @@ public class CandleRepository : ICandleRepository
 
         if (lastEntity is null)
         {
-            var entities = _mapper.Map<List<CandleEntity>>(candles);
+            var entities = candles
+                .Select(x => _mapper.Map<CandleEntity>(x));
             await _context.CandleEntities.AddRangeAsync(entities);
         }
         

@@ -20,7 +20,7 @@ public class AnalyseResultEntity : BaseEntity
     /// <summary>
     /// Результат анализа
     /// </summary>
-    [Column("analyse_result_type_id")]
+    [Column("result")]
     public string Result { get; set; } = string.Empty;
     
     /// <summary>
