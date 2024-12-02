@@ -37,5 +37,10 @@ namespace Oid85.FinMarket.Application.Interfaces.Services
         /// Получить отчет по дивидендам
         /// </summary>
         Task<ReportData> GetReportDividendsStocks();
+
+        /// <summary>
+        /// Получить отчет по облигациям
+        /// </summary>
+        Task<ReportData> GetReportBonds();
     }
 }

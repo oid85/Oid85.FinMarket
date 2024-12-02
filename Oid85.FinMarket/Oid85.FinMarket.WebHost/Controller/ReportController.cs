@@ -113,7 +113,7 @@ namespace Oid85.FinMarket.WebHost.Controller
                 {
                     Result = result
                 });
-        /*
+
         /// <summary>
         /// Отчет по облигациям
         /// </summary>        
@@ -128,6 +128,5 @@ namespace Oid85.FinMarket.WebHost.Controller
                 {
                     Result = result
                 });        
-        */
     }
 }

@@ -128,6 +128,16 @@ namespace Oid85.FinMarket.Application.Services
             return reportData;
         }
 
+        public async Task<ReportData> GetReportDataBondsAsync()
+        {
+            var reportData = new ReportData() 
+            { 
+                Title = "Bonds"
+            };
+
+            return reportData;
+        }        
+        
         private async Task<ReportData> GetReportDataByTickerListAsync(
             string analyseType, 
             Dictionary<string, List<Tuple<string, string>>> data, 

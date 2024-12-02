@@ -93,5 +93,9 @@ namespace Oid85.FinMarket.Application.Services
         /// <inheritdoc />
         public Task<ReportData> GetReportDividendsStocks() =>
             GetReportDataDividendsAsync();
+        
+        /// <inheritdoc />
+        public Task<ReportData> GetReportBonds() =>
+            GetReportDataBondsAsync();        
     }
 }
