@@ -24,6 +24,12 @@ public class AnalyseResultEntity : BaseEntity
     public string Result { get; set; } = string.Empty;
     
     /// <summary>
+    /// Тип анализа
+    /// </summary>
+    [Column("analyse_type")]
+    public string AnalyseType { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Дата
     /// </summary>
     [Column("date", TypeName = "timestamp with time zone")]
