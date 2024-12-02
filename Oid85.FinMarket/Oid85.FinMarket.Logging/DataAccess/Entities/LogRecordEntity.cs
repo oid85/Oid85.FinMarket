@@ -24,4 +24,10 @@ public class LogRecordEntity
     /// </summary>
     [Column("message")]
     public string Message { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Параметры
+    /// </summary>
+    [Column("parameters")]
+    public string Parameters { get; set; } = string.Empty;
 }

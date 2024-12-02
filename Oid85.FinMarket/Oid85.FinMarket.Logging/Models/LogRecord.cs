@@ -21,4 +21,9 @@ public class LogRecord
     /// Сообщение
     /// </summary>
     public string Message { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Параметры
+    /// </summary>
+    public string Parameters { get; set; } = string.Empty;    
 }

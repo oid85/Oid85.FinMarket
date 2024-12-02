@@ -33,7 +33,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                await logService.LogError(exception.Message);
+                await logService.LogException(exception);
                 return [];
             }
         }
@@ -51,7 +51,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                await logService.LogError(exception.Message);
+                await logService.LogException(exception);
                 return [];
             }
         }        
@@ -136,7 +136,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                await logService.LogError(exception.Message);
+                await logService.LogException(exception);
                 return [];
             }
         }
@@ -175,7 +175,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                await logService.LogError(exception.Message);
+                await logService.LogException(exception);
                 return [];
             }
         }
@@ -245,7 +245,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             
             catch (Exception exception)
             {
-                await logService.LogError(exception.Message);
+                await logService.LogException(exception);
                 return [];
             }
         }
@@ -315,7 +315,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             
             catch (Exception exception)
             {
-                await logService.LogError(exception.Message);
+                await logService.LogException(exception);
                 return [];
             }
         }
