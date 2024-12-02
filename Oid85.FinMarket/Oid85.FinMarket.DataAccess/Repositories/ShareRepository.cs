@@ -6,19 +6,10 @@ using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class ShareRepository : IShareRepository
+public class ShareRepository(
+    FinMarketContext context,
+    IMapper mapper) : IShareRepository
 {
-    private readonly FinMarketContext _context;
-    private readonly IMapper _mapper;
-    
-    public ShareRepository(
-        FinMarketContext context, 
-        IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
-
     public async Task AddOrUpdateAsync(List<Share> shares)
     {
         if (!shares.Any())
@@ -26,14 +17,14 @@ public class ShareRepository : IShareRepository
         
         foreach (var share in shares)
         {
-            var entity = _context.ShareEntities
+            var entity = context.ShareEntities
                 .FirstOrDefault(x => 
                     x.Ticker == share.Ticker);
 
             if (entity is null)
             {
-                entity = _mapper.Map<ShareEntity>(share);
-                await _context.ShareEntities.AddAsync(entity);
+                entity = mapper.Map<ShareEntity>(share);
+                await context.ShareEntities.AddAsync(entity);
             }
 
             else
@@ -45,39 +36,39 @@ public class ShareRepository : IShareRepository
             }
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     public Task<List<Share>> GetSharesAsync() =>
-        _context.ShareEntities
-            .Select(x => _mapper.Map<Share>(x))
+        context.ShareEntities
+            .Select(x => mapper.Map<Share>(x))
             .ToListAsync();
 
     public Task<List<Share>> GetMoexIndexSharesAsync() =>
-        _context.ShareEntities
+        context.ShareEntities
             .Where(x => x.InIrusIndex)
-            .Select(x => _mapper.Map<Share>(x))
+            .Select(x => mapper.Map<Share>(x))
             .ToListAsync();
 
     public Task<List<Share>> GetPortfolioSharesAsync() =>
-        _context.ShareEntities
+        context.ShareEntities
             .Where(x => x.InPortfolio)
-            .Select(x => _mapper.Map<Share>(x))
+            .Select(x => mapper.Map<Share>(x))
             .ToListAsync();
 
     public Task<List<Share>> GetWatchListSharesAsync() =>
-        _context.ShareEntities
+        context.ShareEntities
             .Where(x => x.InWatchList)
-            .Select(x => _mapper.Map<Share>(x))
+            .Select(x => mapper.Map<Share>(x))
             .ToListAsync();
 
     public async Task<Share?> GetShareByTickerAsync(string ticker)
     {
-        var entity = await _context.ShareEntities
+        var entity = await context.ShareEntities
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
         return entity is null 
             ? null 
-            : _mapper.Map<Share>(entity);
+            : mapper.Map<Share>(entity);
     }
 }

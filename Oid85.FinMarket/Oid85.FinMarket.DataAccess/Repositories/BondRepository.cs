@@ -6,19 +6,10 @@ using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class BondRepository : IBondRepository
+public class BondRepository(
+    FinMarketContext context,
+    IMapper mapper) : IBondRepository
 {
-    private readonly FinMarketContext _context;
-    private readonly IMapper _mapper;
-    
-    public BondRepository(
-        FinMarketContext context, 
-        IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
-    
     public async Task AddOrUpdateAsync(List<Bond> bonds)
     {        
         if (!bonds.Any())
@@ -26,14 +17,14 @@ public class BondRepository : IBondRepository
         
         foreach (var bond in bonds)
         {
-            var entity = _context.BondEntities
+            var entity = context.BondEntities
                 .FirstOrDefault(x => 
                     x.Ticker == bond.Ticker);
 
             if (entity is null)
             {
-                entity = _mapper.Map<BondEntity>(bond);
-                await _context.BondEntities.AddAsync(entity);
+                entity = mapper.Map<BondEntity>(bond);
+                await context.BondEntities.AddAsync(entity);
             }
 
             else
@@ -45,11 +36,11 @@ public class BondRepository : IBondRepository
             }
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     public Task<List<Bond>> GetBondsAsync() =>
-        _context.BondEntities
-            .Select(x => _mapper.Map<Bond>(x))
+        context.BondEntities
+            .Select(x => mapper.Map<Bond>(x))
             .ToListAsync();
 }

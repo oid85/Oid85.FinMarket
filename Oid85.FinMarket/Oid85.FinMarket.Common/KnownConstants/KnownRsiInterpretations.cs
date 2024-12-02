@@ -1,8 +1,8 @@
 ﻿namespace Oid85.FinMarket.Common.KnownConstants
 {
-    public class KnownRsiInterpretations
+    public static class KnownRsiInterpretations
     {
-        public static readonly string OverBought = "Перекупленность";
-        public static readonly string OverSold = "Перепроданность";
+        public const string OverBought = "Перекупленность";
+        public const string OverSold = "Перепроданность";
     }
 }

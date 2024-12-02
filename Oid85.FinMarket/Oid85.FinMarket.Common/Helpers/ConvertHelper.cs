@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.Common.Helpers;
 
-public class ConvertHelper
+public static class ConvertHelper
 {
     public static double QuotationToDouble(Quotation quotation)
     {

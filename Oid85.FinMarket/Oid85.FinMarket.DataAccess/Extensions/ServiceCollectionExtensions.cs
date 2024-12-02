@@ -31,6 +31,7 @@ namespace Oid85.FinMarket.DataAccess.Extensions
             
             services.AddTransient<IShareRepository, ShareRepository>();
             services.AddTransient<IBondRepository, BondRepository>();
+            services.AddTransient<IBondCouponRepository, BondCouponRepository>();
             services.AddTransient<IDividendInfoRepository, DividendInfoRepository>();
             services.AddTransient<IAnalyseResultRepository, AnalyseResultRepository>();
             services.AddTransient<ICandleRepository, CandleRepository>();

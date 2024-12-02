@@ -5,13 +5,8 @@ using Oid85.FinMarket.DataAccess.Schemas;
 
 namespace Oid85.FinMarket.DataAccess;
 
-public class FinMarketContext : DbContext
+public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbContext(options)
 {
-    public FinMarketContext(DbContextOptions<FinMarketContext> options) : base(options)
-    {
-
-    }
-
     public DbSet<ShareEntity> ShareEntities { get; set; }
     public DbSet<BondEntity> BondEntities { get; set; }
     public DbSet<DividendInfoEntity> DividendInfoEntities { get; set; }

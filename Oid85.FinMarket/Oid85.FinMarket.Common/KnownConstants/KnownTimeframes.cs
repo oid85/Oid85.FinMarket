@@ -1,10 +1,10 @@
 ﻿namespace Oid85.FinMarket.Common.KnownConstants
 {
-    public class KnownTimeframes
+    public static class KnownTimeframes
     {
-        public static readonly string Daily = "Daily";
-        public static readonly string Hourly = "Hourly";
-        public static readonly string FiveMinutes = "FiveMinutes";
-        public static readonly string OneMinutes = "OneMinutes";
+        public const string Daily = "Daily";
+        public const string Hourly = "Hourly";
+        public const string FiveMinutes = "FiveMinutes";
+        public const string OneMinutes = "OneMinutes";
     }
 }

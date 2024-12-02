@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Logging.DataAccess.Entities;
+using Oid85.FinMarket.Logging.KnownConstants;
 
 namespace Oid85.FinMarket.Logging.DataAccess.Configurations;
 

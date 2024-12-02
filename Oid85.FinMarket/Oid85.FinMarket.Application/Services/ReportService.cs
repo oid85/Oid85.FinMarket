@@ -7,22 +7,18 @@ using Oid85.FinMarket.Common.KnownConstants;
 namespace Oid85.FinMarket.Application.Services
 {
     /// <inheritdoc cref="IReportService" />
-    public class ReportService : ReportServiceBase, IReportService
+    public class ReportService(
+        IAnalyseResultRepository analyseResultRepository,
+        IShareRepository shareRepository,
+        IDividendInfoRepository dividendInfoRepository)
+        : ReportServiceBase(
+            analyseResultRepository, 
+            shareRepository, 
+            dividendInfoRepository), IReportService
     {
-        private readonly IAnalyseResultRepository _analyseResultRepository;
-        private readonly IShareRepository _shareRepository;
-        private readonly IDividendInfoRepository _dividendInfoRepository;
-
-        public ReportService(
-            IAnalyseResultRepository analyseResultRepository,
-            IShareRepository shareRepository,
-            IDividendInfoRepository dividendInfoRepository) 
-            : base(analyseResultRepository, shareRepository, dividendInfoRepository)
-        {
-            _analyseResultRepository = analyseResultRepository ?? throw new ArgumentNullException(nameof(analyseResultRepository));
-            _shareRepository = shareRepository ?? throw new ArgumentNullException(nameof(shareRepository));
-            _dividendInfoRepository = dividendInfoRepository ?? throw new ArgumentNullException(nameof(dividendInfoRepository));
-        }
+        private readonly IAnalyseResultRepository _analyseResultRepository = analyseResultRepository;
+        private readonly IShareRepository _shareRepository = shareRepository;
+        private readonly IDividendInfoRepository _dividendInfoRepository = dividendInfoRepository;
 
         /// <inheritdoc />
         public async Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request)

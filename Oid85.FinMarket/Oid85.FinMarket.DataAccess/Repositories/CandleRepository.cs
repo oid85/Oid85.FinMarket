@@ -6,19 +6,10 @@ using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class CandleRepository : ICandleRepository
+public class CandleRepository(
+    FinMarketContext context,
+    IMapper mapper) : ICandleRepository
 {
-    private readonly FinMarketContext _context;
-    private readonly IMapper _mapper;
-    
-    public CandleRepository(
-        FinMarketContext context, 
-        IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
-    
     public async Task AddOrUpdateAsync(List<Candle> candles)
     {
         if (!candles.Any())
@@ -30,8 +21,8 @@ public class CandleRepository : ICandleRepository
         if (lastEntity is null)
         {
             var entities = candles
-                .Select(x => _mapper.Map<CandleEntity>(x));
-            await _context.CandleEntities.AddRangeAsync(entities);
+                .Select(x => mapper.Map<CandleEntity>(x));
+            await context.CandleEntities.AddRangeAsync(entities);
         }
         
         else
@@ -49,26 +40,26 @@ public class CandleRepository : ICandleRepository
             }
 
             var entities = candles
-                .Select(x => _mapper.Map<CandleEntity>(x))
+                .Select(x => mapper.Map<CandleEntity>(x))
                 .Where(x => x.Date > lastEntity.Date);
                 
-            await _context.CandleEntities.AddRangeAsync(entities);  
+            await context.CandleEntities.AddRangeAsync(entities);  
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     public Task<List<Candle>> GetCandlesAsync(string ticker, string timeframe) =>
-        _context.CandleEntities
+        context.CandleEntities
             .Where(x => ticker == x.Ticker)
             .Where(x => x.Timeframe == timeframe)
             .OrderBy(x => x.Date)
-            .Select(x => _mapper.Map<Candle>(x))
+            .Select(x => mapper.Map<Candle>(x))
             .ToListAsync();
 
     private async Task<CandleEntity?> GetLastAsync(string ticker, string timeframe)
     {
-        bool exists = await _context.CandleEntities
+        bool exists = await context.CandleEntities
             .Where(x => x.Timeframe == timeframe)
             .Where(x => x.Ticker == ticker)
             .AnyAsync();
@@ -76,12 +67,12 @@ public class CandleRepository : ICandleRepository
         if (!exists)
             return null;
         
-        var maxDate = await _context.CandleEntities
+        var maxDate = await context.CandleEntities
             .Where(x => x.Timeframe == timeframe)
             .Where(x => x.Ticker == ticker)
             .MaxAsync(x => x.Date);
 
-        var entity = await _context.CandleEntities
+        var entity = await context.CandleEntities
             .Where(x => x.Timeframe == timeframe)
             .Where(x => x.Ticker == ticker)
             .FirstAsync(x => x.Date == maxDate);

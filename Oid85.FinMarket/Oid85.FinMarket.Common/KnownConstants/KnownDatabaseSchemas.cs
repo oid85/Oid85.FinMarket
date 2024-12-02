@@ -1,9 +1,8 @@
 ﻿namespace Oid85.FinMarket.Common.KnownConstants
 {
-    public class KnownDatabaseSchemas
+    public static class KnownDatabaseSchemas
     {
-        public static readonly string Default = "public";
-        public static readonly string Storage = "storage";
-        public static readonly string Log = "log";
+        public const string Default = "public";
+        public const string Storage = "storage";
     }
 }

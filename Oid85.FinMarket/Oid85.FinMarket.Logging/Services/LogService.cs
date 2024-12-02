@@ -1,6 +1,6 @@
 ﻿using NLog;
-using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Logging.DataAccess.Repositories;
+using Oid85.FinMarket.Logging.KnownConstants;
 using Oid85.FinMarket.Logging.Models;
 
 namespace Oid85.FinMarket.Logging.Services

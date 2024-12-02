@@ -1,17 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Logging.DataAccess.Entities;
 using Oid85.FinMarket.Logging.DataAccess.Schemas;
+using Oid85.FinMarket.Logging.KnownConstants;
 
 namespace Oid85.FinMarket.Logging.DataAccess;
 
-public class LogContext : DbContext
+public class LogContext(DbContextOptions<LogContext> options) : DbContext(options)
 {
-    public LogContext(DbContextOptions<LogContext> options) : base(options)
-    {
-
-    }
-    
     public DbSet<LogRecordEntity> LogEntities { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
