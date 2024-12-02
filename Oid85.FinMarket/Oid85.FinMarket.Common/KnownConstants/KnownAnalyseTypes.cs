@@ -2,9 +2,9 @@
 {
     public class KnownAnalyseTypes
     {
-        public static string Supertrend = "Supertrend";
-        public static string CandleSequence = "Candle Sequence";
-        public static string CandleVolume = "Candle Volume";
-        public static string Rsi = "Rsi";
+        public static readonly string Supertrend = "Supertrend";
+        public static readonly string CandleSequence = "Candle Sequence";
+        public static readonly string CandleVolume = "Candle Volume";
+        public static readonly string Rsi = "Rsi";
     }
 }

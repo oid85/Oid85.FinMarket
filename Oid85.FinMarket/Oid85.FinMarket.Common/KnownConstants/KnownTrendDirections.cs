@@ -1,8 +1,8 @@
-﻿namespace Oid85.FinMarket.Application.Constants
+﻿namespace Oid85.FinMarket.Common.KnownConstants
 {
     public class KnownTrendDirections
     {
-        public static string Up = "Тренд вверх";
-        public static string Down = "Тренд вниз";
+        public static readonly string Up = "Тренд вверх";
+        public static readonly string Down = "Тренд вниз";
     }
 }

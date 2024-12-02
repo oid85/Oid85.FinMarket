@@ -1,5 +1,4 @@
-﻿using Oid85.FinMarket.Application.Constants;
-using Oid85.FinMarket.Common.KnownConstants;
+﻿using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Skender.Stock.Indicators;
 using Oid85.FinMarket.Application.Interfaces.Repositories;

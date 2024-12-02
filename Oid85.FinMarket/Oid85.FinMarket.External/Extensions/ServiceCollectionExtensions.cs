@@ -15,7 +15,7 @@ namespace Oid85.FinMarket.External.Extensions
 
             services.AddInvestApiClient((_, settings) =>
             {
-                settings.AccessToken = configuration.GetValue<string>(KnownSettingsKeys.Tinkoff_Token);
+                settings.AccessToken = configuration.GetValue<string>(KnownSettingsKeys.TinkoffToken);
             });
         }
     }

@@ -16,12 +16,13 @@
     <PackageReference Include="NLog.Web.AspNetCore" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
-    <PackageReference Include="Npgsql" VersionOverride="8.0.5" />
+    <PackageReference Include="Npgsql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Oid85.FinMarket.Application\Oid85.FinMarket.Application.csproj" />
     <ProjectReference Include="..\Oid85.FinMarket.DataAccess\Oid85.FinMarket.DataAccess.csproj" />
     <ProjectReference Include="..\Oid85.FinMarket.External\Oid85.FinMarket.External.csproj" />
+    <ProjectReference Include="..\Oid85.FinMarket.Logging\Oid85.FinMarket.Logging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="reinstall_service.bat">

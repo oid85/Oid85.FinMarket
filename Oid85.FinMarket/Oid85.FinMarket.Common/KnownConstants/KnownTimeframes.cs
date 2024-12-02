@@ -2,9 +2,9 @@
 {
     public class KnownTimeframes
     {
-        public static string Daily = "Daily";
-        public static string Hourly = "Hourly";
-        public static string FiveMinutes = "FiveMinutes";
-        public static string OneMinutes = "OneMinutes";
+        public static readonly string Daily = "Daily";
+        public static readonly string Hourly = "Hourly";
+        public static readonly string FiveMinutes = "FiveMinutes";
+        public static readonly string OneMinutes = "OneMinutes";
     }
 }

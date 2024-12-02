@@ -2,8 +2,8 @@
 {
     public class KnownDatabaseSchemas
     {
-        public static string Default = "public";
-        public static string Storage = "storage";
-        public static string Dictionaries = "dict";
+        public static readonly string Default = "public";
+        public static readonly string Storage = "storage";
+        public static readonly string Log = "log";
     }
 }

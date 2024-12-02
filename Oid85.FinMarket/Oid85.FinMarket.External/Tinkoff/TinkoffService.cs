@@ -15,22 +15,12 @@ using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
 namespace Oid85.FinMarket.External.Tinkoff
 {
     /// <inheritdoc />
-    public class TinkoffService : ITinkoffService
+    public class TinkoffService(
+        ILogger logger,
+        InvestApiClient client,
+        IConfiguration configuration)
+        : ITinkoffService
     {
-        private readonly ILogger _logger;
-        private readonly InvestApiClient _client;
-        private readonly IConfiguration _configuration;
-
-        public TinkoffService(
-            ILogger logger,
-            InvestApiClient client, 
-            IConfiguration configuration)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        }
-
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
             Share share, string timeframe)
@@ -43,7 +33,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                logger.Error(exception);
                 return [];
             }
         }
@@ -61,7 +51,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                logger.Error(exception);
                 return [];
             }
         }        
@@ -80,13 +70,13 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             if (interval == CandleInterval.Unspecified)
             {
-                _logger.Error("Неизвестный интервал. interval = CandleInterval.Unspecified");
+                logger.Error("Неизвестный интервал. interval = CandleInterval.Unspecified");
                 return [];
             }
 
             request.Interval = interval;
 
-            var response = await _client.MarketData.GetCandlesAsync(request);
+            var response = await client.MarketData.GetCandlesAsync(request);
 
             var candles = new List<Candle>() { };
 
@@ -116,7 +106,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         {
             try
             {
-                List<TinkoffShare> shares = (await _client.Instruments
+                List<TinkoffShare> shares = (await client.Instruments
                     .SharesAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList(); 
@@ -146,7 +136,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                logger.Error(exception);
                 return [];
             }
         }
@@ -156,7 +146,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         {
             try
             {
-                List<TinkoffBond> bonds = (await _client.Instruments
+                List<TinkoffBond> bonds = (await client.Instruments
                     .BondsAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList();
@@ -185,7 +175,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                logger.Error(exception);
                 return [];
             }
         }
@@ -211,7 +201,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                     To = Timestamp.FromDateTime(to)
                 };
 
-                var response = await _client.Instruments.GetDividendsAsync(request);
+                var response = await client.Instruments.GetDividendsAsync(request);
 
                 if (response is null)
                     continue;
@@ -270,7 +260,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                     To = Timestamp.FromDateTime(to)
                 };
 
-                var response = await _client.Instruments.GetBondCouponsAsync(request);
+                var response = await client.Instruments.GetBondCouponsAsync(request);
 
                 if (response is null)
                     continue;
@@ -314,7 +304,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         private Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
         {           
-            var buffer = _configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettings_Buffer);
+            var buffer = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettings_Buffer);
 
             var startDate = DateTime.Now;
             var endDate = DateTime.Now;

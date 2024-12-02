@@ -1,24 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
-using Oid85.FinMarket.Application.Models.Results;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller
 {
     [Route("api")]
     [ApiController]
-    public class ReportController : FinMarketBaseController
+    public class ReportController(IReportService reportService) : FinMarketBaseController
     {
-        private readonly IReportService _reportService;        
-        
-        public ReportController(
-            IReportService reportService)
-        {
-            _reportService = reportService;
-        }
-        
         /// <summary>
         /// Отчет по акции
         /// </summary>        
@@ -29,7 +21,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> ReportAnalyseStockAsync(
             [FromBody] GetReportAnalyseStockRequest request) =>
             GetResponseAsync(
-                () => _reportService.GetReportAnalyseStock(request),
+                () => reportService.GetReportAnalyseStock(request),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result
@@ -45,7 +37,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> ReportAnalyseSupertrendStocksAsync(
             [FromBody] GetReportAnalyseRequest request) =>
             GetResponseAsync(
-                () => _reportService.GetReportAnalyseSupertrendStocks(request),
+                () => reportService.GetReportAnalyseSupertrendStocks(request),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result
@@ -61,7 +53,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> ReportAnalyseCandleSequenceStocksAsync(
             [FromBody] GetReportAnalyseRequest request) =>
             GetResponseAsync(
-                () => _reportService.GetReportAnalyseCandleSequenceStocks(request),
+                () => reportService.GetReportAnalyseCandleSequenceStocks(request),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result
@@ -77,7 +69,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> ReportAnalyseCandleVolumeStocksAsync(
             [FromBody] GetReportAnalyseRequest request) =>
             GetResponseAsync(
-                () => _reportService.GetReportAnalyseCandleVolumeStocks(request),
+                () => reportService.GetReportAnalyseCandleVolumeStocks(request),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result
@@ -93,7 +85,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> ReportAnalyseRsiStocksAsync(
             [FromBody] GetReportAnalyseRequest request) =>
             GetResponseAsync(
-                () => _reportService.GetReportAnalyseRsiStocks(request),
+                () => reportService.GetReportAnalyseRsiStocks(request),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result
@@ -108,7 +100,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> ReportDividendsStocksAsync() =>
             GetResponseAsync(
-                () => _reportService.GetReportDividendsStocks(),
+                () => reportService.GetReportDividendsStocks(),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result
@@ -123,7 +115,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> ReportBondsAsync() =>
             GetResponseAsync(
-                () => _reportService.GetReportBonds(),
+                () => reportService.GetReportBonds(),
                 result => new BaseResponse<ReportData>
                 {
                     Result = result

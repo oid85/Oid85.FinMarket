@@ -2,6 +2,7 @@ using Oid85.FinMarket.WebHost.Extensions;
 using Oid85.FinMarket.External.Extensions;
 using Oid85.FinMarket.Application.Extensions;
 using Oid85.FinMarket.DataAccess.Extensions;
+using Oid85.FinMarket.Logging.Extensions;
 
 namespace Oid85.FinMarket.WebHost
 {
@@ -19,6 +20,7 @@ namespace Oid85.FinMarket.WebHost
             builder.Services.ConfigureApplicationServices();
             builder.Services.ConfigureExternalServices(builder.Configuration);
             builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
+            builder.Services.ConfigureLogs(builder.Configuration);
             builder.Services.AddWindowsService(options =>
             {
                 options.ServiceName = "Oid85 FinMarket Service";
@@ -27,6 +29,7 @@ namespace Oid85.FinMarket.WebHost
             var app = builder.Build();
 
             await app.ApplyMigrations();
+            await app.ApplyLogMigrations();
             
             app.UseRouting();
 
@@ -41,7 +44,7 @@ namespace Oid85.FinMarket.WebHost
 
             app.MapControllers();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

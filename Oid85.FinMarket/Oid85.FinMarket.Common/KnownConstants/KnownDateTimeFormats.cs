@@ -2,8 +2,8 @@
 {
     public class KnownDateTimeFormats
     {
-        public static string DateTimeISO = "yyyy-MM-dd HH:mm:ss";
-        public static string DateISO = "yyyy-MM-dd";
-        public static string TimeISO = "HH:mm:ss";
+        public static readonly string DateTimeISO = "yyyy-MM-dd HH:mm:ss";
+        public static readonly string DateISO = "yyyy-MM-dd";
+        public static readonly string TimeISO = "HH:mm:ss";
     }
 }

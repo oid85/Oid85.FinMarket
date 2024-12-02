@@ -2,9 +2,9 @@
 {
     public class KnownTickerLists
     {
-        public static string AllStocks = "AllStocks";
-        public static string MoexIndexStocks = "MoexIndexStocks";
-        public static string PortfolioStocks = "PortfolioStocks";
-        public static string WatchListStocks = "WatchListStocks";
+        public static readonly string AllStocks = "AllStocks";
+        public static readonly string MoexIndexStocks = "MoexIndexStocks";
+        public static readonly string PortfolioStocks = "PortfolioStocks";
+        public static readonly string WatchListStocks = "WatchListStocks";
     }
 }

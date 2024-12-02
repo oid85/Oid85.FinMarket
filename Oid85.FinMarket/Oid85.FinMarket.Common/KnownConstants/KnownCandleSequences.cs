@@ -1,8 +1,8 @@
-﻿namespace Oid85.FinMarket.Application.Constants
+﻿namespace Oid85.FinMarket.Common.KnownConstants
 {
     public class KnownCandleSequences
     {
-        public static string White = "Белые свечи";
-        public static string Black = "Черные свечи";
+        public static readonly string White = "Белые свечи";
+        public static readonly string Black = "Черные свечи";
     }
 }
