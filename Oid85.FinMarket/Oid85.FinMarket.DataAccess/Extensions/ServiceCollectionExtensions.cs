@@ -23,9 +23,10 @@ namespace Oid85.FinMarket.DataAccess.Extensions
                 var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
                 
                 options
-                    .UseNpgsql(configuration.GetValue<string>(KnownSettingsKeys.PostgresConnectionString))
+                    .UseNpgsql(configuration
+                        .GetValue<string>(KnownSettingsKeys.PostgresConnectionString))
                     .AddInterceptors(updateInterceptor);
-            }, ServiceLifetime.Scoped, ServiceLifetime.Scoped);
+            });
 
             services.AddAutoMapper(typeof(FinMarketMappingProfile));
             

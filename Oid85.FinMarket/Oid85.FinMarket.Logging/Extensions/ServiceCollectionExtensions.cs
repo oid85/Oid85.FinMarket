@@ -15,11 +15,12 @@ namespace Oid85.FinMarket.Logging.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddDbContext<LogContext>((serviceProvider, options) =>
+            services.AddDbContext<LogContext>((_, options) =>
             {
                 options
-                    .UseNpgsql(configuration.GetValue<string>(KnownSettingsKeys.PostgresConnectionString));
-            }, ServiceLifetime.Scoped, ServiceLifetime.Scoped);
+                    .UseNpgsql(configuration
+                        .GetValue<string>(KnownSettingsKeys.PostgresConnectionString));
+            });
             
             services.AddTransient<ILogRepository, LogRepository>();
             services.AddTransient<ILogService, LogService>();
