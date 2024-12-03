@@ -44,7 +44,7 @@ public class BondCouponRepository(
     }
     
     public Task<List<BondCoupon>> GetBondCouponsAsync() =>
-        context.BondEntities
+        context.BondCouponEntities
             .Select(x => mapper.Map<BondCoupon>(x))
             .ToListAsync();    
 }

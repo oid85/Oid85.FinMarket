@@ -41,6 +41,7 @@ public class ShareRepository(
 
     public Task<List<Share>> GetSharesAsync() =>
         context.ShareEntities
+            .Where(x => x.IsActive)
             .Select(x => mapper.Map<Share>(x))
             .ToListAsync();
 

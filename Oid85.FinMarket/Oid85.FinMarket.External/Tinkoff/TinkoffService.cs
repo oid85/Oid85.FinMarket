@@ -265,12 +265,12 @@ namespace Oid85.FinMarket.External.Tinkoff
                     DateTimeKind.Utc);
             
                 var to = from.AddYears(2);
-            
-                foreach (var bond in bonds)
+
+                for (var i = 0; i < bonds.Count; i++)
                 {
                     var request = new GetBondCouponsRequest
                     {
-                        InstrumentId = bond.Figi,
+                        InstrumentId = bonds[i].Figi,
                         From = Timestamp.FromDateTime(from),
                         To = Timestamp.FromDateTime(to)
                     };
@@ -291,29 +291,36 @@ namespace Oid85.FinMarket.External.Tinkoff
 
                             var bondCoupon = new BondCoupon();
 
-                            bondCoupon.Ticker = bond.Ticker;
-                        
+                            bondCoupon.Ticker = bonds[i].Ticker;
+
                             if (coupon.CouponDate is not null)
                                 bondCoupon.CouponDate = coupon.CouponDate.ToDateTime().ToUniversalTime();
-                        
+
                             bondCoupon.CouponNumber = coupon.CouponNumber;
-                        
+
                             bondCoupon.CouponPeriod = coupon.CouponPeriod;
-                        
+
                             if (coupon.CouponStartDate is not null)
-                                bondCoupon.CouponStartDate = coupon.CouponStartDate.ToDateTime().ToUniversalTime();
-                        
+                                bondCoupon.CouponStartDate = coupon.CouponStartDate is null
+                                    ? DateTime.MinValue.ToUniversalTime()
+                                    : coupon.CouponStartDate.ToDateTime().ToUniversalTime();
+
                             if (coupon.CouponEndDate is not null)
-                                bondCoupon.CouponEndDate = coupon.CouponEndDate.ToDateTime().ToUniversalTime();
-                        
+                                bondCoupon.CouponEndDate = coupon.CouponEndDate is null
+                                    ? DateTime.MinValue.ToUniversalTime()
+                                    : coupon.CouponEndDate.ToDateTime().ToUniversalTime();
+
                             if (coupon.PayOneBond is not null)
                                 bondCoupon.PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond);
 
                             bondCoupons.Add(bondCoupon);
-                        }                    
+                        }
                     }
-                }            
-            
+
+                    double percent = ((i + 1) / (double) bonds.Count) * 100;
+                    await logService.LogTrace($"Загружены купоны для облигации '{bonds[i].Ticker}'. {i + 1} из {bonds.Count}. {percent:N2} % загружено");
+                }
+
                 return bondCoupons;
             }
             

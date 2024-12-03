@@ -14,6 +14,9 @@ public class FinMarketMappingProfile : Profile
         CreateMap<BondEntity, Bond>()
             .ReverseMap();
         
+        CreateMap<BondCouponEntity, BondCoupon>()
+            .ReverseMap();        
+        
         CreateMap<CandleEntity, Candle>()
             .ReverseMap();
         
