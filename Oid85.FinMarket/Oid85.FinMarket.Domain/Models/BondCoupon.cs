@@ -10,7 +10,7 @@ public class BondCoupon
     /// <summary>
     /// Дата выплаты купона
     /// </summary>
-    public DateTime CouponDate { get; set; }
+    public DateOnly CouponDate { get; set; }
     
     /// <summary>
     /// Номер купона
@@ -25,12 +25,12 @@ public class BondCoupon
     /// <summary>
     /// Начало купонного периода
     /// </summary>
-    public DateTime CouponStartDate { get; set; }
+    public DateOnly CouponStartDate { get; set; }
     
     /// <summary>
     /// Окончание купонного периода
     /// </summary>
-    public DateTime CouponEndDate { get; set; }
+    public DateOnly CouponEndDate { get; set; }
     
     /// <summary>
     /// Выплата на одну облигацию

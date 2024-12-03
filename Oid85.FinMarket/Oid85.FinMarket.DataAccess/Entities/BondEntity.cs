@@ -58,12 +58,12 @@ public class BondEntity : AuditableEntity
     /// </summary>
     [Column("nkd")]
     public double NKD { get; set; }
-    
+
     /// <summary>
     /// Дата погашения облигации по UTC
     /// </summary>
-    [Column("maturity_date", TypeName = "timestamp with time zone")]
-    public DateTime MaturityDate { get; set; }
+    [Column("maturity_date", TypeName = "date")]
+    public DateOnly MaturityDate { get; set; } = DateOnly.MinValue;
     
     /// <summary>
     /// Признак облигации с плавающим купоном

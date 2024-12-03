@@ -55,7 +55,7 @@ public class Bond
     /// <summary>
     /// Дата погашения облигации по UTC
     /// </summary>
-    public DateTime MaturityDate { get; set; }
+    public DateOnly MaturityDate { get; set; }
     
     /// <summary>
     /// Признак облигации с плавающим купоном

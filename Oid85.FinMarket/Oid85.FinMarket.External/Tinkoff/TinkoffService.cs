@@ -163,7 +163,7 @@ namespace Oid85.FinMarket.External.Tinkoff
                         Description = bond.Name,
                         Sector = bond.Sector,
                         NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
-                        MaturityDate = bond.MaturityDate.ToDateTime().ToUniversalTime(),
+                        MaturityDate = DateOnly.FromDateTime(bond.MaturityDate.ToDateTime().Date),
                         FloatingCouponFlag = bond.FloatingCouponFlag
                     };
 
@@ -217,27 +217,14 @@ namespace Oid85.FinMarket.External.Tinkoff
                             if (dividend is null)
                                 continue;
 
-                            var dividendInfo = new DividendInfo();
-
-                            dividendInfo.Ticker = share.Ticker;
-                        
-                            if (dividend.DeclaredDate is not null)
-                                dividendInfo.DeclaredDate = dividend.DeclaredDate is null
-                                    ? DateTime.MinValue.ToUniversalTime()
-                                    : dividend.DeclaredDate.ToDateTime().ToUniversalTime();
-
-                            if (dividend.RecordDate is not null)
-                                dividendInfo.RecordDate = dividend.RecordDate is null
-                                    ? DateTime.MinValue.ToUniversalTime()
-                                    : dividend.RecordDate.ToDateTime().ToUniversalTime();
-
-                            if (dividend.DividendNet is not null)
-                                dividendInfo.Dividend = Math.Round(
-                                    ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2);
-
-                            if (dividend.YieldValue is not null)
-                                dividendInfo.DividendPrc = Math.Round(
-                                    ConvertHelper.QuotationToDouble(dividend.YieldValue), 2);
+                            var dividendInfo = new DividendInfo
+                            {
+                                Ticker = share.Ticker,
+                                DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
+                                RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
+                                Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
+                                DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
+                            };
 
                             dividendInfos.Add(dividendInfo);
                         }                    
@@ -289,29 +276,16 @@ namespace Oid85.FinMarket.External.Tinkoff
                             if (coupon is null)
                                 continue;
 
-                            var bondCoupon = new BondCoupon();
-
-                            bondCoupon.Ticker = bonds[i].Ticker;
-
-                            if (coupon.CouponDate is not null)
-                                bondCoupon.CouponDate = coupon.CouponDate.ToDateTime().ToUniversalTime();
-
-                            bondCoupon.CouponNumber = coupon.CouponNumber;
-
-                            bondCoupon.CouponPeriod = coupon.CouponPeriod;
-
-                            if (coupon.CouponStartDate is not null)
-                                bondCoupon.CouponStartDate = coupon.CouponStartDate is null
-                                    ? DateTime.MinValue.ToUniversalTime()
-                                    : coupon.CouponStartDate.ToDateTime().ToUniversalTime();
-
-                            if (coupon.CouponEndDate is not null)
-                                bondCoupon.CouponEndDate = coupon.CouponEndDate is null
-                                    ? DateTime.MinValue.ToUniversalTime()
-                                    : coupon.CouponEndDate.ToDateTime().ToUniversalTime();
-
-                            if (coupon.PayOneBond is not null)
-                                bondCoupon.PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond);
+                            var bondCoupon = new BondCoupon
+                            {
+                                Ticker = bonds[i].Ticker,
+                                CouponNumber = coupon.CouponNumber,
+                                CouponPeriod = coupon.CouponPeriod,
+                                CouponDate = ConvertHelper.TimestampToDateOnly(coupon.CouponDate),
+                                CouponStartDate = ConvertHelper.TimestampToDateOnly(coupon.CouponStartDate),
+                                CouponEndDate = ConvertHelper.TimestampToDateOnly(coupon.CouponEndDate),
+                                PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
+                            };
 
                             bondCoupons.Add(bondCoupon);
                         }
