@@ -57,19 +57,22 @@ namespace Oid85.FinMarket.Logging.Services
         {
             logger.Error(exception);
 
-            var parameters = new Dictionary<string, string>()
+            var dictionary = new Dictionary<string, string>
             {
+                { "Message", exception.Message },
                 { "Source", exception.Source ?? string.Empty },
-                { "HelpLink", exception.HelpLink ?? string.Empty },
                 { "StackTrace", exception.StackTrace ?? string.Empty },
+                { "DeclaringType", exception.TargetSite?.DeclaringType?.ToString() ?? string.Empty }
             };
+            
+            string json = JsonSerializer.Serialize(dictionary);
             
             var logRecord = new LogRecord
             {
                 Date = DateTime.UtcNow,
                 Level = KnownLogLevels.Error,
                 Message = exception.Message,
-                Parameters = JsonSerializer.Serialize(parameters)
+                Parameters = json
             };
             
             await logRepository.AddAsync(logRecord);

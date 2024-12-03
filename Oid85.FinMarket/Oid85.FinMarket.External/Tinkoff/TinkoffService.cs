@@ -222,10 +222,14 @@ namespace Oid85.FinMarket.External.Tinkoff
                             dividendInfo.Ticker = share.Ticker;
                         
                             if (dividend.DeclaredDate is not null)
-                                dividendInfo.DeclaredDate = dividend.DeclaredDate.ToDateTime();
+                                dividendInfo.DeclaredDate = dividend.DeclaredDate is null
+                                    ? DateTime.MinValue.ToUniversalTime()
+                                    : dividend.DeclaredDate.ToDateTime().ToUniversalTime();
 
                             if (dividend.RecordDate is not null)
-                                dividendInfo.RecordDate = dividend.RecordDate.ToDateTime();
+                                dividendInfo.RecordDate = dividend.RecordDate is null
+                                    ? DateTime.MinValue.ToUniversalTime()
+                                    : dividend.RecordDate.ToDateTime().ToUniversalTime();
 
                             if (dividend.DividendNet is not null)
                                 dividendInfo.Dividend = Math.Round(

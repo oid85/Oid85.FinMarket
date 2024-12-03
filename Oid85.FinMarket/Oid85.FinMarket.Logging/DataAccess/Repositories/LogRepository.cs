@@ -12,7 +12,8 @@ public class LogRepository(LogContext context) : ILogRepository
             Id = logRecord.Id,
             Date = logRecord.Date,
             Level = logRecord.Level,
-            Message = logRecord.Message
+            Message = logRecord.Message,
+            Parameters = logRecord.Parameters
         };
         
         await context.LogEntities.AddAsync(entity);
