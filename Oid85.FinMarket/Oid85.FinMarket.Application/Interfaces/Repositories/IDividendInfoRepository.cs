@@ -6,4 +6,5 @@ public interface IDividendInfoRepository
 {
     Task AddOrUpdateAsync(List<DividendInfo> dividendInfos);
     Task<List<DividendInfo>> GetDividendInfosAsync();
+    Task<List<DividendInfo>> GetDividendInfosAsync(List<string> tickers, DateTime from, DateTime to);
 }

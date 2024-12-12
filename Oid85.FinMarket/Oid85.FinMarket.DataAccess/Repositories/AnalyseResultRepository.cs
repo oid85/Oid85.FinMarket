@@ -41,7 +41,16 @@ public class AnalyseResultRepository(
     public Task<List<AnalyseResult>> GetAnalyseResultsAsync(
         string ticker, DateTime from, DateTime to) =>
         context.AnalyseResultEntities
-            .Where(x => ticker == x.Ticker)
+            .Where(x => x.Ticker == ticker)
+            .Where(x => x.Date >= from && x.Date <= to)
+            .OrderBy(x => x.Date)
+            .Select(x => mapper.Map<AnalyseResult>(x))
+            .ToListAsync();
+    
+    public Task<List<AnalyseResult>> GetAnalyseResultsAsync(
+        List<string> tickers, DateTime from, DateTime to) =>
+        context.AnalyseResultEntities
+            .Where(x => tickers.Contains(x.Ticker))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
             .Select(x => mapper.Map<AnalyseResult>(x))
