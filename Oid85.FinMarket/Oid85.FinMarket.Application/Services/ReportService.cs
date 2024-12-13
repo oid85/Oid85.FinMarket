@@ -17,30 +17,81 @@ namespace Oid85.FinMarket.Application.Services
         IShareRepository shareRepository)
         : IReportService
     {
+        private const int WindowInDays = 180;
+        
         /// <inheritdoc />
         public async Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request)
         {
-            var share = shareRepository.GetShareByTickerAsync(request.Ticker);
+            var share = await shareRepository.GetShareByTickerAsync(request.Ticker);
+            
+            if (share is null)
+                return new ();
             
             var reportData = new ReportData();
+
+            var dates = GetDates(request.From, request.To.AddDays(WindowInDays));
+            
+            reportData.Header = ["Тикер", "Сектор"];
+            reportData.Header.AddRange(dates);
+
+            reportData.Data = 
+            [
+                (await GetReportDataByAnalyseTypeStocks(
+                    [share], request.From, request.To, KnownAnalyseTypes.Supertrend))
+                .Data.First(),
+                
+                (await GetReportDataByAnalyseTypeStocks(
+                    [share], request.From, request.To, KnownAnalyseTypes.CandleSequence))
+                .Data.First(),
+                
+                (await GetReportDataByAnalyseTypeStocks(
+                    [share], request.From, request.To, KnownAnalyseTypes.CandleVolume))
+                .Data.First(),
+                
+                (await GetReportDataByAnalyseTypeStocks(
+                    [share], request.From, request.To, KnownAnalyseTypes.Rsi))
+                .Data.First(),
+            ];
+            
+            reportData.Title =
+                $"Анализ {request.Ticker} " +
+                $"с {request.From.ToString(KnownDateTimeFormats.DateISO)} " +
+                $"по {request.To.ToString(KnownDateTimeFormats.DateISO)}";
+            
             return reportData;
         }
 
         /// <inheritdoc />
-        public Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request) =>
-            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.Supertrend);
+        public async Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request) =>
+            await GetReportDataByAnalyseTypeStocks(
+                await GetSharesByTickerList(request.TickerList),
+                request.From,
+                request.To,
+                KnownAnalyseTypes.Supertrend);
 
         /// <inheritdoc />
-        public Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request) =>
-            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.CandleSequence);
+        public async Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request) =>
+            await GetReportDataByAnalyseTypeStocks(
+                await GetSharesByTickerList(request.TickerList),
+                request.From,
+                request.To, 
+                KnownAnalyseTypes.CandleSequence);
 
         /// <inheritdoc />
-        public Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
-            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.CandleVolume);
+        public async Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
+            await GetReportDataByAnalyseTypeStocks(
+                await GetSharesByTickerList(request.TickerList),
+                request.From,
+                request.To,
+                KnownAnalyseTypes.CandleVolume);
 
         /// <inheritdoc />
-        public Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request) =>
-            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.Rsi);
+        public async Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request) =>
+            await GetReportDataByAnalyseTypeStocks(
+                await GetSharesByTickerList(request.TickerList),
+                request.From,
+                request.To,
+                KnownAnalyseTypes.Rsi);
 
         /// <inheritdoc />
         public async Task<ReportData> GetReportDividendsStocks()
@@ -72,7 +123,47 @@ namespace Oid85.FinMarket.Application.Services
         /// <inheritdoc />
         public async Task<ReportData> GetReportBonds()
         {
-            var reportData = new ReportData();
+            var bonds = await bondRepository
+                .GetBondsAsync();
+            
+            var reportData = new ReportData
+            {
+                Title = "Информация по облигациям",
+                Header = [ "Тикер", "Сектор", "Плав. купон", "До погаш., дней"]
+            };
+            
+            var bondCoupons = await bondCouponRepository
+                .GetBondCouponsAsync(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+            
+            var dates = GetDates(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+            
+            reportData.Header.AddRange(dates);
+            
+            foreach (var bond in bonds)
+            {
+                List<string> data =
+                [
+                    bond.Ticker,
+                    bond.Sector,
+                    bond.FloatingCouponFlag ? "Да" : string.Empty,
+                    (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString()
+                ];
+                
+                foreach (var date in dates)
+                {
+                    var bondCoupon = bondCoupons
+                        .FirstOrDefault(x => 
+                            x.Ticker == bond.Ticker && 
+                            x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date);
+
+                    data.Add(bondCoupon is not null 
+                        ? bondCoupon.PayOneBond.ToString(CultureInfo.InvariantCulture) 
+                        : string.Empty);
+                }
+                
+                reportData.Data.Add(data);
+            }
+            
             return reportData;
         }
 
@@ -93,14 +184,12 @@ namespace Oid85.FinMarket.Application.Services
             return [];
         }
         
-        private List<string> GetDates(DateTime from, DateTime to, int addDays)
+        private List<string> GetDates(DateTime from, DateTime to)
         {
-            var endDate = to.AddDays(addDays);
             var curDate = from;
-            
             var dates = new List<string>();
 
-            while (curDate <= endDate)
+            while (curDate <= to)
             {
                 dates.Add(curDate.ToString(KnownDateTimeFormats.DateISO));
                 curDate = curDate.AddDays(1);
@@ -110,30 +199,31 @@ namespace Oid85.FinMarket.Application.Services
         }
         
         private async Task<ReportData> GetReportDataByAnalyseTypeStocks(
-            GetReportAnalyseRequest request,
+            List<Share> shares,
+            DateTime from,
+            DateTime to,
             string analyseType)
         {
-            var shares = await GetSharesByTickerList(request.TickerList);
-            
             var tickers = shares
                 .Select(x => x.Ticker)
                 .ToList();
             
             var analyseResults = (await analyseResultRepository
-                .GetAnalyseResultsAsync(tickers, request.From, request.To))
+                .GetAnalyseResultsAsync(tickers, from, to))
                 .Where(x => x.AnalyseType == analyseType)
                 .ToList();
 
-            const int addDays = 180;
-            
             var dividendInfos = await dividendInfoRepository
-                .GetDividendInfosAsync(tickers, request.To.AddDays(1), request.To.AddDays(addDays));
+                .GetDividendInfosAsync(tickers, to.AddDays(1), to.AddDays(WindowInDays));
             
-            var dates = GetDates(request.From, request.To, addDays);
+            var dates = GetDates(from, to.AddDays(WindowInDays));
             
             var reportData = new ReportData
             {
-                Title = $"Анализ Супертренд {request.From.ToString(KnownDateTimeFormats.DateISO)} с по {request.To.ToString(KnownDateTimeFormats.DateISO)}",
+                Title = $"Анализ {analyseType} " +
+                        $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                        $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
                 Header = ["Тикер", "Сектор"]
             };
 

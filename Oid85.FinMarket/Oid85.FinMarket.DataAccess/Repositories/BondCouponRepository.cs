@@ -46,5 +46,14 @@ public class BondCouponRepository(
     public Task<List<BondCoupon>> GetBondCouponsAsync() =>
         context.BondCouponEntities
             .Select(x => mapper.Map<BondCoupon>(x))
-            .ToListAsync();    
+            .ToListAsync(); 
+    
+    public Task<List<BondCoupon>> GetBondCouponsAsync(
+        DateTime from, DateTime to) =>
+        context.BondCouponEntities
+            .Where(x => 
+                x.CouponDate >= DateOnly.FromDateTime(from) && 
+                x.CouponDate <= DateOnly.FromDateTime(to))
+            .Select(x => mapper.Map<BondCoupon>(x))
+            .ToListAsync();   
 }
