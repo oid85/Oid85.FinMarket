@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using System.Globalization;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
@@ -26,42 +27,45 @@ namespace Oid85.FinMarket.Application.Services
         }
 
         /// <inheritdoc />
-        public async Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request)
-        {
-            return await GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.Supertrend);
-        }
+        public Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request) =>
+            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.Supertrend);
 
         /// <inheritdoc />
-        public async Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request)
-        {
-            var shares = GetSharesByTickerList(request.TickerList);
-            
-            var reportData = new ReportData();
-            return reportData;
-        }
+        public Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request) =>
+            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.CandleSequence);
 
         /// <inheritdoc />
-        public async Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request)
-        {
-            var shares = GetSharesByTickerList(request.TickerList);
-            
-            var reportData = new ReportData();
-            return reportData;
-        }
+        public Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
+            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.CandleVolume);
 
         /// <inheritdoc />
-        public async Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request)
-        {
-            var shares = GetSharesByTickerList(request.TickerList);
-            
-            var reportData = new ReportData();
-            return reportData;
-        }
+        public Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request) =>
+            GetReportDataByAnalyseTypeStocks(request, KnownAnalyseTypes.Rsi);
 
         /// <inheritdoc />
         public async Task<ReportData> GetReportDividendsStocks()
         {
-            var reportData = new ReportData();
+            var dividendInfos = await dividendInfoRepository
+                .GetDividendInfosAsync();
+            
+            var reportData = new ReportData
+            {
+                Title = "Информация по дивидендам",
+                Header = [ "Тикер", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %"]
+            };
+            
+            foreach (var dividendInfo in dividendInfos)
+            {
+                reportData.Data.Add(
+                [
+                    dividendInfo.Ticker,
+                    dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO),
+                    dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO),
+                    dividendInfo.Dividend.ToString(CultureInfo.InvariantCulture), 
+                    dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)
+                ]);
+            }
+            
             return reportData;
         }
         
@@ -120,7 +124,7 @@ namespace Oid85.FinMarket.Application.Services
                 .Where(x => x.AnalyseType == analyseType)
                 .ToList();
 
-            const int addDays = 90;
+            const int addDays = 180;
             
             var dividendInfos = await dividendInfoRepository
                 .GetDividendInfosAsync(tickers, request.To.AddDays(1), request.To.AddDays(addDays));
@@ -145,9 +149,10 @@ namespace Oid85.FinMarket.Application.Services
                         .FirstOrDefault(x => 
                             x.Ticker == share.Ticker && 
                             x.Date.ToString(KnownDateTimeFormats.DateISO) == date);
-                    
-                    if (analyseResult is not null)
-                        data.Add(analyseResult.Result);
+
+                    data.Add(analyseResult is not null 
+                        ? analyseResult.Result 
+                        : string.Empty);
                 }
                 
                 foreach (var date in dates)
@@ -156,9 +161,10 @@ namespace Oid85.FinMarket.Application.Services
                         .FirstOrDefault(x => 
                             x.Ticker == share.Ticker && 
                             x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date);
-                    
-                    if (dividendInfo is not null)
-                        data.Add(dividendInfo.DividendPrc.ToString("N1"));
+
+                    data.Add(dividendInfo is not null
+                        ? dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)
+                        : string.Empty);
                 }
                 
                 reportData.Data.Add(data);
