@@ -1,10 +1,10 @@
 ﻿namespace Oid85.FinMarket.Common.KnownConstants
 {
-    public class KnownTickerLists
+    public static class KnownTickerLists
     {
-        public static string AllStocks = "AllStocks";
-        public static string MoexIndexStocks = "MoexIndexStocks";
-        public static string PortfolioStocks = "PortfolioStocks";
-        public static string WatchListStocks = "WatchListStocks";
+        public const string AllStocks = "AllStocks";
+        public const string MoexIndexStocks = "MoexIndexStocks";
+        public const string PortfolioStocks = "PortfolioStocks";
+        public const string WatchListStocks = "WatchListStocks";
     }
 }

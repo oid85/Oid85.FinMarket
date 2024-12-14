@@ -26,6 +26,11 @@
         public string Timeframe { get; set; } = string.Empty;
 
         /// <summary>
+        /// Тип анализа
+        /// </summary>
+        public string AnalyseType { get; set; } = string.Empty;        
+        
+        /// <summary>
         /// Результат анализа
         /// </summary>
         public string Result { get; set; } = string.Empty;

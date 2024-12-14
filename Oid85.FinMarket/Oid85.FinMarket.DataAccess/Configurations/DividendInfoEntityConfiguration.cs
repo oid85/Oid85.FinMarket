@@ -5,12 +5,12 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class DividendInfoEntityConfiguration : EntityConfigurationBase<ShareEntity>
+internal class DividendInfoEntityConfiguration : EntityConfigurationBase<DividendInfoEntity>
 {
-    public override void Configure(EntityTypeBuilder<ShareEntity> builder)
+    public override void Configure(EntityTypeBuilder<DividendInfoEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("dividend_info", KnownDatabaseSchemas.Default);
+        builder.ToTable("dividend_infos", KnownDatabaseSchemas.Default);
     }
 }

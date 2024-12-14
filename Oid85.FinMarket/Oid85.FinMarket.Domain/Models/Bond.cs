@@ -46,4 +46,19 @@ public class Bond
     /// Находится в списке наблюдения
     /// </summary>
     public bool InWatchList { get; set; }
+
+    /// <summary>
+    /// Значение НКД (накопленного купонного дохода) на дату
+    /// </summary>
+    public double NKD { get; set; }
+    
+    /// <summary>
+    /// Дата погашения облигации по UTC
+    /// </summary>
+    public DateOnly MaturityDate { get; set; }
+    
+    /// <summary>
+    /// Признак облигации с плавающим купоном
+    /// </summary>
+    public bool FloatingCouponFlag { get; set; }
 }

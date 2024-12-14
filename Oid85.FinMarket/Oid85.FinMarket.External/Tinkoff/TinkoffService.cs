@@ -1,8 +1,9 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Configuration;
-using NLog;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Logging.Services;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -14,22 +15,12 @@ using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
 namespace Oid85.FinMarket.External.Tinkoff
 {
     /// <inheritdoc />
-    public class TinkoffService : ITinkoffService
+    public class TinkoffService(
+        ILogService logService,
+        InvestApiClient client,
+        IConfiguration configuration)
+        : ITinkoffService
     {
-        private readonly ILogger _logger;
-        private readonly InvestApiClient _client;
-        private readonly IConfiguration _configuration;
-
-        public TinkoffService(
-            ILogger logger,
-            InvestApiClient client, 
-            IConfiguration configuration)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        }
-
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
             Share share, string timeframe)
@@ -42,7 +33,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                await logService.LogException(exception);
                 return [];
             }
         }
@@ -60,7 +51,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                await logService.LogException(exception);
                 return [];
             }
         }        
@@ -79,13 +70,13 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             if (interval == CandleInterval.Unspecified)
             {
-                _logger.Error("Неизвестный интервал. interval = CandleInterval.Unspecified");
+                await logService.LogError("Неизвестный интервал. interval = CandleInterval.Unspecified");
                 return [];
             }
 
             request.Interval = interval;
 
-            var response = await _client.MarketData.GetCandlesAsync(request);
+            var response = await client.MarketData.GetCandlesAsync(request);
 
             var candles = new List<Candle>() { };
 
@@ -95,10 +86,10 @@ namespace Oid85.FinMarket.External.Tinkoff
                 {
                     Ticker = share.Ticker,
                     Timeframe = timeframe,
-                    Open = ConvertToDouble(response.Candles[i].Open),
-                    Close = ConvertToDouble(response.Candles[i].Close),
-                    High = ConvertToDouble(response.Candles[i].High),
-                    Low = ConvertToDouble(response.Candles[i].Low),
+                    Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
+                    Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
+                    High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
+                    Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
                     Volume = response.Candles[i].Volume,
                     Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
                     IsComplete = response.Candles[i].IsComplete
@@ -115,7 +106,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         {
             try
             {
-                List<TinkoffShare> shares = (await _client.Instruments
+                List<TinkoffShare> shares = (await client.Instruments
                     .SharesAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList(); 
@@ -145,7 +136,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                await logService.LogException(exception);
                 return [];
             }
         }
@@ -155,7 +146,7 @@ namespace Oid85.FinMarket.External.Tinkoff
         {
             try
             {
-                List<TinkoffBond> bonds = (await _client.Instruments
+                List<TinkoffBond> bonds = (await client.Instruments
                     .BondsAsync()).Instruments
                     .Where(x => x.CountryOfRisk.ToLower() == "ru")
                     .ToList();
@@ -170,7 +161,10 @@ namespace Oid85.FinMarket.External.Tinkoff
                         Figi = bond.Figi,
                         Isin = bond.Isin,
                         Description = bond.Name,
-                        Sector = bond.Sector
+                        Sector = bond.Sector,
+                        NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
+                        MaturityDate = DateOnly.FromDateTime(bond.MaturityDate.ToDateTime().Date),
+                        FloatingCouponFlag = bond.FloatingCouponFlag
                     };
 
                     result.Add(instrument);
@@ -181,7 +175,7 @@ namespace Oid85.FinMarket.External.Tinkoff
 
             catch (Exception exception)
             {
-                _logger.Error(exception);
+                await logService.LogException(exception);
                 return [];
             }
         }
@@ -190,65 +184,130 @@ namespace Oid85.FinMarket.External.Tinkoff
         public async Task<List<DividendInfo>> GetDividendInfoAsync(
             List<Share> shares)
         {
-            var dividendInfos = new List<DividendInfo>();
-            
-            var from = DateTime.SpecifyKind(new DateTime(DateTime.UtcNow.Year, 1, 1), DateTimeKind.Utc);
-            var to = from.AddYears(2);
-
-            foreach (var share in shares)
+            try
             {
-                var request = new GetDividendsRequest
+                var dividendInfos = new List<DividendInfo>();
+            
+                var from = DateTime.SpecifyKind(
+                    new DateTime(DateTime.UtcNow.Year, 1, 1), 
+                    DateTimeKind.Utc);
+            
+                var to = from.AddYears(2);
+
+                foreach (var share in shares)
                 {
-                    InstrumentId = share.Figi,
-                    From = Timestamp.FromDateTime(from),
-                    To = Timestamp.FromDateTime(to)
-                };
-
-                var response = await _client.Instruments.GetDividendsAsync(request);
-
-                if (response is null)
-                    continue;
-
-                var dividends = response.Dividends.ToList();
-
-                if (dividends.Any())
-                {
-                    foreach (var dividend in dividends)
+                    var request = new GetDividendsRequest
                     {
-                        if (dividend is null)
-                            continue;
+                        InstrumentId = share.Figi,
+                        From = Timestamp.FromDateTime(from),
+                        To = Timestamp.FromDateTime(to)
+                    };
 
-                        var dividendInfo = new DividendInfo();
+                    var response = await client.Instruments.GetDividendsAsync(request);
 
-                        dividendInfo.Ticker = share.Ticker;
+                    if (response is null)
+                        continue;
 
-                        if (dividend.DeclaredDate is not null)
-                            dividendInfo.DeclaredDate = dividend.DeclaredDate.ToDateTime();
+                    var dividends = response.Dividends.ToList();
 
-                        if (dividend.RecordDate is not null)
-                            dividendInfo.RecordDate = dividend.RecordDate.ToDateTime();
+                    if (dividends.Any())
+                    {
+                        foreach (var dividend in dividends)
+                        {
+                            if (dividend is null)
+                                continue;
 
-                        if (dividend.DividendNet is not null)
-                            dividendInfo.Dividend = Math.Round(ConvertToDouble(new Quotation()
+                            var dividendInfo = new DividendInfo
                             {
-                                Units = dividend.DividendNet.Units,
-                                Nano = dividend.DividendNet.Nano
-                            }), 2);
+                                Ticker = share.Ticker,
+                                DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
+                                RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
+                                Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
+                                DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
+                            };
 
-                        if (dividend.YieldValue is not null)
-                            dividendInfo.DividendPrc = Math.Round(ConvertToDouble(dividend.YieldValue), 2);
-
-                        dividendInfos.Add(dividendInfo);
-                    }                    
+                            dividendInfos.Add(dividendInfo);
+                        }                    
+                    }
                 }
-            }
 
-            return dividendInfos;
+                return dividendInfos;
+            }
+            
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
+        }
+
+        public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
+        {
+            try
+            {
+                var bondCoupons = new List<BondCoupon>();
+            
+                var from = DateTime.SpecifyKind(
+                    new DateTime(DateTime.UtcNow.Year, 1, 1), 
+                    DateTimeKind.Utc);
+            
+                var to = from.AddYears(2);
+
+                for (var i = 0; i < bonds.Count; i++)
+                {
+                    var request = new GetBondCouponsRequest
+                    {
+                        InstrumentId = bonds[i].Figi,
+                        From = Timestamp.FromDateTime(from),
+                        To = Timestamp.FromDateTime(to)
+                    };
+
+                    var response = await client.Instruments.GetBondCouponsAsync(request);
+
+                    if (response is null)
+                        continue;
+
+                    var coupons = response.Events.ToList();
+
+                    if (coupons.Any())
+                    {
+                        foreach (var coupon in coupons)
+                        {
+                            if (coupon is null)
+                                continue;
+
+                            var bondCoupon = new BondCoupon
+                            {
+                                Ticker = bonds[i].Ticker,
+                                CouponNumber = coupon.CouponNumber,
+                                CouponPeriod = coupon.CouponPeriod,
+                                CouponDate = ConvertHelper.TimestampToDateOnly(coupon.CouponDate),
+                                CouponStartDate = ConvertHelper.TimestampToDateOnly(coupon.CouponStartDate),
+                                CouponEndDate = ConvertHelper.TimestampToDateOnly(coupon.CouponEndDate),
+                                PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
+                            };
+
+                            bondCoupons.Add(bondCoupon);
+                        }
+                    }
+
+                    double percent = ((i + 1) / (double) bonds.Count) * 100;
+                    await logService.LogTrace($"Загружены купоны для облигации '{bonds[i].Ticker}'. {i + 1} из {bonds.Count}. {percent:N2} % загружено");
+                }
+
+                return bondCoupons;
+            }
+            
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
         }
 
         private Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
         {           
-            var buffer = _configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettings_Buffer);
+            var buffer = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsBuffer);
 
             var startDate = DateTime.Now;
             var endDate = DateTime.Now;
@@ -285,11 +344,6 @@ namespace Oid85.FinMarket.External.Tinkoff
                 return CandleInterval._1Min;
 
             return CandleInterval.Unspecified;
-        }
-
-        private static double ConvertToDouble(Quotation quotation)
-        {
-            return quotation.Units + quotation.Nano / 1_000_000_000.0;
         }
     }
 }

@@ -1,38 +1,25 @@
-﻿using Oid85.FinMarket.Application.Constants;
-using Oid85.FinMarket.Common.KnownConstants;
+﻿using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Skender.Stock.Indicators;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Logging.Services;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
-using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.Application.Services
 {
     /// <inheritdoc />
-    public class AnalyseService : IAnalyseService
+    public class AnalyseService(
+        ILogService logService,
+        IShareRepository shareRepository,
+        ICandleRepository candleRepository,
+        IAnalyseResultRepository analyseResultRepository)
+        : IAnalyseService
     {
-        private readonly ILogger _logger;
-        private readonly IShareRepository _shareRepository;
-        private readonly ICandleRepository _candleRepository;
-        private readonly IAnalyseResultRepository _analyseResultRepository;
-
-        public AnalyseService(
-            ILogger logger, 
-            IShareRepository shareRepository, 
-            ICandleRepository candleRepository, 
-            IAnalyseResultRepository analyseResultRepository)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _shareRepository = shareRepository ?? throw new ArgumentNullException(nameof(shareRepository));
-            _candleRepository = candleRepository ?? throw new ArgumentNullException(nameof(candleRepository));
-            _analyseResultRepository = analyseResultRepository ?? throw new ArgumentNullException(nameof(analyseResultRepository));
-        }
-
         /// <inheritdoc />
         public async Task AnalyseStocksAsync()
         {
-            var shares = await _shareRepository.GetSharesAsync();
+            var shares = await shareRepository.GetSharesAsync();
             var timeframe = KnownTimeframes.Daily;
             
             for (int i = 0; i < shares.Count; i++)
@@ -44,7 +31,7 @@ namespace Oid85.FinMarket.Application.Services
 
                 double percent = ((i + 1) / (double) shares.Count) * 100;
 
-                _logger.Trace($"Analyse '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
+                await logService.LogTrace($"Analyse '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
             }
         }
         
@@ -68,12 +55,12 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 
-                int lookbackPeriods = 50;
-                double multiplier = 3.0;
+                const int lookbackPeriods = 50;
+                const double multiplier = 3.0;
 
                 var quotes = candles
                     .Select(x => new Quote()
@@ -98,14 +85,14 @@ namespace Oid85.FinMarket.Application.Services
                     })
                     .ToList();
 
-                await _analyseResultRepository.AddOrUpdateAsync(results);
+                await analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
                 throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }
@@ -116,9 +103,6 @@ namespace Oid85.FinMarket.Application.Services
         {
             string GetResult(List<Candle> candles)
             {
-                if (candles == null)
-                    return string.Empty;
-
                 // Свечи белые
                 if (candles.All(x => x.Close > x.Open))
                     return KnownCandleSequences.White;
@@ -132,7 +116,7 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 
@@ -167,14 +151,14 @@ namespace Oid85.FinMarket.Application.Services
                     results.Add(result);
                 }
 
-                await _analyseResultRepository.AddOrUpdateAsync(results);
+                await analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
                 throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }
@@ -185,9 +169,6 @@ namespace Oid85.FinMarket.Application.Services
         {
             string GetResult(List<Candle> candles)
             {
-                if (candles == null)
-                    return string.Empty;
-
                 var lastVolume = candles.Last().Volume;
                 var prevVolumes = candles
                     .Select(x => x.Volume)
@@ -202,7 +183,7 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 
@@ -245,22 +226,22 @@ namespace Oid85.FinMarket.Application.Services
                     results.Add(result);
                 }
 
-                await _analyseResultRepository.AddOrUpdateAsync(results);
+                await analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
                 throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }
 
         private string GetRsiResult(RsiResult result)
         {
-            double upLimit = 60.0;
-            double downLimit = 40.0;
+            const double upLimit = 60.0;
+            const double downLimit = 40.0;
 
             if (result.Rsi == null)
                 return string.Empty;
@@ -280,7 +261,7 @@ namespace Oid85.FinMarket.Application.Services
         {
             try
             {
-                var candles = (await _candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 
@@ -309,14 +290,14 @@ namespace Oid85.FinMarket.Application.Services
                     })
                     .ToList();
 
-                await _analyseResultRepository.AddOrUpdateAsync(results);
+                await analyseResultRepository.AddOrUpdateAsync(results);
 
                 return results;
             }
 
             catch (Exception exception)
             {
-                _logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+                await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
                 throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
             }
         }

@@ -18,12 +18,12 @@
         /// <summary>
         /// Дата фиксации реестра
         /// </summary>
-        public DateTime RecordDate { get; set; }
+        public DateOnly RecordDate { get; set; }
 
         /// <summary>
         /// Дата объявления дивидендов
         /// </summary>
-        public DateTime DeclaredDate { get; set; }
+        public DateOnly DeclaredDate { get; set; }
 
         /// <summary>
         /// Выплата, руб

@@ -7,16 +7,8 @@ namespace Oid85.FinMarket.WebHost.Controller
 {
     [Route("api")]
     [ApiController]
-    public class LoadController : FinMarketBaseController
+    public class LoadController(ILoadService loadService) : FinMarketBaseController
     {
-        private readonly ILoadService _loadService;
-
-        public LoadController(
-            ILoadService loadService)
-        {
-            _loadService = loadService ?? throw new ArgumentNullException(nameof(loadService));
-        }
-
         /// <summary>
         /// Загрузить справочник акций
         /// </summary>
@@ -26,7 +18,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadStocksAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadStocksAsync);
+                loadService.LoadStocksAsync);
 
         /// <summary>
         /// Загрузить справочник облигаций
@@ -37,7 +29,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadBondsAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadBondsAsync);
+                loadService.LoadBondsAsync);
         
         /// <summary>
         /// Подгрузить последние свечи
@@ -48,7 +40,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadStocksDailyCandlesAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadCandlesAsync);
+                loadService.LoadCandlesAsync);
 
         /// <summary>
         /// Загрузить свечи за конкретный год
@@ -60,10 +52,10 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadStocksDailyCandlesForYearAsync(int year) =>
             GetResponseAsync<object, BaseResponse<object>>(
-                () => _loadService.LoadCandlesAsync(year));
+                () => loadService.LoadCandlesAsync(year));
 
         /// <summary>
-        /// Подгрузить данные о дивидендах
+        /// Загрузить данные о дивидендах
         /// </summary>
         [HttpGet("load-dividends-info")]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
@@ -71,6 +63,17 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> LoadDividendInfosAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
-                _loadService.LoadDividendInfosAsync);
+                loadService.LoadDividendInfosAsync);
+        
+        /// <summary>
+        /// Загрузить данные о купонах
+        /// </summary>
+        [HttpGet("load-bond-coupons")]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadBondCouponsAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                loadService.LoadBondCouponsAsync);        
     }    
 }

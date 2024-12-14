@@ -1,9 +1,10 @@
-﻿namespace Oid85.FinMarket.Common.KnownConstants
+﻿// ReSharper disable All
+namespace Oid85.FinMarket.Common.KnownConstants
 {
-    public class KnownDateTimeFormats
+    public static class KnownDateTimeFormats
     {
-        public static string DateTimeISO = "yyyy-MM-dd HH:mm:ss";
-        public static string DateISO = "yyyy-MM-dd";
-        public static string TimeISO = "HH:mm:ss";
+        public const string DateTimeISO = "yyyy-MM-dd HH:mm:ss";
+        public const string DateISO = "yyyy-MM-dd";
+        public const string TimeISO = "HH:mm:ss";
     }
 }

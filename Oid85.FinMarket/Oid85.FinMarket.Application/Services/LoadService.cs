@@ -1,86 +1,89 @@
-﻿using NLog;
-using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Tinkoff;
+using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.Application.Services
 {
-    public class LoadService : ILoadService
+    public class LoadService(
+        ILogService logService,
+        ITinkoffService tinkoffService,
+        IShareRepository shareRepository,
+        IBondRepository bondRepository,
+        ICandleRepository candleRepository,
+        IDividendInfoRepository dividendInfoRepository,
+        IBondCouponRepository bondCouponRepository)
+        : ILoadService
     {
-        private readonly ILogger _logger;
-        private readonly ITinkoffService _tinkoffService;
-        private readonly IShareRepository _shareRepository;
-        private readonly IBondRepository _bondRepository;
-        private readonly ICandleRepository _candleRepository;
-        private readonly IDividendInfoRepository _dividendInfoRepository;
-
-        public LoadService(
-            ILogger logger,
-            ITinkoffService tinkoffService, 
-            IShareRepository shareRepository, 
-            IBondRepository bondRepository, 
-            ICandleRepository candleRepository, 
-            IDividendInfoRepository dividendInfoRepository)
-        {
-            _logger = logger;
-            _tinkoffService = tinkoffService;
-            _shareRepository = shareRepository;
-            _bondRepository = bondRepository;
-            _candleRepository = candleRepository;
-            _dividendInfoRepository = dividendInfoRepository;
-        }
-
         public async Task LoadBondsAsync()
         {
-            var bonds = await _tinkoffService.GetBondsAsync();
-            await _bondRepository.AddOrUpdateAsync(bonds);
+            var bonds = await tinkoffService.GetBondsAsync();
+            await bondRepository.AddOrUpdateAsync(bonds);
+            
+            await logService.LogTrace($"Загружены облигации. {bonds.Count} шт.");
         }
 
         public async Task LoadStocksAsync()
         {
-            var shares = await _tinkoffService.GetSharesAsync();
-            await _shareRepository.AddOrUpdateAsync(shares);
+            var shares = await tinkoffService.GetSharesAsync();
+            await shareRepository.AddOrUpdateAsync(shares);
+            
+            await logService.LogTrace($"Загружены акции. {shares.Count} шт.");
         }
 
         public async Task LoadCandlesAsync()
         {
-            var shares = await _shareRepository.GetSharesAsync();
+            var shares = await shareRepository.GetSharesAsync();
 
-            foreach (var share in shares)
+            for (int i = 0; i < shares.Count; i++)
             {
+                await logService.LogTrace($"Загрузка свечей '{shares[i].Ticker}'. {i + 1} из {shares.Count}");
+                
                 var timeframe = KnownTimeframes.Daily;
-                var candles = await _tinkoffService.GetCandlesAsync(share, timeframe);
-                await _candleRepository.AddOrUpdateAsync(candles);
+                var candles = await tinkoffService.GetCandlesAsync(shares[i], timeframe);
+                await candleRepository.AddOrUpdateAsync(candles);
+                
+                double percent = ((i + 1) / (double) shares.Count) * 100;
+                await logService.LogTrace($"Загружены свечи '{shares[i].Ticker}'. {i + 1} из {shares.Count}. {percent:N2} % загружено");
             }
         }
 
         public async Task LoadCandlesAsync(int year)
         {
-            var shares = (await _shareRepository.GetSharesAsync())
+            var shares = (await shareRepository.GetSharesAsync())
                 .OrderBy(share => share.Ticker)
                 .ToList();
 
             for (int i = 0; i < shares.Count; i++)
             {
-                _logger.Trace($"Loading '{shares[i].Ticker}'. {i + 1} of {shares.Count}");
+                await logService.LogTrace($"Загрузка свечей за {year} год '{shares[i].Ticker}'. {i + 1} из {shares.Count}");
                 
                 var timeframe = KnownTimeframes.Daily;
-                var candles = await _tinkoffService.GetCandlesAsync(shares[i], timeframe, year);
-                await _candleRepository.AddOrUpdateAsync(candles);
+                var candles = await tinkoffService.GetCandlesAsync(shares[i], timeframe, year);
+                await candleRepository.AddOrUpdateAsync(candles);
                 
                 double percent = ((i + 1) / (double) shares.Count) * 100;
-                
-                _logger.Trace($"Loaded '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
+                await logService.LogTrace($"Загружены свечи за {year} год '{shares[i].Ticker}'. {i + 1} из {shares.Count}. {percent:N2} % загружено");
             }
         }
 
         public async Task LoadDividendInfosAsync()
         {
-            var shares = await _shareRepository.GetSharesAsync();
-            var dividendInfos = await _tinkoffService.GetDividendInfoAsync(shares);
-            await _dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
+            var shares = await shareRepository.GetSharesAsync();
+            var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
+            await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
+            
+            await logService.LogTrace($"Загружена информация по дивидендам. {dividendInfos.Count} шт.");
+        }
+
+        public async Task LoadBondCouponsAsync()
+        {
+            var bonds = await bondRepository.GetBondsAsync();
+            var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
+            await bondCouponRepository.AddOrUpdateAsync(bondCoupons);
+            
+            await logService.LogTrace($"Загружена информация по купонам облигаций. {bondCoupons.Count} шт.");
         }
     }
 }

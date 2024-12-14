@@ -6,19 +6,10 @@ using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class DividendInfoRepository : IDividendInfoRepository
+public class DividendInfoRepository(
+    FinMarketContext context,
+    IMapper mapper) : IDividendInfoRepository
 {
-    private readonly FinMarketContext _context;
-    private readonly IMapper _mapper;
-    
-    public DividendInfoRepository(
-        FinMarketContext context, 
-        IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
-
     public async Task AddOrUpdateAsync(List<DividendInfo> dividendInfos)
     {
         if (!dividendInfos.Any())
@@ -26,7 +17,7 @@ public class DividendInfoRepository : IDividendInfoRepository
         
         foreach (var dividendInfo in dividendInfos)
         {
-            var entity = _context.DividendInfoEntities
+            var entity = context.DividendInfoEntities
                 .FirstOrDefault(x => 
                     x.Ticker == dividendInfo.Ticker &&
                     x.RecordDate == dividendInfo.RecordDate &&
@@ -34,8 +25,8 @@ public class DividendInfoRepository : IDividendInfoRepository
 
             if (entity is null)
             {
-                entity = _mapper.Map<DividendInfoEntity>(dividendInfo);
-                await _context.DividendInfoEntities.AddAsync(entity);
+                entity = mapper.Map<DividendInfoEntity>(dividendInfo);
+                await context.DividendInfoEntities.AddAsync(entity);
             }
 
             else
@@ -45,11 +36,21 @@ public class DividendInfoRepository : IDividendInfoRepository
             }
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     public Task<List<DividendInfo>> GetDividendInfosAsync() =>
-        _context.DividendInfoEntities
-            .Select(x => _mapper.Map<DividendInfo>(x))
+        context.DividendInfoEntities
+            .Select(x => mapper.Map<DividendInfo>(x))
+            .ToListAsync();
+    
+    public Task<List<DividendInfo>> GetDividendInfosAsync(
+        List<string> tickers, DateTime from, DateTime to) =>
+        context.DividendInfoEntities
+            .Where(x => tickers.Contains(x.Ticker))
+            .Where(x => 
+                x.RecordDate >= DateOnly.FromDateTime(from) && 
+                x.RecordDate <= DateOnly.FromDateTime(to))
+            .Select(x => mapper.Map<DividendInfo>(x))
             .ToListAsync();
 }

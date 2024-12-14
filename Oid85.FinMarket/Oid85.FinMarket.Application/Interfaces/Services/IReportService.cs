@@ -1,5 +1,5 @@
-﻿using Oid85.FinMarket.Application.Models.Requests;
-using Oid85.FinMarket.Application.Models.Results;
+﻿using Oid85.FinMarket.Application.Models.Reports;
+using Oid85.FinMarket.Application.Models.Requests;
 
 namespace Oid85.FinMarket.Application.Interfaces.Services
 {
@@ -37,5 +37,10 @@ namespace Oid85.FinMarket.Application.Interfaces.Services
         /// Получить отчет по дивидендам
         /// </summary>
         Task<ReportData> GetReportDividendsStocks();
+
+        /// <summary>
+        /// Получить отчет по облигациям
+        /// </summary>
+        Task<ReportData> GetReportBonds();
     }
 }

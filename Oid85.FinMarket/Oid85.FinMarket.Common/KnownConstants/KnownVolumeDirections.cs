@@ -1,8 +1,7 @@
-﻿namespace Oid85.FinMarket.Application.Constants
+﻿namespace Oid85.FinMarket.Common.KnownConstants
 {
-    public class KnownVolumeDirections
+    public static class KnownVolumeDirections
     {
-        public static string Up = "Объем растет";
-        public static string Down = "Объем падает";
+        public const string Up = "Объем растет";
     }
 }

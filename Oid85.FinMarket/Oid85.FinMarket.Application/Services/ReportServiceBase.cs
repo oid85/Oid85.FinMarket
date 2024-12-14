@@ -1,28 +1,16 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.Application.Models.Results;
+using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.Application.Services
 {
-    /// <inheritdoc />
-    public class ReportServiceBase
+    public class ReportServiceBase(
+        IAnalyseResultRepository analyseResultRepository,
+        IShareRepository shareRepository,
+        IDividendInfoRepository dividendInfoRepository)
     {
-        private readonly IAnalyseResultRepository _analyseResultRepository;
-        private readonly IShareRepository _shareRepository;
-        private readonly IDividendInfoRepository _dividendInfoRepository;
-
-        public ReportServiceBase(
-            IAnalyseResultRepository analyseResultRepository,
-            IShareRepository shareRepository,
-            IDividendInfoRepository dividendInfoRepository) 
-        {
-            _analyseResultRepository = analyseResultRepository ?? throw new ArgumentNullException(nameof(analyseResultRepository));
-            _shareRepository = shareRepository ?? throw new ArgumentNullException(nameof(shareRepository));
-            _dividendInfoRepository = dividendInfoRepository ?? throw new ArgumentNullException(nameof(dividendInfoRepository));
-        }
-
-        public async Task<ReportData> GetReportDataAsync(
+        protected async Task<ReportData> GetReportDataAsync(
             string tickerList, 
             string analyseType,
             DateTime from,
@@ -30,7 +18,7 @@ namespace Oid85.FinMarket.Application.Services
         {
             if (tickerList == KnownTickerLists.AllStocks)
             {
-                var shares = await _shareRepository.GetSharesAsync();
+                var shares = await shareRepository.GetSharesAsync();
                 var tickers = shares.Select(x => x.Ticker);
 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
@@ -45,7 +33,7 @@ namespace Oid85.FinMarket.Application.Services
 
             if (tickerList == KnownTickerLists.MoexIndexStocks)
             {
-                var shares = await _shareRepository.GetMoexIndexSharesAsync();
+                var shares = await shareRepository.GetMoexIndexSharesAsync();
                 var tickers = shares.Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
@@ -60,7 +48,7 @@ namespace Oid85.FinMarket.Application.Services
 
             if (tickerList == KnownTickerLists.PortfolioStocks)
             {
-                var shares = await _shareRepository.GetPortfolioSharesAsync();
+                var shares = await shareRepository.GetPortfolioSharesAsync();
                 var tickers = shares.Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
@@ -75,7 +63,7 @@ namespace Oid85.FinMarket.Application.Services
 
             if (tickerList == KnownTickerLists.WatchListStocks)
             {
-                var shares = await _shareRepository.GetWatchListSharesAsync();
+                var shares = await shareRepository.GetWatchListSharesAsync();
                 var tickers = shares.Select(x => x.Ticker);
                 
                 var data = await GetDataAsync(analyseType, tickers, from, to);
@@ -103,7 +91,7 @@ namespace Oid85.FinMarket.Application.Services
             }            
         }
 
-        public async Task<ReportData> GetReportDataDividendsAsync()
+        protected async Task<ReportData> GetReportDataDividendsAsync()
         {
             var reportData = new ReportData() 
             { 
@@ -111,7 +99,7 @@ namespace Oid85.FinMarket.Application.Services
                 Header = [ "Тикер", "Дата фикс. реестра", "Дата объяв.", "Размер, руб", "Доходность, %"]
             };
 
-            var dividendInfos = await _dividendInfoRepository.GetDividendInfosAsync();
+            var dividendInfos = await dividendInfoRepository.GetDividendInfosAsync();
 
             foreach (var dividendInfo in dividendInfos)
             {
@@ -128,6 +116,16 @@ namespace Oid85.FinMarket.Application.Services
             return reportData;
         }
 
+        protected async Task<ReportData> GetReportDataBondsAsync()
+        {
+            var reportData = new ReportData() 
+            { 
+                Title = "Bonds"
+            };
+
+            return reportData;
+        }        
+        
         private async Task<ReportData> GetReportDataByTickerListAsync(
             string analyseType, 
             Dictionary<string, List<Tuple<string, string>>> data, 
@@ -147,7 +145,7 @@ namespace Oid85.FinMarket.Application.Services
 
             foreach (var ticker in tickers)
             {
-                string sector = (await _shareRepository.GetShareByTickerAsync(ticker))!.Sector;
+                string sector = (await shareRepository.GetShareByTickerAsync(ticker))!.Sector;
 
                 var tickerData = new List<string>() { ticker, sector };
 
@@ -175,11 +173,11 @@ namespace Oid85.FinMarket.Application.Services
         {
             var data = new Dictionary<string, List<Tuple<string, string>>>();
 
-            var dividendInfos = await _dividendInfoRepository.GetDividendInfosAsync();
+            var dividendInfos = await dividendInfoRepository.GetDividendInfosAsync();
             
             foreach (var ticker in tickers)
             {
-                var analyseResults = await _analyseResultRepository.GetAnalyseResultsAsync(ticker, from, to);
+                var analyseResults = await analyseResultRepository.GetAnalyseResultsAsync(ticker, from, to);
 
                 if (analyseResults is [])
                     continue;

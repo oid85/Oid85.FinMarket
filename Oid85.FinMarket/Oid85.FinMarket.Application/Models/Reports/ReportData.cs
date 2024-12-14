@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Application.Models.Results
+﻿namespace Oid85.FinMarket.Application.Models.Reports
 {
     public class ReportData
     {

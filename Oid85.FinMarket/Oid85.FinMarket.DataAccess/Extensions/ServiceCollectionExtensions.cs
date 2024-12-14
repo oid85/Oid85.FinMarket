@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Interceptors;
@@ -22,17 +23,27 @@ namespace Oid85.FinMarket.DataAccess.Extensions
                 var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
                 
                 options
-                    .UseNpgsql(configuration.GetValue<string>(KnownSettingsKeys.Postgres_ConnectionString))
+                    .UseNpgsql(configuration
+                        .GetValue<string>(KnownSettingsKeys.PostgresConnectionString))
                     .AddInterceptors(updateInterceptor);
-            }, ServiceLifetime.Scoped, ServiceLifetime.Scoped);
+            });
 
             services.AddAutoMapper(typeof(FinMarketMappingProfile));
             
             services.AddTransient<IShareRepository, ShareRepository>();
             services.AddTransient<IBondRepository, BondRepository>();
+            services.AddTransient<IBondCouponRepository, BondCouponRepository>();
             services.AddTransient<IDividendInfoRepository, DividendInfoRepository>();
             services.AddTransient<IAnalyseResultRepository, AnalyseResultRepository>();
             services.AddTransient<ICandleRepository, CandleRepository>();
+        }
+
+        public static async Task ApplyMigrations(this IHost host)
+        {
+            var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
+            await using var scope = scopeFactory.CreateAsyncScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<FinMarketContext>();
+            await context.Database.MigrateAsync();
         }
     }
 }
