@@ -3,6 +3,7 @@
     public interface ILoadService
     {
         Task LoadStocksAsync();
+        Task LoadFuturesAsync();
         Task LoadBondsAsync();
         Task LoadCandlesAsync();
         Task LoadCandlesAsync(int year);

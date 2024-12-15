@@ -3,7 +3,7 @@ using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
 
-public class BondEntity : AuditableEntity
+public class FutureEntity : AuditableEntity
 {
     /// <summary>
     /// Тикер
@@ -16,12 +16,6 @@ public class BondEntity : AuditableEntity
     /// </summary>
     [Column("price")]
     public double Price { get; set; }
-    
-    /// <summary>
-    /// Идентификатор ISIN
-    /// </summary>
-    [Column("isin")]
-    public string Isin { get; set; } = string.Empty;
 
     /// <summary>
     /// Идентификатор FIGI
@@ -34,46 +28,28 @@ public class BondEntity : AuditableEntity
     /// </summary>
     [Column("description")]
     public string Description { get; set; } = string.Empty;
-
+    
     /// <summary>
-    /// Сектор
+    /// Дата истечения срока
     /// </summary>
-    [Column("sector")]
-    public string Sector { get; set; } = string.Empty;
-
+    [Column("expiration_date", TypeName = "date")]
+    public DateOnly ExpirationDate = DateOnly.MinValue;
+    
     /// <summary>
     /// Флаг активности
     /// </summary>
     [Column("is_active")]
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; } = true;   
     
     /// <summary>
     /// Находится в портфеле
     /// </summary>
     [Column("in_portfolio")]
-    public bool InPortfolio { get; set; }
+    public bool InPortfolio { get; set; } = false; 
     
     /// <summary>
     /// Находится в списке наблюдения
     /// </summary>
     [Column("in_watch_list")]
-    public bool InWatchList { get; set; }
-    
-    /// <summary>
-    /// Значение НКД (накопленного купонного дохода) на дату
-    /// </summary>
-    [Column("nkd")]
-    public double NKD { get; set; }
-
-    /// <summary>
-    /// Дата погашения облигации по UTC
-    /// </summary>
-    [Column("maturity_date", TypeName = "date")]
-    public DateOnly MaturityDate { get; set; } = DateOnly.MinValue;
-    
-    /// <summary>
-    /// Признак облигации с плавающим купоном
-    /// </summary>
-    [Column("floating_coupon_flag")]
-    public bool FloatingCouponFlag { get; set; }
+    public bool InWatchList { get; set; } = false; 
 }

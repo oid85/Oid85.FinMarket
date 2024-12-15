@@ -21,6 +21,17 @@ namespace Oid85.FinMarket.WebHost.Controller
                 loadService.LoadStocksAsync);
 
         /// <summary>
+        /// Загрузить справочник фьючерсов
+        /// </summary>
+        [HttpGet("load-futures")]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadFuturesAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                loadService.LoadFuturesAsync);        
+        
+        /// <summary>
         /// Загрузить справочник облигаций
         /// </summary>
         [HttpGet("load-bonds")]

@@ -12,6 +12,12 @@ public class ShareEntity : AuditableEntity
     public string Ticker { get; set; } = string.Empty;
 
     /// <summary>
+    /// Цена инструмента
+    /// </summary>
+    [Column("price")]
+    public double Price { get; set; }
+    
+    /// <summary>
     /// Идентификатор ISIN
     /// </summary>
     [Column("isin")]

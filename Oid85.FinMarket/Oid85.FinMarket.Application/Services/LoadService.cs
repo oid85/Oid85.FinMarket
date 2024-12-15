@@ -10,26 +10,35 @@ namespace Oid85.FinMarket.Application.Services
         ILogService logService,
         ITinkoffService tinkoffService,
         IShareRepository shareRepository,
+        IFutureRepository futureRepository,
         IBondRepository bondRepository,
         ICandleRepository candleRepository,
         IDividendInfoRepository dividendInfoRepository,
         IBondCouponRepository bondCouponRepository)
         : ILoadService
     {
-        public async Task LoadBondsAsync()
-        {
-            var bonds = await tinkoffService.GetBondsAsync();
-            await bondRepository.AddOrUpdateAsync(bonds);
-            
-            await logService.LogTrace($"Загружены облигации. {bonds.Count} шт.");
-        }
-
         public async Task LoadStocksAsync()
         {
             var shares = await tinkoffService.GetSharesAsync();
             await shareRepository.AddOrUpdateAsync(shares);
             
             await logService.LogTrace($"Загружены акции. {shares.Count} шт.");
+        }
+        
+        public async Task LoadFuturesAsync()
+        {
+            var futures = await tinkoffService.GetFuturesAsync();
+            await futureRepository.AddOrUpdateAsync(futures);
+            
+            await logService.LogTrace($"Загружены фьючерсы. {futures.Count} шт.");
+        }
+        
+        public async Task LoadBondsAsync()
+        {
+            var bonds = await tinkoffService.GetBondsAsync();
+            await bondRepository.AddOrUpdateAsync(bonds);
+            
+            await logService.LogTrace($"Загружены облигации. {bonds.Count} шт.");
         }
 
         public async Task LoadCandlesAsync()
@@ -41,10 +50,14 @@ namespace Oid85.FinMarket.Application.Services
                 await logService.LogTrace($"Загрузка свечей '{shares[i].Ticker}'. {i + 1} из {shares.Count}");
                 
                 var timeframe = KnownTimeframes.Daily;
-                var candles = await tinkoffService.GetCandlesAsync(shares[i], timeframe);
+                
+                var candles = await tinkoffService.GetCandlesAsync(
+                    shares[i].Figi, shares[i].Ticker, timeframe);
+                
                 await candleRepository.AddOrUpdateAsync(candles);
                 
                 double percent = ((i + 1) / (double) shares.Count) * 100;
+                
                 await logService.LogTrace($"Загружены свечи '{shares[i].Ticker}'. {i + 1} из {shares.Count}. {percent:N2} % загружено");
             }
         }
@@ -60,10 +73,14 @@ namespace Oid85.FinMarket.Application.Services
                 await logService.LogTrace($"Загрузка свечей за {year} год '{shares[i].Ticker}'. {i + 1} из {shares.Count}");
                 
                 var timeframe = KnownTimeframes.Daily;
-                var candles = await tinkoffService.GetCandlesAsync(shares[i], timeframe, year);
+                
+                var candles = await tinkoffService.GetCandlesAsync(
+                    shares[i].Figi, shares[i].Ticker, timeframe, year);
+                
                 await candleRepository.AddOrUpdateAsync(candles);
                 
                 double percent = ((i + 1) / (double) shares.Count) * 100;
+                
                 await logService.LogTrace($"Загружены свечи за {year} год '{shares[i].Ticker}'. {i + 1} из {shares.Count}. {percent:N2} % загружено");
             }
         }

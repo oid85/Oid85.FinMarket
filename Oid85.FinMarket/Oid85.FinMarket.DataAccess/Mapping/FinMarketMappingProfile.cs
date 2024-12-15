@@ -25,5 +25,8 @@ public class FinMarketMappingProfile : Profile
         
         CreateMap<ShareEntity, Share>()
             .ReverseMap();
+        
+        CreateMap<FutureEntity, Future>()
+            .ReverseMap();
     }
 }
