@@ -41,7 +41,7 @@ public class BondRepository(
 
     public Task<List<Bond>> GetBondsAsync() =>
         context.BondEntities
-            .Where(x => x.IsActive)
+            .Where(x => !x.IsDeleted)
             .Select(x => mapper.Map<Bond>(x))
             .ToListAsync();
 }

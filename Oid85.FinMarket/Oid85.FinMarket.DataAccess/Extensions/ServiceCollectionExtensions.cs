@@ -31,6 +31,7 @@ namespace Oid85.FinMarket.DataAccess.Extensions
             services.AddAutoMapper(typeof(FinMarketMappingProfile));
             
             services.AddTransient<IShareRepository, ShareRepository>();
+            services.AddTransient<IFutureRepository, FutureRepository>();
             services.AddTransient<IBondRepository, BondRepository>();
             services.AddTransient<IBondCouponRepository, BondCouponRepository>();
             services.AddTransient<IDividendInfoRepository, DividendInfoRepository>();

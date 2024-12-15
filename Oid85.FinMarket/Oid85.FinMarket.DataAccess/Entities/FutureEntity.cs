@@ -36,12 +36,6 @@ public class FutureEntity : AuditableEntity
     public DateOnly ExpirationDate = DateOnly.MinValue;
     
     /// <summary>
-    /// Флаг активности
-    /// </summary>
-    [Column("is_active")]
-    public bool IsActive { get; set; } = true;   
-    
-    /// <summary>
     /// Находится в портфеле
     /// </summary>
     [Column("in_portfolio")]

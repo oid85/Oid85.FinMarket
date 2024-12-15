@@ -40,18 +40,20 @@ public class FutureRepository(
 
     public Task<List<Future>> GetFuturesAsync() =>
         context.FutureEntities
-            .Where(x => x.IsActive)
+            .Where(x => !x.IsDeleted)
             .Select(x => mapper.Map<Future>(x))
             .ToListAsync();
 
     public Task<List<Future>> GetPortfolioFuturesAsync() =>
         context.FutureEntities
+            .Where(x => !x.IsDeleted)
             .Where(x => x.InPortfolio)
             .Select(x => mapper.Map<Future>(x))
             .ToListAsync();
 
     public Task<List<Future>> GetWatchListFuturesAsync() =>
         context.FutureEntities
+            .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .Select(x => mapper.Map<Future>(x))
             .ToListAsync();
@@ -59,6 +61,7 @@ public class FutureRepository(
     public async Task<Future?> GetFutureByTickerAsync(string ticker)
     {
         var entity = await context.FutureEntities
+            .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
         return entity is null 

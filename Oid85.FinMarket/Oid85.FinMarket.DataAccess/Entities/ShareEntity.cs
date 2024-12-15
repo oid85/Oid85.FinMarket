@@ -40,12 +40,6 @@ public class ShareEntity : AuditableEntity
     /// </summary>
     [Column("sector")]
     public string Sector { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Флаг активности
-    /// </summary>
-    [Column("is_active")]
-    public bool IsActive { get; set; } = true;   
     
     /// <summary>
     /// Находится в составе индекса Московской биржи
