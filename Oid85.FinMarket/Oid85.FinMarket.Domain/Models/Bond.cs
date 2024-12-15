@@ -33,11 +33,6 @@ public class Bond
     public string Sector { get; set; } = string.Empty;
 
     /// <summary>
-    /// Флаг активности
-    /// </summary>
-    public bool IsActive { get; set; } = true;
-    
-    /// <summary>
     /// Находится в портфеле
     /// </summary>
     public bool InPortfolio { get; set; }

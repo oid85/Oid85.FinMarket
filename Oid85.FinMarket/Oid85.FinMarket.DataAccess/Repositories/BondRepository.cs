@@ -44,4 +44,29 @@ public class BondRepository(
             .Where(x => !x.IsDeleted)
             .Select(x => mapper.Map<Bond>(x))
             .ToListAsync();
+    
+    public Task<List<Bond>> GetPortfolioBondsAsync() =>
+        context.BondEntities
+            .Where(x => !x.IsDeleted)
+            .Where(x => x.InPortfolio)
+            .Select(x => mapper.Map<Bond>(x))
+            .ToListAsync();
+
+    public Task<List<Bond>> GetWatchListBondsAsync() =>
+        context.BondEntities
+            .Where(x => !x.IsDeleted)
+            .Where(x => x.InWatchList)
+            .Select(x => mapper.Map<Bond>(x))
+            .ToListAsync();
+
+    public async Task<Bond?> GetBondByTickerAsync(string ticker)
+    {
+        var entity = await context.BondEntities
+            .Where(x => !x.IsDeleted)
+            .FirstOrDefaultAsync(x => x.Ticker == ticker);
+        
+        return entity is null 
+            ? null 
+            : mapper.Map<Bond>(entity);
+    }
 }

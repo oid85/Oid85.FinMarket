@@ -31,11 +31,6 @@ public class Share
     /// Сектор
     /// </summary>
     public string Sector { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Флаг активности
-    /// </summary>
-    public bool IsActive { get; set; } = true;   
     
     /// <summary>
     /// Находится в составе индекса Московской биржи
