@@ -1,8 +1,8 @@
 namespace Oid85.FinMarket.Application.Models.Reports;
 
 public class ReportParameter(
-    string displayType, string displayValue)
+    string type, string value)
 {
-    public string DisplayType { get; set; } = displayType;
-    public string DisplayValue { get; set; } = displayValue;
+    public string Type { get; set; } = type;
+    public string Value { get; set; } = value;
 }

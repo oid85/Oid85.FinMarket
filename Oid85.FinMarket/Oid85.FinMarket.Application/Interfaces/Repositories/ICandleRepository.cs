@@ -5,5 +5,5 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 public interface ICandleRepository
 {
     Task AddOrUpdateAsync(List<Candle> candles);
-    Task<List<Candle>> GetCandlesAsync(string ticker, string timeframe);
+    Task<List<Candle>> GetAsync(string ticker, string timeframe);
 }

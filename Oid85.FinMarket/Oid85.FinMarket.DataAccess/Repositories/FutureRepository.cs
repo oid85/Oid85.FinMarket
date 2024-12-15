@@ -38,27 +38,27 @@ public class FutureRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Future>> GetFuturesAsync() =>
+    public Task<List<Future>> GetAllAsync() =>
         context.FutureEntities
             .Where(x => !x.IsDeleted)
             .Select(x => mapper.Map<Future>(x))
             .ToListAsync();
 
-    public Task<List<Future>> GetPortfolioFuturesAsync() =>
+    public Task<List<Future>> GetPortfolioAsync() =>
         context.FutureEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InPortfolio)
             .Select(x => mapper.Map<Future>(x))
             .ToListAsync();
 
-    public Task<List<Future>> GetWatchListFuturesAsync() =>
+    public Task<List<Future>> GetWatchListAsync() =>
         context.FutureEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .Select(x => mapper.Map<Future>(x))
             .ToListAsync();
 
-    public async Task<Future?> GetFutureByTickerAsync(string ticker)
+    public async Task<Future?> GetByTickerAsync(string ticker)
     {
         var entity = await context.FutureEntities
             .Where(x => !x.IsDeleted)

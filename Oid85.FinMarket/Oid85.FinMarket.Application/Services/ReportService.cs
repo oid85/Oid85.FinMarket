@@ -22,7 +22,7 @@ namespace Oid85.FinMarket.Application.Services
         /// <inheritdoc />
         public async Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request)
         {
-            var share = await shareRepository.GetShareByTickerAsync(request.Ticker);
+            var share = await shareRepository.GetByTickerAsync(request.Ticker);
             
             if (share is null)
                 return new ();
@@ -102,7 +102,7 @@ namespace Oid85.FinMarket.Application.Services
         public async Task<ReportData> GetReportDividendsStocks()
         {
             var dividendInfos = await dividendInfoRepository
-                .GetDividendInfosAsync();
+                .GetAllAsync();
             
             var reportData = new ReportData
             {
@@ -150,7 +150,7 @@ namespace Oid85.FinMarket.Application.Services
         public async Task<ReportData> GetReportBonds()
         {
             var bonds = await bondRepository
-                .GetBondsAsync();
+                .GetAllAsync();
             
             var reportData = new ReportData
             {
@@ -165,7 +165,7 @@ namespace Oid85.FinMarket.Application.Services
             };
             
             var bondCoupons = await bondCouponRepository
-                .GetBondCouponsAsync(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+                .GetAsync(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
             
             var dates = GetDates(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
             
@@ -192,7 +192,7 @@ namespace Oid85.FinMarket.Application.Services
                     var bondCoupon = bondCoupons
                         .FirstOrDefault(x => 
                             x.Ticker == bond.Ticker && 
-                            x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.DisplayValue);
+                            x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                     data.Add(bondCoupon is not null 
                         ? new ReportParameter(
@@ -212,16 +212,16 @@ namespace Oid85.FinMarket.Application.Services
         private async Task<List<Share>> GetSharesByTickerList(string tickerList)
         {
             if (tickerList == KnownTickerLists.AllStocks)
-                return await shareRepository.GetSharesAsync();
+                return await shareRepository.GetAllAsync();
             
             if (tickerList == KnownTickerLists.MoexIndexStocks)
-                return await shareRepository.GetMoexIndexSharesAsync();
+                return await shareRepository.GetMoexIndexAsync();
             
             if (tickerList == KnownTickerLists.PortfolioStocks)
-                return await shareRepository.GetPortfolioSharesAsync();
+                return await shareRepository.GetPortfolioAsync();
             
             if (tickerList == KnownTickerLists.WatchListStocks)
-                return await shareRepository.GetWatchListSharesAsync();
+                return await shareRepository.GetWatchListAsync();
 
             return [];
         }
@@ -254,12 +254,12 @@ namespace Oid85.FinMarket.Application.Services
                 .ToList();
             
             var analyseResults = (await analyseResultRepository
-                .GetAnalyseResultsAsync(tickers, from, to))
+                .GetAsync(tickers, from, to))
                 .Where(x => x.AnalyseType == analyseType)
                 .ToList();
 
             var dividendInfos = await dividendInfoRepository
-                .GetDividendInfosAsync(tickers, to.AddDays(1), to.AddDays(WindowInDays));
+                .GetAsync(tickers, to.AddDays(1), to.AddDays(WindowInDays));
             
             var dates = GetDates(from, to.AddDays(WindowInDays));
             
@@ -291,7 +291,7 @@ namespace Oid85.FinMarket.Application.Services
                     var analyseResult = analyseResults
                         .FirstOrDefault(x => 
                             x.Ticker == share.Ticker && 
-                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.DisplayValue);
+                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                     data.Add(analyseResult is not null 
                         ? new ReportParameter(
@@ -307,7 +307,7 @@ namespace Oid85.FinMarket.Application.Services
                     var dividendInfo = dividendInfos
                         .FirstOrDefault(x => 
                             x.Ticker == share.Ticker && 
-                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.DisplayValue);
+                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                     data.Add(dividendInfo is not null 
                         ? new ReportParameter(

@@ -43,12 +43,12 @@ public class BondCouponRepository(
         await context.SaveChangesAsync();
     }
     
-    public Task<List<BondCoupon>> GetBondCouponsAsync() =>
+    public Task<List<BondCoupon>> GetAllAsync() =>
         context.BondCouponEntities
             .Select(x => mapper.Map<BondCoupon>(x))
             .ToListAsync(); 
     
-    public Task<List<BondCoupon>> GetBondCouponsAsync(
+    public Task<List<BondCoupon>> GetAsync(
         DateTime from, DateTime to) =>
         context.BondCouponEntities
             .Where(x => 

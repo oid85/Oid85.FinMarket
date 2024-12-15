@@ -43,7 +43,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadCandlesAsync()
         {
-            var shares = await shareRepository.GetSharesAsync();
+            var shares = await shareRepository.GetAllAsync();
 
             for (int i = 0; i < shares.Count; i++)
             {
@@ -64,7 +64,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadCandlesAsync(int year)
         {
-            var shares = (await shareRepository.GetSharesAsync())
+            var shares = (await shareRepository.GetAllAsync())
                 .OrderBy(share => share.Ticker)
                 .ToList();
 
@@ -87,7 +87,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadDividendInfosAsync()
         {
-            var shares = await shareRepository.GetSharesAsync();
+            var shares = await shareRepository.GetAllAsync();
             var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
             await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
             
@@ -96,7 +96,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadBondCouponsAsync()
         {
-            var bonds = await bondRepository.GetBondsAsync();
+            var bonds = await bondRepository.GetAllAsync();
             var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
             await bondCouponRepository.AddOrUpdateAsync(bondCoupons);
             

@@ -49,7 +49,7 @@ public class CandleRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Candle>> GetCandlesAsync(string ticker, string timeframe) =>
+    public Task<List<Candle>> GetAsync(string ticker, string timeframe) =>
         context.CandleEntities
             .Where(x => ticker == x.Ticker)
             .Where(x => x.Timeframe == timeframe)

@@ -39,12 +39,12 @@ public class DividendInfoRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<DividendInfo>> GetDividendInfosAsync() =>
+    public Task<List<DividendInfo>> GetAllAsync() =>
         context.DividendInfoEntities
             .Select(x => mapper.Map<DividendInfo>(x))
             .ToListAsync();
     
-    public Task<List<DividendInfo>> GetDividendInfosAsync(
+    public Task<List<DividendInfo>> GetAsync(
         List<string> tickers, DateTime from, DateTime to) =>
         context.DividendInfoEntities
             .Where(x => tickers.Contains(x.Ticker))
