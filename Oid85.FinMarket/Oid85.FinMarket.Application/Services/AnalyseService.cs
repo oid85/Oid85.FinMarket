@@ -19,7 +19,7 @@ namespace Oid85.FinMarket.Application.Services
         /// <inheritdoc />
         public async Task AnalyseStocksAsync()
         {
-            var shares = await shareRepository.GetSharesAsync();
+            var shares = await shareRepository.GetAllAsync();
             var timeframe = KnownTimeframes.Daily;
             
             for (int i = 0; i < shares.Count; i++)
@@ -55,7 +55,7 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 
@@ -116,7 +116,7 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 
@@ -183,7 +183,7 @@ namespace Oid85.FinMarket.Application.Services
             
             try
             {
-                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 
@@ -261,7 +261,7 @@ namespace Oid85.FinMarket.Application.Services
         {
             try
             {
-                var candles = (await candleRepository.GetCandlesAsync(share.Ticker, timeframe))
+                var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
                     .Where(x => x.IsComplete)
                     .ToList();
 

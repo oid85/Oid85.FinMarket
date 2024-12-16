@@ -3,7 +3,7 @@ using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
 
-public class ShareEntity : AuditableEntity
+public class FutureEntity : AuditableEntity
 {
     /// <summary>
     /// Тикер
@@ -16,12 +16,6 @@ public class ShareEntity : AuditableEntity
     /// </summary>
     [Column("price")]
     public double Price { get; set; }
-    
-    /// <summary>
-    /// Идентификатор ISIN
-    /// </summary>
-    [Column("isin")]
-    public string Isin { get; set; } = string.Empty;
 
     /// <summary>
     /// Идентификатор FIGI
@@ -34,18 +28,12 @@ public class ShareEntity : AuditableEntity
     /// </summary>
     [Column("description")]
     public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Сектор
-    /// </summary>
-    [Column("sector")]
-    public string Sector { get; set; } = string.Empty;
     
     /// <summary>
-    /// Находится в составе индекса Московской биржи
+    /// Дата истечения срока
     /// </summary>
-    [Column("in_irus_index")]
-    public bool InIrusIndex { get; set; } = false;
+    [Column("expiration_date", TypeName = "date")]
+    public DateOnly ExpirationDate = DateOnly.MinValue;
     
     /// <summary>
     /// Находится в портфеле

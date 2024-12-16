@@ -19,7 +19,7 @@ namespace Oid85.FinMarket.WebHost.Controller
         [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status500InternalServerError)]
         public Task<IActionResult> GetWatchListAsync() =>
             GetResponseAsync(
-                shareRepository.GetWatchListSharesAsync,
+                shareRepository.GetWatchListAsync,
                 result => new BaseResponse<List<Share>>
                 {
                     Result = result

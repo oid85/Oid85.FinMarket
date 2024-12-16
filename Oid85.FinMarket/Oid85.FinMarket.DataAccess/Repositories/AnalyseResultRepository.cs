@@ -38,7 +38,7 @@ public class AnalyseResultRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<AnalyseResult>> GetAnalyseResultsAsync(
+    public Task<List<AnalyseResult>> GetAsync(
         string ticker, DateTime from, DateTime to) =>
         context.AnalyseResultEntities
             .Where(x => x.Ticker == ticker)
@@ -47,7 +47,7 @@ public class AnalyseResultRepository(
             .Select(x => mapper.Map<AnalyseResult>(x))
             .ToListAsync();
     
-    public Task<List<AnalyseResult>> GetAnalyseResultsAsync(
+    public Task<List<AnalyseResult>> GetAsync(
         List<string> tickers, DateTime from, DateTime to) =>
         context.AnalyseResultEntities
             .Where(x => tickers.Contains(x.Ticker))

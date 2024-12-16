@@ -13,6 +13,11 @@ public class Bond
     public string Ticker { get; set; } = string.Empty;
 
     /// <summary>
+    /// Цена инструмента
+    /// </summary>
+    public double Price { get; set; }
+    
+    /// <summary>
     /// Идентификатор ISIN
     /// </summary>
     public string Isin { get; set; } = string.Empty;
@@ -32,11 +37,6 @@ public class Bond
     /// </summary>
     public string Sector { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Флаг активности
-    /// </summary>
-    public bool IsActive { get; set; } = true;
-    
     /// <summary>
     /// Находится в портфеле
     /// </summary>

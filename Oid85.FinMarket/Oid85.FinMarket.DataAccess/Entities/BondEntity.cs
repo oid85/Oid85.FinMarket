@@ -12,6 +12,12 @@ public class BondEntity : AuditableEntity
     public string Ticker { get; set; } = string.Empty;
 
     /// <summary>
+    /// Цена инструмента
+    /// </summary>
+    [Column("price")]
+    public double Price { get; set; }
+    
+    /// <summary>
     /// Идентификатор ISIN
     /// </summary>
     [Column("isin")]
@@ -34,12 +40,6 @@ public class BondEntity : AuditableEntity
     /// </summary>
     [Column("sector")]
     public string Sector { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Флаг активности
-    /// </summary>
-    [Column("is_active")]
-    public bool IsActive { get; set; } = true;
     
     /// <summary>
     /// Находится в портфеле

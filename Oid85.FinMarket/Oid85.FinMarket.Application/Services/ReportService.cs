@@ -22,7 +22,7 @@ namespace Oid85.FinMarket.Application.Services
         /// <inheritdoc />
         public async Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request)
         {
-            var share = await shareRepository.GetShareByTickerAsync(request.Ticker);
+            var share = await shareRepository.GetByTickerAsync(request.Ticker);
             
             if (share is null)
                 return new ();
@@ -30,8 +30,13 @@ namespace Oid85.FinMarket.Application.Services
             var reportData = new ReportData();
 
             var dates = GetDates(request.From, request.To.AddDays(WindowInDays));
+
+            reportData.Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор")
+            ];
             
-            reportData.Header = ["Тикер", "Сектор"];
             reportData.Header.AddRange(dates);
 
             reportData.Data = 
@@ -97,23 +102,44 @@ namespace Oid85.FinMarket.Application.Services
         public async Task<ReportData> GetReportDividendsStocks()
         {
             var dividendInfos = await dividendInfoRepository
-                .GetDividendInfosAsync();
+                .GetAllAsync();
             
             var reportData = new ReportData
             {
                 Title = "Информация по дивидендам",
-                Header = [ "Тикер", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %"]
+                Header =
+                [
+                    new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                    new ReportParameter(KnownDisplayTypes.String, "Фикс. р."),
+                    new ReportParameter(KnownDisplayTypes.String, "Объяв."),
+                    new ReportParameter(KnownDisplayTypes.String, "Размер, руб"),
+                    new ReportParameter(KnownDisplayTypes.String, "Дох-ть, %")
+                ]
             };
             
             foreach (var dividendInfo in dividendInfos)
             {
                 reportData.Data.Add(
                 [
-                    dividendInfo.Ticker,
-                    dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO),
-                    dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO),
-                    dividendInfo.Dividend.ToString(CultureInfo.InvariantCulture), 
-                    dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)
+                    new ReportParameter(
+                        KnownDisplayTypes.Ticker, 
+                        dividendInfo.Ticker),
+                    
+                    new ReportParameter(
+                        KnownDisplayTypes.Date, 
+                        dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)),
+                    
+                    new ReportParameter(
+                        KnownDisplayTypes.Date, 
+                        dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO)),
+                    
+                    new ReportParameter(
+                        KnownDisplayTypes.Ruble, 
+                        dividendInfo.Dividend.ToString(CultureInfo.InvariantCulture)), 
+                    
+                    new ReportParameter(
+                        KnownDisplayTypes.Percent, 
+                        dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture))
                 ]);
             }
             
@@ -124,16 +150,23 @@ namespace Oid85.FinMarket.Application.Services
         public async Task<ReportData> GetReportBonds()
         {
             var bonds = await bondRepository
-                .GetBondsAsync();
+                .GetAllAsync();
             
             var reportData = new ReportData
             {
                 Title = "Информация по облигациям",
-                Header = [ "Тикер", "Сектор", "Плав. купон", "До погаш., дней"]
+                Header =
+                [
+                    new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                    new ReportParameter(KnownDisplayTypes.String, "Сектор"),
+                    new ReportParameter(KnownDisplayTypes.String, "Плав. купон"),
+                    new ReportParameter(KnownDisplayTypes.String, "До погаш., дней"),
+                    new ReportParameter(KnownDisplayTypes.String, "Дох-ть., %")
+                ]
             };
             
             var bondCoupons = await bondCouponRepository
-                .GetBondCouponsAsync(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+                .GetAsync(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
             
             var dates = GetDates(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
             
@@ -141,24 +174,47 @@ namespace Oid85.FinMarket.Application.Services
             
             foreach (var bond in bonds)
             {
-                List<string> data =
+                List<ReportParameter> data =
                 [
-                    bond.Ticker,
-                    bond.Sector,
-                    bond.FloatingCouponFlag ? "Да" : string.Empty,
-                    (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString()
+                    new (KnownDisplayTypes.Ticker, 
+                        bond.Ticker),
+                    
+                    new (KnownDisplayTypes.Sector, bond.Sector),
+                    
+                    new (KnownDisplayTypes.String, 
+                        bond.FloatingCouponFlag ? "Да" : string.Empty),
+                    
+                    new (KnownDisplayTypes.String, 
+                        (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString())
                 ];
+                
+                // Вычисляем полную доходность облигации
+                var nextCoupon = bondCoupons
+                    .FirstOrDefault(x => x.Ticker == bond.Ticker);
+                
+                double profitPrc = 0.0;
+                
+                if (nextCoupon is not null)
+                    profitPrc = (bond.Price / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+                
+                data.Add(new ReportParameter(
+                    KnownDisplayTypes.Percent, 
+                    profitPrc.ToString(CultureInfo.InvariantCulture)));
                 
                 foreach (var date in dates)
                 {
                     var bondCoupon = bondCoupons
                         .FirstOrDefault(x => 
-                            x.Ticker == bond.Ticker && 
-                            x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date);
+                            x.Ticker == bond.Ticker &&
+                            x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                     data.Add(bondCoupon is not null 
-                        ? bondCoupon.PayOneBond.ToString(CultureInfo.InvariantCulture) 
-                        : string.Empty);
+                        ? new ReportParameter(
+                            KnownDisplayTypes.Ruble, 
+                            bondCoupon.PayOneBond.ToString(CultureInfo.InvariantCulture)) 
+                        : new ReportParameter(
+                            KnownDisplayTypes.Ruble, 
+                            string.Empty));
                 }
                 
                 reportData.Data.Add(data);
@@ -170,28 +226,31 @@ namespace Oid85.FinMarket.Application.Services
         private async Task<List<Share>> GetSharesByTickerList(string tickerList)
         {
             if (tickerList == KnownTickerLists.AllStocks)
-                return await shareRepository.GetSharesAsync();
+                return await shareRepository.GetAllAsync();
             
             if (tickerList == KnownTickerLists.MoexIndexStocks)
-                return await shareRepository.GetMoexIndexSharesAsync();
+                return await shareRepository.GetMoexIndexAsync();
             
             if (tickerList == KnownTickerLists.PortfolioStocks)
-                return await shareRepository.GetPortfolioSharesAsync();
+                return await shareRepository.GetPortfolioAsync();
             
             if (tickerList == KnownTickerLists.WatchListStocks)
-                return await shareRepository.GetWatchListSharesAsync();
+                return await shareRepository.GetWatchListAsync();
 
             return [];
         }
         
-        private List<string> GetDates(DateTime from, DateTime to)
+        private List<ReportParameter> GetDates(DateTime from, DateTime to)
         {
             var curDate = from;
-            var dates = new List<string>();
+            var dates = new List<ReportParameter>();
 
             while (curDate <= to)
             {
-                dates.Add(curDate.ToString(KnownDateTimeFormats.DateISO));
+                dates.Add(new ReportParameter(
+                    KnownDisplayTypes.Date,
+                    curDate.ToString(KnownDateTimeFormats.DateISO)));
+                
                 curDate = curDate.AddDays(1);
             }
             
@@ -209,12 +268,12 @@ namespace Oid85.FinMarket.Application.Services
                 .ToList();
             
             var analyseResults = (await analyseResultRepository
-                .GetAnalyseResultsAsync(tickers, from, to))
+                .GetAsync(tickers, from, to))
                 .Where(x => x.AnalyseType == analyseType)
                 .ToList();
 
             var dividendInfos = await dividendInfoRepository
-                .GetDividendInfosAsync(tickers, to.AddDays(1), to.AddDays(WindowInDays));
+                .GetAsync(tickers, to.AddDays(1), to.AddDays(WindowInDays));
             
             var dates = GetDates(from, to.AddDays(WindowInDays));
             
@@ -224,25 +283,37 @@ namespace Oid85.FinMarket.Application.Services
                         $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
                         $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
                 
-                Header = ["Тикер", "Сектор"]
+                Header = 
+                [
+                    new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                    new ReportParameter(KnownDisplayTypes.String, "Сектор")
+                ]
             };
 
             reportData.Header.AddRange(dates);
 
             foreach (var share in shares)
             {
-                var data = new List<string> { share.Ticker, share.Sector };
+                var data = new List<ReportParameter>
+                {
+                    new (KnownDisplayTypes.Ticker, share.Ticker), 
+                    new (KnownDisplayTypes.Sector, share.Sector)
+                };
 
                 foreach (var date in dates)
                 {
                     var analyseResult = analyseResults
                         .FirstOrDefault(x => 
                             x.Ticker == share.Ticker && 
-                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date);
+                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                     data.Add(analyseResult is not null 
-                        ? analyseResult.Result 
-                        : string.Empty);
+                        ? new ReportParameter(
+                            KnownDisplayTypes.AnalyseTypeValue, 
+                            analyseResult.Result) 
+                        : new ReportParameter(
+                            KnownDisplayTypes.AnalyseTypeValue, 
+                            string.Empty));
                 }
                 
                 foreach (var date in dates)
@@ -250,11 +321,15 @@ namespace Oid85.FinMarket.Application.Services
                     var dividendInfo = dividendInfos
                         .FirstOrDefault(x => 
                             x.Ticker == share.Ticker && 
-                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date);
+                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
-                    data.Add(dividendInfo is not null
-                        ? dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)
-                        : string.Empty);
+                    data.Add(dividendInfo is not null 
+                        ? new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)) 
+                        : new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            string.Empty));
                 }
                 
                 reportData.Data.Add(data);

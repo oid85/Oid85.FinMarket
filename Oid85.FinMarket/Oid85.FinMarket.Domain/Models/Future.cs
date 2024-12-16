@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models;
 
-public class Share
+public class Future
 {
     /// <summary>
     /// Id
@@ -11,16 +11,11 @@ public class Share
     /// Тикер
     /// </summary>
     public string Ticker { get; set; } = string.Empty;
-
+    
     /// <summary>
     /// Цена инструмента
     /// </summary>
     public double Price { get; set; }
-    
-    /// <summary>
-    /// Идентификатор ISIN
-    /// </summary>
-    public string Isin { get; set; } = string.Empty;
 
     /// <summary>
     /// Идентификатор FIGI
@@ -31,16 +26,11 @@ public class Share
     /// Описание
     /// </summary>
     public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Сектор
-    /// </summary>
-    public string Sector { get; set; } = string.Empty;
     
     /// <summary>
-    /// Находится в составе индекса Московской биржи
+    /// Дата истечения срока
     /// </summary>
-    public bool InIrusIndex { get; set; } = false;
+    public DateOnly ExpirationDate = DateOnly.MinValue;
     
     /// <summary>
     /// Находится в портфеле
@@ -50,5 +40,5 @@ public class Share
     /// <summary>
     /// Находится в списке наблюдения
     /// </summary>
-    public bool InWatchList { get; set; } = false; 
+    public bool InWatchList { get; set; } = false;
 }

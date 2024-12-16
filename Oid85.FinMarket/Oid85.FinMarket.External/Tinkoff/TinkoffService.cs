@@ -9,7 +9,9 @@ using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
 using Share = Oid85.FinMarket.Domain.Models.Share;
 using Bond = Oid85.FinMarket.Domain.Models.Bond;
+using Future = Oid85.FinMarket.Domain.Models.Future;
 using TinkoffShare = Tinkoff.InvestApi.V1.Share;
+using TinkoffFuture = Tinkoff.InvestApi.V1.Future;
 using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
 
 namespace Oid85.FinMarket.External.Tinkoff
@@ -23,12 +25,12 @@ namespace Oid85.FinMarket.External.Tinkoff
     {
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            Share share, string timeframe)
+            string figi, string ticker, string timeframe)
         {
             try
             {
                 var (from, to) = await GetDataRange(timeframe);
-                return await GetCandlesAsync(share, timeframe, from, to);
+                return await GetCandlesAsync(figi, ticker, timeframe, from, to);
             }
 
             catch (Exception exception)
@@ -40,13 +42,13 @@ namespace Oid85.FinMarket.External.Tinkoff
 
         /// <inheritdoc />
         public async Task<List<Candle>> GetCandlesAsync(
-            Share share, string timeframe, int year)
+            string figi, string ticker, string timeframe, int year)
         {
             try
             {
                 var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
                 var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
-                return await GetCandlesAsync(share, timeframe, from, to);
+                return await GetCandlesAsync(figi, ticker, timeframe, from, to);
             }
 
             catch (Exception exception)
@@ -54,14 +56,45 @@ namespace Oid85.FinMarket.External.Tinkoff
                 await logService.LogException(exception);
                 return [];
             }
-        }        
-        
+        }
+
+        /// <inheritdoc />
+        public async Task<List<double>> GetPricesAsync(List<string> figiList)
+        {
+            try
+            {
+                var request = new GetLastPricesRequest();
+
+                foreach (var figi in figiList)
+                    request.InstrumentId.Add(figi);
+
+                request.LastPriceType = LastPriceType.LastPriceExchange;
+                
+                var response = await client.MarketData.GetLastPricesAsync(request);
+                
+                if (response is null)
+                    return [];
+                
+                var result = response.LastPrices
+                    .Select(x => ConvertHelper.QuotationToDouble(x.Price))
+                    .ToList();
+
+                return result;
+            }
+
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
+        }
+
         private async Task<List<Candle>> GetCandlesAsync(
-            Share share, string timeframe, Timestamp from, Timestamp to)
+            string figi, string ticker, string timeframe, Timestamp from, Timestamp to)
         {
             var request = new GetCandlesRequest
             {
-                InstrumentId = share.Figi,
+                InstrumentId = figi,
                 From = from,
                 To = to
             };
@@ -84,7 +117,7 @@ namespace Oid85.FinMarket.External.Tinkoff
             {
                 var candle = new Candle
                 {
-                    Ticker = share.Ticker,
+                    Ticker = ticker,
                     Timeframe = timeframe,
                     Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
                     Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
@@ -140,7 +173,45 @@ namespace Oid85.FinMarket.External.Tinkoff
                 return [];
             }
         }
+        /// <inheritdoc />
+        public async Task<List<Future>> GetFuturesAsync()
+        {
+            try
+            {
+                List<TinkoffFuture> futures = (await client.Instruments
+                        .FuturesAsync()).Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList(); 
 
+                var result = new List<Future>();
+
+                foreach (var future in futures)
+                {
+                    if (future.Ticker.Contains("@"))
+                        continue;
+                    
+                    if (future.Ticker.Contains("-"))
+                        continue;
+                    
+                    result.Add(new Future
+                    {
+                        Ticker = future.Ticker,
+                        Figi = future.Figi,
+                        Description = future.Name,
+                        ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate)
+                    });
+                }
+
+                return result;
+            }
+
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
+        }
+        
         /// <inheritdoc />
         public async Task<List<Bond>> GetBondsAsync()
         {

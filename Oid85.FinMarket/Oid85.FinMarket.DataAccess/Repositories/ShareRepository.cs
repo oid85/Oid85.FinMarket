@@ -39,33 +39,41 @@ public class ShareRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Share>> GetSharesAsync() =>
+    public Task<List<Share>> GetAllAsync() =>
         context.ShareEntities
-            .Where(x => x.IsActive)
+            .Where(x => !x.IsDeleted)
             .Select(x => mapper.Map<Share>(x))
+            .OrderBy(x => x.Ticker)
             .ToListAsync();
 
-    public Task<List<Share>> GetMoexIndexSharesAsync() =>
+    public Task<List<Share>> GetMoexIndexAsync() =>
         context.ShareEntities
+            .Where(x => !x.IsDeleted)
             .Where(x => x.InIrusIndex)
             .Select(x => mapper.Map<Share>(x))
+            .OrderBy(x => x.Ticker)
             .ToListAsync();
 
-    public Task<List<Share>> GetPortfolioSharesAsync() =>
+    public Task<List<Share>> GetPortfolioAsync() =>
         context.ShareEntities
+            .Where(x => !x.IsDeleted)
             .Where(x => x.InPortfolio)
             .Select(x => mapper.Map<Share>(x))
+            .OrderBy(x => x.Ticker)
             .ToListAsync();
 
-    public Task<List<Share>> GetWatchListSharesAsync() =>
+    public Task<List<Share>> GetWatchListAsync() =>
         context.ShareEntities
+            .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .Select(x => mapper.Map<Share>(x))
+            .OrderBy(x => x.Ticker)
             .ToListAsync();
 
-    public async Task<Share?> GetShareByTickerAsync(string ticker)
+    public async Task<Share?> GetByTickerAsync(string ticker)
     {
         var entity = await context.ShareEntities
+            .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
         return entity is null 
