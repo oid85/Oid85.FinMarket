@@ -160,7 +160,8 @@ namespace Oid85.FinMarket.Application.Services
                     new ReportParameter(KnownDisplayTypes.String, "Тикер"),
                     new ReportParameter(KnownDisplayTypes.String, "Сектор"),
                     new ReportParameter(KnownDisplayTypes.String, "Плав. купон"),
-                    new ReportParameter(KnownDisplayTypes.String, "До погаш., дней")
+                    new ReportParameter(KnownDisplayTypes.String, "До погаш., дней"),
+                    new ReportParameter(KnownDisplayTypes.String, "Дох-ть., %")
                 ]
             };
             
@@ -187,11 +188,24 @@ namespace Oid85.FinMarket.Application.Services
                         (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString())
                 ];
                 
+                // Вычисляем полную доходность облигации
+                var nextCoupon = bondCoupons
+                    .FirstOrDefault(x => x.Ticker == bond.Ticker);
+                
+                double profitPrc = 0.0;
+                
+                if (nextCoupon is not null)
+                    profitPrc = (bond.Price / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+                
+                data.Add(new ReportParameter(
+                    KnownDisplayTypes.Percent, 
+                    profitPrc.ToString(CultureInfo.InvariantCulture)));
+                
                 foreach (var date in dates)
                 {
                     var bondCoupon = bondCoupons
                         .FirstOrDefault(x => 
-                            x.Ticker == bond.Ticker && 
+                            x.Ticker == bond.Ticker &&
                             x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                     data.Add(bondCoupon is not null 

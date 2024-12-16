@@ -18,6 +18,11 @@ namespace Oid85.FinMarket.External.Tinkoff
         public Task<List<Candle>> GetCandlesAsync(string figi, string ticker, string timeframe, int year);
         
         /// <summary>
+        /// Получить последние цены
+        /// </summary>
+        public Task<List<double>> GetPricesAsync(List<string> figiList);
+        
+        /// <summary>
         /// Получить список акций
         /// </summary>
         public Task<List<Share>> GetSharesAsync();

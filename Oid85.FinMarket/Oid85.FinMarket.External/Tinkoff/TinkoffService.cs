@@ -56,8 +56,39 @@ namespace Oid85.FinMarket.External.Tinkoff
                 await logService.LogException(exception);
                 return [];
             }
-        }        
-        
+        }
+
+        /// <inheritdoc />
+        public async Task<List<double>> GetPricesAsync(List<string> figiList)
+        {
+            try
+            {
+                var request = new GetLastPricesRequest();
+
+                foreach (var figi in figiList)
+                    request.InstrumentId.Add(figi);
+
+                request.LastPriceType = LastPriceType.LastPriceExchange;
+                
+                var response = await client.MarketData.GetLastPricesAsync(request);
+                
+                if (response is null)
+                    return [];
+                
+                var result = response.LastPrices
+                    .Select(x => ConvertHelper.QuotationToDouble(x.Price))
+                    .ToList();
+
+                return result;
+            }
+
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
+        }
+
         private async Task<List<Candle>> GetCandlesAsync(
             string figi, string ticker, string timeframe, Timestamp from, Timestamp to)
         {

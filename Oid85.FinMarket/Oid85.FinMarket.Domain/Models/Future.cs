@@ -11,7 +11,7 @@ public class Future
     /// Тикер
     /// </summary>
     public string Ticker { get; set; } = string.Empty;
-
+    
     /// <summary>
     /// Цена инструмента
     /// </summary>

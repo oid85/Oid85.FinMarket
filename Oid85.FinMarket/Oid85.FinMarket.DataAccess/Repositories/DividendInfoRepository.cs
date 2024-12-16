@@ -42,6 +42,7 @@ public class DividendInfoRepository(
     public Task<List<DividendInfo>> GetAllAsync() =>
         context.DividendInfoEntities
             .Select(x => mapper.Map<DividendInfo>(x))
+            .OrderBy(x => x.DividendPrc)
             .ToListAsync();
     
     public Task<List<DividendInfo>> GetAsync(
@@ -52,5 +53,6 @@ public class DividendInfoRepository(
                 x.RecordDate >= DateOnly.FromDateTime(from) && 
                 x.RecordDate <= DateOnly.FromDateTime(to))
             .Select(x => mapper.Map<DividendInfo>(x))
+            .OrderBy(x => x.DividendPrc)
             .ToListAsync();
 }

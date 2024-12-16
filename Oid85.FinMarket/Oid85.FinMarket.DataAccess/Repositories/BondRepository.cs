@@ -43,6 +43,7 @@ public class BondRepository(
         context.BondEntities
             .Where(x => !x.IsDeleted)
             .Select(x => mapper.Map<Bond>(x))
+            .OrderBy(x => x.Ticker)
             .ToListAsync();
     
     public Task<List<Bond>> GetPortfolioAsync() =>
@@ -50,6 +51,7 @@ public class BondRepository(
             .Where(x => !x.IsDeleted)
             .Where(x => x.InPortfolio)
             .Select(x => mapper.Map<Bond>(x))
+            .OrderBy(x => x.Ticker)
             .ToListAsync();
 
     public Task<List<Bond>> GetWatchListAsync() =>
@@ -57,6 +59,7 @@ public class BondRepository(
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .Select(x => mapper.Map<Bond>(x))
+            .OrderBy(x => x.Ticker)
             .ToListAsync();
 
     public async Task<Bond?> GetByTickerAsync(string ticker)
