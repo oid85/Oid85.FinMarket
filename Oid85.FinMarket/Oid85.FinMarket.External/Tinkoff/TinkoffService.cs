@@ -252,6 +252,48 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
         
         /// <inheritdoc />
+        public async Task<List<Indicative>> GetIndicativesAsync()
+        {
+            try
+            {
+                var request = new IndicativesRequest();
+                
+                
+                List<TinkoffIndicative> bonds = (await client.Instruments
+                        .Indicatives()).Instruments
+                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                    .ToList();
+
+                var result = new List<Bond>();
+
+                foreach (var bond in bonds)
+                {
+                    var instrument = new Bond
+                    {
+                        Ticker = bond.Ticker,
+                        Figi = bond.Figi,
+                        Isin = bond.Isin,
+                        Description = bond.Name,
+                        Sector = bond.Sector,
+                        NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
+                        MaturityDate = DateOnly.FromDateTime(bond.MaturityDate.ToDateTime().Date),
+                        FloatingCouponFlag = bond.FloatingCouponFlag
+                    };
+
+                    result.Add(instrument);
+                }
+
+                return result;
+            }
+
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
+        }
+        
+        /// <inheritdoc />
         public async Task<List<DividendInfo>> GetDividendInfoAsync(
             List<Share> shares)
         {

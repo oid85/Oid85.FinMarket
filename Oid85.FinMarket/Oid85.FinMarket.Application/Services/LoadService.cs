@@ -13,6 +13,7 @@ namespace Oid85.FinMarket.Application.Services
         IShareRepository shareRepository,
         IFutureRepository futureRepository,
         IBondRepository bondRepository,
+        IIndicativeRepository indicativeRepository,
         ICandleRepository candleRepository,
         IDividendInfoRepository dividendInfoRepository,
         IBondCouponRepository bondCouponRepository)
@@ -74,6 +75,14 @@ namespace Oid85.FinMarket.Application.Services
             await logService.LogTrace($"Загружены облигации. {bonds.Count} шт.");
         }
 
+        public async Task LoadIndicativesAsync()
+        {
+            var indicatives = await tinkoffService.GetIndicativesAsync();
+            await indicativeRepository.AddOrUpdateAsync(indicatives);
+            
+            await logService.LogTrace($"Загружены индикативные инструменты. {indicatives.Count} шт.");
+        }
+        
         public async Task LoadStocksDailyCandlesAsync()
         {
             var shares = await shareRepository.GetAllAsync();

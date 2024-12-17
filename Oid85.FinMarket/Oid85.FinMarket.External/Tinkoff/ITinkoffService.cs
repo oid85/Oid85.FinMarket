@@ -38,6 +38,11 @@ namespace Oid85.FinMarket.External.Tinkoff
         public Task<List<Bond>> GetBondsAsync();
 
         /// <summary>
+        /// Получить список индикативов
+        /// </summary>
+        public Task<List<Indicative>> GetIndicativesAsync();
+        
+        /// <summary>
         /// Получить информацию по дивидендам
         /// </summary>
         public Task<List<DividendInfo>> GetDividendInfoAsync(List<Share> shares);

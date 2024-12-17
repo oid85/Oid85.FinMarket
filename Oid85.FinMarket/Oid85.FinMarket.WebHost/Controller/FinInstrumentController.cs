@@ -11,9 +11,9 @@ namespace Oid85.FinMarket.WebHost.Controller
     public class FinInstrumentController(IShareRepository shareRepository) : FinMarketBaseController
     {
         /// <summary>
-        /// Получить инструменты из листа наблюдения
+        /// Получить акции из листа наблюдения
         /// </summary>
-        [HttpGet("fin-instrument/watch-list")]
+        [HttpGet("fin-instrument/watch-list/stocks")]
         [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status500InternalServerError)]
