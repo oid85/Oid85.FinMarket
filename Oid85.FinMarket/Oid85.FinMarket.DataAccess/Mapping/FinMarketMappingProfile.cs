@@ -28,5 +28,8 @@ public class FinMarketMappingProfile : Profile
         
         CreateMap<FutureEntity, Future>()
             .ReverseMap();
+        
+        CreateMap<IndicativeEntity, Indicative>()
+            .ReverseMap();
     }
 }

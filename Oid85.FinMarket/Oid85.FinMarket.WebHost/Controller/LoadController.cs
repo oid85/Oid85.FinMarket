@@ -43,6 +43,17 @@ namespace Oid85.FinMarket.WebHost.Controller
                 loadService.LoadBondsAsync);
         
         /// <summary>
+        /// Загрузить справочник индикативных инструментов
+        /// </summary>
+        [HttpGet("load-indicatives")]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadIndicativesAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                loadService.LoadIndicativesAsync);        
+        
+        /// <summary>
         /// Подгрузить последние свечи по акциям
         /// </summary>
         [HttpGet("load-stocks-daily-candles")]
@@ -142,5 +153,16 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> LoadBondPricesAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
                 loadService.LoadBondPricesAsync);
+        
+        /// <summary>
+        /// Загрузить последние цены индикативных инструментов
+        /// </summary>
+        [HttpGet("load-indicative-prices")]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadIndicativePricesAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                loadService.LoadIndicativePricesAsync);
     }    
 }

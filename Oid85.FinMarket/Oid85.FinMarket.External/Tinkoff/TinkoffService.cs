@@ -252,6 +252,47 @@ namespace Oid85.FinMarket.External.Tinkoff
         }
         
         /// <inheritdoc />
+        public async Task<List<Indicative>> GetIndicativesAsync()
+        {
+            try
+            {
+                var request = new IndicativesRequest();
+                
+                var indicatives = (await client.Instruments
+                    .IndicativesAsync(request))
+                    .Instruments
+                    .ToList();
+
+                var result = new List<Indicative>();
+
+                foreach (var indicative in indicatives)
+                {
+                    var instrument = new Indicative
+                    {
+                        Figi = indicative.Figi,
+                        Ticker = indicative.Ticker,
+                        ClassCode = indicative.ClassCode,
+                        Currency = indicative.Currency,
+                        InstrumentKind = indicative.InstrumentKind.ToString(),
+                        Name = indicative.Name,
+                        Exchange = indicative.Exchange,
+                        Uid = indicative.Uid
+                    };
+
+                    result.Add(instrument);
+                }
+
+                return result;
+            }
+
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
+        }
+        
+        /// <inheritdoc />
         public async Task<List<DividendInfo>> GetDividendInfoAsync(
             List<Share> shares)
         {
