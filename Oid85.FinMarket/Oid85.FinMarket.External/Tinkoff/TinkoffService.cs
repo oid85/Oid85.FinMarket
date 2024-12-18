@@ -258,26 +258,25 @@ namespace Oid85.FinMarket.External.Tinkoff
             {
                 var request = new IndicativesRequest();
                 
-                
-                List<TinkoffIndicative> bonds = (await client.Instruments
-                        .Indicatives()).Instruments
-                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                var indicatives = (await client.Instruments
+                    .IndicativesAsync(request))
+                    .Instruments
                     .ToList();
 
-                var result = new List<Bond>();
+                var result = new List<Indicative>();
 
-                foreach (var bond in bonds)
+                foreach (var indicative in indicatives)
                 {
-                    var instrument = new Bond
+                    var instrument = new Indicative
                     {
-                        Ticker = bond.Ticker,
-                        Figi = bond.Figi,
-                        Isin = bond.Isin,
-                        Description = bond.Name,
-                        Sector = bond.Sector,
-                        NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
-                        MaturityDate = DateOnly.FromDateTime(bond.MaturityDate.ToDateTime().Date),
-                        FloatingCouponFlag = bond.FloatingCouponFlag
+                        Figi = indicative.Figi,
+                        Ticker = indicative.Ticker,
+                        ClassCode = indicative.ClassCode,
+                        Currency = indicative.Currency,
+                        InstrumentKind = indicative.InstrumentKind.ToString(),
+                        Name = indicative.Name,
+                        Exchange = indicative.Exchange,
+                        Uid = indicative.Uid
                     };
 
                     result.Add(instrument);
