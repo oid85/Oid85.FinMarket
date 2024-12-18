@@ -18,6 +18,11 @@ public class Indicative
     public string Ticker { get; set; }
     
     /// <summary>
+    /// Цена инструмента
+    /// </summary>
+    public double Price { get; set; }
+    
+    /// <summary>
     /// Класс-код инструмента
     /// </summary>
     public string ClassCode { get; set; }

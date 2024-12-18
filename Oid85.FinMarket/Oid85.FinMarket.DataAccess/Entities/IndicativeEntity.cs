@@ -18,6 +18,12 @@ public class IndicativeEntity : AuditableEntity
     public string Ticker { get; set; }
     
     /// <summary>
+    /// Цена инструмента
+    /// </summary>
+    [Column("price")]
+    public double Price { get; set; }
+    
+    /// <summary>
     /// Класс-код инструмента
     /// </summary>
     [Column("class_code")]

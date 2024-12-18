@@ -19,5 +19,6 @@ namespace Oid85.FinMarket.Application.Interfaces.Services
         Task LoadBondPricesAsync();
         Task LoadDividendInfosAsync();
         Task LoadIndicativesAsync();
+        Task LoadIndicativePricesAsync();
     }
 }

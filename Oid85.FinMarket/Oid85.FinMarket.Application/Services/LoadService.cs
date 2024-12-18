@@ -67,6 +67,22 @@ namespace Oid85.FinMarket.Application.Services
             await logService.LogTrace($"Загружены последние цены по фьючерсам. {futures.Count} шт.");
         }
 
+        public async Task LoadIndicativePricesAsync()
+        {
+            var indicatives = await tinkoffService.GetIndicativesAsync();
+            
+            var figiList = indicatives.Select(x => x.Figi).ToList();
+            
+            var lastPrices = await tinkoffService.GetPricesAsync(figiList);
+
+            for (int i = 0; i < indicatives.Count; i++) 
+                indicatives[i].Price = lastPrices[i];
+            
+            await indicativeRepository.AddOrUpdateAsync(indicatives);
+            
+            await logService.LogTrace($"Загружены последние цены по индикативам. {indicatives.Count} шт.");
+        }
+        
         public async Task LoadBondsAsync()
         {
             var bonds = await tinkoffService.GetBondsAsync();
