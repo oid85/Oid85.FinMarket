@@ -28,7 +28,8 @@ namespace Oid85.FinMarket.DataAccess.Extensions
                     .AddInterceptors(updateInterceptor);
             });
 
-            services.AddAutoMapper(typeof(FinMarketMappingProfile));
+            var mapsterConfig = new MapsterConfig();
+            services.AddSingleton<MapsterConfig>();
             
             services.AddTransient<IShareRepository, ShareRepository>();
             services.AddTransient<IFutureRepository, FutureRepository>();
