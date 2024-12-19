@@ -43,6 +43,11 @@ namespace Oid85.FinMarket.External.Tinkoff
         public Task<List<Indicative>> GetIndicativesAsync();
         
         /// <summary>
+        /// Получить список валют
+        /// </summary>
+        public Task<List<Currency>> GetCurrenciesAsync();
+        
+        /// <summary>
         /// Получить информацию по дивидендам
         /// </summary>
         public Task<List<DividendInfo>> GetDividendInfoAsync(List<Share> shares);

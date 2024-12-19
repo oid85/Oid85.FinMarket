@@ -14,6 +14,7 @@ namespace Oid85.FinMarket.Application.Services
         IFutureRepository futureRepository,
         IBondRepository bondRepository,
         IIndicativeRepository indicativeRepository,
+        ICurrencyRepository currencyRepository,
         ICandleRepository candleRepository,
         IDividendInfoRepository dividendInfoRepository,
         IBondCouponRepository bondCouponRepository)
@@ -29,7 +30,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadStockPricesAsync()
         {
-            var shares = await tinkoffService.GetSharesAsync();
+            var shares = await shareRepository.GetAllAsync();
             
             var figiList = shares.Select(x => x.Figi).ToList();
             
@@ -53,7 +54,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadFuturePricesAsync()
         {
-            var futures = await tinkoffService.GetFuturesAsync();
+            var futures = await futureRepository.GetAllAsync();
             
             var figiList = futures.Select(x => x.Figi).ToList();
             
@@ -69,7 +70,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadIndicativePricesAsync()
         {
-            var indicatives = await tinkoffService.GetIndicativesAsync();
+            var indicatives = await indicativeRepository.GetAllAsync();
             
             var figiList = indicatives.Select(x => x.Figi).ToList();
             
@@ -82,7 +83,31 @@ namespace Oid85.FinMarket.Application.Services
             
             await logService.LogTrace($"Загружены последние цены по индикативам. {indicatives.Count} шт.");
         }
-        
+
+        public async Task LoadCurrenciesAsync()
+        {
+            var currencies = await tinkoffService.GetCurrenciesAsync();
+            await currencyRepository.AddOrUpdateAsync(currencies);
+            
+            await logService.LogTrace($"Загружены валюты. {currencies.Count} шт.");
+        }
+
+        public async Task LoadCurrencyPricesAsync()
+        {
+            var currencies = await currencyRepository.GetAllAsync();
+            
+            var figiList = currencies.Select(x => x.Figi).ToList();
+            
+            var lastPrices = await tinkoffService.GetPricesAsync(figiList);
+
+            for (int i = 0; i < currencies.Count; i++) 
+                currencies[i].Price = lastPrices[i];
+            
+            await currencyRepository.AddOrUpdateAsync(currencies);
+            
+            await logService.LogTrace($"Загружены последние цены по валютам. {currencies.Count} шт.");
+        }
+
         public async Task LoadBondsAsync()
         {
             var bonds = await tinkoffService.GetBondsAsync();
@@ -213,7 +238,7 @@ namespace Oid85.FinMarket.Application.Services
 
         public async Task LoadBondPricesAsync()
         {
-            var bonds = await tinkoffService.GetBondsAsync();
+            var bonds = await bondRepository.GetAllAsync();
             
             var figiList = bonds.Select(x => x.Figi).ToList();
             
