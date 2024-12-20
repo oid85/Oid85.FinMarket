@@ -1,5 +1,8 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Hangfire;
+using Hangfire.PostgreSql;
+using Microsoft.OpenApi.Models;
 using NLog;
+using Oid85.FinMarket.Common.KnownConstants;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Extensions
@@ -51,6 +54,21 @@ namespace Oid85.FinMarket.WebHost.Extensions
             });
         }
 
+        public static void ConfigureHangfire(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(options => 
+                    options.UseNpgsqlConnection(configuration
+                        .GetValue<string>(KnownSettingsKeys.PostgresHangfireConnectionString))));
+            
+            services.AddHangfireServer();
+        }
+        
         public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
             where TService : class
             where TImplementation : class, TService

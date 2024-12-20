@@ -11,6 +11,7 @@ namespace Oid85.FinMarket.Application.Extensions
             services.AddTransient<ILoadService, LoadService>();
             services.AddTransient<IAnalyseService, AnalyseService>();
             services.AddTransient<IReportService, ReportService>();
+            services.AddTransient<IJobService, JobService>();
         }
     }
 }

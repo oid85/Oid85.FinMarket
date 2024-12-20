@@ -1,3 +1,4 @@
+using Hangfire;
 using Oid85.FinMarket.WebHost.Extensions;
 using Oid85.FinMarket.External.Extensions;
 using Oid85.FinMarket.Application.Extensions;
@@ -21,6 +22,8 @@ namespace Oid85.FinMarket.WebHost
             builder.Services.ConfigureExternalServices(builder.Configuration);
             builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
             builder.Services.ConfigureLogs(builder.Configuration);
+            builder.Services.ConfigureHangfire(builder.Configuration);
+            
             builder.Services.AddWindowsService(options =>
             {
                 options.ServiceName = "Oid85 FinMarket Service";
@@ -42,6 +45,8 @@ namespace Oid85.FinMarket.WebHost
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1");
             });
 
+            app.UseHangfireDashboard("/dashboard");
+            
             app.MapControllers();
 
             await app.RunAsync();

@@ -19,7 +19,7 @@ namespace Oid85.FinMarket.Logging.Extensions
             {
                 options
                     .UseNpgsql(configuration
-                        .GetValue<string>(KnownSettingsKeys.PostgresConnectionString));
+                        .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString));
             });
             
             services.AddTransient<ILogRepository, LogRepository>();

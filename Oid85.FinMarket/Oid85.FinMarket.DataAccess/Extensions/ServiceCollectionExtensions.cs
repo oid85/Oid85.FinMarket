@@ -24,7 +24,7 @@ namespace Oid85.FinMarket.DataAccess.Extensions
                 
                 options
                     .UseNpgsql(configuration
-                        .GetValue<string>(KnownSettingsKeys.PostgresConnectionString))
+                        .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString))
                     .AddInterceptors(updateInterceptor);
             });
 
