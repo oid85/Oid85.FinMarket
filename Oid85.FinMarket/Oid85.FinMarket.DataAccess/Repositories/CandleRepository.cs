@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class CandleRepository(
-    FinMarketContext context,
-    IMapper mapper) : ICandleRepository
+    FinMarketContext context) : ICandleRepository
 {
     public async Task AddOrUpdateAsync(List<Candle> candles)
     {
@@ -21,7 +20,7 @@ public class CandleRepository(
         if (lastEntity is null)
         {
             var entities = candles
-                .Select(x => mapper.Map<CandleEntity>(x));
+                .Select(x => x.Adapt<CandleEntity>());
             await context.CandleEntities.AddRangeAsync(entities);
         }
         
@@ -30,17 +29,11 @@ public class CandleRepository(
             if (!lastEntity.IsComplete)
             {
                 var candle = candles.First(x => x.Date == lastEntity.Date);
-                
-                lastEntity.Open = candle.Open;
-                lastEntity.Close = candle.Close;
-                lastEntity.High = candle.High;
-                lastEntity.Low = candle.Low;
-                lastEntity.Volume = candle.Volume;
-                lastEntity.IsComplete = candle.IsComplete;
+                lastEntity.Adapt(candle);
             }
 
             var entities = candles
-                .Select(x => mapper.Map<CandleEntity>(x))
+                .Select(x => x.Adapt<CandleEntity>())
                 .Where(x => x.Date > lastEntity.Date);
                 
             await context.CandleEntities.AddRangeAsync(entities);  
@@ -54,7 +47,7 @@ public class CandleRepository(
             .Where(x => ticker == x.Ticker)
             .Where(x => x.Timeframe == timeframe)
             .OrderBy(x => x.Date)
-            .Select(x => mapper.Map<Candle>(x))
+            .Select(x => x.Adapt<Candle>())
             .ToListAsync();
 
     private async Task<CandleEntity?> GetLastAsync(string ticker, string timeframe)
