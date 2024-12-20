@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class AnalyseResultRepository(
-    FinMarketContext context,
-    IMapper mapper) : IAnalyseResultRepository
+    FinMarketContext context) : IAnalyseResultRepository
 {
     public async Task AddOrUpdateAsync(List<AnalyseResult> results)
     {
@@ -21,7 +20,7 @@ public class AnalyseResultRepository(
         if (lastEntity is null)
         {
             var entities = results
-                .Select(x => mapper.Map<AnalyseResultEntity>(x));
+                .Select(x => x.Adapt<AnalyseResultEntity>());
             
             await context.AnalyseResultEntities.AddRangeAsync(entities);
         }
@@ -29,7 +28,7 @@ public class AnalyseResultRepository(
         else
         {
             var entities = results
-                .Select(x => mapper.Map<AnalyseResultEntity>(x))
+                .Select(x => x.Adapt<AnalyseResultEntity>())
                 .Where(x => x.Date > lastEntity.Date);
                 
             await context.AnalyseResultEntities.AddRangeAsync(entities);    
@@ -44,7 +43,7 @@ public class AnalyseResultRepository(
             .Where(x => x.Ticker == ticker)
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
-            .Select(x => mapper.Map<AnalyseResult>(x))
+            .Select(x => x.Adapt<AnalyseResult>())
             .ToListAsync();
     
     public Task<List<AnalyseResult>> GetAsync(
@@ -53,7 +52,7 @@ public class AnalyseResultRepository(
             .Where(x => tickers.Contains(x.Ticker))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
-            .Select(x => mapper.Map<AnalyseResult>(x))
+            .Select(x => x.Adapt<AnalyseResult>())
             .ToListAsync();
 
     private async Task<AnalyseResultEntity?> GetLastAsync(string ticker, string timeframe)

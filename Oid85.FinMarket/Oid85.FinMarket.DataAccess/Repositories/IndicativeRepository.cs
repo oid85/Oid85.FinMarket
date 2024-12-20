@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class IndicativeRepository(
-    FinMarketContext context,
-    IMapper mapper) : IIndicativeRepository
+    FinMarketContext context) : IIndicativeRepository
 {
     public async Task AddOrUpdateAsync(List<Indicative> indicatives)
     {
@@ -23,20 +22,13 @@ public class IndicativeRepository(
 
             if (entity is null)
             {
-                entity = mapper.Map<IndicativeEntity>(indicative);
+                entity = indicative.Adapt<IndicativeEntity>();
                 await context.IndicativeEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Figi = indicative.Figi;
-                entity.Ticker = indicative.Ticker;
-                entity.ClassCode = indicative.ClassCode;
-                entity.Currency = indicative.Currency;
-                entity.InstrumentKind = indicative.InstrumentKind;
-                entity.Name = indicative.Name;
-                entity.Exchange = indicative.Exchange;
-                entity.Uid = indicative.Uid;
+                entity.Adapt(indicative);
             }
         }
 
@@ -46,7 +38,7 @@ public class IndicativeRepository(
     public Task<List<Indicative>> GetAllAsync() =>
         context.IndicativeEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => mapper.Map<Indicative>(x))
+            .Select(x => x.Adapt<Indicative>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -54,7 +46,7 @@ public class IndicativeRepository(
         context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => mapper.Map<Indicative>(x))
+            .Select(x => x.Adapt<Indicative>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -63,9 +55,7 @@ public class IndicativeRepository(
         var entity = await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
-        
-        return entity is null 
-            ? null 
-            : mapper.Map<Indicative>(entity);
+
+        return entity?.Adapt<Indicative>();
     }
 }

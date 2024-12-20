@@ -54,6 +54,17 @@ namespace Oid85.FinMarket.WebHost.Controller
                 loadService.LoadIndicativesAsync);        
         
         /// <summary>
+        /// Загрузить справочник валют
+        /// </summary>
+        [HttpGet("load-currencies")]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadCurrenciesAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                loadService.LoadCurrenciesAsync);         
+        
+        /// <summary>
         /// Подгрузить последние свечи по акциям
         /// </summary>
         [HttpGet("load-stocks-daily-candles")]
@@ -164,5 +175,16 @@ namespace Oid85.FinMarket.WebHost.Controller
         public Task<IActionResult> LoadIndicativePricesAsync() =>
             GetResponseAsync<object, BaseResponse<object>>(
                 loadService.LoadIndicativePricesAsync);
+        
+        /// <summary>
+        /// Загрузить последние цены валют
+        /// </summary>
+        [HttpGet("load-curency-prices")]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> LoadCurrencyPricesAsync() =>
+            GetResponseAsync<object, BaseResponse<object>>(
+                loadService.LoadCurrencyPricesAsync);
     }    
 }

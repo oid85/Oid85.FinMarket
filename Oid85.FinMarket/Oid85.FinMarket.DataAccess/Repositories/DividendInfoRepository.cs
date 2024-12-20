@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class DividendInfoRepository(
-    FinMarketContext context,
-    IMapper mapper) : IDividendInfoRepository
+    FinMarketContext context) : IDividendInfoRepository
 {
     public async Task AddOrUpdateAsync(List<DividendInfo> dividendInfos)
     {
@@ -25,14 +24,13 @@ public class DividendInfoRepository(
 
             if (entity is null)
             {
-                entity = mapper.Map<DividendInfoEntity>(dividendInfo);
+                entity = dividendInfo.Adapt<DividendInfoEntity>();
                 await context.DividendInfoEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Dividend = dividendInfo.Dividend;
-                entity.DividendPrc = dividendInfo.DividendPrc;
+                entity.Adapt(dividendInfo);
             }
         }
 
@@ -41,7 +39,7 @@ public class DividendInfoRepository(
 
     public Task<List<DividendInfo>> GetAllAsync() =>
         context.DividendInfoEntities
-            .Select(x => mapper.Map<DividendInfo>(x))
+            .Select(x => x.Adapt<DividendInfo>())
             .OrderBy(x => x.DividendPrc)
             .ToListAsync();
     
@@ -52,7 +50,7 @@ public class DividendInfoRepository(
             .Where(x => 
                 x.RecordDate >= DateOnly.FromDateTime(from) && 
                 x.RecordDate <= DateOnly.FromDateTime(to))
-            .Select(x => mapper.Map<DividendInfo>(x))
+            .Select(x => x.Adapt<DividendInfo>())
             .OrderBy(x => x.DividendPrc)
             .ToListAsync();
 }

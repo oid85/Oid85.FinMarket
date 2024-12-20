@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class BondCouponRepository(
-    FinMarketContext context,
-    IMapper mapper) : IBondCouponRepository
+    FinMarketContext context) : IBondCouponRepository
 {
     public async Task AddOrUpdateAsync(List<BondCoupon> bondCoupons)
     {
@@ -24,19 +23,13 @@ public class BondCouponRepository(
 
             if (entity is null)
             {
-                entity = mapper.Map<BondCouponEntity>(bondCoupon);
+                entity = bondCoupon.Adapt<BondCouponEntity>();
                 await context.BondCouponEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Ticker = bondCoupon.Ticker;
-                entity.CouponDate = bondCoupon.CouponDate;
-                entity.CouponNumber = bondCoupon.CouponNumber;
-                entity.CouponPeriod = bondCoupon.CouponPeriod;
-                entity.CouponStartDate = bondCoupon.CouponStartDate;
-                entity.CouponEndDate = bondCoupon.CouponEndDate;
-                entity.PayOneBond = bondCoupon.PayOneBond;
+                entity.Adapt(bondCoupon);
             }
         }
 
@@ -45,7 +38,7 @@ public class BondCouponRepository(
     
     public Task<List<BondCoupon>> GetAllAsync() =>
         context.BondCouponEntities
-            .Select(x => mapper.Map<BondCoupon>(x))
+            .Select(x => x.Adapt<BondCoupon>())
             .ToListAsync(); 
     
     public Task<List<BondCoupon>> GetAsync(
@@ -54,6 +47,6 @@ public class BondCouponRepository(
             .Where(x => 
                 x.CouponDate >= DateOnly.FromDateTime(from) && 
                 x.CouponDate <= DateOnly.FromDateTime(to))
-            .Select(x => mapper.Map<BondCoupon>(x))
+            .Select(x => x.Adapt<BondCoupon>())
             .ToListAsync();   
 }

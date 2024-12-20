@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class BondRepository(
-    FinMarketContext context,
-    IMapper mapper) : IBondRepository
+    FinMarketContext context) : IBondRepository
 {
     public async Task AddOrUpdateAsync(List<Bond> bonds)
     {        
@@ -23,16 +22,13 @@ public class BondRepository(
 
             if (entity is null)
             {
-                entity = mapper.Map<BondEntity>(bond);
+                entity = bond.Adapt<BondEntity>();
                 await context.BondEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Isin = bond.Isin;
-                entity.Figi = bond.Figi;
-                entity.Description = bond.Description;
-                entity.Sector = bond.Sector;
+                entity.Adapt(bond);
             }
         }
 
@@ -42,7 +38,7 @@ public class BondRepository(
     public Task<List<Bond>> GetAllAsync() =>
         context.BondEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => mapper.Map<Bond>(x))
+            .Select(x => x.Adapt<Bond>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
     
@@ -50,7 +46,7 @@ public class BondRepository(
         context.BondEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InPortfolio)
-            .Select(x => mapper.Map<Bond>(x))
+            .Select(x => x.Adapt<Bond>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -58,7 +54,7 @@ public class BondRepository(
         context.BondEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => mapper.Map<Bond>(x))
+            .Select(x => x.Adapt<Bond>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -68,8 +64,6 @@ public class BondRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity is null 
-            ? null 
-            : mapper.Map<Bond>(entity);
+        return entity?.Adapt<Bond>();
     }
 }

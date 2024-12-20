@@ -9,6 +9,7 @@ using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
 using Share = Oid85.FinMarket.Domain.Models.Share;
 using Bond = Oid85.FinMarket.Domain.Models.Bond;
+using Currency = Oid85.FinMarket.Domain.Models.Currency;
 using Future = Oid85.FinMarket.Domain.Models.Future;
 using TinkoffShare = Tinkoff.InvestApi.V1.Share;
 using TinkoffFuture = Tinkoff.InvestApi.V1.Future;
@@ -291,7 +292,47 @@ namespace Oid85.FinMarket.External.Tinkoff
                 return [];
             }
         }
-        
+
+        /// <inheritdoc />
+        public async Task<List<Currency>> GetCurrenciesAsync()
+        {
+            try
+            {
+                var request = new InstrumentsRequest();
+                
+                var currencies = (await client.Instruments
+                        .CurrenciesAsync(request))
+                    .Instruments
+                    .ToList();
+
+                var result = new List<Currency>();
+
+                foreach (var currency in currencies)
+                {
+                    var instrument = new Currency
+                    {
+                        Ticker = currency.Ticker,
+                        Isin = currency.Isin,
+                        Figi = currency.Figi,
+                        ClassCode = currency.ClassCode,
+                        Name = currency.Name,
+                        IsoCurrencyName = currency.IsoCurrencyName,
+                        Uid = currency.Uid
+                    };
+
+                    result.Add(instrument);
+                }
+
+                return result;
+            }
+
+            catch (Exception exception)
+            {
+                await logService.LogException(exception);
+                return [];
+            }
+        }
+
         /// <inheritdoc />
         public async Task<List<DividendInfo>> GetDividendInfoAsync(
             List<Share> shares)

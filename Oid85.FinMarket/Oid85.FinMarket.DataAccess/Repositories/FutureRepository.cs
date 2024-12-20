@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class FutureRepository(
-    FinMarketContext context,
-    IMapper mapper) : IFutureRepository
+    FinMarketContext context) : IFutureRepository
 {
     public async Task AddOrUpdateAsync(List<Future> futures)
     {
@@ -23,15 +22,13 @@ public class FutureRepository(
 
             if (entity is null)
             {
-                entity = mapper.Map<FutureEntity>(future);
+                entity = future.Adapt<FutureEntity>();
                 await context.FutureEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Figi = future.Figi;
-                entity.Description = future.Description;
-                entity.ExpirationDate = future.ExpirationDate;
+                entity.Adapt(future);
             }
         }
 
@@ -41,7 +38,7 @@ public class FutureRepository(
     public Task<List<Future>> GetAllAsync() =>
         context.FutureEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => mapper.Map<Future>(x))
+            .Select(x => x.Adapt<Future>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -49,7 +46,7 @@ public class FutureRepository(
         context.FutureEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InPortfolio)
-            .Select(x => mapper.Map<Future>(x))
+            .Select(x => x.Adapt<Future>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -57,7 +54,7 @@ public class FutureRepository(
         context.FutureEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => mapper.Map<Future>(x))
+            .Select(x => x.Adapt<Future>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -66,9 +63,7 @@ public class FutureRepository(
         var entity = await context.FutureEntities
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
-        
-        return entity is null 
-            ? null 
-            : mapper.Map<Future>(entity);
+
+        return entity?.Adapt<Future>();
     }
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
@@ -7,8 +7,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class ShareRepository(
-    FinMarketContext context,
-    IMapper mapper) : IShareRepository
+    FinMarketContext context) : IShareRepository
 {
     public async Task AddOrUpdateAsync(List<Share> shares)
     {
@@ -23,16 +22,13 @@ public class ShareRepository(
 
             if (entity is null)
             {
-                entity = mapper.Map<ShareEntity>(share);
+                entity = share.Adapt<ShareEntity>();
                 await context.ShareEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Isin = share.Isin;
-                entity.Figi = share.Figi;
-                entity.Description = share.Description;
-                entity.Sector = share.Sector;
+                entity.Adapt(share);
             }
         }
 
@@ -42,7 +38,7 @@ public class ShareRepository(
     public Task<List<Share>> GetAllAsync() =>
         context.ShareEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => mapper.Map<Share>(x))
+            .Select(x => x.Adapt<Share>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -50,7 +46,7 @@ public class ShareRepository(
         context.ShareEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InIrusIndex)
-            .Select(x => mapper.Map<Share>(x))
+            .Select(x => x.Adapt<Share>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -58,7 +54,7 @@ public class ShareRepository(
         context.ShareEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InPortfolio)
-            .Select(x => mapper.Map<Share>(x))
+            .Select(x => x.Adapt<Share>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -66,7 +62,7 @@ public class ShareRepository(
         context.ShareEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => mapper.Map<Share>(x))
+            .Select(x => x.Adapt<Share>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
@@ -76,8 +72,6 @@ public class ShareRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity is null 
-            ? null 
-            : mapper.Map<Share>(entity);
+        return entity?.Adapt<Share>();
     }
 }
