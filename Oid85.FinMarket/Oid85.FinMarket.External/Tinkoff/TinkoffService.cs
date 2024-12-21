@@ -235,7 +235,7 @@ public class TinkoffService(
                     Description = bond.Name,
                     Sector = bond.Sector,
                     NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
-                    MaturityDate = DateOnly.FromDateTime(bond.MaturityDate.ToDateTime().Date),
+                    MaturityDate = ConvertHelper.TimestampToDateOnly(bond.MaturityDate),
                     FloatingCouponFlag = bond.FloatingCouponFlag
                 };
 
