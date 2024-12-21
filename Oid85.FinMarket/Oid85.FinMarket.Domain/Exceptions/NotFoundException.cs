@@ -1,18 +1,17 @@
-﻿namespace Oid85.FinMarket.Domain.Exceptions
-{
-    [Serializable]
-    public class NotFoundException : Exception
-    {
-        public string Code { get; set; }
-        
-        public NotFoundException(string code, string message) : base(message)            
-        {
-            Code = code;
-        }
+﻿namespace Oid85.FinMarket.Domain.Exceptions;
 
-        public NotFoundException(string code, string message, Exception exception) : base(message, exception)
-        {
-            Code = code;
-        }
+[Serializable]
+public class NotFoundException : Exception
+{
+    public string Code { get; set; }
+        
+    public NotFoundException(string code, string message) : base(message)            
+    {
+        Code = code;
+    }
+
+    public NotFoundException(string code, string message, Exception exception) : base(message, exception)
+    {
+        Code = code;
     }
 }

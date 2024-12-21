@@ -1,9 +1,8 @@
 ﻿using Oid85.FinMarket.Common.KnownConstants;
 
-namespace Oid85.FinMarket.Application.Models.Requests
+namespace Oid85.FinMarket.Application.Models.Requests;
+
+public class GetReportDividendsRequest
 {
-    public class GetReportDividendsRequest
-    {
-        public string TickerList { get; set; } = KnownTickerLists.WatchListStocks;
-    }
+    public string TickerList { get; set; } = KnownTickerLists.WatchListStocks;
 }

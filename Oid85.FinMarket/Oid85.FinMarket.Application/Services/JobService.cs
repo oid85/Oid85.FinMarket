@@ -3,7 +3,8 @@
 namespace Oid85.FinMarket.Application.Services;
 
 public class JobService(
-    ILoadService loadService) 
+    ILoadService loadService,
+    IAnalyseService analyseService) 
     : IJobService
 {
     public async Task LoadInstrumentsAsync()
@@ -21,5 +22,26 @@ public class JobService(
         await loadService.LoadBondPricesAsync();
         await loadService.LoadFuturePricesAsync();
         await loadService.LoadCurrencyPricesAsync();
+    }
+
+    public async Task LoadBondCouponsAsync()
+    {
+        await loadService.LoadBondCouponsAsync();
+    }
+
+    public async Task LoadDividendInfosAsync()
+    {
+        await loadService.LoadDividendInfosAsync();
+    }
+
+    public async Task LoadDailyCandlesAsync()
+    {
+        await loadService.LoadStocksDailyCandlesAsync();
+        await loadService.LoadFuturesDailyCandlesAsync();
+    }
+
+    public async Task AnalyseAsync()
+    {
+        await analyseService.AnalyseStocksAsync();
     }
 }

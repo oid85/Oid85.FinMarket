@@ -1,7 +1,6 @@
-﻿namespace Oid85.FinMarket.Logging.KnownConstants
+﻿namespace Oid85.FinMarket.Logging.KnownConstants;
+
+public static class KnownDatabaseSchemas
 {
-    public static class KnownDatabaseSchemas
-    {
-        public const string Log = "log";
-    }
+    public const string Log = "log";
 }

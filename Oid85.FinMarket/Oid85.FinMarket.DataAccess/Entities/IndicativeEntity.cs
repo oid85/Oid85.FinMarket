@@ -9,13 +9,13 @@ public class IndicativeEntity : AuditableEntity
     /// FIGI-идентификатор инструмента
     /// </summary>
     [Column("figi")]
-    public string Figi { get; set; }
+    public string Figi { get; set; } = string.Empty;
     
     /// <summary>
     /// Тикер инструмента
     /// </summary>
     [Column("ticker")]
-    public string Ticker { get; set; }
+    public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
     /// Цена инструмента
@@ -27,37 +27,37 @@ public class IndicativeEntity : AuditableEntity
     /// Класс-код инструмента
     /// </summary>
     [Column("class_code")]
-    public string ClassCode { get; set; }
+    public string ClassCode { get; set; } = string.Empty;
     
     /// <summary>
     /// Валюта расчётов
     /// </summary>
     [Column("currency")]
-    public string Currency { get; set; }
+    public string Currency { get; set; } = string.Empty;
     
     /// <summary>
     /// Тип инструмента
     /// </summary>
     [Column("instrument_kind")]
-    public string InstrumentKind { get; set; }
+    public string InstrumentKind { get; set; } = string.Empty;
     
     /// <summary>
     /// Название инструмента
     /// </summary>
     [Column("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     
     /// <summary>
     /// Tорговая площадка (секция биржи)
     /// </summary>
     [Column("exchange")]
-    public string Exchange { get; set; }
+    public string Exchange { get; set; } = string.Empty;
     
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
     [Column("uid")]
-    public string Uid { get; set; }
+    public string Uid { get; set; } = string.Empty;
     
     /// <summary>
     /// Находится в списке наблюдения

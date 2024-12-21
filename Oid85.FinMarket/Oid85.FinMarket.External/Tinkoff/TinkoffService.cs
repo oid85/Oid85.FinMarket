@@ -15,488 +15,487 @@ using TinkoffShare = Tinkoff.InvestApi.V1.Share;
 using TinkoffFuture = Tinkoff.InvestApi.V1.Future;
 using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
 
-namespace Oid85.FinMarket.External.Tinkoff
+namespace Oid85.FinMarket.External.Tinkoff;
+
+/// <inheritdoc />
+public class TinkoffService(
+    ILogService logService,
+    InvestApiClient client,
+    IConfiguration configuration)
+    : ITinkoffService
 {
     /// <inheritdoc />
-    public class TinkoffService(
-        ILogService logService,
-        InvestApiClient client,
-        IConfiguration configuration)
-        : ITinkoffService
+    public async Task<List<Candle>> GetCandlesAsync(
+        string figi, string ticker, string timeframe)
     {
-        /// <inheritdoc />
-        public async Task<List<Candle>> GetCandlesAsync(
-            string figi, string ticker, string timeframe)
+        try
         {
-            try
-            {
-                var (from, to) = await GetDataRange(timeframe);
-                return await GetCandlesAsync(figi, ticker, timeframe, from, to);
-            }
-
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
-                return [];
-            }
+            var (from, to) = await GetDataRange(timeframe);
+            return await GetCandlesAsync(figi, ticker, timeframe, from, to);
         }
 
-        /// <inheritdoc />
-        public async Task<List<Candle>> GetCandlesAsync(
-            string figi, string ticker, string timeframe, int year)
+        catch (Exception exception)
         {
-            try
-            {
-                var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
-                var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
-                return await GetCandlesAsync(figi, ticker, timeframe, from, to);
-            }
+            await logService.LogException(exception);
+            return [];
+        }
+    }
 
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
-                return [];
-            }
+    /// <inheritdoc />
+    public async Task<List<Candle>> GetCandlesAsync(
+        string figi, string ticker, string timeframe, int year)
+    {
+        try
+        {
+            var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
+            var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
+            return await GetCandlesAsync(figi, ticker, timeframe, from, to);
         }
 
-        /// <inheritdoc />
-        public async Task<List<double>> GetPricesAsync(List<string> figiList)
+        catch (Exception exception)
         {
-            try
-            {
-                var request = new GetLastPricesRequest();
+            await logService.LogException(exception);
+            return [];
+        }
+    }
 
-                foreach (var figi in figiList)
-                    request.InstrumentId.Add(figi);
+    /// <inheritdoc />
+    public async Task<List<double>> GetPricesAsync(List<string> figiList)
+    {
+        try
+        {
+            var request = new GetLastPricesRequest();
 
-                request.LastPriceType = LastPriceType.LastPriceExchange;
+            foreach (var figi in figiList)
+                request.InstrumentId.Add(figi);
+
+            request.LastPriceType = LastPriceType.LastPriceExchange;
                 
-                var response = await client.MarketData.GetLastPricesAsync(request);
+            var response = await client.MarketData.GetLastPricesAsync(request);
                 
-                if (response is null)
-                    return [];
-                
-                var result = response.LastPrices
-                    .Select(x => ConvertHelper.QuotationToDouble(x.Price))
-                    .ToList();
-
-                return result;
-            }
-
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
+            if (response is null)
                 return [];
-            }
+                
+            var result = response.LastPrices
+                .Select(x => ConvertHelper.QuotationToDouble(x.Price))
+                .ToList();
+
+            return result;
         }
 
-        private async Task<List<Candle>> GetCandlesAsync(
-            string figi, string ticker, string timeframe, Timestamp from, Timestamp to)
+        catch (Exception exception)
         {
-            var request = new GetCandlesRequest
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
+    private async Task<List<Candle>> GetCandlesAsync(
+        string figi, string ticker, string timeframe, Timestamp from, Timestamp to)
+    {
+        var request = new GetCandlesRequest
+        {
+            InstrumentId = figi,
+            From = from,
+            To = to
+        };
+
+        var interval = GetCandleInterval(timeframe);
+
+        if (interval == CandleInterval.Unspecified)
+        {
+            await logService.LogError("Неизвестный интервал. interval = CandleInterval.Unspecified");
+            return [];
+        }
+
+        request.Interval = interval;
+
+        var response = await client.MarketData.GetCandlesAsync(request);
+
+        var candles = new List<Candle>() { };
+
+        for (var i = 0; i < response.Candles.Count; i++)
+        {
+            var candle = new Candle
             {
-                InstrumentId = figi,
-                From = from,
-                To = to
+                Ticker = ticker,
+                Timeframe = timeframe,
+                Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
+                Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
+                High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
+                Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
+                Volume = response.Candles[i].Volume,
+                Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
+                IsComplete = response.Candles[i].IsComplete
             };
 
-            var interval = GetCandleInterval(timeframe);
+            candles.Add(candle);
+        }
 
-            if (interval == CandleInterval.Unspecified)
+        return candles;
+    }
+
+    /// <inheritdoc />
+    public async Task<List<Share>> GetSharesAsync()
+    {
+        try
+        {
+            List<TinkoffShare> shares = (await client.Instruments
+                    .SharesAsync()).Instruments
+                .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                .ToList(); 
+
+            var result = new List<Share>();
+
+            foreach (var share in shares)
             {
-                await logService.LogError("Неизвестный интервал. interval = CandleInterval.Unspecified");
-                return [];
+                if (share.Ticker.Contains("@"))
+                    continue;
+                    
+                if (share.Ticker.Contains("-"))
+                    continue;
+                    
+                result.Add(new Share
+                {
+                    Ticker = share.Ticker,
+                    Figi = share.Figi,
+                    Isin = share.Isin,
+                    Description = share.Name,
+                    Sector = share.Sector
+                });
             }
 
-            request.Interval = interval;
+            return result;
+        }
 
-            var response = await client.MarketData.GetCandlesAsync(request);
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+    /// <inheritdoc />
+    public async Task<List<Future>> GetFuturesAsync()
+    {
+        try
+        {
+            List<TinkoffFuture> futures = (await client.Instruments
+                    .FuturesAsync()).Instruments
+                .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                .ToList(); 
 
-            var candles = new List<Candle>() { };
+            var result = new List<Future>();
 
-            for (var i = 0; i < response.Candles.Count; i++)
+            foreach (var future in futures)
             {
-                var candle = new Candle
+                if (future.Ticker.Contains("@"))
+                    continue;
+                    
+                if (future.Ticker.Contains("-"))
+                    continue;
+                    
+                result.Add(new Future
                 {
-                    Ticker = ticker,
-                    Timeframe = timeframe,
-                    Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
-                    Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
-                    High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
-                    Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
-                    Volume = response.Candles[i].Volume,
-                    Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
-                    IsComplete = response.Candles[i].IsComplete
+                    Ticker = future.Ticker,
+                    Figi = future.Figi,
+                    Description = future.Name,
+                    ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate)
+                });
+            }
+
+            return result;
+        }
+
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+        
+    /// <inheritdoc />
+    public async Task<List<Bond>> GetBondsAsync()
+    {
+        try
+        {
+            List<TinkoffBond> bonds = (await client.Instruments
+                    .BondsAsync()).Instruments
+                .Where(x => x.CountryOfRisk.ToLower() == "ru")
+                .ToList();
+
+            var result = new List<Bond>();
+
+            foreach (var bond in bonds)
+            {
+                var instrument = new Bond
+                {
+                    Ticker = bond.Ticker,
+                    Figi = bond.Figi,
+                    Isin = bond.Isin,
+                    Description = bond.Name,
+                    Sector = bond.Sector,
+                    NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
+                    MaturityDate = DateOnly.FromDateTime(bond.MaturityDate.ToDateTime().Date),
+                    FloatingCouponFlag = bond.FloatingCouponFlag
                 };
 
-                candles.Add(candle);
+                result.Add(instrument);
             }
 
-            return candles;
+            return result;
         }
 
-        /// <inheritdoc />
-        public async Task<List<Share>> GetSharesAsync()
+        catch (Exception exception)
         {
-            try
-            {
-                List<TinkoffShare> shares = (await client.Instruments
-                    .SharesAsync()).Instruments
-                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
-                    .ToList(); 
-
-                var result = new List<Share>();
-
-                foreach (var share in shares)
-                {
-                    if (share.Ticker.Contains("@"))
-                        continue;
-                    
-                    if (share.Ticker.Contains("-"))
-                        continue;
-                    
-                    result.Add(new Share
-                    {
-                        Ticker = share.Ticker,
-                        Figi = share.Figi,
-                        Isin = share.Isin,
-                        Description = share.Name,
-                        Sector = share.Sector
-                    });
-                }
-
-                return result;
-            }
-
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
-                return [];
-            }
+            await logService.LogException(exception);
+            return [];
         }
-        /// <inheritdoc />
-        public async Task<List<Future>> GetFuturesAsync()
-        {
-            try
-            {
-                List<TinkoffFuture> futures = (await client.Instruments
-                        .FuturesAsync()).Instruments
-                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
-                    .ToList(); 
-
-                var result = new List<Future>();
-
-                foreach (var future in futures)
-                {
-                    if (future.Ticker.Contains("@"))
-                        continue;
-                    
-                    if (future.Ticker.Contains("-"))
-                        continue;
-                    
-                    result.Add(new Future
-                    {
-                        Ticker = future.Ticker,
-                        Figi = future.Figi,
-                        Description = future.Name,
-                        ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate)
-                    });
-                }
-
-                return result;
-            }
-
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
-                return [];
-            }
-        }
+    }
         
-        /// <inheritdoc />
-        public async Task<List<Bond>> GetBondsAsync()
+    /// <inheritdoc />
+    public async Task<List<Indicative>> GetIndicativesAsync()
+    {
+        try
         {
-            try
-            {
-                List<TinkoffBond> bonds = (await client.Instruments
-                    .BondsAsync()).Instruments
-                    .Where(x => x.CountryOfRisk.ToLower() == "ru")
-                    .ToList();
-
-                var result = new List<Bond>();
-
-                foreach (var bond in bonds)
-                {
-                    var instrument = new Bond
-                    {
-                        Ticker = bond.Ticker,
-                        Figi = bond.Figi,
-                        Isin = bond.Isin,
-                        Description = bond.Name,
-                        Sector = bond.Sector,
-                        NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
-                        MaturityDate = DateOnly.FromDateTime(bond.MaturityDate.ToDateTime().Date),
-                        FloatingCouponFlag = bond.FloatingCouponFlag
-                    };
-
-                    result.Add(instrument);
-                }
-
-                return result;
-            }
-
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
-                return [];
-            }
-        }
-        
-        /// <inheritdoc />
-        public async Task<List<Indicative>> GetIndicativesAsync()
-        {
-            try
-            {
-                var request = new IndicativesRequest();
+            var request = new IndicativesRequest();
                 
-                var indicatives = (await client.Instruments
+            var indicatives = (await client.Instruments
                     .IndicativesAsync(request))
-                    .Instruments
-                    .ToList();
+                .Instruments
+                .ToList();
 
-                var result = new List<Indicative>();
+            var result = new List<Indicative>();
 
-                foreach (var indicative in indicatives)
-                {
-                    var instrument = new Indicative
-                    {
-                        Figi = indicative.Figi,
-                        Ticker = indicative.Ticker,
-                        ClassCode = indicative.ClassCode,
-                        Currency = indicative.Currency,
-                        InstrumentKind = indicative.InstrumentKind.ToString(),
-                        Name = indicative.Name,
-                        Exchange = indicative.Exchange,
-                        Uid = indicative.Uid
-                    };
-
-                    result.Add(instrument);
-                }
-
-                return result;
-            }
-
-            catch (Exception exception)
+            foreach (var indicative in indicatives)
             {
-                await logService.LogException(exception);
-                return [];
+                var instrument = new Indicative
+                {
+                    Figi = indicative.Figi,
+                    Ticker = indicative.Ticker,
+                    ClassCode = indicative.ClassCode,
+                    Currency = indicative.Currency,
+                    InstrumentKind = indicative.InstrumentKind.ToString(),
+                    Name = indicative.Name,
+                    Exchange = indicative.Exchange,
+                    Uid = indicative.Uid
+                };
+
+                result.Add(instrument);
             }
+
+            return result;
         }
 
-        /// <inheritdoc />
-        public async Task<List<Currency>> GetCurrenciesAsync()
+        catch (Exception exception)
         {
-            try
-            {
-                var request = new InstrumentsRequest();
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<List<Currency>> GetCurrenciesAsync()
+    {
+        try
+        {
+            var request = new InstrumentsRequest();
                 
-                var currencies = (await client.Instruments
-                        .CurrenciesAsync(request))
-                    .Instruments
-                    .ToList();
+            var currencies = (await client.Instruments
+                    .CurrenciesAsync(request))
+                .Instruments
+                .ToList();
 
-                var result = new List<Currency>();
+            var result = new List<Currency>();
 
-                foreach (var currency in currencies)
-                {
-                    var instrument = new Currency
-                    {
-                        Ticker = currency.Ticker,
-                        Isin = currency.Isin,
-                        Figi = currency.Figi,
-                        ClassCode = currency.ClassCode,
-                        Name = currency.Name,
-                        IsoCurrencyName = currency.IsoCurrencyName,
-                        Uid = currency.Uid
-                    };
-
-                    result.Add(instrument);
-                }
-
-                return result;
-            }
-
-            catch (Exception exception)
+            foreach (var currency in currencies)
             {
-                await logService.LogException(exception);
-                return [];
+                var instrument = new Currency
+                {
+                    Ticker = currency.Ticker,
+                    Isin = currency.Isin,
+                    Figi = currency.Figi,
+                    ClassCode = currency.ClassCode,
+                    Name = currency.Name,
+                    IsoCurrencyName = currency.IsoCurrencyName,
+                    Uid = currency.Uid
+                };
+
+                result.Add(instrument);
             }
+
+            return result;
         }
 
-        /// <inheritdoc />
-        public async Task<List<DividendInfo>> GetDividendInfoAsync(
-            List<Share> shares)
+        catch (Exception exception)
         {
-            try
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<List<DividendInfo>> GetDividendInfoAsync(
+        List<Share> shares)
+    {
+        try
+        {
+            var dividendInfos = new List<DividendInfo>();
+            
+            var from = DateTime.SpecifyKind(
+                new DateTime(DateTime.UtcNow.Year, 1, 1), 
+                DateTimeKind.Utc);
+            
+            var to = from.AddYears(2);
+
+            foreach (var share in shares)
             {
-                var dividendInfos = new List<DividendInfo>();
-            
-                var from = DateTime.SpecifyKind(
-                    new DateTime(DateTime.UtcNow.Year, 1, 1), 
-                    DateTimeKind.Utc);
-            
-                var to = from.AddYears(2);
-
-                foreach (var share in shares)
+                var request = new GetDividendsRequest
                 {
-                    var request = new GetDividendsRequest
+                    InstrumentId = share.Figi,
+                    From = Timestamp.FromDateTime(from),
+                    To = Timestamp.FromDateTime(to)
+                };
+
+                var response = await client.Instruments.GetDividendsAsync(request);
+
+                if (response is null)
+                    continue;
+
+                var dividends = response.Dividends.ToList();
+
+                if (dividends.Any())
+                {
+                    foreach (var dividend in dividends)
                     {
-                        InstrumentId = share.Figi,
-                        From = Timestamp.FromDateTime(from),
-                        To = Timestamp.FromDateTime(to)
-                    };
+                        if (dividend is null)
+                            continue;
 
-                    var response = await client.Instruments.GetDividendsAsync(request);
-
-                    if (response is null)
-                        continue;
-
-                    var dividends = response.Dividends.ToList();
-
-                    if (dividends.Any())
-                    {
-                        foreach (var dividend in dividends)
+                        var dividendInfo = new DividendInfo
                         {
-                            if (dividend is null)
-                                continue;
+                            Ticker = share.Ticker,
+                            DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
+                            RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
+                            Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
+                            DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
+                        };
 
-                            var dividendInfo = new DividendInfo
-                            {
-                                Ticker = share.Ticker,
-                                DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
-                                RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
-                                Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
-                                DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
-                            };
+                        dividendInfos.Add(dividendInfo);
+                    }                    
+                }
+            }
 
-                            dividendInfos.Add(dividendInfo);
-                        }                    
+            return dividendInfos;
+        }
+            
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
+    public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
+    {
+        try
+        {
+            var bondCoupons = new List<BondCoupon>();
+            
+            var from = DateTime.SpecifyKind(
+                new DateTime(DateTime.UtcNow.Year, 1, 1), 
+                DateTimeKind.Utc);
+            
+            var to = from.AddYears(2);
+
+            for (var i = 0; i < bonds.Count; i++)
+            {
+                var request = new GetBondCouponsRequest
+                {
+                    InstrumentId = bonds[i].Figi,
+                    From = Timestamp.FromDateTime(from),
+                    To = Timestamp.FromDateTime(to)
+                };
+
+                var response = await client.Instruments.GetBondCouponsAsync(request);
+
+                if (response is null)
+                    continue;
+
+                var coupons = response.Events.ToList();
+
+                if (coupons.Any())
+                {
+                    foreach (var coupon in coupons)
+                    {
+                        if (coupon is null)
+                            continue;
+
+                        var bondCoupon = new BondCoupon
+                        {
+                            Ticker = bonds[i].Ticker,
+                            CouponNumber = coupon.CouponNumber,
+                            CouponPeriod = coupon.CouponPeriod,
+                            CouponDate = ConvertHelper.TimestampToDateOnly(coupon.CouponDate),
+                            CouponStartDate = ConvertHelper.TimestampToDateOnly(coupon.CouponStartDate),
+                            CouponEndDate = ConvertHelper.TimestampToDateOnly(coupon.CouponEndDate),
+                            PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
+                        };
+
+                        bondCoupons.Add(bondCoupon);
                     }
                 }
 
-                return dividendInfos;
+                double percent = ((i + 1) / (double) bonds.Count) * 100;
+                await logService.LogTrace($"Загружены купоны для облигации '{bonds[i].Ticker}'. {i + 1} из {bonds.Count}. {percent:N2} % загружено");
             }
-            
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
-                return [];
-            }
-        }
 
-        public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
+            return bondCoupons;
+        }
+            
+        catch (Exception exception)
         {
-            try
-            {
-                var bondCoupons = new List<BondCoupon>();
-            
-                var from = DateTime.SpecifyKind(
-                    new DateTime(DateTime.UtcNow.Year, 1, 1), 
-                    DateTimeKind.Utc);
-            
-                var to = from.AddYears(2);
-
-                for (var i = 0; i < bonds.Count; i++)
-                {
-                    var request = new GetBondCouponsRequest
-                    {
-                        InstrumentId = bonds[i].Figi,
-                        From = Timestamp.FromDateTime(from),
-                        To = Timestamp.FromDateTime(to)
-                    };
-
-                    var response = await client.Instruments.GetBondCouponsAsync(request);
-
-                    if (response is null)
-                        continue;
-
-                    var coupons = response.Events.ToList();
-
-                    if (coupons.Any())
-                    {
-                        foreach (var coupon in coupons)
-                        {
-                            if (coupon is null)
-                                continue;
-
-                            var bondCoupon = new BondCoupon
-                            {
-                                Ticker = bonds[i].Ticker,
-                                CouponNumber = coupon.CouponNumber,
-                                CouponPeriod = coupon.CouponPeriod,
-                                CouponDate = ConvertHelper.TimestampToDateOnly(coupon.CouponDate),
-                                CouponStartDate = ConvertHelper.TimestampToDateOnly(coupon.CouponStartDate),
-                                CouponEndDate = ConvertHelper.TimestampToDateOnly(coupon.CouponEndDate),
-                                PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
-                            };
-
-                            bondCoupons.Add(bondCoupon);
-                        }
-                    }
-
-                    double percent = ((i + 1) / (double) bonds.Count) * 100;
-                    await logService.LogTrace($"Загружены купоны для облигации '{bonds[i].Ticker}'. {i + 1} из {bonds.Count}. {percent:N2} % загружено");
-                }
-
-                return bondCoupons;
-            }
-            
-            catch (Exception exception)
-            {
-                await logService.LogException(exception);
-                return [];
-            }
+            await logService.LogException(exception);
+            return [];
         }
+    }
 
-        private Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
-        {           
-            var buffer = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsBuffer);
+    private Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
+    {           
+        var buffer = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsBuffer);
 
-            var startDate = DateTime.Now;
-            var endDate = DateTime.Now;
+        var startDate = DateTime.Now;
+        var endDate = DateTime.Now;
 
-            if (timeframe == KnownTimeframes.Daily)
-                startDate = DateTime.Now.AddDays(-1 * buffer);
+        if (timeframe == KnownTimeframes.Daily)
+            startDate = DateTime.Now.AddDays(-1 * buffer);
 
-            else if (timeframe == KnownTimeframes.Hourly)
-                startDate = DateTime.Now.AddHours(-1 * buffer);
+        else if (timeframe == KnownTimeframes.Hourly)
+            startDate = DateTime.Now.AddHours(-1 * buffer);
 
-            else if (timeframe == KnownTimeframes.FiveMinutes)
-                startDate = DateTime.Now.AddMinutes(-5 * buffer);
+        else if (timeframe == KnownTimeframes.FiveMinutes)
+            startDate = DateTime.Now.AddMinutes(-5 * buffer);
 
-            else if (timeframe == KnownTimeframes.OneMinutes)
-                startDate = DateTime.Now.AddMinutes(-1 * buffer);
+        else if (timeframe == KnownTimeframes.OneMinutes)
+            startDate = DateTime.Now.AddMinutes(-1 * buffer);
 
-            return Task.FromResult((
-                Timestamp.FromDateTime(startDate.ToUniversalTime()), 
-                Timestamp.FromDateTime(endDate.ToUniversalTime())));
-        }
+        return Task.FromResult((
+            Timestamp.FromDateTime(startDate.ToUniversalTime()), 
+            Timestamp.FromDateTime(endDate.ToUniversalTime())));
+    }
 
-        private static CandleInterval GetCandleInterval(string timeframe) 
-        { 
-            if (timeframe == KnownTimeframes.Daily)
-                return CandleInterval.Day;
+    private static CandleInterval GetCandleInterval(string timeframe) 
+    { 
+        if (timeframe == KnownTimeframes.Daily)
+            return CandleInterval.Day;
 
-            if (timeframe == KnownTimeframes.Hourly)
-                return CandleInterval.Hour;
+        if (timeframe == KnownTimeframes.Hourly)
+            return CandleInterval.Hour;
 
-            if (timeframe == KnownTimeframes.FiveMinutes)
-                return CandleInterval._5Min;
+        if (timeframe == KnownTimeframes.FiveMinutes)
+            return CandleInterval._5Min;
 
-            if (timeframe == KnownTimeframes.OneMinutes)
-                return CandleInterval._1Min;
+        if (timeframe == KnownTimeframes.OneMinutes)
+            return CandleInterval._1Min;
 
-            return CandleInterval.Unspecified;
-        }
+        return CandleInterval.Unspecified;
     }
 }
