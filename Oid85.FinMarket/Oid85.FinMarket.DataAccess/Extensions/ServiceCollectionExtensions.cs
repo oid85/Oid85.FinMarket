@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
                 .UseNpgsql(configuration
                     .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString))
                 .AddInterceptors(updateInterceptor);
-        }, ServiceLifetime.Singleton);
+        });
 
         var mapsterConfig = new MapsterConfig();
         services.AddSingleton<MapsterConfig>();

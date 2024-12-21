@@ -33,7 +33,7 @@ public class Program
 
         await app.ApplyMigrations();
         await app.ApplyLogMigrations();
-            
+        
         app.UseRouting();
 
         app.UseCors("CorsPolicy");
@@ -46,7 +46,9 @@ public class Program
         });
 
         app.UseHangfireDashboard("/dashboard");
-            
+        
+        await app.RegisterHangfireJobs(builder.Configuration);
+        
         app.MapControllers();
 
         await app.RunAsync();

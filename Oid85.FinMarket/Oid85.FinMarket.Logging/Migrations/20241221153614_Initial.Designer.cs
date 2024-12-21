@@ -12,8 +12,8 @@ using Oid85.FinMarket.Logging.DataAccess;
 namespace Oid85.FinMarket.Logging.Migrations
 {
     [DbContext(typeof(LogContext))]
-    [Migration("20241202173246_AddParametersColumn")]
-    partial class AddParametersColumn
+    [Migration("20241221153614_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

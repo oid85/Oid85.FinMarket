@@ -22,7 +22,8 @@ namespace Oid85.FinMarket.Logging.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     level = table.Column<string>(type: "text", nullable: false),
-                    message = table.Column<string>(type: "text", nullable: false)
+                    message = table.Column<string>(type: "text", nullable: false),
+                    parameters = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

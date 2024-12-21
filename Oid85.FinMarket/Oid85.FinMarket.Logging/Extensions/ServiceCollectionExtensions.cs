@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
             options
                 .UseNpgsql(configuration
                     .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString));
-        }, ServiceLifetime.Singleton);
+        });
             
         services.AddTransient<ILogRepository, LogRepository>();
         services.AddTransient<ILogService, LogService>();

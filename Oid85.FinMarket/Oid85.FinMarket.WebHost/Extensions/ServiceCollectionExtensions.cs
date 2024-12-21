@@ -1,8 +1,6 @@
 ﻿using Hangfire;
-using Hangfire.PostgreSql;
 using Microsoft.OpenApi.Models;
 using NLog;
-using Oid85.FinMarket.Common.KnownConstants;
 using ILogger = NLog.ILogger;
 
 namespace Oid85.FinMarket.WebHost.Extensions;
@@ -59,12 +57,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddHangfire(config => config
-            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-            .UseSimpleAssemblyNameTypeSerializer()
-            .UseRecommendedSerializerSettings()
-            .UsePostgreSqlStorage(options => 
-                options.UseNpgsqlConnection(configuration
-                    .GetValue<string>(KnownSettingsKeys.PostgresHangfireConnectionString))));
+            .UseInMemoryStorage());
             
         services.AddHangfireServer();
     }
