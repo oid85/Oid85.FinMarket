@@ -6,4 +6,5 @@ public interface ICandleRepository
 {
     Task AddOrUpdateAsync(List<Candle> candles);
     Task<List<Candle>> GetAsync(string ticker, string timeframe);
+    Task<Candle?> GetLastAsync(string ticker, string timeframe);
 }

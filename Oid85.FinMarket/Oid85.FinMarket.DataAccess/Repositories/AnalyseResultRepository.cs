@@ -14,10 +14,10 @@ public class AnalyseResultRepository(
         if (!results.Any())
             return;
         
-        var lastEntity = await GetLastAsync(
+        var lastAnalyseResult = await GetLastAsync(
             results.First().Ticker, results.First().Timeframe);
 
-        if (lastEntity is null)
+        if (lastAnalyseResult is null)
         {
             var entities = results
                 .Select(x => x.Adapt<AnalyseResultEntity>());
@@ -29,7 +29,7 @@ public class AnalyseResultRepository(
         {
             var entities = results
                 .Select(x => x.Adapt<AnalyseResultEntity>())
-                .Where(x => x.Date > lastEntity.Date);
+                .Where(x => x.Date > lastAnalyseResult.Date);
                 
             await context.AnalyseResultEntities.AddRangeAsync(entities);    
         }
@@ -55,7 +55,7 @@ public class AnalyseResultRepository(
             .Select(x => x.Adapt<AnalyseResult>())
             .ToListAsync();
 
-    private async Task<AnalyseResultEntity?> GetLastAsync(string ticker, string timeframe)
+    public async Task<AnalyseResult?> GetLastAsync(string ticker, string timeframe)
     {
         bool exists = await context.AnalyseResultEntities
             .Where(x => x.Timeframe == timeframe)
@@ -75,6 +75,8 @@ public class AnalyseResultRepository(
             .Where(x => x.Ticker == ticker)
             .FirstAsync(x => x.Date == maxDate);
         
-        return entity;
+        var analyseResult = entity.Adapt<AnalyseResult>();
+        
+        return analyseResult;
     }
 }

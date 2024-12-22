@@ -9,12 +9,15 @@ public interface ILoadService
     Task LoadStockDailyCandlesAsync();
     Task LoadFuturesAsync();
     Task LoadFuturePricesAsync();
+    Task LoadFutureDailyCandlesAsync();
     Task LoadBondsAsync();
     Task LoadBondCouponsAsync();
     Task LoadBondPricesAsync();
+    Task LoadBondDailyCandlesAsync();
     Task LoadDividendInfosAsync();
     Task LoadIndicativesAsync();
     Task LoadIndicativePricesAsync();
+    Task LoadIndicativeDailyCandlesAsync();
     Task LoadCurrenciesAsync();
     Task LoadCurrencyPricesAsync();
 }

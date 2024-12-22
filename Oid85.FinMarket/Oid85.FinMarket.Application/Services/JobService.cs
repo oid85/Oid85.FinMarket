@@ -36,8 +36,9 @@ public class JobService(
 
     public async Task LoadDailyCandlesAsync()
     {
-        await loadService.LoadStocksDailyCandlesAsync();
-        await loadService.LoadFuturesDailyCandlesAsync();
+        await loadService.LoadStockDailyCandlesAsync();
+        await loadService.LoadFutureDailyCandlesAsync();
+        await loadService.LoadIndicativeDailyCandlesAsync();
     }
 
     public async Task AnalyseAsync()

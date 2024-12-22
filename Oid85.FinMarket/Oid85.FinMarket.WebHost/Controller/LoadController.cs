@@ -89,7 +89,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить данные о дивидендах
     /// </summary>
-    [HttpGet("load-dividend-infoы")]
+    [HttpGet("load-dividend-infos")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]

@@ -14,10 +14,10 @@ public class CandleRepository(
         if (!candles.Any())
             return;
         
-        var lastEntity = await GetLastAsync(
+        var lastCandle = await GetLastAsync(
             candles.First().Ticker, candles.First().Timeframe);
 
-        if (lastEntity is null)
+        if (lastCandle is null)
         {
             var entities = candles
                 .Select(x => x.Adapt<CandleEntity>());
@@ -26,15 +26,15 @@ public class CandleRepository(
         
         else
         {
-            if (!lastEntity.IsComplete)
+            if (!lastCandle.IsComplete)
             {
-                var candle = candles.First(x => x.Date == lastEntity.Date);
-                lastEntity.Adapt(candle);
+                var candle = candles.First(x => x.Date == lastCandle.Date);
+                lastCandle.Adapt(candle);
             }
 
             var entities = candles
                 .Select(x => x.Adapt<CandleEntity>())
-                .Where(x => x.Date > lastEntity.Date);
+                .Where(x => x.Date > lastCandle.Date);
                 
             await context.CandleEntities.AddRangeAsync(entities);  
         }
@@ -50,7 +50,7 @@ public class CandleRepository(
             .Select(x => x.Adapt<Candle>())
             .ToListAsync();
 
-    private async Task<CandleEntity?> GetLastAsync(string ticker, string timeframe)
+    public async Task<Candle?> GetLastAsync(string ticker, string timeframe)
     {
         bool exists = await context.CandleEntities
             .Where(x => x.Timeframe == timeframe)
@@ -69,7 +69,9 @@ public class CandleRepository(
             .Where(x => x.Timeframe == timeframe)
             .Where(x => x.Ticker == ticker)
             .FirstAsync(x => x.Date == maxDate);
+
+        var candle = entity.Adapt<Candle>();
         
-        return entity;
+        return candle;
     }
 }
