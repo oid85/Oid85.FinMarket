@@ -42,22 +42,6 @@ public class ShareRepository(
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
-    public Task<List<Share>> GetMoexIndexAsync() =>
-        context.ShareEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.InIrusIndex)
-            .Select(x => x.Adapt<Share>())
-            .OrderBy(x => x.Ticker)
-            .ToListAsync();
-
-    public Task<List<Share>> GetPortfolioAsync() =>
-        context.ShareEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.InPortfolio)
-            .Select(x => x.Adapt<Share>())
-            .OrderBy(x => x.Ticker)
-            .ToListAsync();
-
     public Task<List<Share>> GetWatchListAsync() =>
         context.ShareEntities
             .Where(x => !x.IsDeleted)

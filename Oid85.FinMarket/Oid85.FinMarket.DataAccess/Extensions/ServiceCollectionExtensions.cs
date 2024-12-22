@@ -8,46 +8,45 @@ using Oid85.FinMarket.DataAccess.Interceptors;
 using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.DataAccess.Repositories;
 
-namespace Oid85.FinMarket.DataAccess.Extensions
+namespace Oid85.FinMarket.DataAccess.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static void ConfigureFinMarketDataAccess(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        public static void ConfigureFinMarketDataAccess(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        services.AddSingleton<UpdateAuditableEntitiesInterceptor>();
+                
+        services.AddDbContext<FinMarketContext>((serviceProvider, options) =>
         {
-            services.AddSingleton<UpdateAuditableEntitiesInterceptor>();
+            var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
                 
-            services.AddDbContext<FinMarketContext>((serviceProvider, options) =>
-            {
-                var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
-                
-                options
-                    .UseNpgsql(configuration
-                        .GetValue<string>(KnownSettingsKeys.PostgresConnectionString))
-                    .AddInterceptors(updateInterceptor);
-            });
+            options
+                .UseNpgsql(configuration
+                    .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString))
+                .AddInterceptors(updateInterceptor);
+        });
 
-            var mapsterConfig = new MapsterConfig();
-            services.AddSingleton<MapsterConfig>();
+        var mapsterConfig = new MapsterConfig();
+        services.AddSingleton<MapsterConfig>();
             
-            services.AddTransient<IShareRepository, ShareRepository>();
-            services.AddTransient<IFutureRepository, FutureRepository>();
-            services.AddTransient<IBondRepository, BondRepository>();
-            services.AddTransient<IIndicativeRepository, IndicativeRepository>();
-            services.AddTransient<ICurrencyRepository, CurrencyRepository>();
-            services.AddTransient<IBondCouponRepository, BondCouponRepository>();
-            services.AddTransient<IDividendInfoRepository, DividendInfoRepository>();
-            services.AddTransient<IAnalyseResultRepository, AnalyseResultRepository>();
-            services.AddTransient<ICandleRepository, CandleRepository>();
-        }
+        services.AddTransient<IShareRepository, ShareRepository>();
+        services.AddTransient<IFutureRepository, FutureRepository>();
+        services.AddTransient<IBondRepository, BondRepository>();
+        services.AddTransient<IIndicativeRepository, IndicativeRepository>();
+        services.AddTransient<ICurrencyRepository, CurrencyRepository>();
+        services.AddTransient<IBondCouponRepository, BondCouponRepository>();
+        services.AddTransient<IDividendInfoRepository, DividendInfoRepository>();
+        services.AddTransient<IAnalyseResultRepository, AnalyseResultRepository>();
+        services.AddTransient<ICandleRepository, CandleRepository>();
+    }
 
-        public static async Task ApplyMigrations(this IHost host)
-        {
-            var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
-            await using var scope = scopeFactory.CreateAsyncScope();
-            await using var context = scope.ServiceProvider.GetRequiredService<FinMarketContext>();
-            await context.Database.MigrateAsync();
-        }
+    public static async Task ApplyMigrations(this IHost host)
+    {
+        var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
+        await using var scope = scopeFactory.CreateAsyncScope();
+        await using var context = scope.ServiceProvider.GetRequiredService<FinMarketContext>();
+        await context.Database.MigrateAsync();
     }
 }

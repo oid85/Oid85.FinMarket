@@ -6,11 +6,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
+    <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.17" />
+    <PackageVersion Include="Hangfire.InMemory" Version="1.0.0" />
     <PackageVersion Include="Mapster" Version="7.4.0" />
     <PackageVersion Include="Mapster.Core" Version="1.2.1" />
     <PackageVersion Include="Mapster.DependencyInjection" Version="1.0.1" />
     <PackageVersion Include="Mapster.EFCore" Version="5.1.1" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="8.0.8" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.10" />

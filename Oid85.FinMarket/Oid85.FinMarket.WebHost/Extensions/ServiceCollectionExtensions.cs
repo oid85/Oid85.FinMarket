@@ -1,67 +1,77 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Hangfire;
+using Microsoft.OpenApi.Models;
 using NLog;
 using ILogger = NLog.ILogger;
 
-namespace Oid85.FinMarket.WebHost.Extensions
+namespace Oid85.FinMarket.WebHost.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static void ConfigureLogger(this IServiceCollection services)
     {
-        public static void ConfigureLogger(this IServiceCollection services)
-        {
-            LogManager
-                .Setup()
-                .LoadConfigurationFromFile("nlog.config");
+        LogManager
+            .Setup()
+            .LoadConfigurationFromFile("nlog.config");
 
-            services.AddTransient(typeof(ILogger), factory =>
+        services.AddTransient(typeof(ILogger), factory =>
+        {
+            Logger logger = LogManager.GetLogger(AppDomain.CurrentDomain.FriendlyName);
+
+            return logger;
+        });
+    }
+
+    public static void ConfigureSwagger(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Logger logger = LogManager.GetLogger(AppDomain.CurrentDomain.FriendlyName);
-
-                return logger;
+                Version = "v1",
+                Title = "Api",
+                Description = AppDomain.CurrentDomain.FriendlyName
             });
-        }
 
-        public static void ConfigureSwagger(this IServiceCollection services, IConfiguration configuration)
+            c.IncludeXmlComments(GetXmlCommentsPath());
+        });
+    }
+
+    public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddCors(options =>
         {
-            services.AddSwaggerGen(c =>
+            options.AddPolicy("CorsPolicy", builder =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Version = "v1",
-                    Title = "Api",
-                    Description = AppDomain.CurrentDomain.FriendlyName
-                });
-
-                c.IncludeXmlComments(GetXmlCommentsPath());
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+                builder.SetIsOriginAllowed(host => true);
+                builder.AllowCredentials();
             });
-        }
+        });
+    }
 
-        public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy", builder =>
-                {
-                    builder.AllowAnyHeader();
-                    builder.AllowAnyMethod();
-                    builder.AllowAnyHeader();
-                    builder.AllowAnyMethod();
-                    builder.SetIsOriginAllowed(host => true);
-                    builder.AllowCredentials();
-                });
-            });
-        }
+    public static void ConfigureHangfire(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddHangfire(config => config
+            .UseInMemoryStorage());
+            
+        services.AddHangfireServer();
+    }
+        
+    public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
+        where TService : class
+        where TImplementation : class, TService
+    {
+        services.AddTransient<TService, TImplementation>();
+        services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>()!);
+    }
 
-        public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
-            where TService : class
-            where TImplementation : class, TService
-        {
-            services.AddTransient<TService, TImplementation>();
-            services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>()!);
-        }
-
-        private static string GetXmlCommentsPath()
-        {
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SwaggerTest.XML");
-        }
+    private static string GetXmlCommentsPath()
+    {
+        return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SwaggerTest.XML");
     }
 }

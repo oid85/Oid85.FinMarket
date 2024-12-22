@@ -6,8 +6,6 @@ public interface IShareRepository
 {
     Task AddOrUpdateAsync(List<Share> shares);
     Task<List<Share>> GetAllAsync();
-    Task<List<Share>> GetMoexIndexAsync();
-    Task<List<Share>> GetPortfolioAsync();
     Task<List<Share>> GetWatchListAsync();
     Task<Share?> GetByTickerAsync(string ticker);
 }

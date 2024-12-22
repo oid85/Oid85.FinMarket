@@ -6,7 +6,6 @@ public interface IFutureRepository
 {
     Task AddOrUpdateAsync(List<Future> futures);
     Task<List<Future>> GetAllAsync();
-    Task<List<Future>> GetPortfolioAsync();
     Task<List<Future>> GetWatchListAsync();
     Task<Future?> GetByTickerAsync(string ticker);
 }

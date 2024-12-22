@@ -12,8 +12,8 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    [Migration("20241203151938_RenameTableDividendInfos")]
-    partial class RenameTableDividendInfos
+    [Migration("20241222150303_Refactoring")]
+    partial class Refactoring
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,12 +75,12 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<DateTime>("CouponDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("CouponDate")
+                        .HasColumnType("date")
                         .HasColumnName("coupon_date");
 
-                    b.Property<DateTime>("CouponEndDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("CouponEndDate")
+                        .HasColumnType("date")
                         .HasColumnName("coupon_end_date");
 
                     b.Property<long>("CouponNumber")
@@ -91,8 +91,8 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("coupon_period");
 
-                    b.Property<DateTime>("CouponStartDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("CouponStartDate")
+                        .HasColumnType("date")
                         .HasColumnName("coupon_start_date");
 
                     b.Property<DateTime>("CreatedAt")
@@ -110,6 +110,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("PayOneBond")
                         .HasColumnType("double precision")
                         .HasColumnName("pay_one_bond");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price");
 
                     b.Property<string>("Ticker")
                         .IsRequired()
@@ -156,17 +160,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("floating_coupon_flag");
 
-                    b.Property<bool>("InPortfolio")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_portfolio");
-
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -177,13 +173,17 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("isin");
 
-                    b.Property<DateTime>("MaturityDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("MaturityDate")
+                        .HasColumnType("date")
                         .HasColumnName("maturity_date");
 
                     b.Property<double>("NKD")
                         .HasColumnType("double precision")
                         .HasColumnName("nkd");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price");
 
                     b.Property<string>("Sector")
                         .IsRequired()
@@ -260,6 +260,79 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.ToTable("candles", "storage");
                 });
 
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.CurrencyEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("class_code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Figi")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("figi");
+
+                    b.Property<bool>("InWatchList")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_watch_list");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Isin")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("isin");
+
+                    b.Property<string>("IsoCurrencyName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("iso_currency_name");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("ticker");
+
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("uid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_currencies");
+
+                    b.ToTable("currencies", "public");
+                });
+
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.DividendInfoEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -272,8 +345,8 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTime>("DeclaredDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("DeclaredDate")
+                        .HasColumnType("date")
                         .HasColumnName("declared_date");
 
                     b.Property<DateTime>("DeletedAt")
@@ -292,8 +365,8 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
-                    b.Property<DateTime>("RecordDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<DateOnly>("RecordDate")
+                        .HasColumnType("date")
                         .HasColumnName("record_date");
 
                     b.Property<string>("Ticker")
@@ -309,6 +382,141 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasName("pk_dividend_infos");
 
                     b.ToTable("dividend_infos", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.FutureEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<DateOnly>("ExpirationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("expiration_date");
+
+                    b.Property<string>("Figi")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("figi");
+
+                    b.Property<bool>("InWatchList")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_watch_list");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("ticker");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_futures");
+
+                    b.ToTable("futures", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.IndicativeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("class_code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("currency");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("exchange");
+
+                    b.Property<string>("Figi")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("figi");
+
+                    b.Property<bool>("InWatchList")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_watch_list");
+
+                    b.Property<string>("InstrumentKind")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("instrument_kind");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("ticker");
+
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("uid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_indicatives");
+
+                    b.ToTable("indicatives", "public");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.ShareEntity", b =>
@@ -337,21 +545,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("figi");
 
-                    b.Property<bool>("InIrusIndex")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_irus_index");
-
-                    b.Property<bool>("InPortfolio")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_portfolio");
-
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
@@ -361,6 +557,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("isin");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price");
 
                     b.Property<string>("Sector")
                         .IsRequired()

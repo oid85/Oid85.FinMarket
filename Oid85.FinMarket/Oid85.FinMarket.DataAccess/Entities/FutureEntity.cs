@@ -33,13 +33,7 @@ public class FutureEntity : AuditableEntity
     /// Дата истечения срока
     /// </summary>
     [Column("expiration_date", TypeName = "date")]
-    public DateOnly ExpirationDate = DateOnly.MinValue;
-    
-    /// <summary>
-    /// Находится в портфеле
-    /// </summary>
-    [Column("in_portfolio")]
-    public bool InPortfolio { get; set; } = false; 
+    public DateOnly ExpirationDate { get; set; } = DateOnly.MinValue;
     
     /// <summary>
     /// Находится в списке наблюдения

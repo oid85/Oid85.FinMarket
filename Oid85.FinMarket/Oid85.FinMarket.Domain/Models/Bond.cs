@@ -36,11 +36,6 @@ public class Bond
     /// Сектор
     /// </summary>
     public string Sector { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Находится в портфеле
-    /// </summary>
-    public bool InPortfolio { get; set; }
     
     /// <summary>
     /// Находится в списке наблюдения

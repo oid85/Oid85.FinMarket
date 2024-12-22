@@ -42,12 +42,6 @@ public class BondEntity : AuditableEntity
     public string Sector { get; set; } = string.Empty;
     
     /// <summary>
-    /// Находится в портфеле
-    /// </summary>
-    [Column("in_portfolio")]
-    public bool InPortfolio { get; set; }
-    
-    /// <summary>
     /// Находится в списке наблюдения
     /// </summary>
     [Column("in_watch_list")]
