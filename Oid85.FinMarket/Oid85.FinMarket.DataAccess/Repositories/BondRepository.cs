@@ -41,14 +41,6 @@ public class BondRepository(
             .Select(x => x.Adapt<Bond>())
             .OrderBy(x => x.Ticker)
             .ToListAsync();
-    
-    public Task<List<Bond>> GetPortfolioAsync() =>
-        context.BondEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.InPortfolio)
-            .Select(x => x.Adapt<Bond>())
-            .OrderBy(x => x.Ticker)
-            .ToListAsync();
 
     public Task<List<Bond>> GetWatchListAsync() =>
         context.BondEntities

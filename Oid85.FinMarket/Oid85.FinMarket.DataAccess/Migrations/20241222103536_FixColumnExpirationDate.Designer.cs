@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oid85.FinMarket.DataAccess;
@@ -11,9 +12,11 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    partial class FinMarketContextModelSnapshot : ModelSnapshot
+    [Migration("20241222103536_FixColumnExpirationDate")]
+    partial class FixColumnExpirationDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,6 +159,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<bool>("FloatingCouponFlag")
                         .HasColumnType("boolean")
                         .HasColumnName("floating_coupon_flag");
+
+                    b.Property<bool>("InPortfolio")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_portfolio");
 
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
@@ -411,6 +418,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("text")
                         .HasColumnName("figi");
 
+                    b.Property<bool>("InPortfolio")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_portfolio");
+
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
@@ -541,6 +552,14 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("figi");
+
+                    b.Property<bool>("InIrusIndex")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_irus_index");
+
+                    b.Property<bool>("InPortfolio")
+                        .HasColumnType("boolean")
+                        .HasColumnName("in_portfolio");
 
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")

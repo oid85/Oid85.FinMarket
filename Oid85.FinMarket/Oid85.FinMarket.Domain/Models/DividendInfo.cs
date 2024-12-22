@@ -34,9 +34,4 @@ public class DividendInfo
     /// Доходность, %
     /// </summary>
     public double DividendPrc { get; set; }
-        
-    /// <summary>
-    /// Акция
-    /// </summary>
-    public Share Share { get; set; } = new();
 }

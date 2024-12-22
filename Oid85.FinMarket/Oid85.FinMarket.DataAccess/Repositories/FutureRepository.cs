@@ -42,14 +42,6 @@ public class FutureRepository(
             .OrderBy(x => x.Ticker)
             .ToListAsync();
 
-    public Task<List<Future>> GetPortfolioAsync() =>
-        context.FutureEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.InPortfolio)
-            .Select(x => x.Adapt<Future>())
-            .OrderBy(x => x.Ticker)
-            .ToListAsync();
-
     public Task<List<Future>> GetWatchListAsync() =>
         context.FutureEntities
             .Where(x => !x.IsDeleted)

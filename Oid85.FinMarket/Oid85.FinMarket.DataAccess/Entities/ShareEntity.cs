@@ -42,18 +42,6 @@ public class ShareEntity : AuditableEntity
     public string Sector { get; set; } = string.Empty;
     
     /// <summary>
-    /// Находится в составе индекса Московской биржи
-    /// </summary>
-    [Column("in_irus_index")]
-    public bool InIrusIndex { get; set; } = false;
-    
-    /// <summary>
-    /// Находится в портфеле
-    /// </summary>
-    [Column("in_portfolio")]
-    public bool InPortfolio { get; set; } = false; 
-    
-    /// <summary>
     /// Находится в списке наблюдения
     /// </summary>
     [Column("in_watch_list")]

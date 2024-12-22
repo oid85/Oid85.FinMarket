@@ -38,16 +38,6 @@ public class Share
     public string Sector { get; set; } = string.Empty;
     
     /// <summary>
-    /// Находится в составе индекса Московской биржи
-    /// </summary>
-    public bool InIrusIndex { get; set; } = false;
-    
-    /// <summary>
-    /// Находится в портфеле
-    /// </summary>
-    public bool InPortfolio { get; set; } = false; 
-    
-    /// <summary>
     /// Находится в списке наблюдения
     /// </summary>
     public bool InWatchList { get; set; } = false; 

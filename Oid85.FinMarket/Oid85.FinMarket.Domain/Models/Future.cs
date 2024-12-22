@@ -33,11 +33,6 @@ public class Future
     public DateOnly ExpirationDate = DateOnly.MinValue;
     
     /// <summary>
-    /// Находится в портфеле
-    /// </summary>
-    public bool InPortfolio { get; set; } = false; 
-    
-    /// <summary>
     /// Находится в списке наблюдения
     /// </summary>
     public bool InWatchList { get; set; } = false;

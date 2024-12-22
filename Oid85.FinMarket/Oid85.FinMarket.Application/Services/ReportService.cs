@@ -69,7 +69,7 @@ public class ReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
-            await GetSharesByTickerList(request.TickerList),
+            await shareRepository.GetWatchListAsync(),
             request.From,
             request.To,
             KnownAnalyseTypes.Supertrend);
@@ -77,7 +77,7 @@ public class ReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
-            await GetSharesByTickerList(request.TickerList),
+            await shareRepository.GetWatchListAsync(),
             request.From,
             request.To, 
             KnownAnalyseTypes.CandleSequence);
@@ -85,7 +85,7 @@ public class ReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
-            await GetSharesByTickerList(request.TickerList),
+            await shareRepository.GetWatchListAsync(),
             request.From,
             request.To,
             KnownAnalyseTypes.CandleVolume);
@@ -93,7 +93,7 @@ public class ReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
-            await GetSharesByTickerList(request.TickerList),
+            await shareRepository.GetWatchListAsync(),
             request.From,
             request.To,
             KnownAnalyseTypes.Rsi);
@@ -221,23 +221,6 @@ public class ReportService(
         }
             
         return reportData;
-    }
-
-    private async Task<List<Share>> GetSharesByTickerList(string tickerList)
-    {
-        if (tickerList == KnownTickerLists.AllStocks)
-            return await shareRepository.GetAllAsync();
-            
-        if (tickerList == KnownTickerLists.MoexIndexStocks)
-            return await shareRepository.GetMoexIndexAsync();
-            
-        if (tickerList == KnownTickerLists.PortfolioStocks)
-            return await shareRepository.GetPortfolioAsync();
-            
-        if (tickerList == KnownTickerLists.WatchListStocks)
-            return await shareRepository.GetWatchListAsync();
-
-        return [];
     }
         
     private List<ReportParameter> GetDates(DateTime from, DateTime to)

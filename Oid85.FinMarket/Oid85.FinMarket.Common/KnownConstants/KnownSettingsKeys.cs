@@ -3,7 +3,6 @@
 public static class KnownSettingsKeys
 {
     public const string PostgresFinMarketConnectionString = "Postgres:FinMarketConnectionString";
-    public const string PostgresHangfireConnectionString = "Postgres:HangfireConnectionString";
     public const string TinkoffToken = "Tinkoff:Token";
     public const string ApplicationSettingsBuffer = "ApplicationSettings:Buffer";
 }
