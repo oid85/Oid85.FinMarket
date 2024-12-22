@@ -6,14 +6,9 @@ public interface ILoadService
 {
     Task LoadStocksAsync();
     Task LoadStockPricesAsync();
-    Task LoadStocksDailyCandlesAsync();
-    Task LoadStocksDailyCandlesAsync(Share share);
-    Task LoadStocksDailyCandlesAsync(int year);
+    Task LoadStockDailyCandlesAsync();
     Task LoadFuturesAsync();
     Task LoadFuturePricesAsync();
-    Task LoadFuturesDailyCandlesAsync();
-    Task LoadFuturesDailyCandlesAsync(Future future);
-    Task LoadFuturesDailyCandlesAsync(int year);
     Task LoadBondsAsync();
     Task LoadBondCouponsAsync();
     Task LoadBondPricesAsync();

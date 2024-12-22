@@ -462,20 +462,8 @@ public class TinkoffService(
     {           
         var buffer = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsBuffer);
 
-        var startDate = DateTime.Now;
+        var startDate = DateTime.Now.AddDays(-1 * buffer);
         var endDate = DateTime.Now;
-
-        if (timeframe == KnownTimeframes.Daily)
-            startDate = DateTime.Now.AddDays(-1 * buffer);
-
-        else if (timeframe == KnownTimeframes.Hourly)
-            startDate = DateTime.Now.AddHours(-1 * buffer);
-
-        else if (timeframe == KnownTimeframes.FiveMinutes)
-            startDate = DateTime.Now.AddMinutes(-5 * buffer);
-
-        else if (timeframe == KnownTimeframes.OneMinutes)
-            startDate = DateTime.Now.AddMinutes(-1 * buffer);
 
         return Task.FromResult((
             Timestamp.FromDateTime(startDate.ToUniversalTime()), 
@@ -486,15 +474,6 @@ public class TinkoffService(
     { 
         if (timeframe == KnownTimeframes.Daily)
             return CandleInterval.Day;
-
-        if (timeframe == KnownTimeframes.Hourly)
-            return CandleInterval.Hour;
-
-        if (timeframe == KnownTimeframes.FiveMinutes)
-            return CandleInterval._5Min;
-
-        if (timeframe == KnownTimeframes.OneMinutes)
-            return CandleInterval._1Min;
 
         return CandleInterval.Unspecified;
     }
