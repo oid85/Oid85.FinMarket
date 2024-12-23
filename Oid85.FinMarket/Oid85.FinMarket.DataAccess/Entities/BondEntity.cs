@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
@@ -8,7 +9,7 @@ public class BondEntity : AuditableEntity
     /// <summary>
     /// Тикер
     /// </summary>
-    [Column("ticker")]
+    [Column("ticker"), MaxLength(20)]
     public string Ticker { get; set; } = string.Empty;
 
     /// <summary>
@@ -20,25 +21,31 @@ public class BondEntity : AuditableEntity
     /// <summary>
     /// Идентификатор ISIN
     /// </summary>
-    [Column("isin")]
+    [Column("isin"), MaxLength(20)]
     public string Isin { get; set; } = string.Empty;
 
     /// <summary>
     /// Идентификатор FIGI
     /// </summary>
-    [Column("figi")]
+    [Column("figi"), MaxLength(20)]
     public string Figi { get; set; } = string.Empty;
 
     /// <summary>
-    /// Описание
+    /// Уникальный идентификатор инструмента
     /// </summary>
-    [Column("description")]
-    public string Description { get; set; } = string.Empty;
+    [Column("uid")]
+    public Guid Uid { get; set; }
+    
+    /// <summary>
+    /// Наименование
+    /// </summary>
+    [Column("name"), MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Сектор
     /// </summary>
-    [Column("sector")]
+    [Column("sector"), MaxLength(20)]
     public string Sector { get; set; } = string.Empty;
     
     /// <summary>
@@ -51,7 +58,7 @@ public class BondEntity : AuditableEntity
     /// Значение НКД (накопленного купонного дохода) на дату
     /// </summary>
     [Column("nkd")]
-    public double NKD { get; set; }
+    public double Nkd { get; set; }
 
     /// <summary>
     /// Дата погашения облигации по UTC

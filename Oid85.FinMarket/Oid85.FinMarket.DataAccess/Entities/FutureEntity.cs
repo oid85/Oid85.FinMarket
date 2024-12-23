@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
@@ -8,7 +9,7 @@ public class FutureEntity : AuditableEntity
     /// <summary>
     /// Тикер
     /// </summary>
-    [Column("ticker")]
+    [Column("ticker"), MaxLength(20)]
     public string Ticker { get; set; } = string.Empty;
 
     /// <summary>
@@ -20,14 +21,20 @@ public class FutureEntity : AuditableEntity
     /// <summary>
     /// Идентификатор FIGI
     /// </summary>
-    [Column("figi")]
+    [Column("figi"), MaxLength(20)]
     public string Figi { get; set; } = string.Empty;
 
     /// <summary>
+    /// Уникальный идентификатор инструмента
+    /// </summary>
+    [Column("uid")]
+    public Guid Uid { get; set; }
+    
+    /// <summary>
     /// Описание
     /// </summary>
-    [Column("description")]
-    public string Description { get; set; } = string.Empty;
+    [Column("name"), MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
     
     /// <summary>
     /// Дата истечения срока

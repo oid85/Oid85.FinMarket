@@ -26,12 +26,14 @@ public class TinkoffService(
 {
     /// <inheritdoc />
     public async Task<List<Candle>> GetCandlesAsync(
-        string figi, string ticker, string timeframe)
+        Guid instrumentId, 
+        string ticker, 
+        string timeframe)
     {
         try
         {
             var (from, to) = await GetDataRange(timeframe);
-            return await GetCandlesAsync(figi, ticker, timeframe, from, to);
+            return await GetCandlesAsync(instrumentId, ticker, timeframe, from, to);
         }
 
         catch (Exception exception)
@@ -43,13 +45,16 @@ public class TinkoffService(
 
     /// <inheritdoc />
     public async Task<List<Candle>> GetCandlesAsync(
-        string figi, string ticker, string timeframe, int year)
+        Guid instrumentId, 
+        string ticker, 
+        string timeframe, 
+        int year)
     {
         try
         {
             var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
             var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
-            return await GetCandlesAsync(figi, ticker, timeframe, from, to);
+            return await GetCandlesAsync(instrumentId, ticker, timeframe, from, to);
         }
 
         catch (Exception exception)
@@ -60,14 +65,14 @@ public class TinkoffService(
     }
 
     /// <inheritdoc />
-    public async Task<List<double>> GetPricesAsync(List<string> figiList)
+    public async Task<List<double>> GetPricesAsync(List<Guid> instrumentIds)
     {
         try
         {
             var request = new GetLastPricesRequest();
 
-            foreach (var figi in figiList)
-                request.InstrumentId.Add(figi);
+            foreach (var instrumentId in instrumentIds)
+                request.InstrumentId.Add(instrumentId.ToString());
 
             request.LastPriceType = LastPriceType.LastPriceExchange;
                 
@@ -91,11 +96,11 @@ public class TinkoffService(
     }
 
     private async Task<List<Candle>> GetCandlesAsync(
-        string figi, string ticker, string timeframe, Timestamp from, Timestamp to)
+        Guid instrumentId, string ticker, string timeframe, Timestamp from, Timestamp to)
     {
         var request = new GetCandlesRequest
         {
-            InstrumentId = figi,
+            InstrumentId = instrumentId.ToString(),
             From = from,
             To = to
         };
@@ -159,8 +164,9 @@ public class TinkoffService(
                 {
                     Ticker = share.Ticker,
                     Figi = share.Figi,
+                    Uid = Guid.Parse(share.Uid),
                     Isin = share.Isin,
-                    Description = share.Name,
+                    Name = share.Name,
                     Sector = share.Sector
                 });
             }
@@ -198,7 +204,8 @@ public class TinkoffService(
                 {
                     Ticker = future.Ticker,
                     Figi = future.Figi,
-                    Description = future.Name,
+                    Name = future.Name,
+                    Uid = Guid.Parse(future.Uid),
                     ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate)
                 });
             }
@@ -232,9 +239,10 @@ public class TinkoffService(
                     Ticker = bond.Ticker,
                     Figi = bond.Figi,
                     Isin = bond.Isin,
-                    Description = bond.Name,
+                    Name = bond.Name,
+                    Uid = Guid.Parse(bond.Uid),
                     Sector = bond.Sector,
-                    NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
+                    Nkd = ConvertHelper.MoneyValueToDouble(bond.AciValue),
                     MaturityDate = ConvertHelper.TimestampToDateOnly(bond.MaturityDate),
                     FloatingCouponFlag = bond.FloatingCouponFlag
                 };
@@ -277,7 +285,7 @@ public class TinkoffService(
                     InstrumentKind = indicative.InstrumentKind.ToString(),
                     Name = indicative.Name,
                     Exchange = indicative.Exchange,
-                    Uid = indicative.Uid
+                    Uid = Guid.Parse(indicative.Uid)
                 };
 
                 result.Add(instrument);
@@ -317,7 +325,7 @@ public class TinkoffService(
                     ClassCode = currency.ClassCode,
                     Name = currency.Name,
                     IsoCurrencyName = currency.IsoCurrencyName,
-                    Uid = currency.Uid
+                    Uid = Guid.Parse(currency.Uid)
                 };
 
                 result.Add(instrument);
@@ -351,12 +359,14 @@ public class TinkoffService(
             {
                 var request = new GetDividendsRequest
                 {
-                    InstrumentId = share.Figi,
+                    InstrumentId = share.Uid.ToString(),
                     From = Timestamp.FromDateTime(from),
                     To = Timestamp.FromDateTime(to)
                 };
 
-                var response = await client.Instruments.GetDividendsAsync(request);
+                var response = await client
+                    .Instruments
+                    .GetDividendsAsync(request);
 
                 if (response is null)
                     continue;
@@ -410,7 +420,7 @@ public class TinkoffService(
             {
                 var request = new GetBondCouponsRequest
                 {
-                    InstrumentId = bonds[i].Figi,
+                    InstrumentId = bonds[i].Uid.ToString(),
                     From = Timestamp.FromDateTime(from),
                     To = Timestamp.FromDateTime(to)
                 };

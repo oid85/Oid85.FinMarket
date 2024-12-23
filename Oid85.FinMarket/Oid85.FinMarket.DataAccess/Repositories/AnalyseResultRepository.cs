@@ -37,23 +37,25 @@ public class AnalyseResultRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<AnalyseResult>> GetAsync(
+    public async Task<List<AnalyseResult>> GetAsync(
         string ticker, DateTime from, DateTime to) =>
-        context.AnalyseResultEntities
+        (await context.AnalyseResultEntities
             .Where(x => x.Ticker == ticker)
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
-            .Select(x => x.Adapt<AnalyseResult>())
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<AnalyseResult>())
+        .ToList();
     
-    public Task<List<AnalyseResult>> GetAsync(
+    public async Task<List<AnalyseResult>> GetAsync(
         List<string> tickers, DateTime from, DateTime to) =>
-        context.AnalyseResultEntities
+        (await context.AnalyseResultEntities
             .Where(x => tickers.Contains(x.Ticker))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
-            .Select(x => x.Adapt<AnalyseResult>())
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<AnalyseResult>())
+        .ToList();
 
     public async Task<AnalyseResult?> GetLastAsync(string ticker, string timeframe)
     {

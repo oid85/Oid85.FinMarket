@@ -10,7 +10,7 @@ public interface IAnalyseService
     /// <summary>
     /// Анализ всех акций
     /// </summary>
-    public Task AnalyseStocksAsync();
+    public Task<bool> AnalyseStocksAsync();
 
     /// <summary>
     /// Анализ с индикатором Супертренд

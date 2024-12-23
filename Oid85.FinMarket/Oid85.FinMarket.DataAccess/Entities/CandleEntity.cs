@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
@@ -8,13 +9,13 @@ public class CandleEntity : BaseEntity
     /// <summary>
     /// Тикер
     /// </summary>
-    [Column("ticker")]
+    [Column("ticker"), MaxLength(20)]
     public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
     /// Таймфрейм
     /// </summary>
-    [Column("timeframe")]
+    [Column("timeframe"), MaxLength(20)]
     public string Timeframe { get; set; } = string.Empty;
     
     /// <summary>

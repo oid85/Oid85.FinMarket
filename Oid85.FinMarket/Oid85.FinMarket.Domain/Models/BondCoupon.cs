@@ -5,7 +5,7 @@ public class BondCoupon
     /// <summary>
     /// Тикер
     /// </summary>
-    public string Ticker { get; set; }
+    public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
     /// Дата выплаты купона

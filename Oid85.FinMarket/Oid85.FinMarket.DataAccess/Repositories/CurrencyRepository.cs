@@ -35,20 +35,22 @@ public class CurrencyRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Currency>> GetAllAsync() =>
-        context.CurrencyEntities
+    public async Task<List<Currency>> GetAllAsync() =>
+        (await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => x.Adapt<Currency>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Currency>())
+        .ToList();
 
-    public Task<List<Currency>> GetWatchListAsync() =>
-        context.CurrencyEntities
+    public async Task<List<Currency>> GetWatchListAsync() =>
+        (await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => x.Adapt<Currency>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Currency>())
+        .ToList();
 
     public async Task<Currency?> GetByTickerAsync(string ticker)
     {

@@ -35,20 +35,22 @@ public class IndicativeRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Indicative>> GetAllAsync() =>
-        context.IndicativeEntities
+    public async Task<List<Indicative>> GetAllAsync() =>
+        (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => x.Adapt<Indicative>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Indicative>())
+        .ToList();
 
-    public Task<List<Indicative>> GetWatchListAsync() =>
-        context.IndicativeEntities
+    public async Task<List<Indicative>> GetWatchListAsync() =>
+        (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => x.Adapt<Indicative>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Indicative>())
+        .ToList();
 
     public async Task<Indicative?> GetByTickerAsync(string ticker)
     {

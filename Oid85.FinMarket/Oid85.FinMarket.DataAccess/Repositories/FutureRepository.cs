@@ -35,20 +35,22 @@ public class FutureRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Future>> GetAllAsync() =>
-        context.FutureEntities
+    public async Task<List<Future>> GetAllAsync() =>
+        (await context.FutureEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => x.Adapt<Future>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Future>())
+        .ToList();
 
-    public Task<List<Future>> GetWatchListAsync() =>
-        context.FutureEntities
+    public async Task<List<Future>> GetWatchListAsync() =>
+        (await context.FutureEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => x.Adapt<Future>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Future>())
+        .ToList();
 
     public async Task<Future?> GetByTickerAsync(string ticker)
     {

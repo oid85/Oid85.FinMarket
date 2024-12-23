@@ -17,7 +17,7 @@ public class AnalyseService(
     : IAnalyseService
 {
     /// <inheritdoc />
-    public async Task AnalyseStocksAsync()
+    public async Task<bool> AnalyseStocksAsync()
     {
         var shares = await shareRepository.GetAllAsync();
         var timeframe = KnownTimeframes.Daily;
@@ -33,6 +33,8 @@ public class AnalyseService(
 
             await logService.LogTrace($"Analyse '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
         }
+
+        return true;
     }
         
     /// <inheritdoc />

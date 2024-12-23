@@ -26,11 +26,16 @@ public class Bond
     /// Идентификатор FIGI
     /// </summary>
     public string Figi { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Уникальный идентификатор инструмента
+    /// </summary>
+    public Guid Uid { get; set; }
 
     /// <summary>
-    /// Описание
+    /// Наименование
     /// </summary>
-    public string Description { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Сектор
@@ -45,7 +50,7 @@ public class Bond
     /// <summary>
     /// Значение НКД (накопленного купонного дохода) на дату
     /// </summary>
-    public double NKD { get; set; }
+    public double Nkd { get; set; }
     
     /// <summary>
     /// Дата погашения облигации по UTC

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
@@ -8,13 +9,13 @@ public class IndicativeEntity : AuditableEntity
     /// <summary>
     /// FIGI-идентификатор инструмента
     /// </summary>
-    [Column("figi")]
+    [Column("figi"), MaxLength(20)]
     public string Figi { get; set; } = string.Empty;
     
     /// <summary>
     /// Тикер инструмента
     /// </summary>
-    [Column("ticker")]
+    [Column("ticker"), MaxLength(20)]
     public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
@@ -26,38 +27,38 @@ public class IndicativeEntity : AuditableEntity
     /// <summary>
     /// Класс-код инструмента
     /// </summary>
-    [Column("class_code")]
+    [Column("class_code"), MaxLength(20)]
     public string ClassCode { get; set; } = string.Empty;
     
     /// <summary>
     /// Валюта расчётов
     /// </summary>
-    [Column("currency")]
+    [Column("currency"), MaxLength(20)]
     public string Currency { get; set; } = string.Empty;
     
     /// <summary>
     /// Тип инструмента
     /// </summary>
-    [Column("instrument_kind")]
+    [Column("instrument_kind"), MaxLength(20)]
     public string InstrumentKind { get; set; } = string.Empty;
     
     /// <summary>
     /// Название инструмента
     /// </summary>
-    [Column("name")]
+    [Column("name"), MaxLength(100)]
     public string Name { get; set; } = string.Empty;
     
     /// <summary>
     /// Tорговая площадка (секция биржи)
     /// </summary>
-    [Column("exchange")]
+    [Column("exchange"), MaxLength(20)]
     public string Exchange { get; set; } = string.Empty;
     
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
     [Column("uid")]
-    public string Uid { get; set; } = string.Empty;
+    public Guid Uid { get; set; }
     
     /// <summary>
     /// Находится в списке наблюдения

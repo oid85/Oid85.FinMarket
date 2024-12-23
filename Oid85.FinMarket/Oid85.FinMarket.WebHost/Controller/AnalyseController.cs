@@ -7,16 +7,22 @@ namespace Oid85.FinMarket.WebHost.Controller;
 
 [Route("api")]
 [ApiController]
-public class AnalyseController(IAnalyseService analyseService) : FinMarketBaseController
+public class AnalyseController(
+    IAnalyseService analyseService) 
+    : FinMarketBaseController
 {
     /// <summary>
     /// Выполнить анализ
     /// </summary>
     [HttpGet("analyse-stocks")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> AnalyseStocksAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            analyseService.AnalyseStocksAsync);
+        GetResponseAsync(
+            analyseService.AnalyseStocksAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });        
 }

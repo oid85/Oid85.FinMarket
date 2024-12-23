@@ -30,11 +30,11 @@ public class LoadService(
 
     public async Task LoadStockPricesAsync()
     {
-        var shares = await shareRepository.GetAllAsync();
+        var shares = await shareRepository.GetWatchListAsync();
             
-        var figiList = shares.Select(x => x.Figi).ToList();
+        var instrumentIds = shares.Select(x => x.Uid).ToList();
             
-        var lastPrices = await tinkoffService.GetPricesAsync(figiList);
+        var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
         for (int i = 0; i < shares.Count; i++) 
             shares[i].Price = lastPrices[i];
@@ -50,7 +50,8 @@ public class LoadService(
 
         foreach (var instrument in instruments)
         {
-            var lastCandle = await candleRepository.GetLastAsync(instrument.Figi, KnownTimeframes.Daily);
+            var lastCandle = await candleRepository.GetLastAsync(
+                instrument.Ticker, KnownTimeframes.Daily);
 
             if (lastCandle is null)
             {
@@ -60,7 +61,7 @@ public class LoadService(
                 for (int year = currentYear - historyInYears; year <= currentYear; year++)
                 {
                     var candles = await tinkoffService.GetCandlesAsync(
-                        instrument.Figi, instrument.Ticker, KnownTimeframes.Daily, year);
+                        instrument.Uid, instrument.Ticker, KnownTimeframes.Daily, year);
                     
                     await candleRepository.AddOrUpdateAsync(candles);
                 }
@@ -69,7 +70,7 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.Figi, instrument.Ticker, KnownTimeframes.Daily);
+                    instrument.Uid, instrument.Ticker, KnownTimeframes.Daily);
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
@@ -86,11 +87,11 @@ public class LoadService(
 
     public async Task LoadFuturePricesAsync()
     {
-        var futures = await futureRepository.GetAllAsync();
+        var futures = await futureRepository.GetWatchListAsync();
             
-        var figiList = futures.Select(x => x.Figi).ToList();
+        var instrumentIds = futures.Select(x => x.Uid).ToList();
             
-        var lastPrices = await tinkoffService.GetPricesAsync(figiList);
+        var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
         for (int i = 0; i < futures.Count; i++) 
             futures[i].Price = lastPrices[i];
@@ -106,7 +107,8 @@ public class LoadService(
 
         foreach (var instrument in instruments)
         {
-            var lastCandle = await candleRepository.GetLastAsync(instrument.Figi, KnownTimeframes.Daily);
+            var lastCandle = await candleRepository.GetLastAsync(
+                instrument.Ticker, KnownTimeframes.Daily);
 
             if (lastCandle is null)
             {
@@ -116,7 +118,7 @@ public class LoadService(
                 for (int year = currentYear - historyInYears; year <= currentYear; year++)
                 {
                     var candles = await tinkoffService.GetCandlesAsync(
-                        instrument.Figi, instrument.Ticker, KnownTimeframes.Daily, year);
+                        instrument.Uid, instrument.Ticker, KnownTimeframes.Daily, year);
                     
                     await candleRepository.AddOrUpdateAsync(candles);
                 }
@@ -125,7 +127,7 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.Figi, instrument.Ticker, KnownTimeframes.Daily);
+                    instrument.Uid, instrument.Ticker, KnownTimeframes.Daily);
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
@@ -134,11 +136,11 @@ public class LoadService(
 
     public async Task LoadIndicativePricesAsync()
     {
-        var indicatives = await indicativeRepository.GetAllAsync();
+        var indicatives = await indicativeRepository.GetWatchListAsync();
             
-        var figiList = indicatives.Select(x => x.Figi).ToList();
+        var instrumentIds = indicatives.Select(x => x.Uid).ToList();
             
-        var lastPrices = await tinkoffService.GetPricesAsync(figiList);
+        var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
         for (int i = 0; i < indicatives.Count; i++) 
             indicatives[i].Price = lastPrices[i];
@@ -154,7 +156,8 @@ public class LoadService(
 
         foreach (var instrument in instruments)
         {
-            var lastCandle = await candleRepository.GetLastAsync(instrument.Figi, KnownTimeframes.Daily);
+            var lastCandle = await candleRepository.GetLastAsync(
+                instrument.Ticker, KnownTimeframes.Daily);
 
             if (lastCandle is null)
             {
@@ -164,7 +167,7 @@ public class LoadService(
                 for (int year = currentYear - historyInYears; year <= currentYear; year++)
                 {
                     var candles = await tinkoffService.GetCandlesAsync(
-                        instrument.Figi, instrument.Ticker, KnownTimeframes.Daily, year);
+                        instrument.Uid, instrument.Ticker, KnownTimeframes.Daily, year);
                     
                     await candleRepository.AddOrUpdateAsync(candles);
                 }
@@ -173,7 +176,7 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.Figi, instrument.Ticker, KnownTimeframes.Daily);
+                    instrument.Uid, instrument.Ticker, KnownTimeframes.Daily);
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
@@ -190,11 +193,11 @@ public class LoadService(
 
     public async Task LoadCurrencyPricesAsync()
     {
-        var currencies = await currencyRepository.GetAllAsync();
+        var currencies = await currencyRepository.GetWatchListAsync();
             
-        var figiList = currencies.Select(x => x.Figi).ToList();
+        var instrumentIds = currencies.Select(x => x.Uid).ToList();
             
-        var lastPrices = await tinkoffService.GetPricesAsync(figiList);
+        var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
         for (int i = 0; i < currencies.Count; i++) 
             currencies[i].Price = lastPrices[i];
@@ -222,11 +225,11 @@ public class LoadService(
     
     public async Task LoadBondPricesAsync()
     {
-        var bonds = await bondRepository.GetAllAsync();
+        var bonds = await bondRepository.GetWatchListAsync();
             
-        var figiList = bonds.Select(x => x.Figi).ToList();
+        var instrumentIds = bonds.Select(x => x.Uid).ToList();
             
-        var lastPrices = await tinkoffService.GetPricesAsync(figiList);
+        var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
         for (int i = 0; i < bonds.Count; i++) 
             bonds[i].Price = lastPrices[i];
@@ -242,7 +245,8 @@ public class LoadService(
 
         foreach (var instrument in instruments)
         {
-            var lastCandle = await candleRepository.GetLastAsync(instrument.Figi, KnownTimeframes.Daily);
+            var lastCandle = await candleRepository.GetLastAsync(
+                instrument.Ticker, KnownTimeframes.Daily);
 
             if (lastCandle is null)
             {
@@ -252,7 +256,7 @@ public class LoadService(
                 for (int year = currentYear - historyInYears; year <= currentYear; year++)
                 {
                     var candles = await tinkoffService.GetCandlesAsync(
-                        instrument.Figi, instrument.Ticker, KnownTimeframes.Daily, year);
+                        instrument.Uid, instrument.Ticker, KnownTimeframes.Daily, year);
                     
                     await candleRepository.AddOrUpdateAsync(candles);
                 }
@@ -261,7 +265,7 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.Figi, instrument.Ticker, KnownTimeframes.Daily);
+                    instrument.Uid, instrument.Ticker, KnownTimeframes.Daily);
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
@@ -270,7 +274,7 @@ public class LoadService(
 
     public async Task LoadDividendInfosAsync()
     {
-        var shares = await shareRepository.GetAllAsync();
+        var shares = await shareRepository.GetWatchListAsync();
         var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
         await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
             
@@ -279,7 +283,7 @@ public class LoadService(
 
     public async Task LoadBondCouponsAsync()
     {
-        var bonds = await bondRepository.GetAllAsync();
+        var bonds = await bondRepository.GetWatchListAsync();
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
         await bondCouponRepository.AddOrUpdateAsync(bondCoupons);
             

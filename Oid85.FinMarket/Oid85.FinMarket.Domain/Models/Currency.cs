@@ -40,7 +40,7 @@ public class Currency
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
-    public string Uid { get; set; } = string.Empty;
+    public Guid Uid { get; set; }
     
     /// <summary>
     /// Находится в списке наблюдения
