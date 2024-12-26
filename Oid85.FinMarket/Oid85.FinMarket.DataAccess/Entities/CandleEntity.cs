@@ -7,16 +7,10 @@ namespace Oid85.FinMarket.DataAccess.Entities;
 public class CandleEntity : BaseEntity
 {
     /// <summary>
-    /// Тикер
+    /// Уникальный идентификатор инструмента
     /// </summary>
-    [Column("ticker"), MaxLength(20)]
-    public string Ticker { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Таймфрейм
-    /// </summary>
-    [Column("timeframe"), MaxLength(20)]
-    public string Timeframe { get; set; } = string.Empty;
+    [Column("instrument_id")]
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Цена открытия

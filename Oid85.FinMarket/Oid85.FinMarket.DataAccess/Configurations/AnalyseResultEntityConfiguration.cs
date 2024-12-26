@@ -12,6 +12,6 @@ internal class AnalyseResultEntityConfiguration : EntityConfigurationBase<Analys
         base.Configure(builder);
         
         builder.ToTable("analyse_results", KnownDatabaseSchemas.Storage);
-        builder.HasIndex(x => x.Ticker);
+        builder.HasIndex(x => x.InstrumentId);
     }
 }

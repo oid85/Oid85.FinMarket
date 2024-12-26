@@ -15,7 +15,7 @@ public class Indicative
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
-    public Guid Uid { get; set; }
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Тикер инструмента

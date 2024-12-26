@@ -3,6 +3,11 @@
 public class Currency
 {
     /// <summary>
+    /// Id
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
     /// Тикер
     /// </summary>
     public string Ticker { get; set; } = string.Empty;
@@ -40,7 +45,7 @@ public class Currency
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
-    public Guid Uid { get; set; }
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Находится в списке наблюдения

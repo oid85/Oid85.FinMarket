@@ -33,8 +33,8 @@ public class ShareEntity : AuditableEntity
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
-    [Column("uid"), MaxLength(40)]
-    public Guid Uid { get; set; }
+    [Column("instrument_id")]
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Описание

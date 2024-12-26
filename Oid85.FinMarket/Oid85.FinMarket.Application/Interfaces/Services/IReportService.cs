@@ -42,4 +42,9 @@ public interface IReportService
     /// Получить отчет по облигациям
     /// </summary>
     Task<ReportData> GetReportBonds();
+
+    /// <summary>
+    /// Получить отчет по фундаментальным данным
+    /// </summary>
+    Task<ReportData> GetReportAssetFundamentalsStocks();
 }

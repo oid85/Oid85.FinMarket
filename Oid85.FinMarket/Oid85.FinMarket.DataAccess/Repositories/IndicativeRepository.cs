@@ -11,7 +11,7 @@ public class IndicativeRepository(
 {
     public async Task AddOrUpdateAsync(List<Indicative> indicatives)
     {
-        if (!indicatives.Any())
+        if (indicatives.Count == 0)
             return;
         
         foreach (var indicative in indicatives)

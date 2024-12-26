@@ -27,8 +27,8 @@ public class FutureEntity : AuditableEntity
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
-    [Column("uid")]
-    public Guid Uid { get; set; }
+    [Column("instrument_id")]
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Описание

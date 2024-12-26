@@ -11,7 +11,7 @@ public class CurrencyRepository(
 {
     public async Task AddOrUpdateAsync(List<Currency> currencies)
     {
-        if (!currencies.Any())
+        if (currencies.Count == 0)
             return;
         
         foreach (var currency in currencies)

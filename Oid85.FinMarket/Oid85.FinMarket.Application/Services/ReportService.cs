@@ -8,7 +8,7 @@ using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.Application.Services;
 
-/// <inheritdoc cref="IReportService" />
+/// <inheritdoc />
 public class ReportService(
     IAnalyseResultRepository analyseResultRepository,
     IBondCouponRepository bondCouponRepository,
@@ -150,7 +150,7 @@ public class ReportService(
     public async Task<ReportData> GetReportBonds()
     {
         var bonds = await bondRepository
-            .GetAllAsync();
+            .GetWatchListAsync();
             
         var reportData = new ReportData
         {
@@ -222,7 +222,13 @@ public class ReportService(
             
         return reportData;
     }
-        
+
+    public async Task<ReportData> GetReportAssetFundamentalsStocks()
+    {
+        var reportData = new ReportData();
+        return reportData;
+    }
+
     private List<ReportParameter> GetDates(DateTime from, DateTime to)
     {
         var curDate = from;
@@ -246,17 +252,17 @@ public class ReportService(
         DateTime to,
         string analyseType)
     {
-        var tickers = shares
-            .Select(x => x.Ticker)
-            .ToList();
-            
+        var instrumentIds = shares
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
         var analyseResults = (await analyseResultRepository
-                .GetAsync(tickers, from, to))
+                .GetAsync(instrumentIds, from, to))
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
 
         var dividendInfos = await dividendInfoRepository
-            .GetAsync(tickers, to.AddDays(1), to.AddDays(WindowInDays));
+            .GetAsync(instrumentIds, to.AddDays(1), to.AddDays(WindowInDays));
             
         var dates = GetDates(from, to.AddDays(WindowInDays));
             
@@ -287,7 +293,7 @@ public class ReportService(
             {
                 var analyseResult = analyseResults
                     .FirstOrDefault(x => 
-                        x.Ticker == share.Ticker && 
+                        x.InstrumentId == share.InstrumentId && 
                         x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                 data.Add(analyseResult is not null 

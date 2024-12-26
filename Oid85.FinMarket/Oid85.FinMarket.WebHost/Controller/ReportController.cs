@@ -119,5 +119,20 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
             result => new BaseResponse<ReportData>
             {
                 Result = result
-            });        
+            }); 
+    
+    /// <summary>
+    /// Отчет по фундаментальным данным
+    /// </summary>        
+    [HttpGet("report/asset-fundamentals/stocks")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> ReportAssetFundamentalsStocksAsync() =>
+        GetResponseAsync(
+            () => reportService.GetReportAssetFundamentalsStocks(),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
 }

@@ -109,6 +109,17 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
             loadService.LoadBondCouponsAsync);   
         
     /// <summary>
+    /// Загрузить фундаментальные данные
+    /// </summary>
+    [HttpGet("load-asset-fundamentals")]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadAssetFundamentalsAsync() =>
+        GetResponseAsync<object, BaseResponse<object>>(
+            loadService.LoadAssetFundamentalsAsync);    
+    
+    /// <summary>
     /// Загрузить последние цены акций
     /// </summary>
     [HttpGet("load-stock-prices")]

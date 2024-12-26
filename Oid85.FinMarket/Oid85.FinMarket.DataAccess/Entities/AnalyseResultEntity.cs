@@ -7,16 +7,10 @@ namespace Oid85.FinMarket.DataAccess.Entities;
 public class AnalyseResultEntity : BaseEntity
 {
     /// <summary>
-    /// Тикер
+    /// Id инструмента
     /// </summary>
-    [Column("ticker"), MaxLength(10)]
-    public string Ticker { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Таймфрейм
-    /// </summary>
-    [Column("timeframe"), MaxLength(20)]
-    public string Timeframe { get; set; } = string.Empty;    
+    [Column("instrument_id")]
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Результат анализа

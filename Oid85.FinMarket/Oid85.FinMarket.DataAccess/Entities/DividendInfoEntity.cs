@@ -7,6 +7,12 @@ namespace Oid85.FinMarket.DataAccess.Entities;
 public class DividendInfoEntity : AuditableEntity
 {
     /// <summary>
+    /// Уникальный идентификатор инструмента
+    /// </summary>
+    [Column("instrument_id")]
+    public Guid InstrumentId { get; set; }
+    
+    /// <summary>
     /// Тикер
     /// </summary>
     [Column("ticker"), MaxLength(20)]

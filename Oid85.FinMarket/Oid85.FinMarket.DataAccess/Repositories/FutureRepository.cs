@@ -11,7 +11,7 @@ public class FutureRepository(
 {
     public async Task AddOrUpdateAsync(List<Future> futures)
     {
-        if (!futures.Any())
+        if (futures.Count == 0)
             return;
         
         foreach (var future in futures)

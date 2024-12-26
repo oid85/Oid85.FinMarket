@@ -30,7 +30,7 @@ public class Share
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
-    public Guid Uid { get; set; }
+    public Guid InstrumentId { get; set; }
 
     /// <summary>
     /// Наименование

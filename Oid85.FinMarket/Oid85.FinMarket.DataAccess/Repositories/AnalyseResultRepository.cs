@@ -7,15 +7,15 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class AnalyseResultRepository(
-    FinMarketContext context) : IAnalyseResultRepository
+    FinMarketContext context) 
+    : IAnalyseResultRepository
 {
     public async Task AddOrUpdateAsync(List<AnalyseResult> results)
     {
-        if (!results.Any())
+        if (results.Count == 0)
             return;
         
-        var lastAnalyseResult = await GetLastAsync(
-            results.First().Ticker, results.First().Timeframe);
+        var lastAnalyseResult = await GetLastAsync(results.First().InstrumentId);
 
         if (lastAnalyseResult is null)
         {
@@ -38,9 +38,9 @@ public class AnalyseResultRepository(
     }
 
     public async Task<List<AnalyseResult>> GetAsync(
-        string ticker, DateTime from, DateTime to) =>
+        Guid instrumentId, DateTime from, DateTime to) =>
         (await context.AnalyseResultEntities
-            .Where(x => x.Ticker == ticker)
+            .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
             .ToListAsync())
@@ -48,33 +48,30 @@ public class AnalyseResultRepository(
         .ToList();
     
     public async Task<List<AnalyseResult>> GetAsync(
-        List<string> tickers, DateTime from, DateTime to) =>
+        List<Guid> instrumentIds, DateTime from, DateTime to) =>
         (await context.AnalyseResultEntities
-            .Where(x => tickers.Contains(x.Ticker))
+            .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
             .ToListAsync())
         .Select(x => x.Adapt<AnalyseResult>())
         .ToList();
 
-    public async Task<AnalyseResult?> GetLastAsync(string ticker, string timeframe)
+    public async Task<AnalyseResult?> GetLastAsync(Guid instrumentId)
     {
         bool exists = await context.AnalyseResultEntities
-            .Where(x => x.Timeframe == timeframe)
-            .Where(x => x.Ticker == ticker)
+            .Where(x => x.InstrumentId == instrumentId)
             .AnyAsync();
 
         if (!exists)
             return null;
         
         var maxDate = await context.AnalyseResultEntities
-            .Where(x => x.Timeframe == timeframe)
-            .Where(x => x.Ticker == ticker)
+            .Where(x => x.InstrumentId == instrumentId)
             .MaxAsync(x => x.Date);
 
         var entity = await context.AnalyseResultEntities
-            .Where(x => x.Timeframe == timeframe)
-            .Where(x => x.Ticker == ticker)
+            .Where(x => x.InstrumentId == instrumentId)
             .FirstAsync(x => x.Date == maxDate);
         
         var analyseResult = entity.Adapt<AnalyseResult>();

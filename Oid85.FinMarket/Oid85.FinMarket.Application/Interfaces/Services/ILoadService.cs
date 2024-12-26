@@ -20,4 +20,5 @@ public interface ILoadService
     Task LoadIndicativeDailyCandlesAsync();
     Task LoadCurrenciesAsync();
     Task LoadCurrencyPricesAsync();
+    Task LoadAssetFundamentalsAsync();
 }

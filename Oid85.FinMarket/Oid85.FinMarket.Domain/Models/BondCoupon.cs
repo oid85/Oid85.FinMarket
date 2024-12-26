@@ -3,6 +3,16 @@
 public class BondCoupon
 {
     /// <summary>
+    /// Id
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
+    /// Уникальный идентификатор инструмента
+    /// </summary>
+    public Guid InstrumentId { get; set; }
+    
+    /// <summary>
     /// Тикер
     /// </summary>
     public string Ticker { get; set; } = string.Empty;

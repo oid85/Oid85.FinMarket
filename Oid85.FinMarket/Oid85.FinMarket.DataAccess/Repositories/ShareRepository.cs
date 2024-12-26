@@ -11,7 +11,7 @@ public class ShareRepository(
 {
     public async Task AddOrUpdateAsync(List<Share> shares)
     {
-        if (!shares.Any())
+        if (shares.Count == 0)
             return;
         
         foreach (var share in shares)

@@ -11,7 +11,7 @@ public class BondRepository(
 {
     public async Task AddOrUpdateAsync(List<Bond> bonds)
     {        
-        if (!bonds.Any())
+        if (bonds.Count == 0)
             return;
         
         foreach (var bond in bonds)
@@ -31,7 +31,7 @@ public class BondRepository(
                 entity.Adapt(bond);
             }
         }
-
+        
         await context.SaveChangesAsync();
     }
 
