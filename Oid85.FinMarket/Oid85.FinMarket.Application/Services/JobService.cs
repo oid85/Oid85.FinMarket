@@ -34,6 +34,11 @@ public class JobService(
         await loadService.LoadDividendInfosAsync();
     }
 
+    public async Task LoadAssetFundamentalsAsync()
+    {
+        await loadService.LoadAssetFundamentalsAsync();
+    }
+
     public async Task LoadDailyCandlesAsync()
     {
         await loadService.LoadStockDailyCandlesAsync();
@@ -44,5 +49,6 @@ public class JobService(
     public async Task AnalyseAsync()
     {
         await analyseService.AnalyseStocksAsync();
+        await analyseService.AnalyseIndexesAsync();
     }
 }

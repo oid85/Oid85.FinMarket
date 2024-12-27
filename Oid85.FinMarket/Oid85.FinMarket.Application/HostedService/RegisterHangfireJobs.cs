@@ -18,6 +18,7 @@ public class RegisterHangfireJobs(
         RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadPricesAsync());
         RegisterJob(KnownJobs.LoadBondCoupons, () => jobService.LoadBondCouponsAsync());
         RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
+        RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
         RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandlesAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
 

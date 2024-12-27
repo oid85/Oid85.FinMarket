@@ -7,5 +7,6 @@ public static class KnownJobs
     public const string LoadBondCoupons = "LoadBondCoupons";
     public const string LoadDividendInfos = "LoadDividendInfos";
     public const string LoadDailyCandles = "LoadDailyCandles";
+    public const string LoadAssetFundamentals = "LoadAssetFundamentals";
     public const string Analyse = "Analyse";
 }

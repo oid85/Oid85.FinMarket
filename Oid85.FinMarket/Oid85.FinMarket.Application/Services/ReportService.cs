@@ -14,6 +14,7 @@ public class ReportService(
     IBondCouponRepository bondCouponRepository,
     IBondRepository bondRepository,
     IDividendInfoRepository dividendInfoRepository,
+    IIndicativeRepository indicativeRepository,
     IShareRepository shareRepository,
     IAssetFundamentalRepository assetFundamentalRepository)
     : IReportService
@@ -98,6 +99,14 @@ public class ReportService(
             request.From,
             request.To,
             KnownAnalyseTypes.Rsi);
+
+    /// <inheritdoc />
+    public async Task<ReportData> ReportAnalyseYieldLtmIndexes(GetReportAnalyseRequest request) =>
+        await GetReportDataByAnalyseTypeIndexes(
+            await indicativeRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.YieldLtm);
 
     /// <inheritdoc />
     public async Task<ReportData> GetReportDividendsStocks()
@@ -369,6 +378,66 @@ public class ReportService(
                         dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)) 
                     : new ReportParameter(
                         KnownDisplayTypes.Percent, 
+                        string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+    
+    private async Task<ReportData> GetReportDataByAnalyseTypeIndexes(
+    List<Indicative> indicatives,
+    DateTime from,
+    DateTime to,
+    string analyseType)
+    {
+        var instrumentIds = indicatives
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => x.AnalyseType == analyseType)
+            .ToList();
+            
+        var dates = GetDates(from, to.AddDays(WindowInDays));
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ {analyseType} " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var indicative in indicatives)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, indicative.Ticker)
+            };
+
+            foreach (var date in dates)
+            {
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x => 
+                        x.InstrumentId == indicative.InstrumentId && 
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(analyseResult is not null 
+                    ? new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
+                        analyseResult.Result) 
+                    : new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
                         string.Empty));
             }
                 
