@@ -14,7 +14,8 @@ public class ReportService(
     IBondCouponRepository bondCouponRepository,
     IBondRepository bondRepository,
     IDividendInfoRepository dividendInfoRepository,
-    IShareRepository shareRepository)
+    IShareRepository shareRepository,
+    IAssetFundamentalRepository assetFundamentalRepository)
     : IReportService
 {
     private const int WindowInDays = 180;
@@ -184,7 +185,7 @@ public class ReportService(
                 new (KnownDisplayTypes.String, 
                     bond.FloatingCouponFlag ? "Да" : string.Empty),
                     
-                new (KnownDisplayTypes.String, 
+                new (KnownDisplayTypes.Number, 
                     (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString())
             ];
                 
@@ -225,7 +226,57 @@ public class ReportService(
 
     public async Task<ReportData> GetReportAssetFundamentalsStocks()
     {
-        var reportData = new ReportData();
+        var shares = await shareRepository
+            .GetWatchListAsync();
+            
+        var reportData = new ReportData
+        {
+            Title = "Фундаментальный анализ",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
+                new ReportParameter(KnownDisplayTypes.String, "Рыночная капитализация"),
+                new ReportParameter(KnownDisplayTypes.String, "Минимум за год"),
+                new ReportParameter(KnownDisplayTypes.String, "Максимум за год"),
+                new ReportParameter(KnownDisplayTypes.String, "Бета-коэффициент"),
+                new ReportParameter(KnownDisplayTypes.String, "Чистая прибыль"),
+                new ReportParameter(KnownDisplayTypes.String, "EBITDA"),
+                new ReportParameter(KnownDisplayTypes.String, "EPS"),
+                new ReportParameter(KnownDisplayTypes.String, "Свободный денежный поток"),
+                new ReportParameter(KnownDisplayTypes.String, "EV/EBITDA"),
+                new ReportParameter(KnownDisplayTypes.String, "Total Debt/EBITDA"),
+                new ReportParameter(KnownDisplayTypes.String, "Net Debt/EBITDA")
+            ]
+        };
+
+        foreach (var share in shares)
+        {
+            var assetFundamental = await assetFundamentalRepository.GetLastAsync(share.InstrumentId);
+            
+            if (assetFundamental is null)
+                continue;
+            
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, share.Ticker),
+                new (KnownDisplayTypes.Sector, share.Sector),
+                new (KnownDisplayTypes.Number, assetFundamental.MarketCapitalization.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.LowPriceLast52Weeks.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.HighPriceLast52Weeks.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.Beta.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.NetIncomeTtm.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.EbitdaTtm.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.EpsTtm.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.FreeCashFlowTtm.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.EvToEbitdaMrq.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.TotalDebtToEbitdaMrq.ToString("N2")),
+                new (KnownDisplayTypes.Number, assetFundamental.NetDebtToEbitda.ToString("N2"))
+            ];
+            
+            reportData.Data.Add(data);
+        }
+        
         return reportData;
     }
 
@@ -298,10 +349,10 @@ public class ReportService(
 
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
-                        KnownDisplayTypes.AnalyseTypeValue, 
+                        KnownDisplayTypes.AnalyseResult, 
                         analyseResult.Result) 
                     : new ReportParameter(
-                        KnownDisplayTypes.AnalyseTypeValue, 
+                        KnownDisplayTypes.AnalyseResult, 
                         string.Empty));
             }
                 
