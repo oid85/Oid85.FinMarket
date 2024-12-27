@@ -7,17 +7,17 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class CandleRepository(
-    FinMarketContext context) : ICandleRepository
+    FinMarketContext context) 
+    : ICandleRepository
 {
     public async Task AddOrUpdateAsync(List<Candle> candles)
     {
-        if (!candles.Any())
+        if (candles.Count == 0)
             return;
         
-        var lastEntity = await GetLastAsync(
-            candles.First().Ticker, candles.First().Timeframe);
+        var lastCandle = await GetLastAsync(candles.First().InstrumentId);
 
-        if (lastEntity is null)
+        if (lastCandle is null)
         {
             var entities = candles
                 .Select(x => x.Adapt<CandleEntity>());
@@ -26,15 +26,15 @@ public class CandleRepository(
         
         else
         {
-            if (!lastEntity.IsComplete)
+            if (!lastCandle.IsComplete)
             {
-                var candle = candles.First(x => x.Date == lastEntity.Date);
-                lastEntity.Adapt(candle);
+                var candle = candles.First(x => x.Date == lastCandle.Date);
+                lastCandle.Adapt(candle);
             }
 
             var entities = candles
                 .Select(x => x.Adapt<CandleEntity>())
-                .Where(x => x.Date > lastEntity.Date);
+                .Where(x => x.Date > lastCandle.Date);
                 
             await context.CandleEntities.AddRangeAsync(entities);  
         }
@@ -42,34 +42,32 @@ public class CandleRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Candle>> GetAsync(string ticker, string timeframe) =>
+    public Task<List<Candle>> GetAsync(Guid instrumentId) =>
         context.CandleEntities
-            .Where(x => ticker == x.Ticker)
-            .Where(x => x.Timeframe == timeframe)
+            .Where(x => x.InstrumentId == instrumentId)
             .OrderBy(x => x.Date)
             .Select(x => x.Adapt<Candle>())
             .ToListAsync();
 
-    private async Task<CandleEntity?> GetLastAsync(string ticker, string timeframe)
+    public async Task<Candle?> GetLastAsync(Guid instrumentId)
     {
         bool exists = await context.CandleEntities
-            .Where(x => x.Timeframe == timeframe)
-            .Where(x => x.Ticker == ticker)
+            .Where(x => x.InstrumentId == instrumentId)
             .AnyAsync();
 
         if (!exists)
             return null;
         
         var maxDate = await context.CandleEntities
-            .Where(x => x.Timeframe == timeframe)
-            .Where(x => x.Ticker == ticker)
+            .Where(x => x.InstrumentId == instrumentId)
             .MaxAsync(x => x.Date);
 
         var entity = await context.CandleEntities
-            .Where(x => x.Timeframe == timeframe)
-            .Where(x => x.Ticker == ticker)
+            .Where(x => x.InstrumentId == instrumentId)
             .FirstAsync(x => x.Date == maxDate);
+
+        var candle = entity.Adapt<Candle>();
         
-        return entity;
+        return candle;
     }
 }

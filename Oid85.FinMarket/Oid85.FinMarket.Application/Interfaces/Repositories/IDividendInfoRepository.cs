@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.Domain.Models;
+﻿using System.Collections;
+using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
@@ -6,5 +7,5 @@ public interface IDividendInfoRepository
 {
     Task AddOrUpdateAsync(List<DividendInfo> dividendInfos);
     Task<List<DividendInfo>> GetAllAsync();
-    Task<List<DividendInfo>> GetAsync(List<string> tickers, DateTime from, DateTime to);
+    Task<List<DividendInfo>> GetAsync(List<Guid> instrumentIds, DateTime from, DateTime to);
 }

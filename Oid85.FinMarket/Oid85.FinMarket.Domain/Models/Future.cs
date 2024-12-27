@@ -23,9 +23,14 @@ public class Future
     public string Figi { get; set; } = string.Empty;
 
     /// <summary>
-    /// Описание
+    /// Уникальный идентификатор инструмента
     /// </summary>
-    public string Description { get; set; } = string.Empty;
+    public Guid InstrumentId { get; set; }
+    
+    /// <summary>
+    /// Наименование
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
     
     /// <summary>
     /// Дата истечения срока

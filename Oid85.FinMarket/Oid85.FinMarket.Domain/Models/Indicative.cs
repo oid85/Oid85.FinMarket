@@ -10,12 +10,17 @@ public class Indicative
     /// <summary>
     /// FIGI-идентификатор инструмента
     /// </summary>
-    public string Figi { get; set; }
+    public string Figi { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Уникальный идентификатор инструмента
+    /// </summary>
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Тикер инструмента
     /// </summary>
-    public string Ticker { get; set; }
+    public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
     /// Цена инструмента
@@ -25,32 +30,27 @@ public class Indicative
     /// <summary>
     /// Класс-код инструмента
     /// </summary>
-    public string ClassCode { get; set; }
+    public string ClassCode { get; set; } = string.Empty;
     
     /// <summary>
     /// Валюта расчётов
     /// </summary>
-    public string Currency { get; set; }
+    public string Currency { get; set; } = string.Empty;
     
     /// <summary>
     /// Тип инструмента
     /// </summary>
-    public string InstrumentKind { get; set; }
+    public string InstrumentKind { get; set; } = string.Empty;
     
     /// <summary>
     /// Название инструмента
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     
     /// <summary>
     /// Tорговая площадка (секция биржи)
     /// </summary>
-    public string Exchange { get; set; }
-    
-    /// <summary>
-    /// Уникальный идентификатор инструмента
-    /// </summary>
-    public string Uid { get; set; }
+    public string Exchange { get; set; } = string.Empty;
     
     /// <summary>
     /// Находится в списке наблюдения

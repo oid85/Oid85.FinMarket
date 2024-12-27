@@ -11,7 +11,7 @@ public class DividendInfoRepository(
 {
     public async Task AddOrUpdateAsync(List<DividendInfo> dividendInfos)
     {
-        if (!dividendInfos.Any())
+        if (dividendInfos.Count == 0)
             return;
         
         foreach (var dividendInfo in dividendInfos)
@@ -37,20 +37,22 @@ public class DividendInfoRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<DividendInfo>> GetAllAsync() =>
-        context.DividendInfoEntities
-            .Select(x => x.Adapt<DividendInfo>())
+    public async Task<List<DividendInfo>> GetAllAsync() =>
+        (await context.DividendInfoEntities
             .OrderBy(x => x.DividendPrc)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<DividendInfo>())
+        .ToList();
     
-    public Task<List<DividendInfo>> GetAsync(
-        List<string> tickers, DateTime from, DateTime to) =>
-        context.DividendInfoEntities
-            .Where(x => tickers.Contains(x.Ticker))
-            .Where(x => 
-                x.RecordDate >= DateOnly.FromDateTime(from) && 
+    public async Task<List<DividendInfo>> GetAsync(
+        List<Guid> instrumentIds, DateTime from, DateTime to) =>
+        (await context.DividendInfoEntities
+            .Where(x => instrumentIds.Contains(x.InstrumentId))
+            .Where(x =>
+                x.RecordDate >= DateOnly.FromDateTime(from) &&
                 x.RecordDate <= DateOnly.FromDateTime(to))
-            .Select(x => x.Adapt<DividendInfo>())
             .OrderBy(x => x.DividendPrc)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<DividendInfo>())
+        .ToList();
 }

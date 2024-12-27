@@ -10,17 +10,17 @@ public interface ITinkoffService
     /// <summary>
     /// Получить свечи
     /// </summary>
-    public Task<List<Candle>> GetCandlesAsync(string figi, string ticker, string timeframe);
+    public Task<List<Candle>> GetCandlesAsync(Guid instrumentId);
 
     /// <summary>
     /// Получить свечи за конкретный год
     /// </summary>
-    public Task<List<Candle>> GetCandlesAsync(string figi, string ticker, string timeframe, int year);
+    public Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year);
         
     /// <summary>
     /// Получить последние цены
     /// </summary>
-    public Task<List<double>> GetPricesAsync(List<string> figiList);
+    public Task<List<double>> GetPricesAsync(List<Guid> instrumentIds);
         
     /// <summary>
     /// Получить список акций
@@ -53,7 +53,12 @@ public interface ITinkoffService
     public Task<List<DividendInfo>> GetDividendInfoAsync(List<Share> shares);
         
     /// <summary>
-    /// Запрос купонов по облигации
+    /// Получить купоны по облигациям
     /// </summary>
     public Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds);
+    
+    /// <summary>
+    /// Получить фундаментальные данные
+    /// </summary>
+    public Task<List<AssetFundamental>> GetAssetFundamentalsAsync(List<Guid> instrumentIds);
 }

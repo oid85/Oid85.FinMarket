@@ -11,9 +11,9 @@ public class Candle
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Тикер
+    /// Id инструмента
     /// </summary>
-    public string Ticker { get; set; } = string.Empty;
+    public Guid InstrumentId { get; set; }
         
     /// <summary>
     /// Цена открытия
@@ -49,9 +49,4 @@ public class Candle
     /// Свеча сформирована
     /// </summary>
     public bool IsComplete { get; set; }
-        
-    /// <summary>
-    /// Таймфрейм
-    /// </summary>
-    public string Timeframe { get; set; } = string.Empty;
 }

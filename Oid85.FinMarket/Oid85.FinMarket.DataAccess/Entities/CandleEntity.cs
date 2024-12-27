@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
@@ -6,16 +7,10 @@ namespace Oid85.FinMarket.DataAccess.Entities;
 public class CandleEntity : BaseEntity
 {
     /// <summary>
-    /// Тикер
+    /// Уникальный идентификатор инструмента
     /// </summary>
-    [Column("ticker")]
-    public string Ticker { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Таймфрейм
-    /// </summary>
-    [Column("timeframe")]
-    public string Timeframe { get; set; } = string.Empty;
+    [Column("instrument_id")]
+    public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Цена открытия

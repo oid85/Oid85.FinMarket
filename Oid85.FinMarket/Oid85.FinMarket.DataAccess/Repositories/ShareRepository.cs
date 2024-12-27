@@ -11,7 +11,7 @@ public class ShareRepository(
 {
     public async Task AddOrUpdateAsync(List<Share> shares)
     {
-        if (!shares.Any())
+        if (shares.Count == 0)
             return;
         
         foreach (var share in shares)
@@ -35,20 +35,22 @@ public class ShareRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Share>> GetAllAsync() =>
-        context.ShareEntities
+    public async Task<List<Share>> GetAllAsync() =>
+        (await context.ShareEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => x.Adapt<Share>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Share>())
+        .ToList();
 
-    public Task<List<Share>> GetWatchListAsync() =>
-        context.ShareEntities
+    public async Task<List<Share>> GetWatchListAsync() =>
+        (await context.ShareEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => x.Adapt<Share>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Share>())
+        .ToList();
 
     public async Task<Share?> GetByTickerAsync(string ticker)
     {

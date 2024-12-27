@@ -5,13 +5,12 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class CandleEntityConfiguration : EntityConfigurationBase<CandleEntity>
+internal class AssetFundamentalEntityConfiguration : EntityConfigurationBase<AssetFundamentalEntity>
 {
-    public override void Configure(EntityTypeBuilder<CandleEntity> builder)
+    public override void Configure(EntityTypeBuilder<AssetFundamentalEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("candles", KnownDatabaseSchemas.Storage);
-        builder.HasIndex(x => x.InstrumentId);
+        builder.ToTable("asset_fundamentals", KnownDatabaseSchemas.Default);
     }
 }

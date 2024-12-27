@@ -65,55 +65,31 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
             loadService.LoadCurrenciesAsync);         
         
     /// <summary>
-    /// Подгрузить последние свечи по акциям
+    /// Подгрузить свечи по акциям
     /// </summary>
-    [HttpGet("load-stocks-daily-candles")]
+    [HttpGet("load-stock-daily-candles")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadStocksDailyCandlesAsync() =>
+    public Task<IActionResult> LoadStockDailyCandlesAsync() =>
         GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadStocksDailyCandlesAsync);
-
+            loadService.LoadStockDailyCandlesAsync);
+    
     /// <summary>
-    /// Загрузить свечи по акциям за конкретный год
+    /// Подгрузить свечи по фьючерсам
     /// </summary>
-    /// <param name="year">Год</param>
-    [HttpGet("load-stocks-daily-candles-for-year/{year}")]
+    [HttpGet("load-future-daily-candles")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadStocksDailyCandlesForYearAsync(int year) =>
+    public Task<IActionResult> LoadFutureDailyCandlesAsync() =>
         GetResponseAsync<object, BaseResponse<object>>(
-            () => loadService.LoadStocksDailyCandlesAsync(year));
-
-    /// <summary>
-    /// Подгрузить последние свечи по фьючерсам
-    /// </summary>
-    [HttpGet("load-futures-daily-candles")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadFuturesDailyCandlesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadFuturesDailyCandlesAsync);
-
-    /// <summary>
-    /// Загрузить свечи по фьючерсам за конкретный год
-    /// </summary>
-    /// <param name="year">Год</param>
-    [HttpGet("load-futures-daily-candles-for-year/{year}")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadFuturesDailyCandlesForYearAsync(int year) =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            () => loadService.LoadFuturesDailyCandlesAsync(year));        
-        
+            loadService.LoadFutureDailyCandlesAsync);
+    
     /// <summary>
     /// Загрузить данные о дивидендах
     /// </summary>
-    [HttpGet("load-dividends-info")]
+    [HttpGet("load-dividend-infos")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -132,6 +108,17 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
         GetResponseAsync<object, BaseResponse<object>>(
             loadService.LoadBondCouponsAsync);   
         
+    /// <summary>
+    /// Загрузить фундаментальные данные
+    /// </summary>
+    [HttpGet("load-asset-fundamentals")]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadAssetFundamentalsAsync() =>
+        GetResponseAsync<object, BaseResponse<object>>(
+            loadService.LoadAssetFundamentalsAsync);    
+    
     /// <summary>
     /// Загрузить последние цены акций
     /// </summary>

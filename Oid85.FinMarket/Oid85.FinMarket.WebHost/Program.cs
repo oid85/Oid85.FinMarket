@@ -30,9 +30,6 @@ public class Program
         });
 
         var app = builder.Build();
-
-        await app.ApplyMigrations();
-        await app.ApplyLogMigrations();
         
         app.UseRouting();
 

@@ -16,15 +16,10 @@ public class AnalyseResult
     public DateTime Date { get; set; }
 
     /// <summary>
-    /// Тикер
+    /// Уникальный идентификатор инструмента
     /// </summary>
-    public string Ticker { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Таймфрейм
-    /// </summary>
-    public string Timeframe { get; set; } = string.Empty;
-
+    public Guid InstrumentId { get; set; }
+    
     /// <summary>
     /// Тип анализа
     /// </summary>

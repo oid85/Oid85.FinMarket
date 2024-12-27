@@ -17,27 +17,27 @@ public class AnalyseService(
     : IAnalyseService
 {
     /// <inheritdoc />
-    public async Task AnalyseStocksAsync()
+    public async Task<bool> AnalyseStocksAsync()
     {
-        var shares = await shareRepository.GetAllAsync();
-        var timeframe = KnownTimeframes.Daily;
+        var shares = await shareRepository.GetWatchListAsync();
             
         for (int i = 0; i < shares.Count; i++)
         {                
-            await SupertrendAnalyseAsync(shares[i], timeframe);
-            await CandleSequenceAnalyseAsync(shares[i], timeframe);
-            await CandleVolumeAnalyseAsync(shares[i], timeframe);
-            await RsiAnalyseAsync(shares[i], timeframe);
+            await SupertrendAnalyseAsync(shares[i].InstrumentId);
+            await CandleSequenceAnalyseAsync(shares[i].InstrumentId);
+            await CandleVolumeAnalyseAsync(shares[i].InstrumentId);
+            await RsiAnalyseAsync(shares[i].InstrumentId);
 
             double percent = ((i + 1) / (double) shares.Count) * 100;
 
-            await logService.LogTrace($"Analyse '{shares[i].Ticker}'. {i + 1} of {shares.Count}. {percent:N2} % completed");
+            await logService.LogTrace($"Анализ акций, {i + 1} из {shares.Count}. {percent:N2} % закончено");
         }
+
+        return true;
     }
         
     /// <inheritdoc />
-    public async Task<List<AnalyseResult>> SupertrendAnalyseAsync(
-        Share share, string timeframe)
+    public async Task<List<AnalyseResult>> SupertrendAnalyseAsync(Guid instrumentId)
     {
         string GetResult(SuperTrendResult result)
         {
@@ -55,7 +55,7 @@ public class AnalyseService(
             
         try
         {
-            var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
+            var candles = (await candleRepository.GetAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -79,8 +79,7 @@ public class AnalyseService(
                 .Select(x => new AnalyseResult()
                 {
                     Date = x.Date.ToUniversalTime(),
-                    Ticker = share.Ticker,
-                    Timeframe = timeframe,
+                    InstrumentId = instrumentId,
                     Result = GetResult(x)
                 })
                 .ToList();
@@ -98,8 +97,7 @@ public class AnalyseService(
     }
         
     /// <inheritdoc />
-    public async Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(
-        Share share, string timeframe)
+    public async Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(Guid instrumentId)
     {
         string GetResult(List<Candle> candles)
         {
@@ -116,7 +114,7 @@ public class AnalyseService(
             
         try
         {
-            var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
+            var candles = (await candleRepository.GetAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -129,8 +127,7 @@ public class AnalyseService(
                 if (i < 2)
                 {
                     result.Date = candles[i].Date;
-                    result.Ticker = share.Ticker;
-                    result.Timeframe = timeframe;
+                    result.InstrumentId = instrumentId;
                     result.Result = string.Empty;
                 }
 
@@ -143,8 +140,7 @@ public class AnalyseService(
                     };
 
                     result.Date = candles[i].Date;
-                    result.Ticker = share.Ticker;
-                    result.Timeframe = timeframe;
+                    result.InstrumentId = instrumentId;
                     result.Result = GetResult(candlesForAnalyse);
                 }                    
 
@@ -164,8 +160,7 @@ public class AnalyseService(
     }
         
     /// <inheritdoc />
-    public async Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(
-        Share share, string timeframe)
+    public async Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(Guid instrumentId)
     {
         string GetResult(List<Candle> candles)
         {
@@ -183,7 +178,7 @@ public class AnalyseService(
             
         try
         {
-            var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
+            var candles = (await candleRepository.GetAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -196,8 +191,7 @@ public class AnalyseService(
                 if (i < 10)
                 {
                     result.Date = candles[i].Date;
-                    result.Ticker = share.Ticker;
-                    result.Timeframe = timeframe;
+                    result.InstrumentId = instrumentId;
                     result.Result = string.Empty;
                 }
 
@@ -218,8 +212,7 @@ public class AnalyseService(
                     };
 
                     result.Date = candles[i].Date;
-                    result.Ticker = share.Ticker;
-                    result.Timeframe = timeframe;
+                    result.InstrumentId = instrumentId;
                     result.Result = GetResult(candlesForAnalyse);
                 }
 
@@ -256,12 +249,11 @@ public class AnalyseService(
     }        
         
     /// <inheritdoc />
-    public async Task<List<AnalyseResult>> RsiAnalyseAsync(
-        Share share, string timeframe)
+    public async Task<List<AnalyseResult>> RsiAnalyseAsync(Guid instrumentId)
     {
         try
         {
-            var candles = (await candleRepository.GetAsync(share.Ticker, timeframe))
+            var candles = (await candleRepository.GetAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -284,8 +276,7 @@ public class AnalyseService(
                 .Select(x => new AnalyseResult()
                 {
                     Date = x.Date.ToUniversalTime(),
-                    Ticker = share.Ticker,
-                    Timeframe = timeframe,
+                    InstrumentId = instrumentId,
                     Result = GetRsiResult(x)
                 })
                 .ToList();

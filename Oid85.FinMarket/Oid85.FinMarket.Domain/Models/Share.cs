@@ -26,11 +26,16 @@ public class Share
     /// Идентификатор FIGI
     /// </summary>
     public string Figi { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Уникальный идентификатор инструмента
+    /// </summary>
+    public Guid InstrumentId { get; set; }
 
     /// <summary>
-    /// Описание
+    /// Наименование
     /// </summary>
-    public string Description { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Сектор
@@ -40,5 +45,5 @@ public class Share
     /// <summary>
     /// Находится в списке наблюдения
     /// </summary>
-    public bool InWatchList { get; set; } = false; 
+    public bool InWatchList { get; set; } = false;
 }

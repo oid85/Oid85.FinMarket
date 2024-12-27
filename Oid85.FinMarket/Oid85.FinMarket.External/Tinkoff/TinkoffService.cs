@@ -25,13 +25,12 @@ public class TinkoffService(
     : ITinkoffService
 {
     /// <inheritdoc />
-    public async Task<List<Candle>> GetCandlesAsync(
-        string figi, string ticker, string timeframe)
+    public async Task<List<Candle>> GetCandlesAsync(Guid instrumentId)
     {
         try
         {
-            var (from, to) = await GetDataRange(timeframe);
-            return await GetCandlesAsync(figi, ticker, timeframe, from, to);
+            var (from, to) = await GetDataRange();
+            return await GetCandlesAsync(instrumentId, from, to);
         }
 
         catch (Exception exception)
@@ -42,14 +41,13 @@ public class TinkoffService(
     }
 
     /// <inheritdoc />
-    public async Task<List<Candle>> GetCandlesAsync(
-        string figi, string ticker, string timeframe, int year)
+    public async Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year)
     {
         try
         {
             var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
             var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
-            return await GetCandlesAsync(figi, ticker, timeframe, from, to);
+            return await GetCandlesAsync(instrumentId, from, to);
         }
 
         catch (Exception exception)
@@ -60,14 +58,14 @@ public class TinkoffService(
     }
 
     /// <inheritdoc />
-    public async Task<List<double>> GetPricesAsync(List<string> figiList)
+    public async Task<List<double>> GetPricesAsync(List<Guid> instrumentIds)
     {
         try
         {
             var request = new GetLastPricesRequest();
 
-            foreach (var figi in figiList)
-                request.InstrumentId.Add(figi);
+            foreach (var instrumentId in instrumentIds)
+                request.InstrumentId.Add(instrumentId.ToString());
 
             request.LastPriceType = LastPriceType.LastPriceExchange;
                 
@@ -91,35 +89,26 @@ public class TinkoffService(
     }
 
     private async Task<List<Candle>> GetCandlesAsync(
-        string figi, string ticker, string timeframe, Timestamp from, Timestamp to)
+        Guid instrumentId, Timestamp from, Timestamp to)
     {
         var request = new GetCandlesRequest
         {
-            InstrumentId = figi,
+            InstrumentId = instrumentId.ToString(),
             From = from,
             To = to
         };
 
-        var interval = GetCandleInterval(timeframe);
-
-        if (interval == CandleInterval.Unspecified)
-        {
-            await logService.LogError("Неизвестный интервал. interval = CandleInterval.Unspecified");
-            return [];
-        }
-
-        request.Interval = interval;
+        request.Interval = CandleInterval.Day;
 
         var response = await client.MarketData.GetCandlesAsync(request);
 
-        var candles = new List<Candle>() { };
+        var candles = new List<Candle>();
 
         for (var i = 0; i < response.Candles.Count; i++)
         {
             var candle = new Candle
             {
-                Ticker = ticker,
-                Timeframe = timeframe,
+                InstrumentId = instrumentId,
                 Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
                 Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
                 High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
@@ -159,8 +148,9 @@ public class TinkoffService(
                 {
                     Ticker = share.Ticker,
                     Figi = share.Figi,
+                    InstrumentId = Guid.Parse(share.Uid),
                     Isin = share.Isin,
-                    Description = share.Name,
+                    Name = share.Name,
                     Sector = share.Sector
                 });
             }
@@ -198,7 +188,8 @@ public class TinkoffService(
                 {
                     Ticker = future.Ticker,
                     Figi = future.Figi,
-                    Description = future.Name,
+                    Name = future.Name,
+                    InstrumentId = Guid.Parse(future.Uid),
                     ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate)
                 });
             }
@@ -232,9 +223,10 @@ public class TinkoffService(
                     Ticker = bond.Ticker,
                     Figi = bond.Figi,
                     Isin = bond.Isin,
-                    Description = bond.Name,
+                    Name = bond.Name,
+                    InstrumentId = Guid.Parse(bond.Uid),
                     Sector = bond.Sector,
-                    NKD = ConvertHelper.MoneyValueToDouble(bond.AciValue),
+                    Nkd = ConvertHelper.MoneyValueToDouble(bond.AciValue),
                     MaturityDate = ConvertHelper.TimestampToDateOnly(bond.MaturityDate),
                     FloatingCouponFlag = bond.FloatingCouponFlag
                 };
@@ -277,7 +269,7 @@ public class TinkoffService(
                     InstrumentKind = indicative.InstrumentKind.ToString(),
                     Name = indicative.Name,
                     Exchange = indicative.Exchange,
-                    Uid = indicative.Uid
+                    InstrumentId = Guid.Parse(indicative.Uid)
                 };
 
                 result.Add(instrument);
@@ -317,7 +309,7 @@ public class TinkoffService(
                     ClassCode = currency.ClassCode,
                     Name = currency.Name,
                     IsoCurrencyName = currency.IsoCurrencyName,
-                    Uid = currency.Uid
+                    InstrumentId = Guid.Parse(currency.Uid)
                 };
 
                 result.Add(instrument);
@@ -351,12 +343,14 @@ public class TinkoffService(
             {
                 var request = new GetDividendsRequest
                 {
-                    InstrumentId = share.Figi,
+                    InstrumentId = share.InstrumentId.ToString(),
                     From = Timestamp.FromDateTime(from),
                     To = Timestamp.FromDateTime(to)
                 };
 
-                var response = await client.Instruments.GetDividendsAsync(request);
+                var response = await client
+                    .Instruments
+                    .GetDividendsAsync(request);
 
                 if (response is null)
                     continue;
@@ -373,6 +367,7 @@ public class TinkoffService(
                         var dividendInfo = new DividendInfo
                         {
                             Ticker = share.Ticker,
+                            InstrumentId = share.InstrumentId,
                             DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
                             RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
                             Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
@@ -394,6 +389,7 @@ public class TinkoffService(
         }
     }
 
+    /// <inheritdoc />
     public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
     {
         try
@@ -410,7 +406,7 @@ public class TinkoffService(
             {
                 var request = new GetBondCouponsRequest
                 {
-                    InstrumentId = bonds[i].Figi,
+                    InstrumentId = bonds[i].InstrumentId.ToString(),
                     From = Timestamp.FromDateTime(from),
                     To = Timestamp.FromDateTime(to)
                 };
@@ -431,6 +427,7 @@ public class TinkoffService(
 
                         var bondCoupon = new BondCoupon
                         {
+                            InstrumentId = bonds[i].InstrumentId,
                             Ticker = bonds[i].Ticker,
                             CouponNumber = coupon.CouponNumber,
                             CouponPeriod = coupon.CouponPeriod,
@@ -458,44 +455,109 @@ public class TinkoffService(
         }
     }
 
-    private Task<(Timestamp from, Timestamp to)> GetDataRange(string timeframe)
+    /// <inheritdoc />
+    public async Task<List<AssetFundamental>> GetAssetFundamentalsAsync(List<Guid> instrumentIds)
+    {
+        try
+        {
+            var request = new GetAssetFundamentalsRequest();
+                
+            request.Assets.AddRange(instrumentIds.Select(x => x.ToString()));
+            
+            var response = await client
+                .Instruments
+                .GetAssetFundamentalsAsync(request);
+
+            if (response is null)
+                return [];
+            
+            var result = new List<AssetFundamental>();
+
+            foreach (var item in response.Fundamentals)
+            {
+                var assetFundamental = new AssetFundamental
+                {
+                    Date = DateOnly.FromDateTime(DateTime.Today),
+                    InstrumentId = Guid.Parse(item.AssetUid),
+                    Currency = item.Currency,
+                    MarketCapitalization = item.MarketCapitalization,
+                    HighPriceLast52Weeks = item.HighPriceLast52Weeks,
+                    LowPriceLast52Weeks = item.LowPriceLast52Weeks,
+                    AverageDailyVolumeLast10Days = item.AverageDailyVolumeLast10Days,
+                    AverageDailyVolumeLast4Weeks = item.AverageDailyVolumeLast4Weeks,
+                    Beta = item.Beta,
+                    FreeFloat = item.FreeFloat,
+                    ForwardAnnualDividendYield = item.ForwardAnnualDividendYield,
+                    SharesOutstanding = item.SharesOutstanding,
+                    RevenueTtm = item.RevenueTtm,
+                    EbitdaTtm = item.EbitdaTtm,
+                    NetIncomeTtm = item.NetIncomeTtm,
+                    EpsTtm = item.EpsTtm,
+                    DilutedEpsTtm = item.DilutedEpsTtm,
+                    FreeCashFlowTtm = item.FreeCashFlowTtm,
+                    FiveYearAnnualRevenueGrowthRate = item.FiveYearAnnualRevenueGrowthRate,
+                    ThreeYearAnnualRevenueGrowthRate = item.ThreeYearAnnualRevenueGrowthRate,
+                    PeRatioTtm = item.PeRatioTtm,
+                    PriceToSalesTtm = item.PriceToSalesTtm,
+                    PriceToBookTtm = item.PriceToBookTtm,
+                    PriceToFreeCashFlowTtm = item.PriceToFreeCashFlowTtm,
+                    TotalEnterpriseValueMrq = item.TotalEnterpriseValueMrq,
+                    EvToEbitdaMrq = item.EvToEbitdaMrq,
+                    NetMarginMrq = item.NetMarginMrq,
+                    NetInterestMarginMrq = item.NetInterestMarginMrq,
+                    Roe = item.Roe,
+                    Roa = item.Roa,
+                    Roic = item.Roic,
+                    TotalDebtMrq = item.TotalDebtMrq,
+                    TotalDebtToEquityMrq = item.TotalDebtToEquityMrq,
+                    TotalDebtToEbitdaMrq = item.TotalDebtToEbitdaMrq,
+                    FreeCashFlowToPrice = item.FreeCashFlowToPrice,
+                    NetDebtToEbitda = item.NetDebtToEbitda,
+                    CurrentRatioMrq = item.CurrentRatioMrq,
+                    FixedChargeCoverageRatioFy = item.FixedChargeCoverageRatioFy,
+                    DividendYieldDailyTtm = item.DividendYieldDailyTtm,
+                    DividendRateTtm = item.DividendRateTtm,
+                    DividendsPerShare = item.DividendsPerShare,
+                    FiveYearsAverageDividendYield = item.FiveYearsAverageDividendYield,
+                    FiveYearAnnualDividendGrowthRate = item.FiveYearAnnualDividendGrowthRate,
+                    DividendPayoutRatioFy = item.DividendPayoutRatioFy,
+                    BuyBackTtm = item.BuyBackTtm,
+                    OneYearAnnualRevenueGrowthRate = item.OneYearAnnualRevenueGrowthRate,
+                    DomicileIndicatorCode = item.DomicileIndicatorCode,
+                    AdrToCommonShareRatio = item.AdrToCommonShareRatio,
+                    NumberOfEmployees = item.NumberOfEmployees,
+                    ExDividendDate = ConvertHelper.TimestampToDateOnly(item.ExDividendDate),
+                    FiscalPeriodStartDate = ConvertHelper.TimestampToDateOnly(item.FiscalPeriodStartDate),
+                    FiscalPeriodEndDate = ConvertHelper.TimestampToDateOnly(item.FiscalPeriodEndDate),
+                    RevenueChangeFiveYears = item.RevenueChangeFiveYears,
+                    EpsChangeFiveYears = item.EpsChangeFiveYears,
+                    EbitdaChangeFiveYears = item.EbitdaChangeFiveYears,
+                    TotalDebtChangeFiveYears = item.TotalDebtChangeFiveYears,
+                    EvToSales = item.EvToSales
+                };
+
+                result.Add(assetFundamental);
+            }
+
+            return result;
+        }
+
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
+    private Task<(Timestamp from, Timestamp to)> GetDataRange()
     {           
         var buffer = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsBuffer);
 
-        var startDate = DateTime.Now;
+        var startDate = DateTime.Now.AddDays(-1 * buffer);
         var endDate = DateTime.Now;
-
-        if (timeframe == KnownTimeframes.Daily)
-            startDate = DateTime.Now.AddDays(-1 * buffer);
-
-        else if (timeframe == KnownTimeframes.Hourly)
-            startDate = DateTime.Now.AddHours(-1 * buffer);
-
-        else if (timeframe == KnownTimeframes.FiveMinutes)
-            startDate = DateTime.Now.AddMinutes(-5 * buffer);
-
-        else if (timeframe == KnownTimeframes.OneMinutes)
-            startDate = DateTime.Now.AddMinutes(-1 * buffer);
 
         return Task.FromResult((
             Timestamp.FromDateTime(startDate.ToUniversalTime()), 
             Timestamp.FromDateTime(endDate.ToUniversalTime())));
-    }
-
-    private static CandleInterval GetCandleInterval(string timeframe) 
-    { 
-        if (timeframe == KnownTimeframes.Daily)
-            return CandleInterval.Day;
-
-        if (timeframe == KnownTimeframes.Hourly)
-            return CandleInterval.Hour;
-
-        if (timeframe == KnownTimeframes.FiveMinutes)
-            return CandleInterval._5Min;
-
-        if (timeframe == KnownTimeframes.OneMinutes)
-            return CandleInterval._1Min;
-
-        return CandleInterval.Unspecified;
     }
 }

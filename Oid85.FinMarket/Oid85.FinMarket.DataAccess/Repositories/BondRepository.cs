@@ -11,7 +11,7 @@ public class BondRepository(
 {
     public async Task AddOrUpdateAsync(List<Bond> bonds)
     {        
-        if (!bonds.Any())
+        if (bonds.Count == 0)
             return;
         
         foreach (var bond in bonds)
@@ -31,24 +31,26 @@ public class BondRepository(
                 entity.Adapt(bond);
             }
         }
-
+        
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Bond>> GetAllAsync() =>
-        context.BondEntities
+    public async Task<List<Bond>> GetAllAsync() =>
+        (await context.BondEntities
             .Where(x => !x.IsDeleted)
-            .Select(x => x.Adapt<Bond>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Bond>())
+        .ToList();
 
-    public Task<List<Bond>> GetWatchListAsync() =>
-        context.BondEntities
+    public async Task<List<Bond>> GetWatchListAsync() =>
+        (await context.BondEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
-            .Select(x => x.Adapt<Bond>())
             .OrderBy(x => x.Ticker)
-            .ToListAsync();
+            .ToListAsync())
+        .Select(x => x.Adapt<Bond>())
+        .ToList();
 
     public async Task<Bond?> GetByTickerAsync(string ticker)
     {
