@@ -12,6 +12,7 @@ namespace Oid85.FinMarket.Application.Services;
 public class AnalyseService(
     ILogService logService,
     IShareRepository shareRepository,
+    IIndicativeRepository indicativeRepository,
     ICandleRepository candleRepository,
     IAnalyseResultRepository analyseResultRepository)
     : IAnalyseService
@@ -35,7 +36,24 @@ public class AnalyseService(
 
         return true;
     }
-        
+
+    /// <inheritdoc />
+    public async Task<bool> AnalyseIndexesAsync()
+    {
+        var indicatives = await indicativeRepository.GetWatchListAsync();
+            
+        for (int i = 0; i < indicatives.Count; i++)
+        {                
+            await YieldLtmAnalyseAsync(indicatives[i].InstrumentId);
+
+            double percent = ((i + 1) / (double) indicatives.Count) * 100;
+
+            await logService.LogTrace($"Анализ индексов, {i + 1} из {indicatives.Count}. {percent:N2} % закончено");
+        }
+
+        return true;
+    }
+
     /// <inheritdoc />
     public async Task<List<AnalyseResult>> SupertrendAnalyseAsync(Guid instrumentId)
     {
@@ -230,27 +248,27 @@ public class AnalyseService(
             throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
-
-    private string GetRsiResult(RsiResult result)
-    {
-        const double upLimit = 60.0;
-        const double downLimit = 40.0;
-
-        if (result.Rsi == null)
-            return string.Empty;
-
-        if (result.Rsi >= upLimit)
-            return KnownRsiInterpretations.OverBought;
-
-        if (result.Rsi <= downLimit)
-            return KnownRsiInterpretations.OverSold;
-
-        return string.Empty;
-    }        
         
     /// <inheritdoc />
     public async Task<List<AnalyseResult>> RsiAnalyseAsync(Guid instrumentId)
     {
+        string GetRsiResult(RsiResult result)
+        {
+            const double upLimit = 60.0;
+            const double downLimit = 40.0;
+
+            if (result.Rsi == null)
+                return string.Empty;
+
+            if (result.Rsi >= upLimit)
+                return KnownRsiInterpretations.OverBought;
+
+            if (result.Rsi <= downLimit)
+                return KnownRsiInterpretations.OverSold;
+
+            return string.Empty;
+        }       
+        
         try
         {
             var candles = (await candleRepository.GetAsync(instrumentId))
@@ -280,6 +298,61 @@ public class AnalyseService(
                     Result = GetRsiResult(x)
                 })
                 .ToList();
+
+            await analyseResultRepository.AddOrUpdateAsync(results);
+
+            return results;
+        }
+
+        catch (Exception exception)
+        {
+            await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
+            throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<List<AnalyseResult>> YieldLtmAnalyseAsync(Guid instrumentId)
+    {
+        string GetResult(List<Candle> candles)
+        {
+            double firstPrice = candles.First().Close;
+            double lastPrice = candles.Last().Close;
+            double difference = lastPrice - firstPrice;
+            double yield = difference / firstPrice;
+            double yieldPrc = yield * 100.0;
+            
+            return yieldPrc.ToString("N2");
+        }
+            
+        try
+        {
+            var candles = (await candleRepository.GetAsync(instrumentId))
+                .Where(x => x.IsComplete)
+                .ToList();
+
+            var results = new List<AnalyseResult>();
+            
+            for (int i = 0; i < candles.Count; i++)
+            {
+                var yearAgoCandleDate = candles[i].Date.AddYears(-1);
+                var currentCandleDate = candles[i].Date;
+                
+                var windowCandles = candles
+                    .Where(x => 
+                        x.Date >= yearAgoCandleDate && 
+                        x.Date <= currentCandleDate)
+                    .OrderBy(x => x.Date)
+                    .ToList();
+                
+                results.Add(new AnalyseResult
+                {
+                    AnalyseType = KnownAnalyseTypes.YieldLtm,
+                    Date = currentCandleDate,
+                    InstrumentId = instrumentId,
+                    Result = GetResult(windowCandles)
+                });
+            }
 
             await analyseResultRepository.AddOrUpdateAsync(results);
 

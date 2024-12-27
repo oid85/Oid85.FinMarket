@@ -34,6 +34,11 @@ public interface IReportService
     Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request);
 
     /// <summary>
+    /// Получить отчет по доходности LTM
+    /// </summary>
+    Task<ReportData> ReportAnalyseYieldLtmIndexes(GetReportAnalyseRequest request);
+    
+    /// <summary>
     /// Получить отчет по дивидендам
     /// </summary>
     Task<ReportData> GetReportDividendsStocks();

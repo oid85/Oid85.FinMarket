@@ -12,7 +12,7 @@ public class AnalyseController(
     : FinMarketBaseController
 {
     /// <summary>
-    /// Выполнить анализ
+    /// Выполнить анализ акций
     /// </summary>
     [HttpGet("analyse-stocks")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
@@ -24,5 +24,20 @@ public class AnalyseController(
             result => new BaseResponse<bool>
             {
                 Result = result
-            });        
+            });   
+    
+    /// <summary>
+    /// Выполнить анализ индексов
+    /// </summary>
+    [HttpGet("analyse-indexes")]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> AnalyseIndexesAsync() =>
+        GetResponseAsync(
+            analyseService.AnalyseIndexesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            }); 
 }

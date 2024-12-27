@@ -92,6 +92,22 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
             });
 
     /// <summary>
+    /// Отчет по доходности LTM
+    /// </summary>        
+    [HttpPost("report/analyse-yield-ltm/indexes")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> ReportAnalyseYieldLtmIndexesAsync(
+        [FromBody] GetReportAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.ReportAnalyseYieldLtmIndexes(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
     /// Отчет по дивидендам
     /// </summary>        
     [HttpGet("report/dividends/stocks")]

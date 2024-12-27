@@ -10,25 +10,35 @@ public interface IAnalyseService
     /// <summary>
     /// Анализ всех акций
     /// </summary>
-    public Task<bool> AnalyseStocksAsync();
+    Task<bool> AnalyseStocksAsync();
 
+    /// <summary>
+    /// Анализ индексов
+    /// </summary>
+    Task<bool> AnalyseIndexesAsync();
+    
     /// <summary>
     /// Анализ с индикатором Супертренд
     /// </summary>
-    public Task<List<AnalyseResult>> SupertrendAnalyseAsync(Guid instrumentId);
+    Task<List<AnalyseResult>> SupertrendAnalyseAsync(Guid instrumentId);
 
     /// <summary>
     /// Анализ последовательности подряд идущих свечей
     /// </summary>
-    public Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(Guid instrumentId);
+    Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(Guid instrumentId);
 
     /// <summary>
     /// Анализ растущего объема
     /// </summary>
-    public Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(Guid instrumentId);
+    Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(Guid instrumentId);
 
     /// <summary>
     /// Анализ RSI
     /// </summary>
-    public Task<List<AnalyseResult>> RsiAnalyseAsync(Guid instrumentId);
+    Task<List<AnalyseResult>> RsiAnalyseAsync(Guid instrumentId);
+    
+    /// <summary>
+    /// Анализ доходности LTM
+    /// </summary>
+    Task<List<AnalyseResult>> YieldLtmAnalyseAsync(Guid instrumentId);
 }
