@@ -41,4 +41,54 @@ public class Future
     /// Находится в списке наблюдения
     /// </summary>
     public bool InWatchList { get; set; } = false;
+
+    /// <summary>
+    /// Лотность инструмента
+    /// </summary>
+    public int Lot { get; set; } = 1;
+
+    /// <summary>
+    /// Дата начала обращения контракта по UTC
+    /// </summary>
+    public DateOnly FirstTradeDate { get; set; }
+
+    /// <summary>
+    /// Дата по UTC, до которой возможно проведение операций с фьючерсом
+    /// </summary>
+    public DateOnly LastTradeDate { get; set; }
+
+    /// <summary>
+    /// Тип фьючерса
+    /// </summary>
+    public string FutureType { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Тип актива
+    /// </summary>
+    public string AssetType { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Основной актив
+    /// </summary>
+    public string BasicAsset { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Размер основного актива
+    /// </summary>
+    public double BasicAssetSize { get; set; }
+
+    /// <summary>
+    /// Гарантийное обеспечение при покупке
+    /// </summary>
+    public double InitialMarginOnBuy { get; set; }
+
+    /// <summary>
+    /// Гарантийное обеспечение при продаже
+    /// </summary>
+    public double InitialMarginOnSell { get; set; }
+
+    /// <summary>
+    /// Стоимость шага цены
+    /// </summary>
+    public double MinPriceIncrementAmount { get; set; }
 }

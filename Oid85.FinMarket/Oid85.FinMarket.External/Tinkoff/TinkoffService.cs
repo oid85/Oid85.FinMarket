@@ -190,7 +190,17 @@ public class TinkoffService(
                     Figi = future.Figi,
                     Name = future.Name,
                     InstrumentId = Guid.Parse(future.Uid),
-                    ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate)
+                    ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate),
+                    Lot = future.Lot,
+                    FirstTradeDate = ConvertHelper.TimestampToDateOnly(future.FirstTradeDate),
+                    LastTradeDate = ConvertHelper.TimestampToDateOnly(future.LastTradeDate),
+                    FutureType = future.FuturesType,
+                    AssetType = future.AssetType,
+                    BasicAsset = future.BasicAsset,
+                    BasicAssetSize = ConvertHelper.QuotationToDouble(future.BasicAssetSize),
+                    InitialMarginOnBuy = ConvertHelper.MoneyValueToDouble(future.InitialMarginOnBuy),
+                    InitialMarginOnSell = ConvertHelper.MoneyValueToDouble(future.InitialMarginOnSell),
+                    MinPriceIncrementAmount = ConvertHelper.QuotationToDouble(future.MinPriceIncrementAmount)
                 });
             }
 
