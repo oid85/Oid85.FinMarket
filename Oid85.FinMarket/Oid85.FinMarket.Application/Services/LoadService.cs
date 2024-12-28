@@ -243,6 +243,39 @@ public class LoadService(
         await logService.LogTrace($"Загружены последние цены по валютам. {currencies.Count} шт.");
     }
 
+    public async Task LoadCurrencyDailyCandlesAsync()
+    {
+        var instruments = await currencyRepository.GetWatchListAsync();
+
+        foreach (var instrument in instruments)
+        {
+            var lastCandle = await candleRepository.GetLastAsync(
+                instrument.InstrumentId);
+
+            if (lastCandle is null)
+            {
+                int currentYear = DateTime.Now.Year;
+                const int historyInYears = 3;
+
+                for (int year = currentYear - historyInYears; year <= currentYear; year++)
+                {
+                    var candles = await tinkoffService.GetCandlesAsync(
+                        instrument.InstrumentId, year);
+                    
+                    await candleRepository.AddOrUpdateAsync(candles);
+                }
+            }
+
+            else
+            {
+                var candles = await tinkoffService.GetCandlesAsync(
+                    instrument.InstrumentId);
+                    
+                await candleRepository.AddOrUpdateAsync(candles);
+            }
+        }
+    }
+
     public async Task LoadAssetFundamentalsAsync()
     {
         var shares = await shareRepository.GetWatchListAsync();

@@ -1,0 +1,82 @@
+﻿namespace Oid85.FinMarket.Domain.Models;
+
+public class Spread
+{
+    /// <summary>
+    /// Id
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
+    /// Время расчета спреда
+    /// </summary>
+    public DateTime DateTime { get; set; }
+    
+    /// <summary>
+    /// Id первого инструмента в паре
+    /// </summary>
+    public Guid FirstInstrumentId { get; set; }
+    
+    /// <summary>
+    /// Тикер первого инструмента в паре
+    /// </summary>
+    public string FirstInstrumentTicker { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Роль первого инструмента в паре
+    /// базовый/производный, дальний/ближний (для фьючерсов)
+    /// </summary>
+    public string FirstInstrumentRole { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Цена первого инструмента в паре
+    /// </summary>
+    public double FirstInstrumentPrice { get; set; }
+    
+    /// <summary>
+    /// Id второго инструмента в паре
+    /// </summary>
+    public Guid SecondInstrumentId { get; set; }
+    
+    /// <summary>
+    /// Тикер второго инструмента в паре
+    /// </summary>
+    public string SecondInstrumentTicker { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Роль второго инструмента в паре 
+    /// базовый/производный, дальний/ближний (для фьючерсов)
+    /// </summary>
+    public string SecondInstrumentRole { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Цена второго инструмента в паре
+    /// </summary>
+    public double SecondInstrumentPrice { get; set; }
+    
+    /// <summary>
+    /// Разница цен инструментов
+    /// </summary>
+    public double PriceDifference { get; set; }
+    
+    /// <summary>
+    /// Разница цен инструментов, %
+    /// </summary>
+    public double PriceDifferencePrc { get; set; }
+    
+    /// <summary>
+    /// Фандинг
+    /// </summary>
+    public double Funding { get; set; }
+    
+    /// <summary>
+    /// Отношение цен инструменов, относительно друг друга
+    /// 1 - континго, 2 - бэквордация
+    /// </summary>
+    public int ContangoBackwardation { get; set; }
+    
+    /// <summary>
+    /// Находится в списке наблюдения
+    /// </summary>
+    public bool InWatchList { get; set; } = false; 
+}

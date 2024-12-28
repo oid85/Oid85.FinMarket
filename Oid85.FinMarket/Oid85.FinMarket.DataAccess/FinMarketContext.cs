@@ -18,6 +18,7 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<CandleEntity> CandleEntities { get; set; }
     public DbSet<AnalyseResultEntity> AnalyseResultEntities { get; set; }
     public DbSet<TickerEntity> TickerEntities { get; set; }
+    public DbSet<SpreadEntity> SpreadEntities { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
     {
