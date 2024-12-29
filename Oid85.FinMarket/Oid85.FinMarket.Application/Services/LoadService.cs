@@ -279,8 +279,19 @@ public class LoadService(
     public async Task LoadAssetFundamentalsAsync()
     {
         var shares = await shareRepository.GetWatchListAsync();
+
+        var instrumentIds = new List<Guid>();
+
+        // Загружаем данные, которых нет
+        foreach (var share in shares)
+        {
+            var assetFundamental = await assetFundamentalRepository
+                .GetLastAsync(share.InstrumentId);
             
-        var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
+            if (assetFundamental is not null)
+                if (assetFundamental.Date < DateOnly.FromDateTime(DateTime.Today))
+                    instrumentIds.Add(share.InstrumentId);
+        }
 
         var assetFundamentals = await tinkoffService
             .GetAssetFundamentalsAsync(instrumentIds);

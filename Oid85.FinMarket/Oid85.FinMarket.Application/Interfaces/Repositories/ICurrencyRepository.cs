@@ -8,4 +8,5 @@ public interface ICurrencyRepository
     Task<List<Currency>> GetAllAsync();
     Task<List<Currency>> GetWatchListAsync();
     Task<Currency?> GetByTickerAsync(string ticker);
+    Task<Currency?> GetByInstrumentIdAsync(Guid instrumentId);
 }

@@ -60,4 +60,13 @@ public class FutureRepository(
 
         return entity?.Adapt<Future>();
     }
+    
+    public async Task<Future?> GetByInstrumentIdAsync(Guid instrumentId)
+    {
+        var entity = await context.FutureEntities
+            .Where(x => !x.IsDeleted)
+            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+
+        return entity?.Adapt<Future>();
+    }
 }

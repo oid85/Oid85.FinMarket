@@ -60,4 +60,13 @@ public class CurrencyRepository(
 
         return entity?.Adapt<Currency>();
     }
+
+    public async Task<Currency?> GetByInstrumentIdAsync(Guid instrumentId)
+    {
+        var entity = await context.CurrencyEntities
+            .Where(x => !x.IsDeleted)
+            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+
+        return entity?.Adapt<Currency>();
+    }
 }

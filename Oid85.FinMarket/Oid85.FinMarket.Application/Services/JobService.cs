@@ -4,7 +4,8 @@ namespace Oid85.FinMarket.Application.Services;
 
 public class JobService(
     ILoadService loadService,
-    IAnalyseService analyseService) 
+    IAnalyseService analyseService,
+    ISpreadService spreadService) 
     : IJobService
 {
     public async Task LoadInstrumentsAsync()
@@ -50,5 +51,10 @@ public class JobService(
     {
         await analyseService.AnalyseStocksAsync();
         await analyseService.AnalyseIndexesAsync();
+    }
+
+    public async Task CalculateSpreadsAsync()
+    {
+        await spreadService.CalculateSpreadsAsync();
     }
 }

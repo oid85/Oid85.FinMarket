@@ -21,6 +21,7 @@ public class RegisterHangfireJobs(
         RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
         RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandlesAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
+        RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
 
         return Task.CompletedTask;
     }

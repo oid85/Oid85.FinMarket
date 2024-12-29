@@ -60,4 +60,13 @@ public class ShareRepository(
         
         return entity?.Adapt<Share>();
     }
+    
+    public async Task<Share?> GetByInstrumentIdAsync(Guid instrumentId)
+    {
+        var entity = await context.ShareEntities
+            .Where(x => !x.IsDeleted)
+            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+
+        return entity?.Adapt<Share>();
+    }
 }

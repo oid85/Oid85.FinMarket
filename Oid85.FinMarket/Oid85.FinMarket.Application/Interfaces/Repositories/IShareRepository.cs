@@ -8,4 +8,5 @@ public interface IShareRepository
     Task<List<Share>> GetAllAsync();
     Task<List<Share>> GetWatchListAsync();
     Task<Share?> GetByTickerAsync(string ticker);
+    Task<Share?> GetByInstrumentIdAsync(Guid instrumentId);
 }
