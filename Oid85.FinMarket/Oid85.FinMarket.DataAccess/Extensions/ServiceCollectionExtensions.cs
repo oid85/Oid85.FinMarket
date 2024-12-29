@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<UpdateAuditableEntitiesInterceptor>();
                 
-        services.AddDbContext<FinMarketContext>((serviceProvider, options) =>
+        services.AddDbContextPool<FinMarketContext>((serviceProvider, options) =>
         {
             var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
                 
