@@ -74,10 +74,10 @@ public class SpreadService(
                 SecondInstrumentRole: KnownSpreadRoles.Contract
             })
         {
-            spread.ContangoBackwardation = 
+            spread.SpreadPricePosition = 
                 spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownContangoBackwardation.Contango 
-                    : KnownContangoBackwardation.Backwardation;
+                    ? KnownSpreadPricePositions.Contango 
+                    : KnownSpreadPricePositions.Backwardation;
         }
         
         // Цена контракта выше цены базового актива
@@ -87,10 +87,10 @@ public class SpreadService(
                      SecondInstrumentRole: KnownSpreadRoles.BaseActive
                  })
         {
-            spread.ContangoBackwardation = 
+            spread.SpreadPricePosition = 
                 spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownContangoBackwardation.Contango 
-                    : KnownContangoBackwardation.Backwardation;
+                    ? KnownSpreadPricePositions.Contango 
+                    : KnownSpreadPricePositions.Backwardation;
         }
         
         // Цена дальнего контракта больше цены ближнего
@@ -100,10 +100,10 @@ public class SpreadService(
                 SecondInstrumentRole: KnownSpreadRoles.FarContract
             })
         {
-            spread.ContangoBackwardation = 
+            spread.SpreadPricePosition = 
                 spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownContangoBackwardation.Contango 
-                    : KnownContangoBackwardation.Backwardation;
+                    ? KnownSpreadPricePositions.Contango 
+                    : KnownSpreadPricePositions.Backwardation;
         }
         
         // Цена дальнего контракта больше цены ближнего
@@ -113,10 +113,10 @@ public class SpreadService(
                      SecondInstrumentRole: KnownSpreadRoles.NearContract
                  })
         {
-            spread.ContangoBackwardation = 
+            spread.SpreadPricePosition = 
                 spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownContangoBackwardation.Contango 
-                    : KnownContangoBackwardation.Backwardation;
+                    ? KnownSpreadPricePositions.Contango 
+                    : KnownSpreadPricePositions.Backwardation;
         }        
     }
 }

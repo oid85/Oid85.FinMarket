@@ -11,45 +11,50 @@ public interface IReportService
     /// <summary>
     /// Получить отчет по акции
     /// </summary>
-    Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request);
+    Task<ReportData> GetReportStockAnalyseAsync(GetReportAnalyseStockRequest request);
 
     /// <summary>
     /// Получить отчет с результатами анализа Супертренд
     /// </summary>
-    Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportStocksAnalyseSupertrendAsync(GetReportAnalyseRequest request);
 
     /// <summary>
     /// Получить отчет с результатами анализа Последовательность свечей одного цвета
     /// </summary>
-    Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportStocksAnalyseCandleSequenceAsync(GetReportAnalyseRequest request);
 
     /// <summary>
     /// Получить отчет с результатами анализа Растущий объем
     /// </summary>
-    Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportStocksAnalyseCandleVolumeAsync(GetReportAnalyseRequest request);
 
     /// <summary>
     /// Получить отчет с результатами анализа RSI
     /// </summary>
-    Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportStocksAnalyseRsiAsync(GetReportAnalyseRequest request);
 
     /// <summary>
     /// Получить отчет по доходности LTM
     /// </summary>
-    Task<ReportData> ReportAnalyseYieldLtmIndexes(GetReportAnalyseRequest request);
+    Task<ReportData> ReportIndexesAnalyseYieldLtmAsync(GetReportAnalyseRequest request);
     
     /// <summary>
     /// Получить отчет по дивидендам
     /// </summary>
-    Task<ReportData> GetReportDividendsStocks();
+    Task<ReportData> GetReportDividendsAsync();
 
     /// <summary>
     /// Получить отчет по облигациям
     /// </summary>
-    Task<ReportData> GetReportBonds();
+    Task<ReportData> GetReportBondsAsync();
 
     /// <summary>
     /// Получить отчет по фундаментальным данным
     /// </summary>
-    Task<ReportData> GetReportAssetFundamentalsStocks();
+    Task<ReportData> GetReportAssetFundamentalsAsync();
+
+    /// <summary>
+    /// Получить отчет по спредам
+    /// </summary>
+    Task<ReportData> ReportSpreadsAsync();
 }

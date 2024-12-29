@@ -71,8 +71,8 @@ public class SpreadEntity : AuditableEntity
     /// Отношение цен инструменов, относительно друг друга
     /// 1 - континго, 2 - бэквордация
     /// </summary>
-    [Column("contango_backwardation")]
-    public int ContangoBackwardation { get; set; }
+    [Column("price_position")]
+    public int SpreadPricePosition { get; set; }
     
     /// <summary>
     /// Находится в списке наблюдения

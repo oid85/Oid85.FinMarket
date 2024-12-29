@@ -14,14 +14,14 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по акции
     /// </summary>        
-    [HttpPost("report/analyse/stocks")]
+    [HttpPost("report/stocks/analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAnalyseStockAsync(
+    public Task<IActionResult> ReportStocksAnalyseAsync(
         [FromBody] GetReportAnalyseStockRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportAnalyseStock(request),
+            () => reportService.GetReportStockAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -30,14 +30,14 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по анализу Супертренд
     /// </summary>        
-    [HttpPost("report/analyse-supertrend/stocks")]
+    [HttpPost("report/stocks/analyse-supertrend")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAnalyseSupertrendStocksAsync(
+    public Task<IActionResult> ReportStocksAnalyseSupertrendAsync(
         [FromBody] GetReportAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportAnalyseSupertrendStocks(request),
+            () => reportService.GetReportStocksAnalyseSupertrendAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -46,14 +46,14 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по анализу Последовательность свечей одного цвета
     /// </summary>        
-    [HttpPost("report/analyse-candle-sequence/stocks")]
+    [HttpPost("report/stocks/analyse-candle-sequence")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAnalyseCandleSequenceStocksAsync(
+    public Task<IActionResult> ReportStocksAnalyseCandleSequenceAsync(
         [FromBody] GetReportAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportAnalyseCandleSequenceStocks(request),
+            () => reportService.GetReportStocksAnalyseCandleSequenceAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -62,14 +62,14 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по анализу Растущий объем
     /// </summary>        
-    [HttpPost("report/analyse-candle-volume/stocks")]
+    [HttpPost("report/stocks/analyse-candle-volume")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAnalyseCandleVolumeStocksAsync(
+    public Task<IActionResult> ReportStocksAnalyseCandleVolumeAsync(
         [FromBody] GetReportAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportAnalyseCandleVolumeStocks(request),
+            () => reportService.GetReportStocksAnalyseCandleVolumeAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -78,14 +78,14 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по анализу Rsi
     /// </summary>        
-    [HttpPost("report/analyse-rsi/stocks")]
+    [HttpPost("report/stocks/analyse-rsi")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAnalyseRsiStocksAsync(
+    public Task<IActionResult> ReportStocksAnalyseRsiAsync(
         [FromBody] GetReportAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportAnalyseRsiStocks(request),
+            () => reportService.GetReportStocksAnalyseRsiAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -94,14 +94,14 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по доходности LTM
     /// </summary>        
-    [HttpPost("report/analyse-yield-ltm/indexes")]
+    [HttpPost("report/indexes/analyse-yield-ltm")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAnalyseYieldLtmIndexesAsync(
+    public Task<IActionResult> ReportIndexesAnalyseYieldLtmAsync(
         [FromBody] GetReportAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.ReportAnalyseYieldLtmIndexes(request),
+            () => reportService.ReportIndexesAnalyseYieldLtmAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -110,13 +110,13 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по дивидендам
     /// </summary>        
-    [HttpGet("report/dividends/stocks")]
+    [HttpGet("report/dividends")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportDividendsStocksAsync() =>
+    public Task<IActionResult> ReportDividendsAsync() =>
         GetResponseAsync(
-            () => reportService.GetReportDividendsStocks(),
+            () => reportService.GetReportDividendsAsync(),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -131,7 +131,7 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> ReportBondsAsync() =>
         GetResponseAsync(
-            () => reportService.GetReportBonds(),
+            () => reportService.GetReportBondsAsync(),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -140,13 +140,28 @@ public class ReportController(IReportService reportService) : FinMarketBaseContr
     /// <summary>
     /// Отчет по фундаментальным данным
     /// </summary>        
-    [HttpGet("report/asset-fundamentals/stocks")]
+    [HttpGet("report/asset-fundamentals")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAssetFundamentalsStocksAsync() =>
+    public Task<IActionResult> ReportAssetFundamentalsAsync() =>
         GetResponseAsync(
-            () => reportService.GetReportAssetFundamentalsStocks(),
+            () => reportService.GetReportAssetFundamentalsAsync(),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет по спредам
+    /// </summary>        
+    [HttpGet("report/spreads")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> ReportSpreadsAsync() =>
+        GetResponseAsync(
+            () => reportService.ReportSpreadsAsync(),
             result => new BaseResponse<ReportData>
             {
                 Result = result

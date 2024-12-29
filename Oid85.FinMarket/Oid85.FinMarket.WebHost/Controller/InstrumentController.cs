@@ -9,7 +9,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 
 [Route("api")]
 [ApiController]
-public class FinInstrumentController(
+public class InstrumentController(
     IShareRepository shareRepository,
     ISpreadService spreadService
     ) 
@@ -18,7 +18,7 @@ public class FinInstrumentController(
     /// <summary>
     /// Получить акции из листа наблюдения
     /// </summary>
-    [HttpGet("fin-instrument/watch-list/stocks")]
+    [HttpGet("instrument/stocks/watch-list")]
     [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<List<Share>>), StatusCodes.Status500InternalServerError)]
@@ -33,7 +33,7 @@ public class FinInstrumentController(
     /// <summary>
     /// Расчитать спреды
     /// </summary>
-    [HttpGet("fin-instrument/watch-list/spreads")]
+    [HttpGet("instrument/spreads")]
     [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status500InternalServerError)]

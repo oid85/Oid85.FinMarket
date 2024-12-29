@@ -14,7 +14,7 @@ public class AnalyseController(
     /// <summary>
     /// Выполнить анализ акций
     /// </summary>
-    [HttpGet("analyse-stocks")]
+    [HttpGet("analyse/stocks")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
@@ -29,7 +29,7 @@ public class AnalyseController(
     /// <summary>
     /// Выполнить анализ индексов
     /// </summary>
-    [HttpGet("analyse-indexes")]
+    [HttpGet("analyse/indexes")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]

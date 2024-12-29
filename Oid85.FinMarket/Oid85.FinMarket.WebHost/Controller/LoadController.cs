@@ -12,7 +12,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить справочник акций
     /// </summary>
-    [HttpGet("load-stocks")]
+    [HttpGet("load/stocks")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -23,7 +23,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить справочник фьючерсов
     /// </summary>
-    [HttpGet("load-futures")]
+    [HttpGet("load/futures")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -34,7 +34,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить справочник облигаций
     /// </summary>
-    [HttpGet("load-bonds")]
+    [HttpGet("load/bonds")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -45,7 +45,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить справочник индикативных инструментов
     /// </summary>
-    [HttpGet("load-indicatives")]
+    [HttpGet("load/indicatives")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -56,7 +56,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить справочник валют
     /// </summary>
-    [HttpGet("load-currencies")]
+    [HttpGet("load/currencies")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -67,7 +67,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Подгрузить свечи по акциям
     /// </summary>
-    [HttpGet("load-stock-daily-candles")]
+    [HttpGet("load/stocks/daily-candles")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -78,7 +78,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Подгрузить свечи по фьючерсам
     /// </summary>
-    [HttpGet("load-future-daily-candles")]
+    [HttpGet("load/futures/daily-candles")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -89,7 +89,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить данные о дивидендах
     /// </summary>
-    [HttpGet("load-dividend-infos")]
+    [HttpGet("load/dividend-infos")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -100,7 +100,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить данные о купонах
     /// </summary>
-    [HttpGet("load-bond-coupons")]
+    [HttpGet("load/bond-coupons")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -111,7 +111,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить фундаментальные данные
     /// </summary>
-    [HttpGet("load-asset-fundamentals")]
+    [HttpGet("load/asset-fundamentals")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -122,7 +122,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить последние цены акций
     /// </summary>
-    [HttpGet("load-stock-prices")]
+    [HttpGet("load/stocks/prices")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -133,7 +133,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить последние цены фьючерсов
     /// </summary>
-    [HttpGet("load-future-prices")]
+    [HttpGet("load/futures/prices")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -144,7 +144,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить последние цены облигаций
     /// </summary>
-    [HttpGet("load-bond-prices")]
+    [HttpGet("load/bonds/prices")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -155,7 +155,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить последние цены индикативных инструментов
     /// </summary>
-    [HttpGet("load-indicative-prices")]
+    [HttpGet("load/indicatives/prices")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -166,7 +166,7 @@ public class LoadController(ILoadService loadService) : FinMarketBaseController
     /// <summary>
     /// Загрузить последние цены валют
     /// </summary>
-    [HttpGet("load-curency-prices")]
+    [HttpGet("load/currencies/prices")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]

@@ -16,13 +16,14 @@ public class ReportService(
     IDividendInfoRepository dividendInfoRepository,
     IIndicativeRepository indicativeRepository,
     IShareRepository shareRepository,
-    IAssetFundamentalRepository assetFundamentalRepository)
+    IAssetFundamentalRepository assetFundamentalRepository,
+    ISpreadRepository spreadRepository)
     : IReportService
 {
     private const int WindowInDays = 180;
         
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request)
+    public async Task<ReportData> GetReportStockAnalyseAsync(GetReportAnalyseStockRequest request)
     {
         var share = await shareRepository.GetByTickerAsync(request.Ticker);
             
@@ -69,7 +70,7 @@ public class ReportService(
     }
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request) =>
+    public async Task<ReportData> GetReportStocksAnalyseSupertrendAsync(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
             await shareRepository.GetWatchListAsync(),
             request.From,
@@ -77,7 +78,7 @@ public class ReportService(
             KnownAnalyseTypes.Supertrend);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request) =>
+    public async Task<ReportData> GetReportStocksAnalyseCandleSequenceAsync(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
             await shareRepository.GetWatchListAsync(),
             request.From,
@@ -85,7 +86,7 @@ public class ReportService(
             KnownAnalyseTypes.CandleSequence);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
+    public async Task<ReportData> GetReportStocksAnalyseCandleVolumeAsync(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
             await shareRepository.GetWatchListAsync(),
             request.From,
@@ -93,7 +94,7 @@ public class ReportService(
             KnownAnalyseTypes.CandleVolume);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request) =>
+    public async Task<ReportData> GetReportStocksAnalyseRsiAsync(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeStocks(
             await shareRepository.GetWatchListAsync(),
             request.From,
@@ -101,7 +102,7 @@ public class ReportService(
             KnownAnalyseTypes.Rsi);
 
     /// <inheritdoc />
-    public async Task<ReportData> ReportAnalyseYieldLtmIndexes(GetReportAnalyseRequest request) =>
+    public async Task<ReportData> ReportIndexesAnalyseYieldLtmAsync(GetReportAnalyseRequest request) =>
         await GetReportDataByAnalyseTypeIndexes(
             await indicativeRepository.GetWatchListAsync(),
             request.From,
@@ -109,7 +110,7 @@ public class ReportService(
             KnownAnalyseTypes.YieldLtm);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportDividendsStocks()
+    public async Task<ReportData> GetReportDividendsAsync()
     {
         var dividendInfos = await dividendInfoRepository
             .GetAllAsync();
@@ -157,7 +158,7 @@ public class ReportService(
     }
         
     /// <inheritdoc />
-    public async Task<ReportData> GetReportBonds()
+    public async Task<ReportData> GetReportBondsAsync()
     {
         var bonds = await bondRepository
             .GetWatchListAsync();
@@ -233,7 +234,7 @@ public class ReportService(
         return reportData;
     }
 
-    public async Task<ReportData> GetReportAssetFundamentalsStocks()
+    public async Task<ReportData> GetReportAssetFundamentalsAsync()
     {
         var shares = await shareRepository
             .GetWatchListAsync();
@@ -281,6 +282,49 @@ public class ReportService(
                 new (KnownDisplayTypes.Number, assetFundamental.EvToEbitdaMrq.ToString("N2")),
                 new (KnownDisplayTypes.Number, assetFundamental.TotalDebtToEbitdaMrq.ToString("N2")),
                 new (KnownDisplayTypes.Number, assetFundamental.NetDebtToEbitda.ToString("N2"))
+            ];
+            
+            reportData.Data.Add(data);
+        }
+        
+        return reportData;
+    }
+
+    public async Task<ReportData> ReportSpreadsAsync()
+    {
+        var spreads = await spreadRepository
+            .GetWatchListAsync();
+            
+        var reportData = new ReportData
+        {
+            Title = "Спреды",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер 1"),
+                new ReportParameter(KnownDisplayTypes.String, "Цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Описание"),
+                new ReportParameter(KnownDisplayTypes.String, "Тикер 2"),
+                new ReportParameter(KnownDisplayTypes.String, "Цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Описание"),
+                new ReportParameter(KnownDisplayTypes.String, "Спред"),
+                new ReportParameter(KnownDisplayTypes.String, "Спред, %"),
+                new ReportParameter(KnownDisplayTypes.String, "Фандинг")
+            ]
+        };
+
+        foreach (var spread in spreads)
+        {
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, spread.FirstInstrumentTicker),
+                new (KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N5")),
+                new (KnownDisplayTypes.String, spread.FirstInstrumentRole),
+                new (KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
+                new (KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N5")),
+                new (KnownDisplayTypes.String, spread.SecondInstrumentRole),
+                new (KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N5")),
+                new (KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N5")),
+                new (KnownDisplayTypes.Ruble, spread.Funding.ToString("N5"))
             ];
             
             reportData.Data.Add(data);
