@@ -11,7 +11,7 @@ public interface IReportService
     /// <summary>
     /// Отчет Анализ акции
     /// </summary>
-    Task<ReportData> GetReportShareAnalyseAsync(GetReportAnalyseByTickerRequest request);
+    Task<ReportData> GetReportShareTotalAnalyseAsync(GetReportAnalyseByTickerRequest request);
 
     /// <summary>
     /// Отчет Анализ Супертренд

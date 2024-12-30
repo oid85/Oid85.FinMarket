@@ -107,14 +107,14 @@ public class SharesController(
     /// <summary>
     /// Отчет по акции (по каждому типу анализа)
     /// </summary>        
-    [HttpPost("report/analyse")]
+    [HttpPost("report/total-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportShareAnalyseAsync(
+    public Task<IActionResult> ReportShareTotalAnalyseAsync(
         [FromBody] GetReportAnalyseByTickerRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportShareAnalyseAsync(request),
+            () => reportService.GetReportShareTotalAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result

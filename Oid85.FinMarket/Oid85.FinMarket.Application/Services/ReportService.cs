@@ -24,8 +24,10 @@ public class ReportService(
 {
     private const int WindowInDays = 180;
         
+    #region Shares
+    
     /// <inheritdoc />
-    public async Task<ReportData> GetReportShareAnalyseAsync(
+    public async Task<ReportData> GetReportShareTotalAnalyseAsync(
         GetReportAnalyseByTickerRequest request)
     {
         var share = await shareRepository.GetByTickerAsync(request.Ticker);
@@ -108,15 +110,10 @@ public class ReportService(
             request.To,
             KnownAnalyseTypes.Rsi);
 
-    /// <inheritdoc />
-    public async Task<ReportData> GetReportIndexesAnalyseYieldLtmAsync(
-        GetReportAnalyseRequest request) =>
-        await GetReportDataIndexesByAnalyseType(
-            await indexRepository.GetWatchListAsync(),
-            request.From,
-            request.To,
-            KnownAnalyseTypes.YieldLtm);
+    #endregion
 
+    #region Dividends
+    
     /// <inheritdoc />
     public async Task<ReportData> GetReportDividendsAsync()
     {
@@ -165,6 +162,10 @@ public class ReportService(
         return reportData;
     }
         
+    #endregion
+    
+    #region Bonds
+    
     /// <inheritdoc />
     public async Task<ReportData> GetReportBondsAsync()
     {
@@ -260,6 +261,10 @@ public class ReportService(
             request.To,
             KnownAnalyseTypes.CandleSequence);
 
+    #endregion
+    
+    #region AssetFundamentals
+    
     /// <inheritdoc />
     public async Task<ReportData> GetReportAssetFundamentalsAsync()
     {
@@ -317,6 +322,10 @@ public class ReportService(
         return reportData;
     }
 
+    #endregion
+    
+    #region Spreads
+    
     /// <inheritdoc />
     public async Task<ReportData> GetReportSpreadsAsync()
     {
@@ -361,6 +370,10 @@ public class ReportService(
         return reportData;
     }
 
+    #endregion
+    
+    #region Currencies
+    
     /// <inheritdoc />
     public async Task<ReportData> GetReportCurrenciesAnalyseSupertrendAsync(
         GetReportAnalyseRequest request) =>
@@ -379,6 +392,10 @@ public class ReportService(
             request.To,
             KnownAnalyseTypes.CandleSequence);
 
+    #endregion
+    
+    #region Futures
+    
     /// <inheritdoc />
     public async Task<ReportData> GetReportFuturesAnalyseRsiAsync(
         GetReportAnalyseRequest request) =>
@@ -415,6 +432,10 @@ public class ReportService(
             request.To,
             KnownAnalyseTypes.Supertrend);
 
+    #endregion
+    
+    #region Indexes
+    
     /// <inheritdoc />
     public async Task<ReportData> GetReportIndexesAnalyseSupertrendAsync(
         GetReportAnalyseRequest request) =>
@@ -433,7 +454,19 @@ public class ReportService(
             request.To,
             KnownAnalyseTypes.CandleSequence);
 
-    private List<ReportParameter> GetDates(DateTime from, DateTime to)
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportIndexesAnalyseYieldLtmAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataIndexesByAnalyseType(
+            await indexRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.YieldLtm);
+    
+    #endregion
+    
+    private List<ReportParameter> GetDates(
+        DateTime from, DateTime to)
     {
         var curDate = from;
         var dates = new List<ReportParameter>();
