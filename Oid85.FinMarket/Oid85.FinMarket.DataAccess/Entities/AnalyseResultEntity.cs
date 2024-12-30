@@ -15,7 +15,7 @@ public class AnalyseResultEntity : BaseEntity
     /// <summary>
     /// Результат анализа
     /// </summary>
-    [Column("result"), MaxLength(20)]
+    [Column("result"), MaxLength(200)]
     public string Result { get; set; } = string.Empty;
     
     /// <summary>

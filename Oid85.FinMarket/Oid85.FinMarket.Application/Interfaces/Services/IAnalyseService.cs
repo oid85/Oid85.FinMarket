@@ -8,37 +8,27 @@ namespace Oid85.FinMarket.Application.Interfaces.Services;
 public interface IAnalyseService
 {
     /// <summary>
-    /// Анализ всех акций
+    /// Анализ акций
     /// </summary>
-    Task<bool> AnalyseStocksAsync();
+    Task<bool> AnalyseSharesAsync();
 
+    /// <summary>
+    /// Анализ облигаций
+    /// </summary>
+    Task<bool> AnalyseBondsAsync();
+    
+    /// <summary>
+    /// Анализ валют
+    /// </summary>
+    Task<bool> AnalyseCurrenciesAsync();
+    
+    /// <summary>
+    /// Анализ фьючерсов
+    /// </summary>
+    Task<bool> AnalyseFuturesAsync();
+    
     /// <summary>
     /// Анализ индексов
     /// </summary>
     Task<bool> AnalyseIndexesAsync();
-    
-    /// <summary>
-    /// Анализ с индикатором Супертренд
-    /// </summary>
-    Task<List<AnalyseResult>> SupertrendAnalyseAsync(Guid instrumentId);
-
-    /// <summary>
-    /// Анализ последовательности подряд идущих свечей
-    /// </summary>
-    Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(Guid instrumentId);
-
-    /// <summary>
-    /// Анализ растущего объема
-    /// </summary>
-    Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(Guid instrumentId);
-
-    /// <summary>
-    /// Анализ RSI
-    /// </summary>
-    Task<List<AnalyseResult>> RsiAnalyseAsync(Guid instrumentId);
-    
-    /// <summary>
-    /// Анализ доходности LTM
-    /// </summary>
-    Task<List<AnalyseResult>> YieldLtmAnalyseAsync(Guid instrumentId);
 }

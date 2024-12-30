@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContextPool<LogContext>((_, options) =>
+        services.AddDbContext<LogContext>((_, options) =>
         {
             options
                 .UseNpgsql(configuration

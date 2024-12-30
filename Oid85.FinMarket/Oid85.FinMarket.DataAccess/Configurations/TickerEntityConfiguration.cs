@@ -5,12 +5,12 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class TickerEntityConfiguration : EntityConfigurationBase<TickerEntity>
+internal class InstrumentEntityConfiguration : EntityConfigurationBase<InstrumentEntity>
 {
-    public override void Configure(EntityTypeBuilder<TickerEntity> builder)
+    public override void Configure(EntityTypeBuilder<InstrumentEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("tickers", KnownDatabaseSchemas.Dictionary);
+        builder.ToTable("instruments", KnownDatabaseSchemas.Dictionary);
     }
 }

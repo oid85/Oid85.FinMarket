@@ -33,13 +33,13 @@ public class BondEntity : AuditableEntity
     /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
-    [Column("instrument_id"), MaxLength(40)]
+    [Column("instrument_id")]
     public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Наименование
     /// </summary>
-    [Column("name"), MaxLength(100)]
+    [Column("name"), MaxLength(200)]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

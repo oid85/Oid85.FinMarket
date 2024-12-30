@@ -5,27 +5,27 @@
 /// </summary>
 public interface ILoadService
 {
-    Task LoadStocksAsync();
-    Task LoadStockPricesAsync();
-    Task LoadStockDailyCandlesAsync();
+    Task LoadSharesAsync();
+    Task LoadShareLastPricesAsync();
+    Task LoadShareDailyCandlesAsync();
     
     Task LoadFuturesAsync();
-    Task LoadFuturePricesAsync();
+    Task LoadFutureLastPricesAsync();
     Task LoadFutureDailyCandlesAsync();
     
     Task LoadBondsAsync();
     Task LoadBondCouponsAsync();
-    Task LoadBondPricesAsync();
+    Task LoadBondLastPricesAsync();
     Task LoadBondDailyCandlesAsync();
     
     Task LoadDividendInfosAsync();
     
-    Task LoadIndicativesAsync();
-    Task LoadIndicativePricesAsync();
-    Task LoadIndicativeDailyCandlesAsync();
+    Task LoadIndexesAsync();
+    Task LoadIndexLastPricesAsync();
+    Task LoadIndexDailyCandlesAsync();
     
     Task LoadCurrenciesAsync();
-    Task LoadCurrencyPricesAsync();
+    Task LoadCurrencyLastPricesAsync();
     Task LoadCurrencyDailyCandlesAsync();
     
     Task LoadAssetFundamentalsAsync();

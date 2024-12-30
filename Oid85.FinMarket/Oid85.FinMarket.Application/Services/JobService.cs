@@ -10,19 +10,19 @@ public class JobService(
 {
     public async Task LoadInstrumentsAsync()
     {
-        await loadService.LoadStocksAsync();
+        await loadService.LoadSharesAsync();
         await loadService.LoadBondsAsync();
         await loadService.LoadFuturesAsync();
         await loadService.LoadCurrenciesAsync();
-        await loadService.LoadIndicativesAsync();
+        await loadService.LoadIndexesAsync();
     }
 
     public async Task LoadPricesAsync()
     {
-        await loadService.LoadStockPricesAsync();
-        await loadService.LoadBondPricesAsync();
-        await loadService.LoadFuturePricesAsync();
-        await loadService.LoadCurrencyPricesAsync();
+        await loadService.LoadShareLastPricesAsync();
+        await loadService.LoadBondLastPricesAsync();
+        await loadService.LoadFutureLastPricesAsync();
+        await loadService.LoadCurrencyLastPricesAsync();
     }
 
     public async Task LoadBondCouponsAsync()
@@ -42,14 +42,14 @@ public class JobService(
 
     public async Task LoadDailyCandlesAsync()
     {
-        await loadService.LoadStockDailyCandlesAsync();
+        await loadService.LoadShareDailyCandlesAsync();
         await loadService.LoadFutureDailyCandlesAsync();
-        await loadService.LoadIndicativeDailyCandlesAsync();
+        await loadService.LoadIndexDailyCandlesAsync();
     }
 
     public async Task AnalyseAsync()
     {
-        await analyseService.AnalyseStocksAsync();
+        await analyseService.AnalyseSharesAsync();
         await analyseService.AnalyseIndexesAsync();
     }
 

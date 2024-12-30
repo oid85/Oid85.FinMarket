@@ -33,7 +33,7 @@ public class FutureEntity : AuditableEntity
     /// <summary>
     /// Описание
     /// </summary>
-    [Column("name"), MaxLength(100)]
+    [Column("name"), MaxLength(200)]
     public string Name { get; set; } = string.Empty;
     
     /// <summary>
@@ -69,7 +69,7 @@ public class FutureEntity : AuditableEntity
     /// <summary>
     /// Тип фьючерса
     /// </summary>
-    [Column("future_type"), MaxLength(20)]
+    [Column("future_type"), MaxLength(100)]
     public string FutureType { get; set; } = string.Empty;
 
     /// <summary>
@@ -81,7 +81,7 @@ public class FutureEntity : AuditableEntity
     /// <summary>
     /// Основной актив
     /// </summary>
-    [Column("basic_asset"), MaxLength(20)]
+    [Column("basic_asset"), MaxLength(200)]
     public string BasicAsset { get; set; } = string.Empty;
 
     /// <summary>

@@ -6,25 +6,25 @@ using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class TickerRepository(
+public class InstrumentRepository(
     FinMarketContext context) 
-    : ITickerRepository
+    : IInstrumentRepository
 {
-    public async Task AddOrUpdateAsync(List<Ticker> tickers)
+    public async Task AddOrUpdateAsync(List<Instrument> tickers)
     {
         if (tickers.Count == 0)
             return;
         
         foreach (var ticker in tickers)
         {
-            var entity = context.TickerEntities
+            var entity = context.InstrumentEntities
                 .FirstOrDefault(x => 
                     x.InstrumentId == ticker.InstrumentId);
 
             if (entity is null)
             {
-                entity = ticker.Adapt<TickerEntity>();
-                await context.TickerEntities.AddAsync(entity);
+                entity = ticker.Adapt<InstrumentEntity>();
+                await context.InstrumentEntities.AddAsync(entity);
             }
 
             else
@@ -36,26 +36,26 @@ public class TickerRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<Ticker>> GetAllAsync() =>
-        (await context.TickerEntities
+    public async Task<List<Instrument>> GetAllAsync() =>
+        (await context.InstrumentEntities
             .OrderBy(x => x.Name)
             .ToListAsync())
-        .Select(x => x.Adapt<Ticker>())
+        .Select(x => x.Adapt<Instrument>())
         .ToList();
 
-    public async Task<Ticker?> GetByInstrumentIdAsync(Guid instrumentId)
+    public async Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId)
     {
-        var entity = await context.TickerEntities
+        var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         
-        return entity?.Adapt<Ticker>();
+        return entity?.Adapt<Instrument>();
     }
     
-    public async Task<Ticker?> GetByNameAsync(string name)
+    public async Task<Instrument?> GetByNameAsync(string name)
     {
-        var entity = await context.TickerEntities
+        var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Name == name);
         
-        return entity?.Adapt<Ticker>();
+        return entity?.Adapt<Instrument>();
     }
 }

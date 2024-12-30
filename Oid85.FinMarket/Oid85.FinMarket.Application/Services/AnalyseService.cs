@@ -12,26 +12,97 @@ namespace Oid85.FinMarket.Application.Services;
 public class AnalyseService(
     ILogService logService,
     IShareRepository shareRepository,
-    IIndicativeRepository indicativeRepository,
+    IBondRepository bondRepository,
+    IFutureRepository futureRepository,
+    ICurrencyRepository currencyRepository,
+    IIndexRepository indexRepository,
     ICandleRepository candleRepository,
     IAnalyseResultRepository analyseResultRepository)
     : IAnalyseService
 {
     /// <inheritdoc />
-    public async Task<bool> AnalyseStocksAsync()
+    public async Task<bool> AnalyseSharesAsync()
     {
-        var shares = await shareRepository.GetWatchListAsync();
+        var instruments = await shareRepository.GetWatchListAsync();
             
-        for (int i = 0; i < shares.Count; i++)
+        for (int i = 0; i < instruments.Count; i++)
+        {       
+            // Вызов методом анализа
+            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+            await RsiAnalyseAsync(instruments[i].InstrumentId);
+            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+
+            double percent = ((i + 1) / (double) instruments.Count) * 100;
+
+            await logService.LogTrace($"Анализ акций, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> AnalyseBondsAsync()
+    {
+        var instruments = await bondRepository.GetWatchListAsync();
+            
+        for (int i = 0; i < instruments.Count; i++)
         {                
-            await SupertrendAnalyseAsync(shares[i].InstrumentId);
-            await CandleSequenceAnalyseAsync(shares[i].InstrumentId);
-            await CandleVolumeAnalyseAsync(shares[i].InstrumentId);
-            await RsiAnalyseAsync(shares[i].InstrumentId);
+            // Вызов методом анализа
+            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+            await RsiAnalyseAsync(instruments[i].InstrumentId);
+            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+            
+            double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            double percent = ((i + 1) / (double) shares.Count) * 100;
+            await logService.LogTrace($"Анализ облигаций, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+        }
 
-            await logService.LogTrace($"Анализ акций, {i + 1} из {shares.Count}. {percent:N2} % закончено");
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> AnalyseCurrenciesAsync()
+    {
+        var instruments = await currencyRepository.GetWatchListAsync();
+            
+        for (int i = 0; i < instruments.Count; i++)
+        {                
+            // Вызов методом анализа
+            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+            await RsiAnalyseAsync(instruments[i].InstrumentId);
+            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+            
+            double percent = ((i + 1) / (double) instruments.Count) * 100;
+
+            await logService.LogTrace($"Анализ валют, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> AnalyseFuturesAsync()
+    {
+        var instruments = await futureRepository.GetWatchListAsync();
+            
+        for (int i = 0; i < instruments.Count; i++)
+        {                
+            // Вызов методом анализа
+            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+            await RsiAnalyseAsync(instruments[i].InstrumentId);
+            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+
+            double percent = ((i + 1) / (double) instruments.Count) * 100;
+
+            await logService.LogTrace($"Анализ фьючерсов, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
         }
 
         return true;
@@ -40,22 +111,26 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> AnalyseIndexesAsync()
     {
-        var indicatives = await indicativeRepository.GetWatchListAsync();
+        var instruments = await indexRepository.GetWatchListAsync();
             
-        for (int i = 0; i < indicatives.Count; i++)
+        for (int i = 0; i < instruments.Count; i++)
         {                
-            await YieldLtmAnalyseAsync(indicatives[i].InstrumentId);
+            // Вызов методом анализа
+            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+            await RsiAnalyseAsync(instruments[i].InstrumentId);
+            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
 
-            double percent = ((i + 1) / (double) indicatives.Count) * 100;
+            double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ индексов, {i + 1} из {indicatives.Count}. {percent:N2} % закончено");
+            await logService.LogTrace($"Анализ индексов, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
         }
 
         return true;
     }
-
-    /// <inheritdoc />
-    public async Task<List<AnalyseResult>> SupertrendAnalyseAsync(Guid instrumentId)
+    
+    private async Task SupertrendAnalyseAsync(Guid instrumentId)
     {
         string GetResult(SuperTrendResult result)
         {
@@ -103,8 +178,6 @@ public class AnalyseService(
                 .ToList();
 
             await analyseResultRepository.AddOrUpdateAsync(results);
-
-            return results;
         }
 
         catch (Exception exception)
@@ -113,9 +186,8 @@ public class AnalyseService(
             throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
-        
-    /// <inheritdoc />
-    public async Task<List<AnalyseResult>> CandleSequenceAnalyseAsync(Guid instrumentId)
+    
+    private async Task CandleSequenceAnalyseAsync(Guid instrumentId)
     {
         string GetResult(List<Candle> candles)
         {
@@ -166,8 +238,6 @@ public class AnalyseService(
             }
 
             await analyseResultRepository.AddOrUpdateAsync(results);
-
-            return results;
         }
 
         catch (Exception exception)
@@ -176,9 +246,8 @@ public class AnalyseService(
             throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
-        
-    /// <inheritdoc />
-    public async Task<List<AnalyseResult>> CandleVolumeAnalyseAsync(Guid instrumentId)
+    
+    private async Task CandleVolumeAnalyseAsync(Guid instrumentId)
     {
         string GetResult(List<Candle> candles)
         {
@@ -238,8 +307,6 @@ public class AnalyseService(
             }
 
             await analyseResultRepository.AddOrUpdateAsync(results);
-
-            return results;
         }
 
         catch (Exception exception)
@@ -248,9 +315,8 @@ public class AnalyseService(
             throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
-        
-    /// <inheritdoc />
-    public async Task<List<AnalyseResult>> RsiAnalyseAsync(Guid instrumentId)
+    
+    private async Task RsiAnalyseAsync(Guid instrumentId)
     {
         string GetRsiResult(RsiResult result)
         {
@@ -300,8 +366,6 @@ public class AnalyseService(
                 .ToList();
 
             await analyseResultRepository.AddOrUpdateAsync(results);
-
-            return results;
         }
 
         catch (Exception exception)
@@ -310,9 +374,8 @@ public class AnalyseService(
             throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
-
-    /// <inheritdoc />
-    public async Task<List<AnalyseResult>> YieldLtmAnalyseAsync(Guid instrumentId)
+    
+    private async Task YieldLtmAnalyseAsync(Guid instrumentId)
     {
         string GetResult(List<Candle> candles)
         {
@@ -355,8 +418,6 @@ public class AnalyseService(
             }
 
             await analyseResultRepository.AddOrUpdateAsync(results);
-
-            return results;
         }
 
         catch (Exception exception)

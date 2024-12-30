@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
-public interface IIndicativeRepository
+public interface IIndexRepository
 {
     Task AddOrUpdateAsync(List<Indicative> indicatives);
     Task<List<Indicative>> GetAllAsync();

@@ -39,7 +39,7 @@ public class CurrencyEntity : AuditableEntity
     /// <summary>
     /// Название инструмента
     /// </summary>
-    [Column("name"), MaxLength(100)]
+    [Column("name"), MaxLength(200)]
     public string Name { get; set; } = string.Empty;
     
     /// <summary>
