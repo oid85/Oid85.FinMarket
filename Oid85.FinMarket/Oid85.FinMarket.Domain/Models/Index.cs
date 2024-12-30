@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models;
 
-public class Indicative
+public class Index
 {
     /// <summary>
     /// Id

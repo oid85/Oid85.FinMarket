@@ -164,7 +164,7 @@ public class LoadService(
     
     public async Task LoadIndexesAsync()
     {
-        var indicatives = await tinkoffService.GetIndicativesAsync();
+        var indicatives = await tinkoffService.GetIndexesAsync();
         await indexRepository.AddOrUpdateAsync(indicatives);
             
         var tickers = indicatives
@@ -173,7 +173,7 @@ public class LoadService(
                 InstrumentId = x.InstrumentId,
                 Ticker = x.Ticker,
                 Name = x.Name,
-                Type = KnownInstrumentTypes.Indicative
+                Type = KnownInstrumentTypes.Index
             })
             .ToList();
         

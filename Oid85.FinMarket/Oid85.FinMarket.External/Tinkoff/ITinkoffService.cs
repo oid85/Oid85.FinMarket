@@ -1,4 +1,5 @@
 ﻿using Oid85.FinMarket.Domain.Models;
+using Index = Oid85.FinMarket.Domain.Models.Index;
 
 namespace Oid85.FinMarket.External.Tinkoff;
 
@@ -38,9 +39,9 @@ public interface ITinkoffService
     public Task<List<Bond>> GetBondsAsync();
 
     /// <summary>
-    /// Получить список индикативов
+    /// Получить список индексов
     /// </summary>
-    public Task<List<Indicative>> GetIndicativesAsync();
+    public Task<List<Index>> GetIndexesAsync();
         
     /// <summary>
     /// Получить список валют

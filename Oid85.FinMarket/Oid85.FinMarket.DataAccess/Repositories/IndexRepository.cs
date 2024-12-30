@@ -3,13 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
+using Index = Oid85.FinMarket.Domain.Models.Index;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class IndexRepository(
     FinMarketContext context) : IIndexRepository
 {
-    public async Task AddOrUpdateAsync(List<Indicative> indicatives)
+    public async Task AddOrUpdateAsync(List<Index> indicatives)
     {
         if (indicatives.Count == 0)
             return;
@@ -22,7 +23,7 @@ public class IndexRepository(
 
             if (entity is null)
             {
-                entity = indicative.Adapt<IndicativeEntity>();
+                entity = indicative.Adapt<IndexEntity>();
                 await context.IndicativeEntities.AddAsync(entity);
             }
 
@@ -35,29 +36,29 @@ public class IndexRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<Indicative>> GetAllAsync() =>
+    public async Task<List<Index>> GetAllAsync() =>
         (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Indicative>())
+        .Select(x => x.Adapt<Index>())
         .ToList();
 
-    public async Task<List<Indicative>> GetWatchListAsync() =>
+    public async Task<List<Index>> GetWatchListAsync() =>
         (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Indicative>())
+        .Select(x => x.Adapt<Index>())
         .ToList();
 
-    public async Task<Indicative?> GetByTickerAsync(string ticker)
+    public async Task<Index?> GetByTickerAsync(string ticker)
     {
         var entity = await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 
-        return entity?.Adapt<Indicative>();
+        return entity?.Adapt<Index>();
     }
 }

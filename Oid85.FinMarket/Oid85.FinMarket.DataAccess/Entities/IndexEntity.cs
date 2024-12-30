@@ -4,7 +4,7 @@ using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
 
-public class IndicativeEntity : AuditableEntity
+public class IndexEntity : AuditableEntity
 {
     /// <summary>
     /// FIGI-идентификатор инструмента
