@@ -5,12 +5,12 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class IndexEntityConfiguration : EntityConfigurationBase<IndexEntity>
+internal class FinIndexEntityConfiguration : EntityConfigurationBase<FinIndexEntity>
 {
-    public override void Configure(EntityTypeBuilder<IndexEntity> builder)
+    public override void Configure(EntityTypeBuilder<FinIndexEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("indexes", KnownDatabaseSchemas.Default);
+        builder.ToTable("fin_indexes", KnownDatabaseSchemas.Default);
     }
 }

@@ -11,7 +11,6 @@ using Share = Oid85.FinMarket.Domain.Models.Share;
 using Bond = Oid85.FinMarket.Domain.Models.Bond;
 using Currency = Oid85.FinMarket.Domain.Models.Currency;
 using Future = Oid85.FinMarket.Domain.Models.Future;
-using Index = Oid85.FinMarket.Domain.Models.Index;
 using TinkoffShare = Tinkoff.InvestApi.V1.Share;
 using TinkoffFuture = Tinkoff.InvestApi.V1.Future;
 using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
@@ -256,7 +255,7 @@ public class TinkoffService(
     }
         
     /// <inheritdoc />
-    public async Task<List<Index>> GetIndexesAsync()
+    public async Task<List<FinIndex>> GetIndexesAsync()
     {
         try
         {
@@ -267,11 +266,11 @@ public class TinkoffService(
                 .Instruments
                 .ToList();
 
-            var result = new List<Index>();
+            var result = new List<FinIndex>();
 
             foreach (var indicative in indicatives)
             {
-                var instrument = new Index
+                var instrument = new FinIndex
                 {
                     Figi = indicative.Figi,
                     Ticker = indicative.Ticker,

@@ -5,7 +5,6 @@ using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Index = Oid85.FinMarket.Domain.Models.Index;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -566,7 +565,7 @@ public class ReportService(
     }
     
     private async Task<ReportData> GetReportDataIndexesByAnalyseType(
-        List<Index> indexes,
+        List<FinIndex> indexes,
         DateTime from,
         DateTime to,
         string analyseType)
