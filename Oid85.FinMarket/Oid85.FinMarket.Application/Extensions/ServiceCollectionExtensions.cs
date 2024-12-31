@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
         var jobService = scope.ServiceProvider.GetRequiredService<IJobService>();
         
         RegisterJob(KnownJobs.LoadInstruments, () => jobService.LoadInstrumentsAsync());
-        RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadPricesAsync());
+        RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadLastPricesAsync());
         RegisterJob(KnownJobs.LoadBondCoupons, () => jobService.LoadBondCouponsAsync());
         RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
         RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandlesAsync());

@@ -6,7 +6,7 @@
 public interface IJobService
 {
     Task LoadInstrumentsAsync();
-    Task LoadPricesAsync();
+    Task LoadLastPricesAsync();
     Task LoadBondCouponsAsync();
     Task LoadDividendInfosAsync();
     Task LoadAssetFundamentalsAsync();
