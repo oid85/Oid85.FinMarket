@@ -31,7 +31,7 @@ public class SpreadService(
             spread.PriceDifference = spread.FirstInstrumentPrice - spread.SecondInstrumentPrice;
             spread.PriceDifferencePrc = spread.PriceDifference / spread.FirstInstrumentPrice * 100.0;
             
-            FillContangoBackwardation(spread);
+            FillSpreadPricePosition(spread);
         }
 
         await spreadRepository.AddOrUpdateAsync(spreads);
@@ -59,7 +59,7 @@ public class SpreadService(
         return 0.0;
     }
 
-    private void FillContangoBackwardation(Spread spread)
+    private void FillSpreadPricePosition(Spread spread)
     {
         /*
          Контанго
