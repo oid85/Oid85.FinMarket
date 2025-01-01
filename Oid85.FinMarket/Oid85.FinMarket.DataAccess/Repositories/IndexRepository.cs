@@ -18,7 +18,7 @@ public class IndexRepository(
         {
             var entity = context.IndicativeEntities
                 .FirstOrDefault(x => 
-                    x.Ticker == indicative.Ticker);
+                    x.InstrumentId == indicative.InstrumentId);
 
             if (entity is null)
             {

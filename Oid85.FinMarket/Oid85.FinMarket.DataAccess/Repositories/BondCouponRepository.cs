@@ -18,7 +18,7 @@ public class BondCouponRepository(
         {
             var entity = context.BondCouponEntities
                 .FirstOrDefault(x => 
-                    x.Ticker == bondCoupon.Ticker &&
+                    x.InstrumentId == bondCoupon.InstrumentId &&
                     x.CouponNumber == bondCoupon.CouponNumber);
 
             if (entity is null)

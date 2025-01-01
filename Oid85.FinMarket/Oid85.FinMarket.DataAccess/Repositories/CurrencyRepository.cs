@@ -18,7 +18,7 @@ public class CurrencyRepository(
         {
             var entity = context.CurrencyEntities
                 .FirstOrDefault(x => 
-                    x.Ticker == currency.Ticker);
+                    x.InstrumentId == currency.InstrumentId);
 
             if (entity is null)
             {

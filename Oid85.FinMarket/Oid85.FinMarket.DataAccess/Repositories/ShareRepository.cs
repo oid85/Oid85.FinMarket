@@ -18,7 +18,7 @@ public class ShareRepository(
         {
             var entity = context.ShareEntities
                 .FirstOrDefault(x => 
-                    x.Ticker == share.Ticker);
+                    x.InstrumentId == share.InstrumentId);
 
             if (entity is null)
             {

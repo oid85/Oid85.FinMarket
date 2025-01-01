@@ -18,7 +18,7 @@ public class BondRepository(
         {
             var entity = context.BondEntities
                 .FirstOrDefault(x => 
-                    x.Ticker == bond.Ticker);
+                    x.InstrumentId == bond.InstrumentId);
 
             if (entity is null)
             {

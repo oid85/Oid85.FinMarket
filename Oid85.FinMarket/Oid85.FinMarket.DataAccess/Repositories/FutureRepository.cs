@@ -18,7 +18,7 @@ public class FutureRepository(
         {
             var entity = context.FutureEntities
                 .FirstOrDefault(x => 
-                    x.Ticker == future.Ticker);
+                    x.InstrumentId == future.InstrumentId);
 
             if (entity is null)
             {

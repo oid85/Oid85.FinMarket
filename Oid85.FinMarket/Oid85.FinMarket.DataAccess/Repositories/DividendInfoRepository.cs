@@ -18,7 +18,7 @@ public class DividendInfoRepository(
         {
             var entity = context.DividendInfoEntities
                 .FirstOrDefault(x => 
-                    x.Ticker == dividendInfo.Ticker &&
+                    x.InstrumentId == dividendInfo.InstrumentId &&
                     x.RecordDate == dividendInfo.RecordDate &&
                     x.DeclaredDate == dividendInfo.DeclaredDate);
 
