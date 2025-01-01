@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Interceptors;
-using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.DataAccess.Repositories;
 
 namespace Oid85.FinMarket.DataAccess.Extensions;
@@ -27,10 +26,7 @@ public static class ServiceCollectionExtensions
                     .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString))
                 .AddInterceptors(updateInterceptor);
         });
-
-        var mapsterConfig = new MapsterConfig();
-        services.AddSingleton<MapsterConfig>();
-            
+        
         services.AddTransient<IShareRepository, ShareRepository>();
         services.AddTransient<IFutureRepository, FutureRepository>();
         services.AddTransient<IBondRepository, BondRepository>();

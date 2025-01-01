@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -23,13 +22,15 @@ public class SpreadRepository(
 
             if (entity is null)
             {
-                entity = spread.Adapt<SpreadEntity>();
-                await context.SpreadEntities.AddAsync(entity);
+                SetEntity(ref entity, spread);
+                
+                if (entity is not null)
+                    await context.SpreadEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Adapt(spread);
+                SetEntity(ref entity, spread);
             }
         }
 
@@ -41,7 +42,7 @@ public class SpreadRepository(
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.FirstInstrumentTicker)
             .ToListAsync())
-        .Select(x => x.Adapt<Spread>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<List<Spread>> GetWatchListAsync() =>
@@ -50,7 +51,7 @@ public class SpreadRepository(
             .Where(x => x.InWatchList)
             .OrderBy(x => x.FirstInstrumentTicker)
             .ToListAsync())
-        .Select(x => x.Adapt<Spread>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<Spread?> GetByTickerAsync(string firstInstrumentTicker)
@@ -59,6 +60,51 @@ public class SpreadRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.FirstInstrumentTicker == firstInstrumentTicker);
         
-        return entity?.Adapt<Spread>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+    
+    private void SetEntity(ref SpreadEntity? entity, Spread model)
+    {
+        entity ??= new SpreadEntity();
+        
+        entity.DateTime = model.DateTime;
+        entity.FirstInstrumentId = model.FirstInstrumentId;
+        entity.FirstInstrumentTicker = model.FirstInstrumentTicker;
+        entity.FirstInstrumentRole = model.FirstInstrumentRole;
+        entity.FirstInstrumentPrice = model.FirstInstrumentPrice;
+        entity.SecondInstrumentId = model.SecondInstrumentId;
+        entity.SecondInstrumentTicker = model.SecondInstrumentTicker;
+        entity.SecondInstrumentRole = model.SecondInstrumentRole;
+        entity.SecondInstrumentPrice = model.SecondInstrumentPrice;
+        entity.PriceDifference = model.PriceDifference;
+        entity.PriceDifferencePrc = model.PriceDifferencePrc;
+        entity.Funding = model.Funding;
+        entity.SpreadPricePosition = model.SpreadPricePosition;
+        entity.InWatchList = model.InWatchList;
+    }
+    
+    private Spread GetModel(SpreadEntity entity)
+    {
+        var model = new Spread();
+        
+        model.Id = entity.Id;
+        model.DateTime = entity.DateTime;
+        model.FirstInstrumentId = entity.FirstInstrumentId;
+        model.FirstInstrumentTicker = entity.FirstInstrumentTicker;
+        model.FirstInstrumentRole = entity.FirstInstrumentRole;
+        model.FirstInstrumentPrice = entity.FirstInstrumentPrice;
+        model.SecondInstrumentId = entity.SecondInstrumentId;
+        model.SecondInstrumentTicker = entity.SecondInstrumentTicker;
+        model.SecondInstrumentRole = entity.SecondInstrumentRole;
+        model.SecondInstrumentPrice = entity.SecondInstrumentPrice;
+        model.PriceDifference = entity.PriceDifference;
+        model.PriceDifferencePrc = entity.PriceDifferencePrc;
+        model.Funding = entity.Funding;
+        model.SpreadPricePosition = entity.SpreadPricePosition;
+        model.InWatchList = entity.InWatchList;
+
+        return model;
     }
 }

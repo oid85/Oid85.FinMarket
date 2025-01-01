@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -23,13 +22,15 @@ public class InstrumentRepository(
 
             if (entity is null)
             {
-                entity = ticker.Adapt<InstrumentEntity>();
-                await context.InstrumentEntities.AddAsync(entity);
+                SetEntity(ref entity, ticker);
+                
+                if (entity is not null)
+                    await context.InstrumentEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Adapt(ticker);
+                SetEntity(ref entity, ticker);
             }
         }
 
@@ -40,7 +41,7 @@ public class InstrumentRepository(
         (await context.InstrumentEntities
             .OrderBy(x => x.Name)
             .ToListAsync())
-        .Select(x => x.Adapt<Instrument>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -48,7 +49,9 @@ public class InstrumentRepository(
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         
-        return entity?.Adapt<Instrument>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
     }
     
     public async Task<Instrument?> GetByNameAsync(string name)
@@ -56,6 +59,32 @@ public class InstrumentRepository(
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Name == name);
         
-        return entity?.Adapt<Instrument>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+    
+    private void SetEntity(ref InstrumentEntity? entity, Instrument model)
+    {
+        entity ??= new InstrumentEntity();
+        
+        entity.Id = model.Id;
+        entity.InstrumentId = model.InstrumentId;
+        entity.Ticker = model.Ticker;
+        entity.Name = model.Name;
+        entity.Type = model.Type;
+    }
+    
+    private Instrument GetModel(InstrumentEntity entity)
+    {
+        var model = new Instrument();
+        
+        model.Id = entity.Id;
+        model.InstrumentId = entity.InstrumentId;
+        model.Ticker = entity.Ticker;
+        model.Name = entity.Name;
+        model.Type = entity.Type;
+
+        return model;
     }
 }

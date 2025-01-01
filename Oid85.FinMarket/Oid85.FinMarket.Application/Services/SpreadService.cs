@@ -31,6 +31,8 @@ public class SpreadService(
             spread.PriceDifference = spread.FirstInstrumentPrice - spread.SecondInstrumentPrice;
             spread.PriceDifferencePrc = spread.PriceDifference / spread.FirstInstrumentPrice * 100.0;
             
+            spread.DateTime = DateTime.UtcNow;
+            
             FillSpreadPricePosition(spread);
         }
 

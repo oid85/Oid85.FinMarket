@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -20,7 +19,7 @@ public class AnalyseResultRepository(
         if (lastAnalyseResult is null)
         {
             var entities = results
-                .Select(x => x.Adapt<AnalyseResultEntity>());
+                .Select(GetEntity);
             
             await context.AnalyseResultEntities.AddRangeAsync(entities);
         }
@@ -28,7 +27,7 @@ public class AnalyseResultRepository(
         else
         {
             var entities = results
-                .Select(x => x.Adapt<AnalyseResultEntity>())
+                .Select(GetEntity)
                 .Where(x => x.Date > lastAnalyseResult.Date);
                 
             await context.AnalyseResultEntities.AddRangeAsync(entities);    
@@ -44,7 +43,7 @@ public class AnalyseResultRepository(
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
             .ToListAsync())
-        .Select(x => x.Adapt<AnalyseResult>())
+        .Select(GetModel)
         .ToList();
     
     public async Task<List<AnalyseResult>> GetAsync(
@@ -54,7 +53,7 @@ public class AnalyseResultRepository(
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
             .ToListAsync())
-        .Select(x => x.Adapt<AnalyseResult>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<AnalyseResult?> GetLastAsync(Guid instrumentId)
@@ -74,8 +73,33 @@ public class AnalyseResultRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .FirstAsync(x => x.Date == maxDate);
         
-        var analyseResult = entity.Adapt<AnalyseResult>();
+        var analyseResult = GetModel(entity);
         
         return analyseResult;
+    }
+
+    private AnalyseResultEntity GetEntity(AnalyseResult model)
+    {
+        var entity = new AnalyseResultEntity();
+
+        entity.Date = model.Date;
+        entity.InstrumentId = model.InstrumentId;
+        entity.AnalyseType = model.AnalyseType;
+        entity.Result = model.Result;
+        
+        return entity;
+    }
+    
+    private AnalyseResult GetModel(AnalyseResultEntity entity)
+    {
+        var model = new AnalyseResult();
+        
+        model.Id = entity.Id;
+        model.Date = entity.Date;
+        model.InstrumentId = entity.InstrumentId;
+        model.AnalyseType = entity.AnalyseType;
+        model.Result = entity.Result;
+
+        return model;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -23,13 +22,15 @@ public class BondCouponRepository(
 
             if (entity is null)
             {
-                entity = bondCoupon.Adapt<BondCouponEntity>();
-                await context.BondCouponEntities.AddAsync(entity);
+                SetEntity(ref entity, bondCoupon);
+                
+                if (entity is not null)
+                    await context.BondCouponEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Adapt(bondCoupon);
+                SetEntity(ref entity, bondCoupon);
             }
         }
 
@@ -39,7 +40,7 @@ public class BondCouponRepository(
     public async Task<List<BondCoupon>> GetAllAsync() =>
         (await context.BondCouponEntities
             .ToListAsync())
-        .Select(x => x.Adapt<BondCoupon>())
+        .Select(GetModel)
         .ToList(); 
     
     public async Task<List<BondCoupon>> GetAsync(
@@ -49,6 +50,37 @@ public class BondCouponRepository(
                 x.CouponDate >= DateOnly.FromDateTime(from) && 
                 x.CouponDate <= DateOnly.FromDateTime(to))
             .ToListAsync())
-        .Select(x => x.Adapt<BondCoupon>())
-        .ToList();   
+        .Select(GetModel)
+        .ToList();
+    
+    private void SetEntity(ref BondCouponEntity? entity, BondCoupon model)
+    {
+        entity ??= new BondCouponEntity();
+        
+        entity.InstrumentId = model.InstrumentId;
+        entity.Ticker = model.Ticker;
+        entity.CouponDate = model.CouponDate;
+        entity.CouponNumber = model.CouponNumber;
+        entity.CouponPeriod = model.CouponPeriod;
+        entity.CouponStartDate = model.CouponStartDate;
+        entity.CouponEndDate = model.CouponEndDate;
+        entity.PayOneBond = model.PayOneBond;
+    }
+    
+    private BondCoupon GetModel(BondCouponEntity entity)
+    {
+        var model = new BondCoupon();
+        
+        model.Id = entity.Id;
+        model.InstrumentId = entity.InstrumentId;
+        model.Ticker = entity.Ticker;
+        model.CouponDate = entity.CouponDate;
+        model.CouponNumber = entity.CouponNumber;
+        model.CouponPeriod = entity.CouponPeriod;
+        model.CouponStartDate = entity.CouponStartDate;
+        model.CouponEndDate = entity.CouponEndDate;
+        model.PayOneBond = entity.PayOneBond;
+
+        return model;
+    }
 }

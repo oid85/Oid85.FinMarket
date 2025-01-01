@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -22,13 +21,15 @@ public class ShareRepository(
 
             if (entity is null)
             {
-                entity = share.Adapt<ShareEntity>();
-                await context.ShareEntities.AddAsync(entity);
+                SetEntity(ref entity, share);
+                
+                if (entity is not null)
+                    await context.ShareEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Adapt(share);
+                SetEntity(ref entity, share);
             }
         }
 
@@ -40,7 +41,7 @@ public class ShareRepository(
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Share>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<List<Share>> GetWatchListAsync() =>
@@ -49,7 +50,7 @@ public class ShareRepository(
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Share>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<Share?> GetByTickerAsync(string ticker)
@@ -58,7 +59,9 @@ public class ShareRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity?.Adapt<Share>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
     }
     
     public async Task<Share?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -67,6 +70,39 @@ public class ShareRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
-        return entity?.Adapt<Share>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+
+    private void SetEntity(ref ShareEntity? entity, Share model)
+    {
+        entity ??= new ShareEntity();
+        
+        entity.Ticker = model.Ticker;
+        entity.Price = model.Price;
+        entity.Isin = model.Isin;
+        entity.Figi = model.Figi;
+        entity.InstrumentId = model.InstrumentId;
+        entity.Name = model.Name;
+        entity.Sector = model.Sector;
+        entity.InWatchList = model.InWatchList;
+    }
+    
+    private Share GetModel(ShareEntity entity)
+    {
+        var model = new Share();
+        
+        model.Id = entity.Id;
+        model.Ticker = entity.Ticker;
+        model.Price = entity.Price;
+        model.Isin = entity.Isin;
+        model.Figi = entity.Figi;
+        model.InstrumentId = entity.InstrumentId;
+        model.Name = entity.Name;
+        model.Sector = entity.Sector;
+        model.InWatchList = entity.InWatchList;
+
+        return model;
     }
 }

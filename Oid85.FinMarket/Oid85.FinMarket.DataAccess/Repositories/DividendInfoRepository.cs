@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -24,13 +23,15 @@ public class DividendInfoRepository(
 
             if (entity is null)
             {
-                entity = dividendInfo.Adapt<DividendInfoEntity>();
-                await context.DividendInfoEntities.AddAsync(entity);
+                SetEntity(ref entity, dividendInfo);
+                
+                if (entity is not null)
+                    await context.DividendInfoEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Adapt(dividendInfo);
+                SetEntity(ref entity, dividendInfo);
             }
         }
 
@@ -41,7 +42,7 @@ public class DividendInfoRepository(
         (await context.DividendInfoEntities
             .OrderBy(x => x.DividendPrc)
             .ToListAsync())
-        .Select(x => x.Adapt<DividendInfo>())
+        .Select(GetModel)
         .ToList();
     
     public async Task<List<DividendInfo>> GetAsync(
@@ -53,6 +54,33 @@ public class DividendInfoRepository(
                 x.RecordDate <= DateOnly.FromDateTime(to))
             .OrderBy(x => x.DividendPrc)
             .ToListAsync())
-        .Select(x => x.Adapt<DividendInfo>())
+        .Select(GetModel)
         .ToList();
+    
+    private void SetEntity(ref DividendInfoEntity? entity, DividendInfo model)
+    {
+        entity ??= new DividendInfoEntity();
+        
+        entity.InstrumentId = model.InstrumentId;
+        entity.Ticker = model.Ticker;
+        entity.RecordDate = model.RecordDate;
+        entity.DeclaredDate = model.DeclaredDate;
+        entity.Dividend = model.Dividend;
+        entity.DividendPrc = model.DividendPrc;
+    }
+    
+    private DividendInfo GetModel(DividendInfoEntity entity)
+    {
+        var model = new DividendInfo();
+        
+        model.Id = entity.Id;
+        model.InstrumentId = entity.InstrumentId;
+        model.Ticker = entity.Ticker;
+        model.RecordDate = entity.RecordDate;
+        model.DeclaredDate = entity.DeclaredDate;
+        model.Dividend = entity.Dividend;
+        model.DividendPrc = entity.DividendPrc;
+
+        return model;
+    }
 }

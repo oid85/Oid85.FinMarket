@@ -1,10 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
 
 public class SpreadEntity : AuditableEntity
 {
+    /// <summary>
+    /// Время расчета спреда
+    /// </summary>
+    [Column("datetime", TypeName = "timestamp with time zone")]
+    public DateTime DateTime { get; set; }
+    
     /// <summary>
     /// Id первого инструмента в паре
     /// </summary>
@@ -14,14 +21,14 @@ public class SpreadEntity : AuditableEntity
     /// <summary>
     /// Тикер первого инструмента в паре
     /// </summary>
-    [Column("first_instrument_ticker")]
+    [Column("first_instrument_ticker"), MaxLength(20)]
     public string FirstInstrumentTicker { get; set; } = string.Empty;
     
     /// <summary>
     /// Роль первого инструмента в паре
     /// базовый/производный, дальний/ближний (для фьючерсов)
     /// </summary>
-    [Column("first_instrument_role")]
+    [Column("first_instrument_role"), MaxLength(20)]
     public string FirstInstrumentRole { get; set; } = string.Empty;
     
     /// <summary>
@@ -39,14 +46,14 @@ public class SpreadEntity : AuditableEntity
     /// <summary>
     /// Тикер второго инструмента в паре
     /// </summary>
-    [Column("second_instrument_ticker")]
+    [Column("second_instrument_ticker"), MaxLength(20)]
     public string SecondInstrumentTicker { get; set; } = string.Empty;
     
     /// <summary>
     /// Роль второго инструмента в паре 
     /// базовый/производный, дальний/ближний (для фьючерсов)
     /// </summary>
-    [Column("second_instrument_role")]
+    [Column("second_instrument_role"), MaxLength(20)]
     public string SecondInstrumentRole { get; set; } = string.Empty;
     
     /// <summary>
@@ -60,6 +67,12 @@ public class SpreadEntity : AuditableEntity
     /// </summary>
     [Column("price_difference")]
     public double PriceDifference { get; set; }
+    
+    /// <summary>
+    /// Разница цен инструментов, %
+    /// </summary>
+    [Column("price_difference_prc")]
+    public double PriceDifferencePrc { get; set; }
     
     /// <summary>
     /// Фандинг

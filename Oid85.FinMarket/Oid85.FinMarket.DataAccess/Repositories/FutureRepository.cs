@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -22,13 +21,15 @@ public class FutureRepository(
 
             if (entity is null)
             {
-                entity = future.Adapt<FutureEntity>();
-                await context.FutureEntities.AddAsync(entity);
+                SetEntity(ref entity, future);
+                
+                if (entity is not null)
+                    await context.FutureEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Adapt(future);
+                SetEntity(ref entity, future);
             }
         }
 
@@ -40,7 +41,7 @@ public class FutureRepository(
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Future>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<List<Future>> GetWatchListAsync() =>
@@ -49,7 +50,7 @@ public class FutureRepository(
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Future>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<Future?> GetByTickerAsync(string ticker)
@@ -58,7 +59,9 @@ public class FutureRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 
-        return entity?.Adapt<Future>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
     }
     
     public async Task<Future?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -67,6 +70,58 @@ public class FutureRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
-        return entity?.Adapt<Future>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+    
+    private void SetEntity(ref FutureEntity? entity, Future model)
+    {
+        entity ??= new FutureEntity();
+        
+        entity.Id = model.Id;
+        entity.Ticker = model.Ticker;
+        entity.Price = model.Price;
+        entity.Figi = model.Figi;
+        entity.InstrumentId = model.InstrumentId;
+        entity.Name = model.Name;
+        entity.ExpirationDate = model.ExpirationDate;
+        entity.InWatchList = model.InWatchList;
+        entity.Lot = model.Lot;
+        entity.FirstTradeDate = model.FirstTradeDate;
+        entity.LastTradeDate = model.LastTradeDate;
+        entity.FutureType = model.FutureType;
+        entity.AssetType = model.AssetType;
+        entity.BasicAsset = model.BasicAsset;
+        entity.BasicAssetSize = model.BasicAssetSize;
+        entity.InitialMarginOnBuy = model.InitialMarginOnBuy;
+        entity.InitialMarginOnSell = model.InitialMarginOnSell;
+        entity.MinPriceIncrementAmount = model.MinPriceIncrementAmount;
+    }
+    
+    private Future GetModel(FutureEntity entity)
+    {
+        var model = new Future();
+        
+        model.Id = entity.Id;
+        model.Ticker = entity.Ticker;
+        model.Price = entity.Price;
+        model.Figi = entity.Figi;
+        model.InstrumentId = entity.InstrumentId;
+        model.Name = entity.Name;
+        model.ExpirationDate = entity.ExpirationDate;
+        model.InWatchList = entity.InWatchList;
+        model.Lot = entity.Lot;
+        model.FirstTradeDate = entity.FirstTradeDate;
+        model.LastTradeDate = entity.LastTradeDate;
+        model.FutureType = entity.FutureType;
+        model.AssetType = entity.AssetType;
+        model.BasicAsset = entity.BasicAsset;
+        model.BasicAssetSize = entity.BasicAssetSize;
+        model.InitialMarginOnBuy = entity.InitialMarginOnBuy;
+        model.InitialMarginOnSell = entity.InitialMarginOnSell;
+        model.MinPriceIncrementAmount = entity.MinPriceIncrementAmount;
+
+        return model;
     }
 }

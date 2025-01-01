@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -22,13 +21,15 @@ public class BondRepository(
 
             if (entity is null)
             {
-                entity = bond.Adapt<BondEntity>();
-                await context.BondEntities.AddAsync(entity);
+                SetEntity(ref entity, bond);
+                
+                if (entity is not null)
+                    await context.BondEntities.AddAsync(entity);
             }
 
             else
             {
-                entity.Adapt(bond);
+                SetEntity(ref entity, bond);
             }
         }
         
@@ -40,7 +41,7 @@ public class BondRepository(
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Bond>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<List<Bond>> GetWatchListAsync() =>
@@ -49,7 +50,7 @@ public class BondRepository(
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
             .ToListAsync())
-        .Select(x => x.Adapt<Bond>())
+        .Select(GetModel)
         .ToList();
 
     public async Task<Bond?> GetByTickerAsync(string ticker)
@@ -58,6 +59,45 @@ public class BondRepository(
             .Where(x => !x.IsDeleted)
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity?.Adapt<Bond>();
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+    
+    private void SetEntity(ref BondEntity? entity, Bond model)
+    {
+        entity ??= new BondEntity();
+        
+        entity.Ticker = model.Ticker;
+        entity.Price = model.Price;
+        entity.Isin = model.Isin;
+        entity.Figi = model.Figi;
+        entity.InstrumentId = model.InstrumentId;
+        entity.Name = model.Name;
+        entity.Sector = model.Sector;
+        entity.InWatchList = model.InWatchList;
+        entity.Nkd = model.Nkd;
+        entity.MaturityDate = model.MaturityDate;
+        entity.FloatingCouponFlag = model.FloatingCouponFlag;
+    }
+    
+    private Bond GetModel(BondEntity entity)
+    {
+        var model = new Bond();
+        
+        model.Id = entity.Id;
+        model.Ticker = entity.Ticker;
+        model.Price = entity.Price;
+        model.Isin = entity.Isin;
+        model.Figi = entity.Figi;
+        model.InstrumentId = entity.InstrumentId;
+        model.Name = entity.Name;
+        model.Sector = entity.Sector;
+        model.InWatchList = entity.InWatchList;
+        model.Nkd = entity.Nkd;
+        model.MaturityDate = entity.MaturityDate;
+        model.FloatingCouponFlag = entity.FloatingCouponFlag;
+
+        return model;
     }
 }
