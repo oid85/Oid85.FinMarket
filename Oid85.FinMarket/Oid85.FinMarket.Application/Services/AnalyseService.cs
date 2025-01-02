@@ -36,7 +36,7 @@ public class AnalyseService(
 
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ акций, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+            await logService.LogTrace($"Анализ акций, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -58,7 +58,7 @@ public class AnalyseService(
             
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ облигаций, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+            await logService.LogTrace($"Анализ облигаций, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -80,7 +80,7 @@ public class AnalyseService(
             
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ валют, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+            await logService.LogTrace($"Анализ валют, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -102,7 +102,7 @@ public class AnalyseService(
 
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ фьючерсов, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+            await logService.LogTrace($"Анализ фьючерсов, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -124,7 +124,7 @@ public class AnalyseService(
 
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ индексов, {i + 1} из {instruments.Count}. {percent:N2} % закончено");
+            await logService.LogTrace($"Анализ индексов, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -173,7 +173,8 @@ public class AnalyseService(
                 {
                     Date = DateOnly.FromDateTime(x.Date),
                     InstrumentId = instrumentId,
-                    Result = GetResult(x)
+                    Result = GetResult(x),
+                    AnalyseType = KnownAnalyseTypes.Supertrend
                 })
                 .ToList();
 
@@ -219,6 +220,7 @@ public class AnalyseService(
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
                     result.Result = string.Empty;
+                    result.AnalyseType = KnownAnalyseTypes.CandleSequence;
                 }
 
                 else
@@ -232,6 +234,7 @@ public class AnalyseService(
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
                     result.Result = GetResult(candlesForAnalyse);
+                    result.AnalyseType = KnownAnalyseTypes.CandleSequence;
                 }                    
 
                 results.Add(result);
@@ -280,6 +283,7 @@ public class AnalyseService(
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
                     result.Result = string.Empty;
+                    result.AnalyseType = KnownAnalyseTypes.CandleVolume;
                 }
 
                 else
@@ -301,6 +305,7 @@ public class AnalyseService(
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
                     result.Result = GetResult(candlesForAnalyse);
+                    result.AnalyseType = KnownAnalyseTypes.CandleVolume;
                 }
 
                 results.Add(result);
@@ -361,7 +366,8 @@ public class AnalyseService(
                 {
                     Date = DateOnly.FromDateTime(x.Date),
                     InstrumentId = instrumentId,
-                    Result = GetRsiResult(x)
+                    Result = GetRsiResult(x),
+                    AnalyseType = KnownAnalyseTypes.Rsi
                 })
                 .ToList();
 
@@ -410,10 +416,10 @@ public class AnalyseService(
                 
                 results.Add(new AnalyseResult
                 {
-                    AnalyseType = KnownAnalyseTypes.YieldLtm,
                     Date = currentCandleDate,
                     InstrumentId = instrumentId,
-                    Result = GetResult(windowCandles)
+                    Result = GetResult(windowCandles),
+                    AnalyseType = KnownAnalyseTypes.YieldLtm
                 });
             }
 

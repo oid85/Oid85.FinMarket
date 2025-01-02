@@ -30,7 +30,7 @@ public class ShareRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .ExecuteUpdateAsync(
                 s => s.SetProperty(
-                    u => u.Price, lastPrice));
+                    u => u.LastPrice, lastPrice));
 
     public async Task<List<Share>> GetAllAsync() =>
         (await context.ShareEntities
@@ -76,7 +76,7 @@ public class ShareRepository(
         var entity = new ShareEntity();
         
         entity.Ticker = model.Ticker;
-        entity.Price = model.Price;
+        entity.LastPrice = model.LastPrice;
         entity.Isin = model.Isin;
         entity.Figi = model.Figi;
         entity.InstrumentId = model.InstrumentId;
@@ -93,7 +93,7 @@ public class ShareRepository(
         
         model.Id = entity.Id;
         model.Ticker = entity.Ticker;
-        model.Price = entity.Price;
+        model.LastPrice = entity.LastPrice;
         model.Isin = entity.Isin;
         model.Figi = entity.Figi;
         model.InstrumentId = entity.InstrumentId;

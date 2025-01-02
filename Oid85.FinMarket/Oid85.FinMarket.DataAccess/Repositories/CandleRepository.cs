@@ -28,12 +28,15 @@ public class CandleRepository(
         {
             if (!lastCandle.IsComplete)
             {
-                var candle = candles.First(x => x.Date == lastCandle.Date);
-                
-                var entity = await context.CandleEntities
-                    .FirstAsync(x => x.Id == candle.Id);
-                
-                SetEntity(ref entity, candle);
+                var candle = candles.Find(x => x.Date == lastCandle.Date);
+
+                if (candle is not null)
+                {
+                    var entity = await context.CandleEntities
+                        .FirstAsync(x => x.Id == candle.Id);
+
+                    SetEntity(ref entity, candle);
+                }
             }
 
             var entities = candles

@@ -13,6 +13,12 @@ public interface ITinkoffService
     public Task<List<Candle>> GetCandlesAsync(Guid instrumentId);
 
     /// <summary>
+    /// Получить свечи
+    /// </summary>
+    public Task<List<Candle>> GetCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to);
+    
+    /// <summary>
     /// Получить свечи за конкретный год
     /// </summary>
     public Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year);

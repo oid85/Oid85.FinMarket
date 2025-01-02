@@ -15,8 +15,8 @@ public class FutureEntity : AuditableEntity
     /// <summary>
     /// Цена инструмента
     /// </summary>
-    [Column("price")]
-    public double Price { get; set; }
+    [Column("last_price")]
+    public double LastPrice { get; set; }
 
     /// <summary>
     /// Идентификатор FIGI

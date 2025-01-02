@@ -30,7 +30,7 @@ public class IndexRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .ExecuteUpdateAsync(
                 s => s.SetProperty(
-                    u => u.Price, lastPrice));
+                    u => u.LastPrice, lastPrice));
     
     public async Task<List<FinIndex>> GetAllAsync() =>
         (await context.IndicativeEntities
@@ -67,7 +67,7 @@ public class IndexRepository(
         entity.Figi = model.Figi;
         entity.InstrumentId = model.InstrumentId;
         entity.Ticker = model.Ticker;
-        entity.Price = model.Price;
+        entity.LastPrice = model.LastPrice;
         entity.ClassCode = model.ClassCode;
         entity.Currency = model.Currency;
         entity.InstrumentKind = model.InstrumentKind;
@@ -86,7 +86,7 @@ public class IndexRepository(
         model.Figi = entity.Figi;
         model.InstrumentId = entity.InstrumentId;
         model.Ticker = entity.Ticker;
-        model.Price = entity.Price;
+        model.LastPrice = entity.LastPrice;
         model.ClassCode = entity.ClassCode;
         model.Currency = entity.Currency;
         model.InstrumentKind = entity.InstrumentKind;

@@ -30,7 +30,7 @@ public class FutureRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .ExecuteUpdateAsync(
                 s => s.SetProperty(
-                    u => u.Price, lastPrice));
+                    u => u.LastPrice, lastPrice));
 
     public async Task<List<Future>> GetAllAsync() =>
         (await context.FutureEntities
@@ -77,7 +77,7 @@ public class FutureRepository(
         
         entity.Id = model.Id;
         entity.Ticker = model.Ticker;
-        entity.Price = model.Price;
+        entity.LastPrice = model.LastPrice;
         entity.Figi = model.Figi;
         entity.InstrumentId = model.InstrumentId;
         entity.Name = model.Name;
@@ -103,7 +103,7 @@ public class FutureRepository(
         
         model.Id = entity.Id;
         model.Ticker = entity.Ticker;
-        model.Price = entity.Price;
+        model.LastPrice = entity.LastPrice;
         model.Figi = entity.Figi;
         model.InstrumentId = entity.InstrumentId;
         model.Name = entity.Name;

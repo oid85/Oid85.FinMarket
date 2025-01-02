@@ -19,12 +19,6 @@ public class BondCouponEntity : AuditableEntity
     public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
-    /// Цена инструмента
-    /// </summary>
-    [Column("price")]
-    public double Price { get; set; }
-    
-    /// <summary>
     /// Дата выплаты купона
     /// </summary>
     [Column("coupon_date", TypeName = "date")]

@@ -81,10 +81,14 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
     
@@ -150,10 +154,14 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -220,10 +228,14 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -290,10 +302,14 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -310,7 +326,10 @@ public class LoadService(
             var assetFundamental = await assetFundamentalRepository
                 .GetLastAsync(share.InstrumentId);
             
-            if (assetFundamental is not null)
+            if (assetFundamental is null)
+                instrumentIds.Add(share.InstrumentId);
+            
+            else
                 if (assetFundamental.Date < DateOnly.FromDateTime(DateTime.Today))
                     instrumentIds.Add(share.InstrumentId);
         }
@@ -396,10 +415,14 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 

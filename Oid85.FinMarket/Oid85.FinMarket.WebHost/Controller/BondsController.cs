@@ -69,6 +69,17 @@ public class BondsController(
             loadService.LoadBondLastPricesAsync);
     
     /// <summary>
+    /// Загрузить данные о купонах
+    /// </summary>
+    [HttpGet("load-bond-coupons")]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadBondCouponsAsync() =>
+        GetResponseAsync<object, BaseResponse<object>>(
+            loadService.LoadBondCouponsAsync);
+    
+    /// <summary>
     /// Выполнить анализ облигаций
     /// </summary>
     [HttpGet("analyse")]

@@ -15,7 +15,7 @@ public class Future
     /// <summary>
     /// Цена инструмента
     /// </summary>
-    public double Price { get; set; }
+    public double LastPrice { get; set; }
 
     /// <summary>
     /// Идентификатор FIGI

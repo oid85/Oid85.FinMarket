@@ -40,14 +40,34 @@ public class TinkoffService(
         }
     }
 
+    // <inheritdoc />
+    public async Task<List<Candle>> GetCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to)
+    {
+        try
+        {
+            return await GetCandlesAsync(
+                instrumentId, 
+                Timestamp.FromDateTime(from.ToDateTime(TimeOnly.MinValue).ToUniversalTime()), 
+                Timestamp.FromDateTime(to.ToDateTime(TimeOnly.MinValue).ToUniversalTime()));
+        }
+
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
     /// <inheritdoc />
     public async Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year)
     {
         try
         {
-            var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
-            var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
-            return await GetCandlesAsync(instrumentId, from, to);
+            return await GetCandlesAsync(
+                instrumentId, 
+                Timestamp.FromDateTime(new DateTime(year, 1, 1).ToUniversalTime()), 
+                Timestamp.FromDateTime(new DateTime(year, 12, 31).ToUniversalTime()));
         }
 
         catch (Exception exception)
@@ -470,6 +490,9 @@ public class TinkoffService(
     {
         try
         {
+            if (instrumentIds is [])
+                return [];
+            
             var request = new GetAssetFundamentalsRequest();
                 
             request.Assets.AddRange(instrumentIds.Select(x => x.ToString()));

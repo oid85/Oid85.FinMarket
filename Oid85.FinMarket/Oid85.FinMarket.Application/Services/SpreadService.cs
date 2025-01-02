@@ -46,17 +46,17 @@ public class SpreadService(
         var share = await shareRepository.GetByInstrumentIdAsync(instrumentId);
 
         if (share is not null)
-            return share.Price;
+            return share.LastPrice;
         
         var future = await futureRepository.GetByInstrumentIdAsync(instrumentId);
 
         if (future is not null)
-            return future.Price;
+            return future.LastPrice;
         
         var currency = await currencyRepository.GetByInstrumentIdAsync(instrumentId);
 
         if (currency is not null)
-            return currency.Price;
+            return currency.LastPrice;
 
         return 0.0;
     }

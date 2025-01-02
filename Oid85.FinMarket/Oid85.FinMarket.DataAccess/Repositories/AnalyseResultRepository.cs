@@ -38,14 +38,20 @@ public class AnalyseResultRepository(
         .ToList();
     
     public async Task<List<AnalyseResult>> GetAsync(
-        List<Guid> instrumentIds, DateOnly from, DateOnly to) =>
-        (await context.AnalyseResultEntities
+        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+    {
+        var entities = await context.AnalyseResultEntities
             .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
-            .ToListAsync())
-        .Select(GetModel)
-        .ToList();
+            .ToListAsync();
+        
+        var models = entities
+            .Select(GetModel)
+            .ToList();
+        
+        return models;
+    }
 
     public async Task<AnalyseResult?> GetLastAsync(Guid instrumentId)
     {

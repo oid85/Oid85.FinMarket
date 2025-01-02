@@ -219,7 +219,7 @@ public class ReportService(
             double profitPrc = 0.0;
                 
             if (nextCoupon is not null)
-                profitPrc = (bond.Price / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+                profitPrc = (bond.LastPrice / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
                 
             data.Add(new ReportParameter(
                 KnownDisplayTypes.Percent, 
@@ -532,34 +532,37 @@ public class ReportService(
 
             foreach (var date in dates)
             {
-                var analyseResult = analyseResults
-                    .FirstOrDefault(x => 
-                        x.InstrumentId == share.InstrumentId && 
-                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                if (DateOnly.FromDateTime(Convert.ToDateTime(date.Value)) <= to)
+                {
+                    var analyseResult = analyseResults
+                        .FirstOrDefault(x =>
+                            x.InstrumentId == share.InstrumentId &&
+                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
-                data.Add(analyseResult is not null 
-                    ? new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
-                        analyseResult.Result) 
-                    : new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
-                        string.Empty));
-            }
-                
-            foreach (var date in dates)
-            {
-                var dividendInfo = dividendInfos
-                    .FirstOrDefault(x => 
-                        x.Ticker == share.Ticker && 
-                        x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                    data.Add(analyseResult is not null
+                        ? new ReportParameter(
+                            KnownDisplayTypes.AnalyseResult,
+                            analyseResult.Result)
+                        : new ReportParameter(
+                            KnownDisplayTypes.AnalyseResult,
+                            string.Empty));
+                }
 
-                data.Add(dividendInfo is not null 
-                    ? new ReportParameter(
-                        KnownDisplayTypes.Percent, 
-                        dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)) 
-                    : new ReportParameter(
-                        KnownDisplayTypes.Percent, 
-                        string.Empty));
+                else
+                {
+                    var dividendInfo = dividendInfos
+                        .FirstOrDefault(x => 
+                            x.Ticker == share.Ticker && 
+                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                    data.Add(dividendInfo is not null 
+                        ? new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)) 
+                        : new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            string.Empty));
+                }
             }
                 
             reportData.Data.Add(data);
@@ -583,7 +586,7 @@ public class ReportService(
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
             
-        var dates = GetDates(from, to.AddDays(WindowInDays));
+        var dates = GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -643,7 +646,7 @@ public class ReportService(
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
             
-        var dates = GetDates(from, to.AddDays(WindowInDays));
+        var dates = GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -703,7 +706,7 @@ public class ReportService(
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
             
-        var dates = GetDates(from, to.AddDays(WindowInDays));
+        var dates = GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -763,7 +766,7 @@ public class ReportService(
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
             
-        var dates = GetDates(from, to.AddDays(WindowInDays));
+        var dates = GetDates(from, to);
             
         var reportData = new ReportData
         {

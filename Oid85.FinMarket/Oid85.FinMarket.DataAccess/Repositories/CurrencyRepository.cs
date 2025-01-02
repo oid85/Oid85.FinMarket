@@ -30,7 +30,7 @@ public class CurrencyRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .ExecuteUpdateAsync(
                 s => s.SetProperty(
-                    u => u.Price, lastPrice));
+                    u => u.LastPrice, lastPrice));
     
     public async Task<List<Currency>> GetAllAsync() =>
         (await context.CurrencyEntities
@@ -76,7 +76,7 @@ public class CurrencyRepository(
         var entity = new CurrencyEntity();
         
         entity.Ticker = model.Ticker;
-        entity.Price = model.Price;
+        entity.LastPrice = model.LastPrice;
         entity.Isin = model.Isin;
         entity.Figi = model.Figi;
         entity.ClassCode = model.ClassCode;
@@ -94,7 +94,7 @@ public class CurrencyRepository(
         
         model.Id = entity.Id;
         model.Ticker = entity.Ticker;
-        model.Price = entity.Price;
+        model.LastPrice = entity.LastPrice;
         model.Isin = entity.Isin;
         model.Figi = entity.Figi;
         model.ClassCode = entity.ClassCode;
