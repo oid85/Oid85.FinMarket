@@ -9,34 +9,29 @@ public class BondRepository(
     FinMarketContext context) 
     : IBondRepository
 {
-    public async Task AddOrUpdateAsync(List<Bond> bonds)
+    public async Task AddAsync(List<Bond> bonds)
     {        
         if (bonds.Count == 0)
             return;
+
+        var entities = new List<BondEntity>();
         
         foreach (var bond in bonds)
-        {
-            var entity = context.BondEntities
-                .FirstOrDefault(x => 
-                    x.InstrumentId == bond.InstrumentId);
+            if (!await context.BondEntities
+                    .AnyAsync(x => x.InstrumentId == bond.InstrumentId))
+                entities.Add(GetEntity(bond));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, bond);
-                
-                if (entity is not null)
-                    await context.BondEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, bond);
-            }
-        }
-        
+        await context.BondEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
+    public Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice) =>
+        context.BondEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(
+                    u => u.Price, lastPrice));
+    
     public async Task<List<Bond>> GetAllAsync() =>
         (await context.BondEntities
             .Where(x => !x.IsDeleted)
@@ -65,9 +60,9 @@ public class BondRepository(
             : GetModel(entity);
     }
     
-    private void SetEntity(ref BondEntity? entity, Bond model)
+    private BondEntity GetEntity(Bond model)
     {
-        entity ??= new BondEntity();
+        var entity = new BondEntity();
         
         entity.Ticker = model.Ticker;
         entity.Price = model.Price;
@@ -80,6 +75,8 @@ public class BondRepository(
         entity.Nkd = model.Nkd;
         entity.MaturityDate = model.MaturityDate;
         entity.FloatingCouponFlag = model.FloatingCouponFlag;
+
+        return entity;
     }
     
     private Bond GetModel(BondEntity entity)

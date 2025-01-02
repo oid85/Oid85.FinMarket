@@ -186,9 +186,13 @@ public class ReportService(
         };
             
         var bondCoupons = await bondCouponRepository
-            .GetAsync(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+            .GetAsync(
+                DateOnly.FromDateTime(DateTime.Today), 
+                DateOnly.FromDateTime(DateTime.Today).AddDays(WindowInDays));
             
-        var dates = GetDates(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+        var dates = GetDates(
+            DateOnly.FromDateTime(DateTime.Today), 
+            DateOnly.FromDateTime(DateTime.Today).AddDays(WindowInDays));
             
         reportData.Header.AddRange(dates);
             
@@ -466,7 +470,7 @@ public class ReportService(
     #endregion
     
     private List<ReportParameter> GetDates(
-        DateTime from, DateTime to)
+        DateOnly from, DateOnly to)
     {
         var curDate = from;
         var dates = new List<ReportParameter>();
@@ -485,8 +489,8 @@ public class ReportService(
         
     private async Task<ReportData> GetReportDataSharesByAnalyseType(
         List<Share> shares,
-        DateTime from,
-        DateTime to,
+        DateOnly from,
+        DateOnly to,
         string analyseType)
     {
         var instrumentIds = shares
@@ -566,8 +570,8 @@ public class ReportService(
     
     private async Task<ReportData> GetReportDataIndexesByAnalyseType(
         List<FinIndex> indexes,
-        DateTime from,
-        DateTime to,
+        DateOnly from,
+        DateOnly to,
         string analyseType)
     {
         var instrumentIds = indexes
@@ -626,8 +630,8 @@ public class ReportService(
     
     private async Task<ReportData> GetReportDataFuturesByAnalyseType(
         List<Future> futures,
-        DateTime from,
-        DateTime to,
+        DateOnly from,
+        DateOnly to,
         string analyseType)
     {
         var instrumentIds = futures
@@ -686,8 +690,8 @@ public class ReportService(
     
     private async Task<ReportData> GetReportDataBondsByAnalyseType(
         List<Bond> bonds,
-        DateTime from,
-        DateTime to,
+        DateOnly from,
+        DateOnly to,
         string analyseType)
     {
         var instrumentIds = bonds
@@ -746,8 +750,8 @@ public class ReportService(
     
     private async Task<ReportData> GetReportDataCurrenciesByAnalyseType(
         List<Currency> currencies,
-        DateTime from,
-        DateTime to,
+        DateOnly from,
+        DateOnly to,
         string analyseType)
     {
         var instrumentIds = currencies

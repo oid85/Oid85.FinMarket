@@ -9,33 +9,28 @@ public class FutureRepository(
     FinMarketContext context) 
     : IFutureRepository
 {
-    public async Task AddOrUpdateAsync(List<Future> futures)
+    public async Task AddAsync(List<Future> futures)
     {
         if (futures.Count == 0)
             return;
+
+        var entities = new List<FutureEntity>();
         
         foreach (var future in futures)
-        {
-            var entity = context.FutureEntities
-                .FirstOrDefault(x => 
-                    x.InstrumentId == future.InstrumentId);
+            if (!await context.FutureEntities
+                    .AnyAsync(x => x.InstrumentId == future.InstrumentId))
+                entities.Add(GetEntity(future));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, future);
-                
-                if (entity is not null)
-                    await context.FutureEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, future);
-            }
-        }
-
+        await context.FutureEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
+    
+    public Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice) =>
+        context.FutureEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(
+                    u => u.Price, lastPrice));
 
     public async Task<List<Future>> GetAllAsync() =>
         (await context.FutureEntities
@@ -76,9 +71,9 @@ public class FutureRepository(
             : GetModel(entity);
     }
     
-    private void SetEntity(ref FutureEntity? entity, Future model)
+    private FutureEntity GetEntity(Future model)
     {
-        entity ??= new FutureEntity();
+        var entity = new FutureEntity();
         
         entity.Id = model.Id;
         entity.Ticker = model.Ticker;
@@ -98,6 +93,8 @@ public class FutureRepository(
         entity.InitialMarginOnBuy = model.InitialMarginOnBuy;
         entity.InitialMarginOnSell = model.InitialMarginOnSell;
         entity.MinPriceIncrementAmount = model.MinPriceIncrementAmount;
+
+        return entity;
     }
     
     private Future GetModel(FutureEntity entity)

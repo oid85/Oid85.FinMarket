@@ -9,34 +9,29 @@ public class CurrencyRepository(
     FinMarketContext context) 
     : ICurrencyRepository
 {
-    public async Task AddOrUpdateAsync(List<Currency> currencies)
+    public async Task AddAsync(List<Currency> currencies)
     {
         if (currencies.Count == 0)
             return;
+
+        var entities = new List<CurrencyEntity>();
         
         foreach (var currency in currencies)
-        {
-            var entity = context.CurrencyEntities
-                .FirstOrDefault(x => 
-                    x.InstrumentId == currency.InstrumentId);
+            if (!await context.CurrencyEntities
+                    .AnyAsync(x => x.InstrumentId == currency.InstrumentId))
+                entities.Add(GetEntity(currency));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, currency);
-                
-                if (entity is not null)
-                    await context.CurrencyEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, currency);
-            }
-        }
-
+        await context.CurrencyEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
+    public Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice) =>
+        context.CurrencyEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(
+                    u => u.Price, lastPrice));
+    
     public async Task<List<Currency>> GetAllAsync() =>
         (await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
@@ -76,9 +71,9 @@ public class CurrencyRepository(
             : GetModel(entity);
     }
     
-    private void SetEntity(ref CurrencyEntity? entity, Currency model)
+    private CurrencyEntity GetEntity(Currency model)
     {
-        entity ??= new CurrencyEntity();
+        var entity = new CurrencyEntity();
         
         entity.Ticker = model.Ticker;
         entity.Price = model.Price;
@@ -89,6 +84,8 @@ public class CurrencyRepository(
         entity.IsoCurrencyName = model.IsoCurrencyName;
         entity.InstrumentId = model.InstrumentId;
         entity.InWatchList = model.InWatchList;
+
+        return entity;
     }
     
     private Currency GetModel(CurrencyEntity entity)

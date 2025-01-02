@@ -4,7 +4,8 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
 public interface ICurrencyRepository
 {
-    Task AddOrUpdateAsync(List<Currency> currencies);
+    Task AddAsync(List<Currency> currencies);
+    Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
     Task<List<Currency>> GetAllAsync();
     Task<List<Currency>> GetWatchListAsync();
     Task<Currency?> GetByTickerAsync(string ticker);

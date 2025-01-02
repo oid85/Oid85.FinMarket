@@ -27,6 +27,6 @@ public class AnalyseResultEntity : BaseEntity
     /// <summary>
     /// Дата
     /// </summary>
-    [Column("date", TypeName = "timestamp with time zone")]
-    public DateTime Date { get; set; }    
+    [Column("date", TypeName = "date")]
+    public DateOnly Date { get; set; }    
 }

@@ -92,7 +92,7 @@ public class LoadService(
     public async Task LoadFuturesAsync()
     {
         var futures = await tinkoffService.GetFuturesAsync();
-        await futureRepository.AddOrUpdateAsync(futures);
+        await futureRepository.AddAsync(futures);
             
         var tickers = futures
             .Select(x => new Instrument()
@@ -119,10 +119,8 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < futures.Count; i++) 
-            futures[i].Price = lastPrices[i];
-            
-        await futureRepository.AddOrUpdateAsync(futures);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await futureRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по фьючерсам. {futures.Count} шт.");
     }
@@ -163,7 +161,7 @@ public class LoadService(
     public async Task LoadIndexesAsync()
     {
         var indicatives = await tinkoffService.GetIndexesAsync();
-        await indexRepository.AddOrUpdateAsync(indicatives);
+        await indexRepository.AddAsync(indicatives);
             
         var tickers = indicatives
             .Select(x => new Instrument()
@@ -190,10 +188,8 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < indicatives.Count; i++) 
-            indicatives[i].Price = lastPrices[i];
-            
-        await indexRepository.AddOrUpdateAsync(indicatives);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await indexRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по индикативам. {indicatives.Count} шт.");
     }
@@ -235,7 +231,7 @@ public class LoadService(
     public async Task LoadCurrenciesAsync()
     {
         var currencies = await tinkoffService.GetCurrenciesAsync();
-        await currencyRepository.AddOrUpdateAsync(currencies);
+        await currencyRepository.AddAsync(currencies);
             
         var tickers = currencies
             .Select(x => new Instrument()
@@ -262,10 +258,8 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < currencies.Count; i++) 
-            currencies[i].Price = lastPrices[i];
-            
-        await currencyRepository.AddOrUpdateAsync(currencies);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await currencyRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по валютам. {currencies.Count} шт.");
     }
@@ -343,7 +337,7 @@ public class LoadService(
     public async Task LoadBondsAsync()
     {
         var bonds = await tinkoffService.GetBondsAsync();
-        await bondRepository.AddOrUpdateAsync(bonds);
+        await bondRepository.AddAsync(bonds);
             
         var tickers = bonds
             .Select(x => new Instrument()
@@ -370,10 +364,8 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < bonds.Count; i++) 
-            bonds[i].Price = lastPrices[i];
-            
-        await bondRepository.AddOrUpdateAsync(bonds);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await bondRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по облигациям. {bonds.Count} шт.");
     }

@@ -114,7 +114,7 @@ public class TinkoffService(
                 High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
                 Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
                 Volume = response.Candles[i].Volume,
-                Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
+                Date = ConvertHelper.TimestampToDateOnly(response.Candles[i].Time),
                 IsComplete = response.Candles[i].IsComplete
             };
 

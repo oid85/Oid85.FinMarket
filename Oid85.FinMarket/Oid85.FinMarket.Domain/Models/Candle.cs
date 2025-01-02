@@ -43,7 +43,7 @@ public class Candle
     /// <summary>
     /// Дата
     /// </summary>
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
 
     /// <summary>
     /// Свеча сформирована

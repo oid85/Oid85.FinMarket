@@ -45,11 +45,11 @@ public class BondCouponRepository(
         .ToList(); 
     
     public async Task<List<BondCoupon>> GetAsync(
-        DateTime from, DateTime to) =>
+        DateOnly from, DateOnly to) =>
         (await context.BondCouponEntities
             .Where(x => 
-                x.CouponDate >= DateOnly.FromDateTime(from) && 
-                x.CouponDate <= DateOnly.FromDateTime(to))
+                x.CouponDate >= from && 
+                x.CouponDate <= to)
             .ToListAsync())
         .Select(GetModel)
         .ToList();

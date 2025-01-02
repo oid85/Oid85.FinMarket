@@ -13,31 +13,22 @@ public class AnalyseResultRepository(
     {
         if (results.Count == 0)
             return;
-        
-        var lastAnalyseResult = await GetLastAsync(results.First().InstrumentId);
 
-        if (lastAnalyseResult is null)
-        {
-            var entities = results
-                .Select(GetEntity);
-            
-            await context.AnalyseResultEntities.AddRangeAsync(entities);
-        }
+        var entities = new List<AnalyseResultEntity>();
         
-        else
-        {
-            var entities = results
-                .Select(GetEntity)
-                .Where(x => x.Date > lastAnalyseResult.Date);
-                
-            await context.AnalyseResultEntities.AddRangeAsync(entities);    
-        }
+        foreach (var result in results)
+            if (!await context.AnalyseResultEntities
+                    .AnyAsync(x => 
+                        x.InstrumentId == result.InstrumentId
+                        && x.Date == result.Date))
+                entities.Add(GetEntity(result));
 
+        await context.AnalyseResultEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
     public async Task<List<AnalyseResult>> GetAsync(
-        Guid instrumentId, DateTime from, DateTime to) =>
+        Guid instrumentId, DateOnly from, DateOnly to) =>
         (await context.AnalyseResultEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date >= from && x.Date <= to)
@@ -47,7 +38,7 @@ public class AnalyseResultRepository(
         .ToList();
     
     public async Task<List<AnalyseResult>> GetAsync(
-        List<Guid> instrumentIds, DateTime from, DateTime to) =>
+        List<Guid> instrumentIds, DateOnly from, DateOnly to) =>
         (await context.AnalyseResultEntities
             .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x => x.Date >= from && x.Date <= to)

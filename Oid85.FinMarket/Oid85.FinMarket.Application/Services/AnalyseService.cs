@@ -162,7 +162,7 @@ public class AnalyseService(
                     Close = Convert.ToDecimal(x.Close),
                     High = Convert.ToDecimal(x.High),
                     Low = Convert.ToDecimal(x.Low),
-                    Date = x.Date.ToUniversalTime()
+                    Date = x.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime()
                 })
                 .ToList();
 
@@ -171,7 +171,7 @@ public class AnalyseService(
             var results = superTrendResults
                 .Select(x => new AnalyseResult()
                 {
-                    Date = x.Date.ToUniversalTime(),
+                    Date = DateOnly.FromDateTime(x.Date),
                     InstrumentId = instrumentId,
                     Result = GetResult(x)
                 })
@@ -350,7 +350,7 @@ public class AnalyseService(
                     Close = Convert.ToDecimal(x.Close),
                     High = Convert.ToDecimal(x.High),
                     Low = Convert.ToDecimal(x.Low),
-                    Date = x.Date.ToUniversalTime()
+                    Date = x.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime()
                 })
                 .ToList();
 
@@ -359,7 +359,7 @@ public class AnalyseService(
             var results = rsiResults
                 .Select(x => new AnalyseResult()
                 {
-                    Date = x.Date.ToUniversalTime(),
+                    Date = DateOnly.FromDateTime(x.Date),
                     InstrumentId = instrumentId,
                     Result = GetRsiResult(x)
                 })

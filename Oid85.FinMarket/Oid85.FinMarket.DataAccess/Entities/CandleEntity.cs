@@ -45,8 +45,8 @@ public class CandleEntity : BaseEntity
     /// <summary>
     /// Время
     /// </summary>
-    [Column("date", TypeName = "timestamp with time zone")]
-    public DateTime Date { get; set; }
+    [Column("date", TypeName = "date")]
+    public DateOnly Date { get; set; }
     
     /// <summary>
     /// Свеча сформирована

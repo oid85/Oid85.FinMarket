@@ -47,12 +47,12 @@ public class DividendInfoRepository(
         .ToList();
     
     public async Task<List<DividendInfo>> GetAsync(
-        List<Guid> instrumentIds, DateTime from, DateTime to) =>
+        List<Guid> instrumentIds, DateOnly from, DateOnly to) =>
         (await context.DividendInfoEntities
             .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x =>
-                x.RecordDate >= DateOnly.FromDateTime(from) &&
-                x.RecordDate <= DateOnly.FromDateTime(to))
+                x.RecordDate >= from &&
+                x.RecordDate <= to)
             .OrderBy(x => x.DividendPrc)
             .ToListAsync())
         .Select(GetModel)

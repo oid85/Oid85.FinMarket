@@ -4,7 +4,8 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
 public interface IIndexRepository
 {
-    Task AddOrUpdateAsync(List<FinIndex> indicatives);
+    Task AddAsync(List<FinIndex> indicatives);
+    Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
     Task<List<FinIndex>> GetAllAsync();
     Task<List<FinIndex>> GetWatchListAsync();
     Task<FinIndex?> GetByTickerAsync(string ticker);

@@ -13,7 +13,7 @@ public class AnalyseResult
     /// <summary>
     /// Дата
     /// </summary>
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
 
     /// <summary>
     /// Уникальный идентификатор инструмента

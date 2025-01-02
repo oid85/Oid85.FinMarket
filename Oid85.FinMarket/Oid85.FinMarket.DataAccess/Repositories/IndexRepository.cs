@@ -9,34 +9,29 @@ public class IndexRepository(
     FinMarketContext context) 
     : IIndexRepository
 {
-    public async Task AddOrUpdateAsync(List<FinIndex> indicatives)
+    public async Task AddAsync(List<FinIndex> indicatives)
     {
         if (indicatives.Count == 0)
             return;
+
+        var entities = new List<FinIndexEntity>();
         
         foreach (var indicative in indicatives)
-        {
-            var entity = context.IndicativeEntities
-                .FirstOrDefault(x => 
-                    x.InstrumentId == indicative.InstrumentId);
+            if (!await context.IndicativeEntities
+                    .AnyAsync(x => x.InstrumentId == indicative.InstrumentId))
+                entities.Add(GetEntity(indicative));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, indicative);
-                
-                if (entity is not null)
-                    await context.IndicativeEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, indicative);
-            }
-        }
-
+        await context.IndicativeEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
+    public Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice) =>
+        context.IndicativeEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(
+                    u => u.Price, lastPrice));
+    
     public async Task<List<FinIndex>> GetAllAsync() =>
         (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
@@ -65,9 +60,9 @@ public class IndexRepository(
             : GetModel(entity);
     }
     
-    private void SetEntity(ref FinIndexEntity? entity, FinIndex model)
+    private FinIndexEntity GetEntity(FinIndex model)
     {
-        entity ??= new FinIndexEntity();
+        var entity = new FinIndexEntity();
         
         entity.Figi = model.Figi;
         entity.InstrumentId = model.InstrumentId;
@@ -79,6 +74,8 @@ public class IndexRepository(
         entity.Name = model.Name;
         entity.Exchange = model.Exchange;
         entity.InWatchList = model.InWatchList;
+
+        return entity;
     }
     
     private FinIndex GetModel(FinIndexEntity entity)
