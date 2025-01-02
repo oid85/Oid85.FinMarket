@@ -15,12 +15,13 @@ public class RegisterHangfireJobs(
     public Task StartAsync(CancellationToken cancellationToken)
     {
         RegisterJob(KnownJobs.LoadInstruments, () => jobService.LoadInstrumentsAsync());
-        RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadPricesAsync());
+        RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadLastPricesAsync());
         RegisterJob(KnownJobs.LoadBondCoupons, () => jobService.LoadBondCouponsAsync());
         RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
         RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
         RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandlesAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
+        RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
 
         return Task.CompletedTask;
     }

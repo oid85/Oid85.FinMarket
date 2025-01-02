@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -7,48 +6,73 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class BondCouponRepository(
-    FinMarketContext context) : IBondCouponRepository
+    FinMarketContext context) 
+    : IBondCouponRepository
 {
-    public async Task AddOrUpdateAsync(List<BondCoupon> bondCoupons)
+    public async Task AddAsync(List<BondCoupon> bondCoupons)
     {
         if (bondCoupons.Count == 0)
             return;
+
+        var entities = new List<BondCouponEntity>();
         
         foreach (var bondCoupon in bondCoupons)
-        {
-            var entity = context.BondCouponEntities
-                .FirstOrDefault(x => 
-                    x.Ticker == bondCoupon.Ticker &&
-                    x.CouponNumber == bondCoupon.CouponNumber);
+            if (!await context.BondCouponEntities
+                    .AnyAsync(x => 
+                        x.InstrumentId == bondCoupon.InstrumentId
+                        && x.CouponNumber == bondCoupon.CouponNumber))
+                entities.Add(GetEntity(bondCoupon));
 
-            if (entity is null)
-            {
-                entity = bondCoupon.Adapt<BondCouponEntity>();
-                await context.BondCouponEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                entity.Adapt(bondCoupon);
-            }
-        }
-
+        await context.BondCouponEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
     
     public async Task<List<BondCoupon>> GetAllAsync() =>
         (await context.BondCouponEntities
             .ToListAsync())
-        .Select(x => x.Adapt<BondCoupon>())
+        .Select(GetModel)
         .ToList(); 
     
     public async Task<List<BondCoupon>> GetAsync(
-        DateTime from, DateTime to) =>
+        DateOnly from, DateOnly to) =>
         (await context.BondCouponEntities
             .Where(x => 
-                x.CouponDate >= DateOnly.FromDateTime(from) && 
-                x.CouponDate <= DateOnly.FromDateTime(to))
+                x.CouponDate >= from && 
+                x.CouponDate <= to)
             .ToListAsync())
-        .Select(x => x.Adapt<BondCoupon>())
-        .ToList();   
+        .Select(GetModel)
+        .ToList();
+    
+    private BondCouponEntity GetEntity(BondCoupon model)
+    {
+        var entity = new BondCouponEntity();
+        
+        entity.InstrumentId = model.InstrumentId;
+        entity.Ticker = model.Ticker;
+        entity.CouponDate = model.CouponDate;
+        entity.CouponNumber = model.CouponNumber;
+        entity.CouponPeriod = model.CouponPeriod;
+        entity.CouponStartDate = model.CouponStartDate;
+        entity.CouponEndDate = model.CouponEndDate;
+        entity.PayOneBond = model.PayOneBond;
+
+        return entity;
+    }
+    
+    private BondCoupon GetModel(BondCouponEntity entity)
+    {
+        var model = new BondCoupon();
+        
+        model.Id = entity.Id;
+        model.InstrumentId = entity.InstrumentId;
+        model.Ticker = entity.Ticker;
+        model.CouponDate = entity.CouponDate;
+        model.CouponNumber = entity.CouponNumber;
+        model.CouponPeriod = entity.CouponPeriod;
+        model.CouponStartDate = entity.CouponStartDate;
+        model.CouponEndDate = entity.CouponEndDate;
+        model.PayOneBond = entity.PayOneBond;
+
+        return model;
+    }
 }

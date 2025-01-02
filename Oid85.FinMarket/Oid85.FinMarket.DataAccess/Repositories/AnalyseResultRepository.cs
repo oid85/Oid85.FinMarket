@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -10,52 +9,49 @@ public class AnalyseResultRepository(
     FinMarketContext context) 
     : IAnalyseResultRepository
 {
-    public async Task AddOrUpdateAsync(List<AnalyseResult> results)
+    public async Task AddAsync(List<AnalyseResult> results)
     {
         if (results.Count == 0)
             return;
-        
-        var lastAnalyseResult = await GetLastAsync(results.First().InstrumentId);
 
-        if (lastAnalyseResult is null)
-        {
-            var entities = results
-                .Select(x => x.Adapt<AnalyseResultEntity>());
-            
-            await context.AnalyseResultEntities.AddRangeAsync(entities);
-        }
+        var entities = new List<AnalyseResultEntity>();
         
-        else
-        {
-            var entities = results
-                .Select(x => x.Adapt<AnalyseResultEntity>())
-                .Where(x => x.Date > lastAnalyseResult.Date);
-                
-            await context.AnalyseResultEntities.AddRangeAsync(entities);    
-        }
+        foreach (var result in results)
+            if (!await context.AnalyseResultEntities
+                    .AnyAsync(x => 
+                        x.InstrumentId == result.InstrumentId
+                        && x.Date == result.Date))
+                entities.Add(GetEntity(result));
 
+        await context.AnalyseResultEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
     public async Task<List<AnalyseResult>> GetAsync(
-        Guid instrumentId, DateTime from, DateTime to) =>
+        Guid instrumentId, DateOnly from, DateOnly to) =>
         (await context.AnalyseResultEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
             .ToListAsync())
-        .Select(x => x.Adapt<AnalyseResult>())
+        .Select(GetModel)
         .ToList();
     
     public async Task<List<AnalyseResult>> GetAsync(
-        List<Guid> instrumentIds, DateTime from, DateTime to) =>
-        (await context.AnalyseResultEntities
+        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+    {
+        var entities = await context.AnalyseResultEntities
             .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
-            .ToListAsync())
-        .Select(x => x.Adapt<AnalyseResult>())
-        .ToList();
+            .ToListAsync();
+        
+        var models = entities
+            .Select(GetModel)
+            .ToList();
+        
+        return models;
+    }
 
     public async Task<AnalyseResult?> GetLastAsync(Guid instrumentId)
     {
@@ -74,8 +70,33 @@ public class AnalyseResultRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .FirstAsync(x => x.Date == maxDate);
         
-        var analyseResult = entity.Adapt<AnalyseResult>();
+        var analyseResult = GetModel(entity);
         
         return analyseResult;
+    }
+
+    private AnalyseResultEntity GetEntity(AnalyseResult model)
+    {
+        var entity = new AnalyseResultEntity();
+
+        entity.Date = model.Date;
+        entity.InstrumentId = model.InstrumentId;
+        entity.AnalyseType = model.AnalyseType;
+        entity.Result = model.Result;
+        
+        return entity;
+    }
+    
+    private AnalyseResult GetModel(AnalyseResultEntity entity)
+    {
+        var model = new AnalyseResult();
+        
+        model.Id = entity.Id;
+        model.Date = entity.Date;
+        model.InstrumentId = entity.InstrumentId;
+        model.AnalyseType = entity.AnalyseType;
+        model.Result = entity.Result;
+
+        return model;
     }
 }

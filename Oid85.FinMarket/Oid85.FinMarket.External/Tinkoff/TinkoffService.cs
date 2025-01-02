@@ -40,14 +40,34 @@ public class TinkoffService(
         }
     }
 
+    // <inheritdoc />
+    public async Task<List<Candle>> GetCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to)
+    {
+        try
+        {
+            return await GetCandlesAsync(
+                instrumentId, 
+                Timestamp.FromDateTime(from.ToDateTime(TimeOnly.MinValue).ToUniversalTime()), 
+                Timestamp.FromDateTime(to.ToDateTime(TimeOnly.MinValue).ToUniversalTime()));
+        }
+
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
     /// <inheritdoc />
     public async Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year)
     {
         try
         {
-            var from = Timestamp.FromDateTime((new DateTime(year, 1, 1)).ToUniversalTime());
-            var to = Timestamp.FromDateTime((new DateTime(year, 12, 31)).ToUniversalTime());
-            return await GetCandlesAsync(instrumentId, from, to);
+            return await GetCandlesAsync(
+                instrumentId, 
+                Timestamp.FromDateTime(new DateTime(year, 1, 1).ToUniversalTime()), 
+                Timestamp.FromDateTime(new DateTime(year, 12, 31).ToUniversalTime()));
         }
 
         catch (Exception exception)
@@ -114,7 +134,7 @@ public class TinkoffService(
                 High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
                 Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
                 Volume = response.Candles[i].Volume,
-                Date = response.Candles[i].Time.ToDateTime().ToUniversalTime(),
+                Date = ConvertHelper.TimestampToDateOnly(response.Candles[i].Time),
                 IsComplete = response.Candles[i].IsComplete
             };
 
@@ -190,7 +210,17 @@ public class TinkoffService(
                     Figi = future.Figi,
                     Name = future.Name,
                     InstrumentId = Guid.Parse(future.Uid),
-                    ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate)
+                    ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate),
+                    Lot = future.Lot,
+                    FirstTradeDate = ConvertHelper.TimestampToDateOnly(future.FirstTradeDate),
+                    LastTradeDate = ConvertHelper.TimestampToDateOnly(future.LastTradeDate),
+                    FutureType = future.FuturesType,
+                    AssetType = future.AssetType,
+                    BasicAsset = future.BasicAsset,
+                    BasicAssetSize = ConvertHelper.QuotationToDouble(future.BasicAssetSize),
+                    InitialMarginOnBuy = ConvertHelper.MoneyValueToDouble(future.InitialMarginOnBuy),
+                    InitialMarginOnSell = ConvertHelper.MoneyValueToDouble(future.InitialMarginOnSell),
+                    MinPriceIncrementAmount = ConvertHelper.QuotationToDouble(future.MinPriceIncrementAmount)
                 });
             }
 
@@ -245,7 +275,7 @@ public class TinkoffService(
     }
         
     /// <inheritdoc />
-    public async Task<List<Indicative>> GetIndicativesAsync()
+    public async Task<List<FinIndex>> GetIndexesAsync()
     {
         try
         {
@@ -256,11 +286,11 @@ public class TinkoffService(
                 .Instruments
                 .ToList();
 
-            var result = new List<Indicative>();
+            var result = new List<FinIndex>();
 
             foreach (var indicative in indicatives)
             {
-                var instrument = new Indicative
+                var instrument = new FinIndex
                 {
                     Figi = indicative.Figi,
                     Ticker = indicative.Ticker,
@@ -460,6 +490,9 @@ public class TinkoffService(
     {
         try
         {
+            if (instrumentIds is [])
+                return [];
+            
             var request = new GetAssetFundamentalsRequest();
                 
             request.Assets.AddRange(instrumentIds.Select(x => x.ToString()));

@@ -15,7 +15,7 @@ public class AnalyseResultEntity : BaseEntity
     /// <summary>
     /// Результат анализа
     /// </summary>
-    [Column("result"), MaxLength(20)]
+    [Column("result"), MaxLength(200)]
     public string Result { get; set; } = string.Empty;
     
     /// <summary>
@@ -27,6 +27,6 @@ public class AnalyseResultEntity : BaseEntity
     /// <summary>
     /// Дата
     /// </summary>
-    [Column("date", TypeName = "timestamp with time zone")]
-    public DateTime Date { get; set; }    
+    [Column("date", TypeName = "date")]
+    public DateOnly Date { get; set; }    
 }

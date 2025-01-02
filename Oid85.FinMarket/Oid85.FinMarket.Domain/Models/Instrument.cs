@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models;
 
-public class Ticker
+public class Instrument
 {
     /// <summary>
     /// Id
@@ -8,12 +8,22 @@ public class Ticker
     public Guid Id { get; set; }
     
     /// <summary>
-    /// Уникальный идентификатор инструмента
+    /// Id инструмента из Tinkoff API
     /// </summary>
     public Guid InstrumentId { get; set; }
     
     /// <summary>
     /// Наименование тикера
     /// </summary>
+    public string Ticker { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Имя инструмента
+    /// </summary>
     public string Name { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Тип инструмента
+    /// </summary>
+    public string Type { get; set; } = string.Empty;
 }

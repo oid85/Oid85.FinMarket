@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAnalyseService, AnalyseService>();
         services.AddTransient<IReportService, ReportService>();
         services.AddTransient<IJobService, JobService>();
+        services.AddTransient<ISpreadService, SpreadService>();
     }
     
     public static async Task RegisterHangfireJobs(
@@ -29,7 +30,7 @@ public static class ServiceCollectionExtensions
         var jobService = scope.ServiceProvider.GetRequiredService<IJobService>();
         
         RegisterJob(KnownJobs.LoadInstruments, () => jobService.LoadInstrumentsAsync());
-        RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadPricesAsync());
+        RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadLastPricesAsync());
         RegisterJob(KnownJobs.LoadBondCoupons, () => jobService.LoadBondCouponsAsync());
         RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
         RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandlesAsync());

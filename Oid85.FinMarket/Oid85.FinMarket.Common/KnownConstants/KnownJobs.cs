@@ -9,4 +9,5 @@ public static class KnownJobs
     public const string LoadDailyCandles = "LoadDailyCandles";
     public const string LoadAssetFundamentals = "LoadAssetFundamentals";
     public const string Analyse = "Analyse";
+    public const string CalculateSpreads = "CalculateSpreads";
 }

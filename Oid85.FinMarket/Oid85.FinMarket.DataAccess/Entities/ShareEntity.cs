@@ -15,8 +15,8 @@ public class ShareEntity : AuditableEntity
     /// <summary>
     /// Цена инструмента
     /// </summary>
-    [Column("price")]
-    public double Price { get; set; }
+    [Column("last_price")]
+    public double LastPrice { get; set; }
     
     /// <summary>
     /// Идентификатор ISIN
@@ -39,7 +39,7 @@ public class ShareEntity : AuditableEntity
     /// <summary>
     /// Описание
     /// </summary>
-    [Column("name"), MaxLength(100)]
+    [Column("name"), MaxLength(200)]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

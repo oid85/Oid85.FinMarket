@@ -13,34 +13,36 @@ public class LoadService(
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
     IBondRepository bondRepository,
-    IIndicativeRepository indicativeRepository,
+    IIndexRepository indexRepository,
     ICurrencyRepository currencyRepository,
     ICandleRepository candleRepository,
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
     IAssetFundamentalRepository assetFundamentalRepository,
-    ITickerRepository tickerRepository)
+    IInstrumentRepository instrumentRepository)
     : ILoadService
 {
-    public async Task LoadStocksAsync()
+    public async Task LoadSharesAsync()
     {
         var shares = await tinkoffService.GetSharesAsync();
-        await shareRepository.AddOrUpdateAsync(shares);
+        await shareRepository.AddAsync(shares);
 
         var tickers = shares
-            .Select(x => new Ticker()
+            .Select(x => new Instrument()
             {
                 InstrumentId = x.InstrumentId,
-                Name = x.Name
+                Ticker = x.Ticker,
+                Name = x.Name,
+                Type = KnownInstrumentTypes.Share
             })
             .ToList();
         
-        await tickerRepository.AddOrUpdateAsync(tickers);
+        await instrumentRepository.AddOrUpdateAsync(tickers);
         
         await logService.LogTrace($"Загружены акции. {shares.Count} шт.");
     }
 
-    public async Task LoadStockPricesAsync()
+    public async Task LoadShareLastPricesAsync()
     {
         var shares = await shareRepository.GetWatchListAsync();
             
@@ -48,15 +50,13 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < shares.Count; i++) 
-            shares[i].Price = lastPrices[i];
-            
-        await shareRepository.AddOrUpdateAsync(shares);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await shareRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по акциям. {shares.Count} шт.");
     }
 
-    public async Task LoadStockDailyCandlesAsync()
+    public async Task LoadShareDailyCandlesAsync()
     {
         var instruments = await shareRepository.GetWatchListAsync();
 
@@ -81,32 +81,39 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
+    
     
     public async Task LoadFuturesAsync()
     {
         var futures = await tinkoffService.GetFuturesAsync();
-        await futureRepository.AddOrUpdateAsync(futures);
+        await futureRepository.AddAsync(futures);
             
         var tickers = futures
-            .Select(x => new Ticker()
+            .Select(x => new Instrument()
             {
                 InstrumentId = x.InstrumentId,
-                Name = x.Name
+                Ticker = x.Ticker,
+                Name = x.Name,
+                Type = KnownInstrumentTypes.Future
             })
             .ToList();
         
-        await tickerRepository.AddOrUpdateAsync(tickers);
+        await instrumentRepository.AddOrUpdateAsync(tickers);
         
         await logService.LogTrace($"Загружены фьючерсы. {futures.Count} шт.");
     }
 
-    public async Task LoadFuturePricesAsync()
+    public async Task LoadFutureLastPricesAsync()
     {
         var futures = await futureRepository.GetWatchListAsync();
             
@@ -116,10 +123,8 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < futures.Count; i++) 
-            futures[i].Price = lastPrices[i];
-            
-        await futureRepository.AddOrUpdateAsync(futures);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await futureRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по фьючерсам. {futures.Count} шт.");
     }
@@ -149,16 +154,41 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
-    public async Task LoadIndicativePricesAsync()
+    
+    public async Task LoadIndexesAsync()
     {
-        var indicatives = await indicativeRepository.GetWatchListAsync();
+        var indicatives = await tinkoffService.GetIndexesAsync();
+        await indexRepository.AddAsync(indicatives);
+            
+        var tickers = indicatives
+            .Select(x => new Instrument()
+            {
+                InstrumentId = x.InstrumentId,
+                Ticker = x.Ticker,
+                Name = x.Name,
+                Type = KnownInstrumentTypes.Index
+            })
+            .ToList();
+        
+        await instrumentRepository.AddOrUpdateAsync(tickers);
+        
+        await logService.LogTrace($"Загружены индикативные инструменты. {indicatives.Count} шт.");
+    }
+    
+    public async Task LoadIndexLastPricesAsync()
+    {
+        var indicatives = await indexRepository.GetWatchListAsync();
             
         var instrumentIds = indicatives
             .Select(x => x.InstrumentId)
@@ -166,17 +196,15 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < indicatives.Count; i++) 
-            indicatives[i].Price = lastPrices[i];
-            
-        await indicativeRepository.AddOrUpdateAsync(indicatives);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await indexRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по индикативам. {indicatives.Count} шт.");
     }
 
-    public async Task LoadIndicativeDailyCandlesAsync()
+    public async Task LoadIndexDailyCandlesAsync()
     {
-        var instruments = await indicativeRepository.GetWatchListAsync();
+        var instruments = await indexRepository.GetWatchListAsync();
 
         foreach (var instrument in instruments)
         {
@@ -200,32 +228,39 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
+    
     public async Task LoadCurrenciesAsync()
     {
         var currencies = await tinkoffService.GetCurrenciesAsync();
-        await currencyRepository.AddOrUpdateAsync(currencies);
+        await currencyRepository.AddAsync(currencies);
             
         var tickers = currencies
-            .Select(x => new Ticker()
+            .Select(x => new Instrument()
             {
                 InstrumentId = x.InstrumentId,
-                Name = x.Name
+                Ticker = x.Ticker,
+                Name = x.Name,
+                Type = KnownInstrumentTypes.Currency
             })
             .ToList();
         
-        await tickerRepository.AddOrUpdateAsync(tickers);
+        await instrumentRepository.AddOrUpdateAsync(tickers);
         
         await logService.LogTrace($"Загружены валюты. {currencies.Count} шт.");
     }
 
-    public async Task LoadCurrencyPricesAsync()
+    public async Task LoadCurrencyLastPricesAsync()
     {
         var currencies = await currencyRepository.GetWatchListAsync();
             
@@ -235,65 +270,110 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < currencies.Count; i++) 
-            currencies[i].Price = lastPrices[i];
-            
-        await currencyRepository.AddOrUpdateAsync(currencies);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await currencyRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по валютам. {currencies.Count} шт.");
     }
 
+    public async Task LoadCurrencyDailyCandlesAsync()
+    {
+        var instruments = await currencyRepository.GetWatchListAsync();
+
+        foreach (var instrument in instruments)
+        {
+            var lastCandle = await candleRepository.GetLastAsync(
+                instrument.InstrumentId);
+
+            if (lastCandle is null)
+            {
+                int currentYear = DateTime.Now.Year;
+                const int historyInYears = 3;
+
+                for (int year = currentYear - historyInYears; year <= currentYear; year++)
+                {
+                    var candles = await tinkoffService.GetCandlesAsync(
+                        instrument.InstrumentId, year);
+                    
+                    await candleRepository.AddOrUpdateAsync(candles);
+                }
+            }
+
+            else
+            {
+                var candles = await tinkoffService.GetCandlesAsync(
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
+                    
+                await candleRepository.AddOrUpdateAsync(candles);
+            }
+            
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
+        }
+    }
+
+    
     public async Task LoadAssetFundamentalsAsync()
     {
         var shares = await shareRepository.GetWatchListAsync();
+
+        var instrumentIds = new List<Guid>();
+
+        // Загружаем данные, которых нет
+        foreach (var share in shares)
+        {
+            var assetFundamental = await assetFundamentalRepository
+                .GetLastAsync(share.InstrumentId);
             
-        var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
+            if (assetFundamental is null)
+                instrumentIds.Add(share.InstrumentId);
+            
+            else
+                if (assetFundamental.Date < DateOnly.FromDateTime(DateTime.Today))
+                    instrumentIds.Add(share.InstrumentId);
+        }
 
         var assetFundamentals = await tinkoffService
             .GetAssetFundamentalsAsync(instrumentIds);
         
-        await assetFundamentalRepository.AddOrUpdateAsync(assetFundamentals);
+        await assetFundamentalRepository.AddAsync(assetFundamentals);
             
         await logService.LogTrace($"Загружены фундаментальные данные. {assetFundamentals.Count} шт.");
     }
 
+    
+    public async Task LoadDividendInfosAsync()
+    {
+        var shares = await shareRepository.GetWatchListAsync();
+        var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
+        await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
+            
+        await logService.LogTrace($"Загружена информация по дивидендам. {dividendInfos.Count} шт.");
+    }
+    
+    
     public async Task LoadBondsAsync()
     {
         var bonds = await tinkoffService.GetBondsAsync();
-        await bondRepository.AddOrUpdateAsync(bonds);
+        await bondRepository.AddAsync(bonds);
             
         var tickers = bonds
-            .Select(x => new Ticker()
+            .Select(x => new Instrument()
             {
                 InstrumentId = x.InstrumentId,
-                Name = x.Name
+                Ticker = x.Ticker,
+                Name = x.Name,
+                Type = KnownInstrumentTypes.Bond
             })
             .ToList();
         
-        await tickerRepository.AddOrUpdateAsync(tickers);
+        await instrumentRepository.AddOrUpdateAsync(tickers);
         
         await logService.LogTrace($"Загружены облигации. {bonds.Count} шт.");
     }
-
-    public async Task LoadIndicativesAsync()
-    {
-        var indicatives = await tinkoffService.GetIndicativesAsync();
-        await indicativeRepository.AddOrUpdateAsync(indicatives);
-            
-        var tickers = indicatives
-            .Select(x => new Ticker()
-            {
-                InstrumentId = x.InstrumentId,
-                Name = x.Name
-            })
-            .ToList();
-        
-        await tickerRepository.AddOrUpdateAsync(tickers);
-        
-        await logService.LogTrace($"Загружены индикативные инструменты. {indicatives.Count} шт.");
-    }
     
-    public async Task LoadBondPricesAsync()
+    public async Task LoadBondLastPricesAsync()
     {
         var bonds = await bondRepository.GetWatchListAsync();
             
@@ -303,10 +383,8 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < bonds.Count; i++) 
-            bonds[i].Price = lastPrices[i];
-            
-        await bondRepository.AddOrUpdateAsync(bonds);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await bondRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по облигациям. {bonds.Count} шт.");
     }
@@ -337,27 +415,22 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetCandlesAsync(
-                    instrument.InstrumentId);
+                    instrument.InstrumentId,
+                    lastCandle.Date,
+                    DateOnly.FromDateTime(DateTime.Today));
                     
                 await candleRepository.AddOrUpdateAsync(candles);
             }
-        }
-    }
-
-    public async Task LoadDividendInfosAsync()
-    {
-        var shares = await shareRepository.GetWatchListAsync();
-        var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
-        await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
             
-        await logService.LogTrace($"Загружена информация по дивидендам. {dividendInfos.Count} шт.");
+            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
+        }
     }
 
     public async Task LoadBondCouponsAsync()
     {
         var bonds = await bondRepository.GetWatchListAsync();
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
-        await bondCouponRepository.AddOrUpdateAsync(bondCoupons);
+        await bondCouponRepository.AddAsync(bondCoupons);
             
         await logService.LogTrace($"Загружена информация по купонам облигаций. {bondCoupons.Count} шт.");
     }

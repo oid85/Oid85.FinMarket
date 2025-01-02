@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
@@ -20,7 +19,8 @@ public class CandleRepository(
         if (lastCandle is null)
         {
             var entities = candles
-                .Select(x => x.Adapt<CandleEntity>());
+                .Select(GetEntity);
+            
             await context.CandleEntities.AddRangeAsync(entities);
         }
         
@@ -28,12 +28,19 @@ public class CandleRepository(
         {
             if (!lastCandle.IsComplete)
             {
-                var candle = candles.First(x => x.Date == lastCandle.Date);
-                lastCandle.Adapt(candle);
+                var candle = candles.Find(x => x.Date == lastCandle.Date);
+
+                if (candle is not null)
+                {
+                    var entity = await context.CandleEntities
+                        .FirstAsync(x => x.Id == candle.Id);
+
+                    SetEntity(ref entity, candle);
+                }
             }
 
             var entities = candles
-                .Select(x => x.Adapt<CandleEntity>())
+                .Select(GetEntity)
                 .Where(x => x.Date > lastCandle.Date);
                 
             await context.CandleEntities.AddRangeAsync(entities);  
@@ -42,12 +49,13 @@ public class CandleRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task<List<Candle>> GetAsync(Guid instrumentId) =>
-        context.CandleEntities
+    public async Task<List<Candle>> GetAsync(Guid instrumentId) =>
+        (await context.CandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .OrderBy(x => x.Date)
-            .Select(x => x.Adapt<Candle>())
-            .ToListAsync();
+            .ToListAsync())
+            .Select(GetModel)
+            .ToList();
 
     public async Task<Candle?> GetLastAsync(Guid instrumentId)
     {
@@ -66,8 +74,55 @@ public class CandleRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .FirstAsync(x => x.Date == maxDate);
 
-        var candle = entity.Adapt<Candle>();
+        var candle = GetModel(entity);
         
         return candle;
+    }
+    
+    private void SetEntity(ref CandleEntity? entity, Candle model)
+    {
+        entity ??= new CandleEntity();
+        
+        entity.InstrumentId = model.InstrumentId;
+        entity.Open = model.Open;
+        entity.Close = model.Close;
+        entity.High = model.High;
+        entity.Low = model.Low;
+        entity.Volume = model.Volume;
+        entity.Date = model.Date;
+        entity.IsComplete = model.IsComplete;
+    }
+    
+    private CandleEntity GetEntity(Candle model)
+    {
+        var entity = new CandleEntity();
+        
+        entity.InstrumentId = model.InstrumentId;
+        entity.Open = model.Open;
+        entity.Close = model.Close;
+        entity.High = model.High;
+        entity.Low = model.Low;
+        entity.Volume = model.Volume;
+        entity.Date = model.Date;
+        entity.IsComplete = model.IsComplete;
+
+        return entity;
+    }
+    
+    private Candle GetModel(CandleEntity entity)
+    {
+        var model = new Candle();
+        
+        model.Id = entity.Id;
+        model.InstrumentId = entity.InstrumentId;
+        model.Open = entity.Open;
+        model.Close = entity.Close;
+        model.High = entity.High;
+        model.Low = entity.Low;
+        model.Volume = entity.Volume;
+        model.Date = entity.Date;
+        model.IsComplete = entity.IsComplete;
+
+        return model;
     }
 }

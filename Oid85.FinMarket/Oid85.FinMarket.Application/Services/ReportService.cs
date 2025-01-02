@@ -13,16 +13,22 @@ public class ReportService(
     IAnalyseResultRepository analyseResultRepository,
     IBondCouponRepository bondCouponRepository,
     IBondRepository bondRepository,
+    ICurrencyRepository currencyRepository,
     IDividendInfoRepository dividendInfoRepository,
-    IIndicativeRepository indicativeRepository,
+    IIndexRepository indexRepository,
     IShareRepository shareRepository,
-    IAssetFundamentalRepository assetFundamentalRepository)
+    IFutureRepository futureRepository,
+    IAssetFundamentalRepository assetFundamentalRepository,
+    ISpreadRepository spreadRepository)
     : IReportService
 {
     private const int WindowInDays = 180;
         
+    #region Shares
+    
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request)
+    public async Task<ReportData> GetReportShareTotalAnalyseAsync(
+        GetReportAnalyseByTickerRequest request)
     {
         var share = await shareRepository.GetByTickerAsync(request.Ticker);
             
@@ -43,19 +49,19 @@ public class ReportService(
 
         reportData.Data = 
         [
-            (await GetReportDataByAnalyseTypeStocks(
+            (await GetReportDataSharesByAnalyseType(
                 [share], request.From, request.To, KnownAnalyseTypes.Supertrend))
             .Data.First(),
                 
-            (await GetReportDataByAnalyseTypeStocks(
+            (await GetReportDataSharesByAnalyseType(
                 [share], request.From, request.To, KnownAnalyseTypes.CandleSequence))
             .Data.First(),
                 
-            (await GetReportDataByAnalyseTypeStocks(
+            (await GetReportDataSharesByAnalyseType(
                 [share], request.From, request.To, KnownAnalyseTypes.CandleVolume))
             .Data.First(),
                 
-            (await GetReportDataByAnalyseTypeStocks(
+            (await GetReportDataSharesByAnalyseType(
                 [share], request.From, request.To, KnownAnalyseTypes.Rsi))
             .Data.First(),
         ];
@@ -69,47 +75,47 @@ public class ReportService(
     }
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request) =>
-        await GetReportDataByAnalyseTypeStocks(
+    public async Task<ReportData> GetReportSharesAnalyseSupertrendAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataSharesByAnalyseType(
             await shareRepository.GetWatchListAsync(),
             request.From,
             request.To,
             KnownAnalyseTypes.Supertrend);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request) =>
-        await GetReportDataByAnalyseTypeStocks(
+    public async Task<ReportData> GetReportSharesAnalyseCandleSequenceAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataSharesByAnalyseType(
             await shareRepository.GetWatchListAsync(),
             request.From,
             request.To, 
             KnownAnalyseTypes.CandleSequence);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request) =>
-        await GetReportDataByAnalyseTypeStocks(
+    public async Task<ReportData> GetReportSharesAnalyseCandleVolumeAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataSharesByAnalyseType(
             await shareRepository.GetWatchListAsync(),
             request.From,
             request.To,
             KnownAnalyseTypes.CandleVolume);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request) =>
-        await GetReportDataByAnalyseTypeStocks(
+    public async Task<ReportData> GetReportSharesAnalyseRsiAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataSharesByAnalyseType(
             await shareRepository.GetWatchListAsync(),
             request.From,
             request.To,
             KnownAnalyseTypes.Rsi);
 
-    /// <inheritdoc />
-    public async Task<ReportData> ReportAnalyseYieldLtmIndexes(GetReportAnalyseRequest request) =>
-        await GetReportDataByAnalyseTypeIndexes(
-            await indicativeRepository.GetWatchListAsync(),
-            request.From,
-            request.To,
-            KnownAnalyseTypes.YieldLtm);
+    #endregion
 
+    #region Dividends
+    
     /// <inheritdoc />
-    public async Task<ReportData> GetReportDividendsStocks()
+    public async Task<ReportData> GetReportDividendsAsync()
     {
         var dividendInfos = await dividendInfoRepository
             .GetAllAsync();
@@ -156,8 +162,12 @@ public class ReportService(
         return reportData;
     }
         
+    #endregion
+    
+    #region Bonds
+    
     /// <inheritdoc />
-    public async Task<ReportData> GetReportBonds()
+    public async Task<ReportData> GetReportBondsAsync()
     {
         var bonds = await bondRepository
             .GetWatchListAsync();
@@ -176,9 +186,13 @@ public class ReportService(
         };
             
         var bondCoupons = await bondCouponRepository
-            .GetAsync(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+            .GetAsync(
+                DateOnly.FromDateTime(DateTime.Today), 
+                DateOnly.FromDateTime(DateTime.Today).AddDays(WindowInDays));
             
-        var dates = GetDates(DateTime.Today, DateTime.Today.AddDays(WindowInDays));
+        var dates = GetDates(
+            DateOnly.FromDateTime(DateTime.Today), 
+            DateOnly.FromDateTime(DateTime.Today).AddDays(WindowInDays));
             
         reportData.Header.AddRange(dates);
             
@@ -205,7 +219,7 @@ public class ReportService(
             double profitPrc = 0.0;
                 
             if (nextCoupon is not null)
-                profitPrc = (bond.Price / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+                profitPrc = (bond.LastPrice / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
                 
             data.Add(new ReportParameter(
                 KnownDisplayTypes.Percent, 
@@ -233,7 +247,30 @@ public class ReportService(
         return reportData;
     }
 
-    public async Task<ReportData> GetReportAssetFundamentalsStocks()
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportBondsAnalyseSupertrendAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataBondsByAnalyseType(
+            await bondRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.Supertrend);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportBondsAnalyseCandleSequenceAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataBondsByAnalyseType(
+            await bondRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.CandleSequence);
+
+    #endregion
+    
+    #region AssetFundamentals
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportAssetFundamentalsAsync()
     {
         var shares = await shareRepository
             .GetWatchListAsync();
@@ -289,7 +326,151 @@ public class ReportService(
         return reportData;
     }
 
-    private List<ReportParameter> GetDates(DateTime from, DateTime to)
+    #endregion
+    
+    #region Spreads
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportSpreadsAsync()
+    {
+        var spreads = await spreadRepository
+            .GetWatchListAsync();
+            
+        var reportData = new ReportData
+        {
+            Title = "Спреды",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер 1"),
+                new ReportParameter(KnownDisplayTypes.String, "Цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Описание"),
+                new ReportParameter(KnownDisplayTypes.String, "Тикер 2"),
+                new ReportParameter(KnownDisplayTypes.String, "Цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Описание"),
+                new ReportParameter(KnownDisplayTypes.String, "Спред"),
+                new ReportParameter(KnownDisplayTypes.String, "Спред, %"),
+                new ReportParameter(KnownDisplayTypes.String, "Фандинг")
+            ]
+        };
+
+        foreach (var spread in spreads)
+        {
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, spread.FirstInstrumentTicker),
+                new (KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N5")),
+                new (KnownDisplayTypes.String, spread.FirstInstrumentRole),
+                new (KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
+                new (KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N5")),
+                new (KnownDisplayTypes.String, spread.SecondInstrumentRole),
+                new (KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N5")),
+                new (KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N5")),
+                new (KnownDisplayTypes.Ruble, spread.Funding.ToString("N5"))
+            ];
+            
+            reportData.Data.Add(data);
+        }
+        
+        return reportData;
+    }
+
+    #endregion
+    
+    #region Currencies
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportCurrenciesAnalyseSupertrendAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataCurrenciesByAnalyseType(
+            await currencyRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.Supertrend);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportCurrenciesAnalyseCandleSequenceAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataCurrenciesByAnalyseType(
+            await currencyRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.CandleSequence);
+
+    #endregion
+    
+    #region Futures
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportFuturesAnalyseRsiAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataFuturesByAnalyseType(
+            await futureRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.Rsi);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportFuturesAnalyseCandleVolumeAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataFuturesByAnalyseType(
+            await futureRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.CandleVolume);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportFuturesAnalyseCandleSequenceAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataFuturesByAnalyseType(
+            await futureRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.CandleSequence);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportFuturesAnalyseSupertrendAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataFuturesByAnalyseType(
+            await futureRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.Supertrend);
+
+    #endregion
+    
+    #region Indexes
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportIndexesAnalyseSupertrendAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataIndexesByAnalyseType(
+            await indexRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.Supertrend);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportIndexesAnalyseCandleSequenceAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataIndexesByAnalyseType(
+            await indexRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.CandleSequence);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetReportIndexesAnalyseYieldLtmAsync(
+        GetReportAnalyseRequest request) =>
+        await GetReportDataIndexesByAnalyseType(
+            await indexRepository.GetWatchListAsync(),
+            request.From,
+            request.To,
+            KnownAnalyseTypes.YieldLtm);
+    
+    #endregion
+    
+    private List<ReportParameter> GetDates(
+        DateOnly from, DateOnly to)
     {
         var curDate = from;
         var dates = new List<ReportParameter>();
@@ -306,10 +487,10 @@ public class ReportService(
         return dates;
     }
         
-    private async Task<ReportData> GetReportDataByAnalyseTypeStocks(
+    private async Task<ReportData> GetReportDataSharesByAnalyseType(
         List<Share> shares,
-        DateTime from,
-        DateTime to,
+        DateOnly from,
+        DateOnly to,
         string analyseType)
     {
         var instrumentIds = shares
@@ -351,34 +532,37 @@ public class ReportService(
 
             foreach (var date in dates)
             {
-                var analyseResult = analyseResults
-                    .FirstOrDefault(x => 
-                        x.InstrumentId == share.InstrumentId && 
-                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                if (DateOnly.FromDateTime(Convert.ToDateTime(date.Value)) <= to)
+                {
+                    var analyseResult = analyseResults
+                        .FirstOrDefault(x =>
+                            x.InstrumentId == share.InstrumentId &&
+                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
-                data.Add(analyseResult is not null 
-                    ? new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
-                        analyseResult.Result) 
-                    : new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
-                        string.Empty));
-            }
-                
-            foreach (var date in dates)
-            {
-                var dividendInfo = dividendInfos
-                    .FirstOrDefault(x => 
-                        x.Ticker == share.Ticker && 
-                        x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                    data.Add(analyseResult is not null
+                        ? new ReportParameter(
+                            KnownDisplayTypes.AnalyseResult,
+                            analyseResult.Result)
+                        : new ReportParameter(
+                            KnownDisplayTypes.AnalyseResult,
+                            string.Empty));
+                }
 
-                data.Add(dividendInfo is not null 
-                    ? new ReportParameter(
-                        KnownDisplayTypes.Percent, 
-                        dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)) 
-                    : new ReportParameter(
-                        KnownDisplayTypes.Percent, 
-                        string.Empty));
+                else
+                {
+                    var dividendInfo = dividendInfos
+                        .FirstOrDefault(x => 
+                            x.Ticker == share.Ticker && 
+                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                    data.Add(dividendInfo is not null 
+                        ? new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)) 
+                        : new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            string.Empty));
+                }
             }
                 
             reportData.Data.Add(data);
@@ -387,13 +571,13 @@ public class ReportService(
         return reportData;
     }
     
-    private async Task<ReportData> GetReportDataByAnalyseTypeIndexes(
-    List<Indicative> indicatives,
-    DateTime from,
-    DateTime to,
-    string analyseType)
+    private async Task<ReportData> GetReportDataIndexesByAnalyseType(
+        List<FinIndex> indexes,
+        DateOnly from,
+        DateOnly to,
+        string analyseType)
     {
-        var instrumentIds = indicatives
+        var instrumentIds = indexes
             .Select(x => x.InstrumentId)
             .ToList();        
         
@@ -402,7 +586,7 @@ public class ReportService(
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
             
-        var dates = GetDates(from, to.AddDays(WindowInDays));
+        var dates = GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -418,7 +602,7 @@ public class ReportService(
 
         reportData.Header.AddRange(dates);
 
-        foreach (var indicative in indicatives)
+        foreach (var indicative in indexes)
         {
             var data = new List<ReportParameter>
             {
@@ -430,6 +614,186 @@ public class ReportService(
                 var analyseResult = analyseResults
                     .FirstOrDefault(x => 
                         x.InstrumentId == indicative.InstrumentId && 
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(analyseResult is not null 
+                    ? new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
+                        analyseResult.Result) 
+                    : new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
+                        string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+    
+    private async Task<ReportData> GetReportDataFuturesByAnalyseType(
+        List<Future> futures,
+        DateOnly from,
+        DateOnly to,
+        string analyseType)
+    {
+        var instrumentIds = futures
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => x.AnalyseType == analyseType)
+            .ToList();
+            
+        var dates = GetDates(from, to);
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ {analyseType} " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var future in futures)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, future.Ticker)
+            };
+
+            foreach (var date in dates)
+            {
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x => 
+                        x.InstrumentId == future.InstrumentId && 
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(analyseResult is not null 
+                    ? new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
+                        analyseResult.Result) 
+                    : new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
+                        string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+    
+    private async Task<ReportData> GetReportDataBondsByAnalyseType(
+        List<Bond> bonds,
+        DateOnly from,
+        DateOnly to,
+        string analyseType)
+    {
+        var instrumentIds = bonds
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => x.AnalyseType == analyseType)
+            .ToList();
+            
+        var dates = GetDates(from, to);
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ {analyseType} " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var bond in bonds)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, bond.Ticker)
+            };
+
+            foreach (var date in dates)
+            {
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x => 
+                        x.InstrumentId == bond.InstrumentId && 
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(analyseResult is not null 
+                    ? new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
+                        analyseResult.Result) 
+                    : new ReportParameter(
+                        KnownDisplayTypes.AnalyseResult, 
+                        string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+    
+    private async Task<ReportData> GetReportDataCurrenciesByAnalyseType(
+        List<Currency> currencies,
+        DateOnly from,
+        DateOnly to,
+        string analyseType)
+    {
+        var instrumentIds = currencies
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => x.AnalyseType == analyseType)
+            .ToList();
+            
+        var dates = GetDates(from, to);
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ {analyseType} " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var currency in currencies)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, currency.Ticker)
+            };
+
+            foreach (var date in dates)
+            {
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x => 
+                        x.InstrumentId == currency.InstrumentId && 
                         x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                 data.Add(analyseResult is not null 

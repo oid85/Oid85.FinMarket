@@ -13,6 +13,12 @@ public interface ITinkoffService
     public Task<List<Candle>> GetCandlesAsync(Guid instrumentId);
 
     /// <summary>
+    /// Получить свечи
+    /// </summary>
+    public Task<List<Candle>> GetCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to);
+    
+    /// <summary>
     /// Получить свечи за конкретный год
     /// </summary>
     public Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year);
@@ -38,9 +44,9 @@ public interface ITinkoffService
     public Task<List<Bond>> GetBondsAsync();
 
     /// <summary>
-    /// Получить список индикативов
+    /// Получить список индексов
     /// </summary>
-    public Task<List<Indicative>> GetIndicativesAsync();
+    public Task<List<FinIndex>> GetIndexesAsync();
         
     /// <summary>
     /// Получить список валют

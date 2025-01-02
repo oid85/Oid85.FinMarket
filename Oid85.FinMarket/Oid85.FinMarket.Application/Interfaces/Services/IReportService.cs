@@ -9,47 +9,102 @@ namespace Oid85.FinMarket.Application.Interfaces.Services;
 public interface IReportService
 {
     /// <summary>
-    /// Получить отчет по акции
+    /// Отчет Анализ акции
     /// </summary>
-    Task<ReportData> GetReportAnalyseStock(GetReportAnalyseStockRequest request);
+    Task<ReportData> GetReportShareTotalAnalyseAsync(GetReportAnalyseByTickerRequest request);
 
     /// <summary>
-    /// Получить отчет с результатами анализа Супертренд
+    /// Отчет Анализ Супертренд
     /// </summary>
-    Task<ReportData> GetReportAnalyseSupertrendStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportSharesAnalyseSupertrendAsync(GetReportAnalyseRequest request);
 
     /// <summary>
-    /// Получить отчет с результатами анализа Последовательность свечей одного цвета
+    /// Отчет Анализ Последовательность свечей одного цвета
     /// </summary>
-    Task<ReportData> GetReportAnalyseCandleSequenceStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportSharesAnalyseCandleSequenceAsync(GetReportAnalyseRequest request);
 
     /// <summary>
-    /// Получить отчет с результатами анализа Растущий объем
+    /// Отчет Анализ Растущий объем
     /// </summary>
-    Task<ReportData> GetReportAnalyseCandleVolumeStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportSharesAnalyseCandleVolumeAsync(GetReportAnalyseRequest request);
 
     /// <summary>
-    /// Получить отчет с результатами анализа RSI
+    /// Отчет Анализ RSI
     /// </summary>
-    Task<ReportData> GetReportAnalyseRsiStocks(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportSharesAnalyseRsiAsync(GetReportAnalyseRequest request);
 
     /// <summary>
-    /// Получить отчет по доходности LTM
+    /// Отчет Доходность LTM
     /// </summary>
-    Task<ReportData> ReportAnalyseYieldLtmIndexes(GetReportAnalyseRequest request);
+    Task<ReportData> GetReportIndexesAnalyseYieldLtmAsync(GetReportAnalyseRequest request);
     
     /// <summary>
-    /// Получить отчет по дивидендам
+    /// Отчет Дивиденды
     /// </summary>
-    Task<ReportData> GetReportDividendsStocks();
+    Task<ReportData> GetReportDividendsAsync();
 
     /// <summary>
-    /// Получить отчет по облигациям
+    /// Отчет Облигации
     /// </summary>
-    Task<ReportData> GetReportBonds();
+    Task<ReportData> GetReportBondsAsync();
 
     /// <summary>
-    /// Получить отчет по фундаментальным данным
+    /// Отчет Анализ Супертренд
     /// </summary>
-    Task<ReportData> GetReportAssetFundamentalsStocks();
+    Task<ReportData> GetReportBondsAnalyseSupertrendAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Последовательность свечей одного цвета
+    /// </summary>
+    Task<ReportData> GetReportBondsAnalyseCandleSequenceAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Фундаментальные данные
+    /// </summary>
+    Task<ReportData> GetReportAssetFundamentalsAsync();
+
+    /// <summary>
+    /// Отчет Спреды
+    /// </summary>
+    Task<ReportData> GetReportSpreadsAsync();
+
+    /// <summary>
+    /// Отчет Анализ Супертренд
+    /// </summary>
+    Task<ReportData> GetReportCurrenciesAnalyseSupertrendAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Последовательность свечей одного цвета
+    /// </summary>
+    Task<ReportData> GetReportCurrenciesAnalyseCandleSequenceAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ RSI
+    /// </summary>
+    Task<ReportData> GetReportFuturesAnalyseRsiAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Растущий объем
+    /// </summary>
+    Task<ReportData> GetReportFuturesAnalyseCandleVolumeAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Последовательность свечей одного цвета
+    /// </summary>
+    Task<ReportData> GetReportFuturesAnalyseCandleSequenceAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Супертренд
+    /// </summary>
+    Task<ReportData> GetReportFuturesAnalyseSupertrendAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Супертренд
+    /// </summary>
+    Task<ReportData> GetReportIndexesAnalyseSupertrendAsync(GetReportAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Последовательность свечей одного цвета
+    /// </summary>
+    Task<ReportData> GetReportIndexesAnalyseCandleSequenceAsync(GetReportAnalyseRequest request);
 }
