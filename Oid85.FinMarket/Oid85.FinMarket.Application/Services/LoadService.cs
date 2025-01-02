@@ -50,10 +50,8 @@ public class LoadService(
             
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
-        for (int i = 0; i < shares.Count; i++) 
-            shares[i].Price = lastPrices[i];
-            
-        await shareRepository.AddOrUpdateAsync(shares);
+        for (int i = 0; i < instrumentIds.Count; i++) 
+            await shareRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         await logService.LogTrace($"Загружены последние цены по акциям. {shares.Count} шт.");
     }

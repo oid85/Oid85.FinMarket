@@ -36,6 +36,13 @@ public class ShareRepository(
         await context.SaveChangesAsync();
     }
 
+    public Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice) =>
+        context.ShareEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(
+                    u => u.Price, lastPrice));
+
     public async Task<List<Share>> GetAllAsync() =>
         (await context.ShareEntities
             .Where(x => !x.IsDeleted)
