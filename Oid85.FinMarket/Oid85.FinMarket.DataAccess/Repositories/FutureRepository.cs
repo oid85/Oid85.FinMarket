@@ -6,7 +6,8 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class FutureRepository(
-    FinMarketContext context) : IFutureRepository
+    FinMarketContext context) 
+    : IFutureRepository
 {
     public async Task AddOrUpdateAsync(List<Future> futures)
     {

@@ -6,7 +6,8 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class CurrencyRepository(
-    FinMarketContext context) : ICurrencyRepository
+    FinMarketContext context) 
+    : ICurrencyRepository
 {
     public async Task AddOrUpdateAsync(List<Currency> currencies)
     {

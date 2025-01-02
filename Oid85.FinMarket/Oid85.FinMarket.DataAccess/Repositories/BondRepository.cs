@@ -6,7 +6,8 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class BondRepository(
-    FinMarketContext context) : IBondRepository
+    FinMarketContext context) 
+    : IBondRepository
 {
     public async Task AddOrUpdateAsync(List<Bond> bonds)
     {        

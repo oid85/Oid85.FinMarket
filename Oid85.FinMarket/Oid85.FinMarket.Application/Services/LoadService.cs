@@ -25,7 +25,7 @@ public class LoadService(
     public async Task LoadSharesAsync()
     {
         var shares = await tinkoffService.GetSharesAsync();
-        await shareRepository.AddOrUpdateAsync(shares);
+        await shareRepository.AddAsync(shares);
 
         var tickers = shares
             .Select(x => new Instrument()

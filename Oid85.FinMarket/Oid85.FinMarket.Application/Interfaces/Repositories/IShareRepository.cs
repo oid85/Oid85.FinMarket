@@ -4,7 +4,7 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
 public interface IShareRepository
 {
-    Task AddOrUpdateAsync(List<Share> shares);
+    Task AddAsync(List<Share> shares);
     Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
     Task<List<Share>> GetAllAsync();
     Task<List<Share>> GetWatchListAsync();

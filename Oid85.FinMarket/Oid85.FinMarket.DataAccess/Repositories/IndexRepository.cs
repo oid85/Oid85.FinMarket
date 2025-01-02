@@ -6,7 +6,8 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class IndexRepository(
-    FinMarketContext context) : IIndexRepository
+    FinMarketContext context) 
+    : IIndexRepository
 {
     public async Task AddOrUpdateAsync(List<FinIndex> indicatives)
     {

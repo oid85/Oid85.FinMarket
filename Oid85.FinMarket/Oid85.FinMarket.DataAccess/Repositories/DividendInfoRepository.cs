@@ -6,7 +6,8 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class DividendInfoRepository(
-    FinMarketContext context) : IDividendInfoRepository
+    FinMarketContext context) 
+    : IDividendInfoRepository
 {
     public async Task AddOrUpdateAsync(List<DividendInfo> dividendInfos)
     {

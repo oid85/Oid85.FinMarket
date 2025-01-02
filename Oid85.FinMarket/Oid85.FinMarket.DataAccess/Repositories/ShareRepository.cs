@@ -6,33 +6,22 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class ShareRepository(
-    FinMarketContext context) : IShareRepository
+    FinMarketContext context) 
+    : IShareRepository
 {
-    public async Task AddOrUpdateAsync(List<Share> shares)
+    public async Task AddAsync(List<Share> shares)
     {
         if (shares.Count == 0)
             return;
+
+        var entities = new List<ShareEntity>();
         
         foreach (var share in shares)
-        {
-            var entity = context.ShareEntities
-                .FirstOrDefault(x => 
-                    x.InstrumentId == share.InstrumentId);
+            if (!await context.ShareEntities
+                    .AnyAsync(x => x.InstrumentId == share.InstrumentId))
+                entities.Add(GetEntity(share));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, share);
-                
-                if (entity is not null)
-                    await context.ShareEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, share);
-            }
-        }
-
+        await context.ShareEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
@@ -82,9 +71,9 @@ public class ShareRepository(
             : GetModel(entity);
     }
 
-    private void SetEntity(ref ShareEntity? entity, Share model)
+    private ShareEntity GetEntity(Share model)
     {
-        entity ??= new ShareEntity();
+        var entity = new ShareEntity();
         
         entity.Ticker = model.Ticker;
         entity.Price = model.Price;
@@ -94,6 +83,8 @@ public class ShareRepository(
         entity.Name = model.Name;
         entity.Sector = model.Sector;
         entity.InWatchList = model.InWatchList;
+
+        return entity;
     }
     
     private Share GetModel(ShareEntity entity)
