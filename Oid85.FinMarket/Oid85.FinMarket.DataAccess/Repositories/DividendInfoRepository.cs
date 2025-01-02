@@ -13,29 +13,18 @@ public class DividendInfoRepository(
     {
         if (dividendInfos.Count == 0)
             return;
+
+        var entities = new List<DividendInfoEntity>();
         
         foreach (var dividendInfo in dividendInfos)
-        {
-            var entity = context.DividendInfoEntities
-                .FirstOrDefault(x => 
-                    x.InstrumentId == dividendInfo.InstrumentId &&
-                    x.RecordDate == dividendInfo.RecordDate &&
-                    x.DeclaredDate == dividendInfo.DeclaredDate);
+            if (!await context.DividendInfoEntities
+                    .AnyAsync(x => 
+                        x.InstrumentId == dividendInfo.InstrumentId &&
+                        x.RecordDate == dividendInfo.RecordDate &&
+                        x.DeclaredDate == dividendInfo.DeclaredDate))
+                entities.Add(GetEntity(dividendInfo));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, dividendInfo);
-                
-                if (entity is not null)
-                    await context.DividendInfoEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, dividendInfo);
-            }
-        }
-
+        await context.DividendInfoEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
@@ -58,9 +47,9 @@ public class DividendInfoRepository(
         .Select(GetModel)
         .ToList();
     
-    private void SetEntity(ref DividendInfoEntity? entity, DividendInfo model)
+    private DividendInfoEntity GetEntity(DividendInfo model)
     {
-        entity ??= new DividendInfoEntity();
+        var entity = new DividendInfoEntity();
         
         entity.InstrumentId = model.InstrumentId;
         entity.Ticker = model.Ticker;
@@ -68,6 +57,8 @@ public class DividendInfoRepository(
         entity.DeclaredDate = model.DeclaredDate;
         entity.Dividend = model.Dividend;
         entity.DividendPrc = model.DividendPrc;
+
+        return entity;
     }
     
     private DividendInfo GetModel(DividendInfoEntity entity)

@@ -177,7 +177,7 @@ public class AnalyseService(
                 })
                 .ToList();
 
-            await analyseResultRepository.AddOrUpdateAsync(results);
+            await analyseResultRepository.AddAsync(results);
         }
 
         catch (Exception exception)
@@ -237,7 +237,7 @@ public class AnalyseService(
                 results.Add(result);
             }
 
-            await analyseResultRepository.AddOrUpdateAsync(results);
+            await analyseResultRepository.AddAsync(results);
         }
 
         catch (Exception exception)
@@ -306,7 +306,7 @@ public class AnalyseService(
                 results.Add(result);
             }
 
-            await analyseResultRepository.AddOrUpdateAsync(results);
+            await analyseResultRepository.AddAsync(results);
         }
 
         catch (Exception exception)
@@ -365,7 +365,7 @@ public class AnalyseService(
                 })
                 .ToList();
 
-            await analyseResultRepository.AddOrUpdateAsync(results);
+            await analyseResultRepository.AddAsync(results);
         }
 
         catch (Exception exception)
@@ -417,7 +417,7 @@ public class AnalyseService(
                 });
             }
 
-            await analyseResultRepository.AddOrUpdateAsync(results);
+            await analyseResultRepository.AddAsync(results);
         }
 
         catch (Exception exception)

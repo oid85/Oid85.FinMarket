@@ -4,7 +4,7 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
 public interface IAssetFundamentalRepository
 {
-    Task AddOrUpdateAsync(List<AssetFundamental> assetFundamentals);
+    Task AddAsync(List<AssetFundamental> assetFundamentals);
     Task<List<AssetFundamental>> GetAsync(Guid instrumentId);
     Task<AssetFundamental?> GetLastAsync(Guid instrumentId);
 }

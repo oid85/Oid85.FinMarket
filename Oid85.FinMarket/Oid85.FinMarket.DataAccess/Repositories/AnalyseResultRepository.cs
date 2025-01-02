@@ -9,7 +9,7 @@ public class AnalyseResultRepository(
     FinMarketContext context) 
     : IAnalyseResultRepository
 {
-    public async Task AddOrUpdateAsync(List<AnalyseResult> results)
+    public async Task AddAsync(List<AnalyseResult> results)
     {
         if (results.Count == 0)
             return;

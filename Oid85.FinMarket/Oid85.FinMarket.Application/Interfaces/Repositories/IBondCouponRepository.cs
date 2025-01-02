@@ -4,7 +4,7 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
 public interface IBondCouponRepository
 {
-    Task AddOrUpdateAsync(List<BondCoupon> bondCoupons);
+    Task AddAsync(List<BondCoupon> bondCoupons);
     Task<List<BondCoupon>> GetAllAsync();
     Task<List<BondCoupon>> GetAsync(DateOnly from, DateOnly to);
 }

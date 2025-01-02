@@ -318,7 +318,7 @@ public class LoadService(
         var assetFundamentals = await tinkoffService
             .GetAssetFundamentalsAsync(instrumentIds);
         
-        await assetFundamentalRepository.AddOrUpdateAsync(assetFundamentals);
+        await assetFundamentalRepository.AddAsync(assetFundamentals);
             
         await logService.LogTrace($"Загружены фундаментальные данные. {assetFundamentals.Count} шт.");
     }
@@ -407,7 +407,7 @@ public class LoadService(
     {
         var bonds = await bondRepository.GetWatchListAsync();
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
-        await bondCouponRepository.AddOrUpdateAsync(bondCoupons);
+        await bondCouponRepository.AddAsync(bondCoupons);
             
         await logService.LogTrace($"Загружена информация по купонам облигаций. {bondCoupons.Count} шт.");
     }

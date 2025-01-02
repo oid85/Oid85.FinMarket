@@ -9,28 +9,22 @@ public class AssetFundamentalRepository(
     FinMarketContext context) 
     : IAssetFundamentalRepository
 {
-    public async Task AddOrUpdateAsync(List<AssetFundamental> assetFundamentals)
+    public async Task AddAsync(List<AssetFundamental> assetFundamentals)
     {
         if (assetFundamentals.Count == 0)
             return;
 
-        foreach (var asset in assetFundamentals)
-        {
-            var lastAsset = await GetLastAsync(asset.InstrumentId);
+        var entities = new List<AssetFundamentalEntity>();
+        
+        foreach (var assetFundamental in assetFundamentals)
+            if (!await context.AssetFundamentalEntities
+                    .AnyAsync(x => 
+                        x.InstrumentId == assetFundamental.InstrumentId
+                        && x.Date == assetFundamental.Date))
+                entities.Add(GetEntity(assetFundamental));
 
-            if (lastAsset is null)
-            {
-                var entity = GetEntity(asset);
-                context.AssetFundamentalEntities.Add(entity);
-                continue;
-            }
-            
-            if (asset.Date > lastAsset.Date)
-            {
-                var entity = GetEntity(asset);
-                context.AssetFundamentalEntities.Add(entity);
-            }
-        }
+        await context.AssetFundamentalEntities.AddRangeAsync(entities);
+        await context.SaveChangesAsync();
     }
 
     public async Task<List<AssetFundamental>> GetAsync(Guid instrumentId) =>

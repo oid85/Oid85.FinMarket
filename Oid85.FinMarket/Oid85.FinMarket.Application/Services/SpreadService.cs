@@ -34,9 +34,9 @@ public class SpreadService(
             spread.DateTime = DateTime.UtcNow;
             
             FillSpreadPricePosition(spread);
+            
+            await spreadRepository.UpdateSpreadAsync(spread);
         }
-
-        await spreadRepository.AddOrUpdateAsync(spreads);
         
         return spreads;
     }

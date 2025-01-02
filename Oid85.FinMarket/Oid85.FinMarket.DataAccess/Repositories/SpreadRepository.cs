@@ -9,33 +9,37 @@ public class SpreadRepository(
     FinMarketContext context) 
     : ISpreadRepository
 {
-    public async Task AddOrUpdateAsync(List<Spread> spreads)
+    public async Task AddAsync(List<Spread> spreads)
     {
         if (spreads.Count == 0)
             return;
+
+        var entities = new List<SpreadEntity>();
         
         foreach (var spread in spreads)
-        {
-            var entity = context.SpreadEntities
-                .FirstOrDefault(x => 
-                    x.FirstInstrumentId == spread.FirstInstrumentId);
+            if (!await context.SpreadEntities
+                    .AnyAsync(x => 
+                        x.FirstInstrumentId == spread.FirstInstrumentId &&
+                        x.SecondInstrumentId == spread.SecondInstrumentId))
+                entities.Add(GetEntity(spread));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, spread);
-                
-                if (entity is not null)
-                    await context.SpreadEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, spread);
-            }
-        }
-
+        await context.SpreadEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
+
+    public Task UpdateSpreadAsync(Spread spread) =>
+        context.SpreadEntities
+            .Where(x => 
+                x.FirstInstrumentId == spread.FirstInstrumentId && 
+                x.SecondInstrumentId == spread.SecondInstrumentId)
+            .ExecuteUpdateAsync(
+                s => s
+                    .SetProperty(u => u.DateTime, spread.DateTime)
+                    .SetProperty(u => u.FirstInstrumentPrice, spread.FirstInstrumentPrice)
+                    .SetProperty(u => u.SecondInstrumentPrice, spread.SecondInstrumentPrice)
+                    .SetProperty(u => u.PriceDifference, spread.PriceDifference)
+                    .SetProperty(u => u.Funding, spread.Funding)
+                    .SetProperty(u => u.SpreadPricePosition, spread.SpreadPricePosition));
 
     public async Task<List<Spread>> GetAllAsync() =>
         (await context.SpreadEntities
@@ -65,9 +69,9 @@ public class SpreadRepository(
             : GetModel(entity);
     }
     
-    private void SetEntity(ref SpreadEntity? entity, Spread model)
+    private SpreadEntity GetEntity(Spread model)
     {
-        entity ??= new SpreadEntity();
+        var entity = new SpreadEntity();
         
         entity.DateTime = model.DateTime;
         entity.FirstInstrumentId = model.FirstInstrumentId;
@@ -83,6 +87,8 @@ public class SpreadRepository(
         entity.Funding = model.Funding;
         entity.SpreadPricePosition = model.SpreadPricePosition;
         entity.InWatchList = model.InWatchList;
+
+        return entity;
     }
     
     private Spread GetModel(SpreadEntity entity)

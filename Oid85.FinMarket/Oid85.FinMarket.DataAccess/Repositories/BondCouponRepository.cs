@@ -9,32 +9,21 @@ public class BondCouponRepository(
     FinMarketContext context) 
     : IBondCouponRepository
 {
-    public async Task AddOrUpdateAsync(List<BondCoupon> bondCoupons)
+    public async Task AddAsync(List<BondCoupon> bondCoupons)
     {
         if (bondCoupons.Count == 0)
             return;
+
+        var entities = new List<BondCouponEntity>();
         
         foreach (var bondCoupon in bondCoupons)
-        {
-            var entity = context.BondCouponEntities
-                .FirstOrDefault(x => 
-                    x.InstrumentId == bondCoupon.InstrumentId &&
-                    x.CouponNumber == bondCoupon.CouponNumber);
+            if (!await context.BondCouponEntities
+                    .AnyAsync(x => 
+                        x.InstrumentId == bondCoupon.InstrumentId
+                        && x.CouponNumber == bondCoupon.CouponNumber))
+                entities.Add(GetEntity(bondCoupon));
 
-            if (entity is null)
-            {
-                SetEntity(ref entity, bondCoupon);
-                
-                if (entity is not null)
-                    await context.BondCouponEntities.AddAsync(entity);
-            }
-
-            else
-            {
-                SetEntity(ref entity, bondCoupon);
-            }
-        }
-
+        await context.BondCouponEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
     
@@ -54,9 +43,9 @@ public class BondCouponRepository(
         .Select(GetModel)
         .ToList();
     
-    private void SetEntity(ref BondCouponEntity? entity, BondCoupon model)
+    private BondCouponEntity GetEntity(BondCoupon model)
     {
-        entity ??= new BondCouponEntity();
+        var entity = new BondCouponEntity();
         
         entity.InstrumentId = model.InstrumentId;
         entity.Ticker = model.Ticker;
@@ -66,6 +55,8 @@ public class BondCouponRepository(
         entity.CouponStartDate = model.CouponStartDate;
         entity.CouponEndDate = model.CouponEndDate;
         entity.PayOneBond = model.PayOneBond;
+
+        return entity;
     }
     
     private BondCoupon GetModel(BondCouponEntity entity)
