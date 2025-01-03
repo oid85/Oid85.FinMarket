@@ -11,7 +11,7 @@ public class CurrencyRepository(
 {
     public async Task AddAsync(List<Currency> currencies)
     {
-        if (currencies.Count == 0)
+        if (currencies is [])
             return;
 
         var entities = new List<CurrencyEntity>();

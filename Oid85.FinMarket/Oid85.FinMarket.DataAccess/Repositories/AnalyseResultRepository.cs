@@ -11,7 +11,7 @@ public class AnalyseResultRepository(
 {
     public async Task AddAsync(List<AnalyseResult> results)
     {
-        if (results.Count == 0)
+        if (results is [])
             return;
 
         var entities = new List<AnalyseResultEntity>();

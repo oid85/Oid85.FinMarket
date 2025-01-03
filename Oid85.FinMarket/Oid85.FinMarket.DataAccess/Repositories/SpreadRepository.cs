@@ -11,7 +11,7 @@ public class SpreadRepository(
 {
     public async Task AddAsync(List<Spread> spreads)
     {
-        if (spreads.Count == 0)
+        if (spreads is [])
             return;
 
         var entities = new List<SpreadEntity>();

@@ -11,7 +11,7 @@ public class FutureRepository(
 {
     public async Task AddAsync(List<Future> futures)
     {
-        if (futures.Count == 0)
+        if (futures is [])
             return;
 
         var entities = new List<FutureEntity>();

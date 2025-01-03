@@ -11,7 +11,7 @@ public class InstrumentRepository(
 {
     public async Task AddOrUpdateAsync(List<Instrument> tickers)
     {
-        if (tickers.Count == 0)
+        if (tickers is [])
             return;
         
         foreach (var ticker in tickers)

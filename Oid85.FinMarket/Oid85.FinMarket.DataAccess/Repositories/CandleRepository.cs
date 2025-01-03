@@ -11,7 +11,7 @@ public class CandleRepository(
 {
     public async Task AddOrUpdateAsync(List<Candle> candles)
     {
-        if (candles.Count == 0)
+        if (candles is [])
             return;
         
         var lastCandle = await GetLastAsync(candles.First().InstrumentId);

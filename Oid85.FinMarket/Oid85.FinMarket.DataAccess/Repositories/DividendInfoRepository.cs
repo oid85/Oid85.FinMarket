@@ -11,7 +11,7 @@ public class DividendInfoRepository(
 {
     public async Task AddOrUpdateAsync(List<DividendInfo> dividendInfos)
     {
-        if (dividendInfos.Count == 0)
+        if (dividendInfos is [])
             return;
 
         var entities = new List<DividendInfoEntity>();

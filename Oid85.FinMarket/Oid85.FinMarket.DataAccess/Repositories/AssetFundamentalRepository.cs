@@ -11,7 +11,7 @@ public class AssetFundamentalRepository(
 {
     public async Task AddAsync(List<AssetFundamental> assetFundamentals)
     {
-        if (assetFundamentals.Count == 0)
+        if (assetFundamentals is [])
             return;
 
         var entities = new List<AssetFundamentalEntity>();

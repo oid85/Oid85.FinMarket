@@ -11,7 +11,7 @@ public class ShareRepository(
 {
     public async Task AddAsync(List<Share> shares)
     {
-        if (shares.Count == 0)
+        if (shares is [])
             return;
 
         var entities = new List<ShareEntity>();

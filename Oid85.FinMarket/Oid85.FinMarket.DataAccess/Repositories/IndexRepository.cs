@@ -11,7 +11,7 @@ public class IndexRepository(
 {
     public async Task AddAsync(List<FinIndex> indicatives)
     {
-        if (indicatives.Count == 0)
+        if (indicatives is [])
             return;
 
         var entities = new List<FinIndexEntity>();

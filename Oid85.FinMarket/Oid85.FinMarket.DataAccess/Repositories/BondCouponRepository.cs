@@ -11,7 +11,7 @@ public class BondCouponRepository(
 {
     public async Task AddAsync(List<BondCoupon> bondCoupons)
     {
-        if (bondCoupons.Count == 0)
+        if (bondCoupons is [])
             return;
 
         var entities = new List<BondCouponEntity>();
