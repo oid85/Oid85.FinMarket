@@ -8,7 +8,7 @@ using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
 
-[Route("[controller]/api")]
+[Route("api/[controller]")]
 [ApiController]
 public class SharesController(
     ILoadService loadService,

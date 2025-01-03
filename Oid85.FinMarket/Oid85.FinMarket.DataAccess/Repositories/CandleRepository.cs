@@ -33,7 +33,9 @@ public class CandleRepository(
                 if (candle is not null)
                 {
                     var entity = await context.CandleEntities
-                        .FirstAsync(x => x.Id == candle.Id);
+                        .FirstAsync(x => 
+                            x.Date == candle.Date &&
+                            x.InstrumentId == candle.InstrumentId);
 
                     SetEntity(ref entity, candle);
                 }
