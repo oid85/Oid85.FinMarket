@@ -75,7 +75,6 @@ public class FutureRepository(
     {
         var entity = new FutureEntity();
         
-        entity.Id = model.Id;
         entity.Ticker = model.Ticker;
         entity.LastPrice = model.LastPrice;
         entity.Figi = model.Figi;

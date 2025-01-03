@@ -68,7 +68,6 @@ public class InstrumentRepository(
     {
         entity ??= new InstrumentEntity();
         
-        entity.Id = model.Id;
         entity.InstrumentId = model.InstrumentId;
         entity.Ticker = model.Ticker;
         entity.Name = model.Name;
