@@ -20,6 +20,7 @@ public class AnalyseResultRepository(
             if (!await context.AnalyseResultEntities
                     .AnyAsync(x => 
                         x.InstrumentId == result.InstrumentId
+                        && x.AnalyseType == result.AnalyseType
                         && x.Date == result.Date))
                 entities.Add(GetEntity(result));
 
@@ -53,21 +54,28 @@ public class AnalyseResultRepository(
         return models;
     }
 
-    public async Task<AnalyseResult?> GetLastAsync(Guid instrumentId)
+    public async Task<AnalyseResult?> GetLastAsync(
+        Guid instrumentId, string analyseType)
     {
         bool exists = await context.AnalyseResultEntities
-            .Where(x => x.InstrumentId == instrumentId)
+            .Where(x => 
+                x.InstrumentId == instrumentId
+                && x.AnalyseType == analyseType)
             .AnyAsync();
 
         if (!exists)
             return null;
         
         var maxDate = await context.AnalyseResultEntities
-            .Where(x => x.InstrumentId == instrumentId)
+            .Where(x => 
+                x.InstrumentId == instrumentId
+                && x.AnalyseType == analyseType)
             .MaxAsync(x => x.Date);
 
         var entity = await context.AnalyseResultEntities
-            .Where(x => x.InstrumentId == instrumentId)
+            .Where(x => 
+                x.InstrumentId == instrumentId
+                && x.AnalyseType == analyseType)
             .FirstAsync(x => x.Date == maxDate);
         
         var analyseResult = GetModel(entity);

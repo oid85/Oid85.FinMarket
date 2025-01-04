@@ -541,10 +541,10 @@ public class ReportService(
 
                     data.Add(analyseResult is not null
                         ? new ReportParameter(
-                            KnownDisplayTypes.AnalyseResult,
+                            $"AnalyseResult{analyseType}",
                             analyseResult.Result)
                         : new ReportParameter(
-                            KnownDisplayTypes.AnalyseResult,
+                            $"AnalyseResult{analyseType}",
                             string.Empty));
                 }
 
@@ -618,10 +618,10 @@ public class ReportService(
 
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         analyseResult.Result) 
                     : new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         string.Empty));
             }
                 
@@ -678,10 +678,10 @@ public class ReportService(
 
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         analyseResult.Result) 
                     : new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         string.Empty));
             }
                 
@@ -738,10 +738,10 @@ public class ReportService(
 
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         analyseResult.Result) 
                     : new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         string.Empty));
             }
                 
@@ -798,10 +798,10 @@ public class ReportService(
 
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         analyseResult.Result) 
                     : new ReportParameter(
-                        KnownDisplayTypes.AnalyseResult, 
+                        $"AnalyseResult{analyseType}",
                         string.Empty));
             }
                 

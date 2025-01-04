@@ -27,7 +27,7 @@ public class AnalyseService(
             
         for (int i = 0; i < instruments.Count; i++)
         {       
-            // Вызов методом анализа
+            // Вызов методов анализа
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
             await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
@@ -49,7 +49,7 @@ public class AnalyseService(
             
         for (int i = 0; i < instruments.Count; i++)
         {                
-            // Вызов методом анализа
+            // Вызов методов анализа
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
             await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
@@ -71,7 +71,7 @@ public class AnalyseService(
             
         for (int i = 0; i < instruments.Count; i++)
         {                
-            // Вызов методом анализа
+            // Вызов методов анализа
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
             await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
@@ -93,7 +93,7 @@ public class AnalyseService(
             
         for (int i = 0; i < instruments.Count; i++)
         {                
-            // Вызов методом анализа
+            // Вызов методов анализа
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
             await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
@@ -115,7 +115,7 @@ public class AnalyseService(
             
         for (int i = 0; i < instruments.Count; i++)
         {                
-            // Вызов методом анализа
+            // Вызов методов анализа
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
             await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
@@ -179,12 +179,13 @@ public class AnalyseService(
                 .ToList();
 
             await analyseResultRepository.AddAsync(results);
+            
+            await logService.LogTrace($"Анализ 'Supertrend' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
-            throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
     
@@ -241,12 +242,13 @@ public class AnalyseService(
             }
 
             await analyseResultRepository.AddAsync(results);
+            
+            await logService.LogTrace($"Анализ 'CandleSequence' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
-            throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
     
@@ -312,12 +314,13 @@ public class AnalyseService(
             }
 
             await analyseResultRepository.AddAsync(results);
+            
+            await logService.LogTrace($"Анализ 'CandleVolume' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
-            throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
     
@@ -372,12 +375,13 @@ public class AnalyseService(
                 .ToList();
 
             await analyseResultRepository.AddAsync(results);
+            
+            await logService.LogTrace($"Анализ 'Rsi' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
-            throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
     
@@ -424,12 +428,13 @@ public class AnalyseService(
             }
 
             await analyseResultRepository.AddAsync(results);
+            
+            await logService.LogTrace($"Анализ 'YieldLtm' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
-            throw new Exception($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
     }
 }

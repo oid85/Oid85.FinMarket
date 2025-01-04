@@ -33,8 +33,10 @@ public static class ServiceCollectionExtensions
         RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadLastPricesAsync());
         RegisterJob(KnownJobs.LoadBondCoupons, () => jobService.LoadBondCouponsAsync());
         RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
+        RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
         RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandlesAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
+        RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
         
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)
         {
