@@ -400,8 +400,8 @@ public class TinkoffService(
                             InstrumentId = share.InstrumentId,
                             DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
                             RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
-                            Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
-                            DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
+                            Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 1),
+                            DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 1)
                         };
 
                         dividendInfos.Add(dividendInfo);
