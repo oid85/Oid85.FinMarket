@@ -151,11 +151,11 @@ public class ReportService(
                     
                 new ReportParameter(
                     KnownDisplayTypes.Ruble, 
-                    dividendInfo.Dividend.ToString(CultureInfo.InvariantCulture)), 
+                    dividendInfo.Dividend.ToString("N1")), 
                     
                 new ReportParameter(
                     KnownDisplayTypes.Percent, 
-                    dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture))
+                    dividendInfo.DividendPrc.ToString("N1"))
             ]);
         }
             
@@ -223,7 +223,7 @@ public class ReportService(
                 
             data.Add(new ReportParameter(
                 KnownDisplayTypes.Percent, 
-                profitPrc.ToString(CultureInfo.InvariantCulture)));
+                profitPrc.ToString("N1")));
                 
             foreach (var date in dates)
             {
@@ -235,7 +235,7 @@ public class ReportService(
                 data.Add(bondCoupon is not null 
                     ? new ReportParameter(
                         KnownDisplayTypes.Ruble, 
-                        bondCoupon.PayOneBond.ToString(CultureInfo.InvariantCulture)) 
+                        bondCoupon.PayOneBond.ToString("N1")) 
                     : new ReportParameter(
                         KnownDisplayTypes.Ruble, 
                         string.Empty));
@@ -558,7 +558,7 @@ public class ReportService(
                     data.Add(dividendInfo is not null 
                         ? new ReportParameter(
                             KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString(CultureInfo.InvariantCulture)) 
+                            dividendInfo.DividendPrc.ToString("N1")) 
                         : new ReportParameter(
                             KnownDisplayTypes.Percent, 
                             string.Empty));
