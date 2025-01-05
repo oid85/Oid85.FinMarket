@@ -3,8 +3,11 @@ using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Services;
+using Oid85.FinMarket.Application.Services.ReportServices;
 using Oid85.FinMarket.Common.KnownConstants;
 
 namespace Oid85.FinMarket.Application.Extensions;
@@ -16,7 +19,12 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<ILoadService, LoadService>();
         services.AddTransient<IAnalyseService, AnalyseService>();
-        services.AddTransient<IReportService, ReportService>();
+        services.AddTransient<ISharesReportService, SharesReportService>();
+        services.AddTransient<IIndexesReportService, IndexesReportService>();
+        services.AddTransient<IFuturesReportService, FuturesReportService>();
+        services.AddTransient<ICurrenciesReportService, CurrenciesReportService>();
+        services.AddTransient<IBondsReportService, BondsReportService>();
+        services.AddTransient<ReportHelper>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
     }

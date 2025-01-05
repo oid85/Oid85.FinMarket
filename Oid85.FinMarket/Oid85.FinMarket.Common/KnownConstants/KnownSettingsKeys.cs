@@ -4,5 +4,5 @@ public static class KnownSettingsKeys
 {
     public const string PostgresFinMarketConnectionString = "Postgres:FinMarketConnectionString";
     public const string TinkoffToken = "Tinkoff:Token";
-    public const string ApplicationSettingsBuffer = "ApplicationSettings:Buffer";
+    public const string ApplicationSettingsOutputWindowInDays = "ApplicationSettings:OutputWindowInDays";
 }

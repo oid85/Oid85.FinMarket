@@ -82,36 +82,4 @@ public class CurrenciesController(
             {
                 Result = result
             });
-    
-    /// <summary>
-    /// Отчет по анализу Супертренд
-    /// </summary>        
-    [HttpPost("report/analyse-supertrend")]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportCurrenciesAnalyseSupertrendAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
-        GetResponseAsync(
-            () => reportService.GetReportCurrenciesAnalyseSupertrendAsync(request),
-            result => new BaseResponse<ReportData>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Отчет по анализу Последовательность свечей одного цвета
-    /// </summary>        
-    [HttpPost("report/analyse-candle-sequence")]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportCurrenciesAnalyseCandleSequenceAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
-        GetResponseAsync(
-            () => reportService.GetReportCurrenciesAnalyseCandleSequenceAsync(request),
-            result => new BaseResponse<ReportData>
-            {
-                Result = result
-            });
 }

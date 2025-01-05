@@ -10,11 +10,6 @@ public interface ITinkoffService
     /// <summary>
     /// Получить свечи
     /// </summary>
-    public Task<List<Candle>> GetCandlesAsync(Guid instrumentId);
-
-    /// <summary>
-    /// Получить свечи
-    /// </summary>
     public Task<List<Candle>> GetCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to);
     

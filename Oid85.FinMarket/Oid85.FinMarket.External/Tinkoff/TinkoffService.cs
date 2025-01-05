@@ -24,22 +24,6 @@ public class TinkoffService(
     IConfiguration configuration)
     : ITinkoffService
 {
-    /// <inheritdoc />
-    public async Task<List<Candle>> GetCandlesAsync(Guid instrumentId)
-    {
-        try
-        {
-            var (from, to) = await GetDataRange();
-            return await GetCandlesAsync(instrumentId, from, to);
-        }
-
-        catch (Exception exception)
-        {
-            await logService.LogException(exception);
-            return [];
-        }
-    }
-
     // <inheritdoc />
     public async Task<List<Candle>> GetCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to)
@@ -580,17 +564,5 @@ public class TinkoffService(
             await logService.LogException(exception);
             return [];
         }
-    }
-
-    private Task<(Timestamp from, Timestamp to)> GetDataRange()
-    {           
-        var buffer = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsBuffer);
-
-        var startDate = DateTime.Now.AddDays(-1 * buffer);
-        var endDate = DateTime.Now;
-
-        return Task.FromResult((
-            Timestamp.FromDateTime(startDate.ToUniversalTime()), 
-            Timestamp.FromDateTime(endDate.ToUniversalTime())));
     }
 }
