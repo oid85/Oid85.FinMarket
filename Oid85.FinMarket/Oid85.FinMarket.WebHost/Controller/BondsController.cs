@@ -127,9 +127,9 @@ public class BondsController(
             });
     
     /// <summary>
-    /// Отчет по облигациям
+    /// Отчет по купонам
     /// </summary>        
-    [HttpGet("report/bonds")]
+    [HttpGet("report/coupons")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
