@@ -98,7 +98,7 @@ public class BondsController(
     /// <summary>
     /// Отчет Сводный анализ
     /// </summary>
-    [HttpPost("report/aggregate-analyse")]
+    [HttpPost("report/aggregated-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
