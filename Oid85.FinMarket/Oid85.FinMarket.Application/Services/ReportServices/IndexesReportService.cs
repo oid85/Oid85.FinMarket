@@ -54,6 +54,10 @@ public class IndexesReportService(
             (await GetReportDataByAnalyseType(
                 [instrument], request.From, request.To, KnownAnalyseTypes.Rsi))
             .Data.First(),
+            
+            (await GetReportDataByAnalyseType(
+                [instrument], request.From, request.To, KnownAnalyseTypes.YieldLtm))
+            .Data.First()
         ];
             
         reportData.Title =

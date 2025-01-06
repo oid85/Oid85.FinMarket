@@ -47,6 +47,5 @@ public interface IFuturesReportService
     /// <summary>
     /// Отчет Анализ спреда
     /// </summary>
-    Task<ReportData> GetSpreadAnalyseAsync(
-        GetAnalyseRequest request);
+    Task<ReportData> GetSpreadAnalyseAsync();
 }
