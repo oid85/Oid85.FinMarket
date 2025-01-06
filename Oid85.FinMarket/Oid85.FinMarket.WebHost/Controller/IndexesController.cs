@@ -87,7 +87,7 @@ public class IndexesController(
     /// <summary>
     /// Отчет Сводный анализ
     /// </summary>
-    [HttpGet("report/aggregate-analyse")]
+    [HttpPost("report/aggregate-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -103,7 +103,7 @@ public class IndexesController(
     /// <summary>
     /// Отчет Супертренд
     /// </summary>
-    [HttpGet("report/supertrend-analyse")]
+    [HttpPost("report/supertrend-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -119,7 +119,7 @@ public class IndexesController(
     /// <summary>
     /// Отчет Последовательность свечей одного цвета
     /// </summary>
-    [HttpGet("report/candle-sequence-analyse")]
+    [HttpPost("report/candle-sequence-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -135,7 +135,7 @@ public class IndexesController(
     /// <summary>
     /// Отчет RSI
     /// </summary>
-    [HttpGet("report/rsi-analyse")]
+    [HttpPost("report/rsi-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -151,7 +151,7 @@ public class IndexesController(
     /// <summary>
     /// Отчет Доходность LTM
     /// </summary>
-    [HttpGet("report/yield-ltm-analyse")]
+    [HttpPost("report/yield-ltm-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]

@@ -98,7 +98,7 @@ public class BondsController(
     /// <summary>
     /// Отчет Сводный анализ
     /// </summary>
-    [HttpGet("report/aggregate-analyse")]
+    [HttpPost("report/aggregate-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -114,7 +114,7 @@ public class BondsController(
     /// <summary>
     /// Отчет Супертренд
     /// </summary>
-    [HttpGet("report/supertrend-analyse")]
+    [HttpPost("report/supertrend-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -130,7 +130,7 @@ public class BondsController(
     /// <summary>
     /// Отчет Последовательность свечей одного цвета
     /// </summary>
-    [HttpGet("report/candle-sequence-analyse")]
+    [HttpPost("report/candle-sequence-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -146,7 +146,7 @@ public class BondsController(
     /// <summary>
     /// Отчет Растущий объем
     /// </summary>
-    [HttpGet("report/candle-volume-analyse")]
+    [HttpPost("report/candle-volume-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
@@ -162,7 +162,7 @@ public class BondsController(
     /// <summary>
     /// Отчет Купоны
     /// </summary>
-    [HttpGet("report/coupon-analyse")]
+    [HttpPost("report/coupon-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
