@@ -21,12 +21,18 @@ public class BondsReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseByTickerRequest request)
     {
+        var reportData = new ReportData();
+        
+        if (string.IsNullOrEmpty(request.Ticker))
+            request.Ticker = (await bondRepository.GetWatchListAsync()).FirstOrDefault()?.Ticker ?? string.Empty;
+        
+        if (string.IsNullOrEmpty(request.Ticker))
+            return new ();
+        
         var instrument = await bondRepository.GetByTickerAsync(request.Ticker);
             
         if (instrument is null)
             return new ();
-            
-        var reportData = new ReportData();
 
         int outputWindowInDays = configuration
             .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);

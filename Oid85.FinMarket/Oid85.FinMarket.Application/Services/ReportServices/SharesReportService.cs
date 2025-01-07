@@ -22,13 +22,19 @@ public class SharesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseByTickerRequest request)
     {
+        var reportData = new ReportData();
+        
+        if (string.IsNullOrEmpty(request.Ticker))
+            request.Ticker = (await shareRepository.GetWatchListAsync()).FirstOrDefault()?.Ticker ?? string.Empty;
+        
+        if (string.IsNullOrEmpty(request.Ticker))
+            return new ();
+        
         var instrument = await shareRepository.GetByTickerAsync(request.Ticker);
             
         if (instrument is null)
             return new ();
-            
-        var reportData = new ReportData();
-
+        
         int outputWindowInDays = configuration
             .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         
