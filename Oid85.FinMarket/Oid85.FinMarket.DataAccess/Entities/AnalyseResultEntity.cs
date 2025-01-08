@@ -15,8 +15,14 @@ public class AnalyseResultEntity : BaseEntity
     /// <summary>
     /// Результат анализа
     /// </summary>
-    [Column("result"), MaxLength(200)]
-    public string Result { get; set; } = string.Empty;
+    [Column("result_string"), MaxLength(200)]
+    public string ResultString { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Результат анализа числом
+    /// </summary>
+    [Column("result_number")]
+    public double ResultNumber { get; set; }
     
     /// <summary>
     /// Тип анализа

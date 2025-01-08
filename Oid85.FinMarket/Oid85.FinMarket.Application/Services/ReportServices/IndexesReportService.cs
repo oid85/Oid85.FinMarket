@@ -154,7 +154,7 @@ public class IndexesReportService(
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
-                        analyseResult.Result) 
+                        analyseResult.ResultString) 
                     : new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         string.Empty));

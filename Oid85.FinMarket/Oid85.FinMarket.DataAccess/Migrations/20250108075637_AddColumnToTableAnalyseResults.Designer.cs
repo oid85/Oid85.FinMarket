@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oid85.FinMarket.DataAccess;
@@ -11,9 +12,11 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    partial class FinMarketContextModelSnapshot : ModelSnapshot
+    [Migration("20250108075637_AddColumnToTableAnalyseResults")]
+    partial class AddColumnToTableAnalyseResults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("result_string");
+                        .HasColumnName("result");
 
                     b.HasKey("Id")
                         .HasName("pk_analyse_results");

@@ -132,18 +132,18 @@ public class AnalyseService(
     
     private async Task SupertrendAnalyseAsync(Guid instrumentId)
     {
-        string GetResult(SuperTrendResult result)
+        (string, double) GetResult(SuperTrendResult result)
         {
             if (result.SuperTrend == null)
-                return string.Empty;
+                return (string.Empty, 0.0);
 
             if (result.UpperBand == null && result.LowerBand != null)
-                return KnownTrendDirections.Up;
+                return (KnownTrendDirections.Up, 1.0);
 
             if (result.UpperBand != null && result.LowerBand == null)
-                return KnownTrendDirections.Down;
+                return (KnownTrendDirections.Down, -1.0);
 
-            return string.Empty;
+            return (string.Empty, 0.0);
         }
             
         try
@@ -169,12 +169,18 @@ public class AnalyseService(
             var superTrendResults = quotes.GetSuperTrend(lookbackPeriods, multiplier);
 
             var results = superTrendResults
-                .Select(x => new AnalyseResult()
+                .Select(x =>
                 {
-                    Date = DateOnly.FromDateTime(x.Date),
-                    InstrumentId = instrumentId,
-                    Result = GetResult(x),
-                    AnalyseType = KnownAnalyseTypes.Supertrend
+                    (string resultString, double resultNumber) = GetResult(x);
+                    
+                    return new AnalyseResult()
+                    {
+                        Date = DateOnly.FromDateTime(x.Date),
+                        InstrumentId = instrumentId,
+                        ResultString = resultString,
+                        ResultNumber = resultNumber,
+                        AnalyseType = KnownAnalyseTypes.Supertrend
+                    };
                 })
                 .ToList();
 
@@ -191,17 +197,17 @@ public class AnalyseService(
     
     private async Task CandleSequenceAnalyseAsync(Guid instrumentId)
     {
-        string GetResult(List<Candle> candles)
+        (string, double)  GetResult(List<Candle> candles)
         {
             // Свечи белые
             if (candles.All(x => x.Close > x.Open))
-                return KnownCandleSequences.White;
+                return (KnownCandleSequences.White, 1.0);
 
             // Свечи черные
             if (candles.All(x => x.Close < x.Open))
-                return KnownCandleSequences.Black;
+                return (KnownCandleSequences.Black, -1.0);
 
-            return string.Empty;
+            return (string.Empty, 0.0);
         } 
             
         try
@@ -220,7 +226,8 @@ public class AnalyseService(
                 {
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
-                    result.Result = string.Empty;
+                    result.ResultString = string.Empty;
+                    result.ResultNumber = 0.0;
                     result.AnalyseType = KnownAnalyseTypes.CandleSequence;
                 }
 
@@ -232,9 +239,12 @@ public class AnalyseService(
                         candles[i]
                     };
 
+                    (string resultString, double resultNumber) = GetResult(candlesForAnalyse);
+                    
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
-                    result.Result = GetResult(candlesForAnalyse);
+                    result.ResultString = resultString;
+                    result.ResultNumber = resultNumber;
                     result.AnalyseType = KnownAnalyseTypes.CandleSequence;
                 }                    
 
@@ -254,7 +264,7 @@ public class AnalyseService(
     
     private async Task CandleVolumeAnalyseAsync(Guid instrumentId)
     {
-        string GetResult(List<Candle> candles)
+        (string, double) GetResult(List<Candle> candles)
         {
             var lastVolume = candles.Last().Volume;
             var prevVolumes = candles
@@ -263,9 +273,9 @@ public class AnalyseService(
 
             // Объем последней свечи выше, чем у всех предыдущих
             if (lastVolume > prevVolumes.Max())
-                return KnownVolumeDirections.Up;
+                return (KnownVolumeDirections.Up, 1.0);
 
-            return string.Empty;
+            return (string.Empty, 0.0);
         }
             
         try
@@ -284,7 +294,8 @@ public class AnalyseService(
                 {
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
-                    result.Result = string.Empty;
+                    result.ResultString = string.Empty;
+                    result.ResultNumber = 0.0;
                     result.AnalyseType = KnownAnalyseTypes.CandleVolume;
                 }
 
@@ -304,9 +315,12 @@ public class AnalyseService(
                         candles[i]
                     };
 
+                    (string resultString, double resultNumber) = GetResult(candlesForAnalyse);
+                    
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
-                    result.Result = GetResult(candlesForAnalyse);
+                    result.ResultString = resultString;
+                    result.ResultNumber = resultNumber;
                     result.AnalyseType = KnownAnalyseTypes.CandleVolume;
                 }
 
@@ -326,21 +340,21 @@ public class AnalyseService(
     
     private async Task RsiAnalyseAsync(Guid instrumentId)
     {
-        string GetRsiResult(RsiResult result)
+        (string, double) GetResult(RsiResult result)
         {
             const double upLimit = 60.0;
             const double downLimit = 40.0;
 
             if (result.Rsi == null)
-                return string.Empty;
+                return (string.Empty, 0.0);
 
             if (result.Rsi >= upLimit)
-                return KnownRsiInterpretations.OverBought;
+                return (KnownRsiInterpretations.OverBought, -1.0);
 
             if (result.Rsi <= downLimit)
-                return KnownRsiInterpretations.OverSold;
+                return (KnownRsiInterpretations.OverSold, 1.0);
 
-            return string.Empty;
+            return (string.Empty, 0.0);
         }       
         
         try
@@ -365,12 +379,18 @@ public class AnalyseService(
             var rsiResults = quotes.GetRsi(lookbackPeriods);
 
             var results = rsiResults
-                .Select(x => new AnalyseResult()
+                .Select(x =>
                 {
-                    Date = DateOnly.FromDateTime(x.Date),
-                    InstrumentId = instrumentId,
-                    Result = GetRsiResult(x),
-                    AnalyseType = KnownAnalyseTypes.Rsi
+                    (string resultString, double resultNumber) = GetResult(x);
+                    
+                    return new AnalyseResult()
+                    {
+                        Date = DateOnly.FromDateTime(x.Date),
+                        InstrumentId = instrumentId,
+                        ResultString = resultString,
+                        ResultNumber = resultNumber,
+                        AnalyseType = KnownAnalyseTypes.Rsi
+                    };
                 })
                 .ToList();
 
@@ -387,7 +407,7 @@ public class AnalyseService(
     
     private async Task YieldLtmAnalyseAsync(Guid instrumentId)
     {
-        string GetResult(List<Candle> candles)
+        (string, double) GetResult(List<Candle> candles)
         {
             double firstPrice = candles.First().Close;
             double lastPrice = candles.Last().Close;
@@ -395,7 +415,7 @@ public class AnalyseService(
             double yield = difference / firstPrice;
             double yieldPrc = yield * 100.0;
             
-            return yieldPrc.ToString("N2");
+            return (yieldPrc.ToString("N2"), yieldPrc);
         }
             
         try
@@ -411,18 +431,21 @@ public class AnalyseService(
                 var yearAgoCandleDate = candles[i].Date.AddYears(-1);
                 var currentCandleDate = candles[i].Date;
                 
-                var windowCandles = candles
+                var candlesForAnalyse = candles
                     .Where(x => 
                         x.Date >= yearAgoCandleDate && 
                         x.Date <= currentCandleDate)
                     .OrderBy(x => x.Date)
                     .ToList();
                 
+                (string resultString, double resultNumber) = GetResult(candlesForAnalyse);
+                
                 results.Add(new AnalyseResult
                 {
                     Date = currentCandleDate,
                     InstrumentId = instrumentId,
-                    Result = GetResult(windowCandles),
+                    ResultString = resultString,
+                    ResultNumber = resultNumber,
                     AnalyseType = KnownAnalyseTypes.YieldLtm
                 });
             }

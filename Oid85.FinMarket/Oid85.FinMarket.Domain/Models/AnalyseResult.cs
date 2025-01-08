@@ -28,5 +28,10 @@ public class AnalyseResult
     /// <summary>
     /// Результат анализа
     /// </summary>
-    public string Result { get; set; } = string.Empty;
+    public string ResultString { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Результат анализа числом
+    /// </summary>
+    public double ResultNumber { get; set; }
 }

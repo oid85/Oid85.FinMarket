@@ -90,7 +90,8 @@ public class AnalyseResultRepository(
         entity.Date = model.Date;
         entity.InstrumentId = model.InstrumentId;
         entity.AnalyseType = model.AnalyseType;
-        entity.Result = model.Result;
+        entity.ResultString = model.ResultString;
+        entity.ResultNumber = model.ResultNumber;
         
         return entity;
     }
@@ -103,7 +104,8 @@ public class AnalyseResultRepository(
         model.Date = entity.Date;
         model.InstrumentId = entity.InstrumentId;
         model.AnalyseType = entity.AnalyseType;
-        model.Result = entity.Result;
+        model.ResultString = entity.ResultString;
+        model.ResultNumber = entity.ResultNumber;
 
         return model;
     }
