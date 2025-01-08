@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
@@ -14,7 +15,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 public class CurrenciesController(
     ILoadService loadService,
     IAnalyseService analyseService,
-    IReportService reportService,
+    ICurrenciesReportService reportService,
     ICurrencyRepository currencyRepository) 
     : FinMarketBaseController
 {
@@ -84,32 +85,80 @@ public class CurrenciesController(
             });
     
     /// <summary>
-    /// Отчет по анализу Супертренд
-    /// </summary>        
-    [HttpPost("report/analyse-supertrend")]
+    /// Отчет Сводный анализ
+    /// </summary>
+    [HttpPost("report/aggregated-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportCurrenciesAnalyseSupertrendAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
+    public Task<IActionResult> GetAggregatedAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportCurrenciesAnalyseSupertrendAsync(request),
+            () => reportService.GetAggregatedAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
             });
     
     /// <summary>
-    /// Отчет по анализу Последовательность свечей одного цвета
-    /// </summary>        
-    [HttpPost("report/analyse-candle-sequence")]
+    /// Отчет Супертренд
+    /// </summary>
+    [HttpPost("report/supertrend-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportCurrenciesAnalyseCandleSequenceAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
+    public Task<IActionResult> GetSupertrendAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportCurrenciesAnalyseCandleSequenceAsync(request),
+            () => reportService.GetSupertrendAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Последовательность свечей одного цвета
+    /// </summary>
+    [HttpPost("report/candle-sequence-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetCandleSequenceAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetCandleSequenceAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет RSI
+    /// </summary>
+    [HttpPost("report/rsi-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetRsiAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetRsiAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Доходность LTM
+    /// </summary>
+    [HttpPost("report/yield-ltm-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetYieldLtmAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetYieldLtmAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result

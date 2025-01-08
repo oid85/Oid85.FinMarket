@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
@@ -14,7 +15,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 public class BondsController(
     ILoadService loadService,
     IAnalyseService analyseService,
-    IReportService reportService,
+    IBondsReportService reportService,
     IBondRepository bondRepository) 
     : FinMarketBaseController
 {
@@ -95,47 +96,79 @@ public class BondsController(
             });
     
     /// <summary>
-    /// Отчет по анализу Супертренд
-    /// </summary>        
-    [HttpPost("report/analyse-supertrend")]
+    /// Отчет Сводный анализ
+    /// </summary>
+    [HttpPost("report/aggregated-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportBondsAnalyseSupertrendAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
+    public Task<IActionResult> GetAggregatedAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportBondsAnalyseSupertrendAsync(request),
+            () => reportService.GetAggregatedAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
             });
     
     /// <summary>
-    /// Отчет по анализу Последовательность свечей одного цвета
-    /// </summary>        
-    [HttpPost("report/analyse-candle-sequence")]
+    /// Отчет Супертренд
+    /// </summary>
+    [HttpPost("report/supertrend-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportBondsAnalyseCandleSequenceAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
+    public Task<IActionResult> GetSupertrendAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportBondsAnalyseCandleSequenceAsync(request),
+            () => reportService.GetSupertrendAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
             });
     
     /// <summary>
-    /// Отчет по купонам
-    /// </summary>        
-    [HttpGet("report/coupons")]
+    /// Отчет Последовательность свечей одного цвета
+    /// </summary>
+    [HttpPost("report/candle-sequence-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportBondsAsync() =>
+    public Task<IActionResult> GetCandleSequenceAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportBondsAsync(),
+            () => reportService.GetCandleSequenceAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Растущий объем
+    /// </summary>
+    [HttpPost("report/candle-volume-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetCandleVolumeAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetCandleVolumeAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Купоны
+    /// </summary>
+    [HttpPost("report/coupon-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetCouponAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetCouponAnalyseAsync,
             result => new BaseResponse<ReportData>
             {
                 Result = result

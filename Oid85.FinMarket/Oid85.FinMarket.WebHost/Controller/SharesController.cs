@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
@@ -13,7 +14,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 public class SharesController(
     ILoadService loadService,
     IAnalyseService analyseService,
-    IReportService reportService,
+    ISharesReportService reportService,
     IShareRepository shareRepository)
     : FinMarketBaseController
 {
@@ -103,112 +104,128 @@ public class SharesController(
             {
                 Result = result
             });
-
+    
     /// <summary>
-    /// Отчет по акции (по каждому типу анализа)
-    /// </summary>        
-    [HttpPost("report/total-analyse")]
+    /// Отчет Сводный анализ
+    /// </summary>
+    [HttpPost("report/aggregated-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportShareTotalAnalyseAsync(
-        [FromBody] GetReportAnalyseByTickerRequest request) =>
+    public Task<IActionResult> GetAggregatedAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportShareTotalAnalyseAsync(request),
-            result => new BaseResponse<ReportData>
-            {
-                Result = result
-            });
-
-    /// <summary>
-    /// Отчет по анализу Супертренд
-    /// </summary>        
-    [HttpPost("report/analyse-supertrend")]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportSharesAnalyseSupertrendAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
-        GetResponseAsync(
-            () => reportService.GetReportSharesAnalyseSupertrendAsync(request),
-            result => new BaseResponse<ReportData>
-            {
-                Result = result
-            });
-
-    /// <summary>
-    /// Отчет по анализу Последовательность свечей одного цвета
-    /// </summary>        
-    [HttpPost("report/analyse-candle-sequence")]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportSharesAnalyseCandleSequenceAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
-        GetResponseAsync(
-            () => reportService.GetReportSharesAnalyseCandleSequenceAsync(request),
-            result => new BaseResponse<ReportData>
-            {
-                Result = result
-            });
-
-    /// <summary>
-    /// Отчет по анализу Растущий объем
-    /// </summary>        
-    [HttpPost("report/analyse-candle-volume")]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportSharesAnalyseCandleVolumeAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
-        GetResponseAsync(
-            () => reportService.GetReportSharesAnalyseCandleVolumeAsync(request),
-            result => new BaseResponse<ReportData>
-            {
-                Result = result
-            });
-
-    /// <summary>
-    /// Отчет по анализу Rsi
-    /// </summary>        
-    [HttpPost("report/analyse-rsi")]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportSharesAnalyseRsiAsync(
-        [FromBody] GetReportAnalyseRequest request) =>
-        GetResponseAsync(
-            () => reportService.GetReportSharesAnalyseRsiAsync(request),
+            () => reportService.GetAggregatedAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
             });
     
     /// <summary>
-    /// Отчет по дивидендам
-    /// </summary>        
-    [HttpGet("report/dividends")]
+    /// Отчет Супертренд
+    /// </summary>
+    [HttpPost("report/supertrend-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportDividendsAsync() =>
+    public Task<IActionResult> GetSupertrendAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportDividendsAsync(),
+            () => reportService.GetSupertrendAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
             });
     
     /// <summary>
-    /// Отчет по фундаментальным данным
-    /// </summary>        
-    [HttpGet("report/asset-fundamentals")]
+    /// Отчет Последовательность свечей одного цвета
+    /// </summary>
+    [HttpPost("report/candle-sequence-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> ReportAssetFundamentalsAsync() =>
+    public Task<IActionResult> GetCandleSequenceAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
-            () => reportService.GetReportAssetFundamentalsAsync(),
+            () => reportService.GetCandleSequenceAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Растущий объем
+    /// </summary>
+    [HttpPost("report/candle-volume-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetCandleVolumeAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetCandleVolumeAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет RSI
+    /// </summary>
+    [HttpPost("report/rsi-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetRsiAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetRsiAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Доходность LTM
+    /// </summary>
+    [HttpPost("report/yield-ltm-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetYieldLtmAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetYieldLtmAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Дивиденды
+    /// </summary>
+    [HttpPost("report/dividend-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetDividendAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetDividendAnalyseAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Фундаментальные данные
+    /// </summary>
+    [HttpPost("report/asset-fundamental-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetAssetFundamentalAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetAssetFundamentalAnalyseAsync,
             result => new BaseResponse<ReportData>
             {
                 Result = result
