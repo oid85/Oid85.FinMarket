@@ -19,57 +19,11 @@ public class BondsReportService(
     : IBondsReportService
 {
     /// <inheritdoc />
-    public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseByTickerRequest request)
-    {
-        var reportData = new ReportData();
-        
-        if (string.IsNullOrEmpty(request.Ticker))
-            request.Ticker = (await bondRepository.GetWatchListAsync()).FirstOrDefault()?.Ticker ?? string.Empty;
-        
-        if (string.IsNullOrEmpty(request.Ticker))
-            return new ();
-        
-        var instrument = await bondRepository.GetByTickerAsync(request.Ticker);
-            
-        if (instrument is null)
-            return new ();
-
-        int outputWindowInDays = configuration
-            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
-        
-        var dates = reportHelper
-            .GetDates(request.From, request.To.AddDays(outputWindowInDays));
-
-        reportData.Header =
-        [
-            new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-            new ReportParameter(KnownDisplayTypes.String, "Сектор")
-        ];
-            
-        reportData.Header.AddRange(dates);
-
-        reportData.Data = 
-        [
-            (await GetReportDataByAnalyseType(
-                [instrument], request.From, request.To, KnownAnalyseTypes.Supertrend))
-            .Data.First(),
-                
-            (await GetReportDataByAnalyseType(
-                [instrument], request.From, request.To, KnownAnalyseTypes.CandleSequence))
-            .Data.First(),
-                
-            (await GetReportDataByAnalyseType(
-                [instrument], request.From, request.To, KnownAnalyseTypes.CandleVolume))
-            .Data.First()
-        ];
-            
-        reportData.Title =
-            $"Анализ {request.Ticker} " +
-            $"с {request.From.ToString(KnownDateTimeFormats.DateISO)} " +
-            $"по {request.To.ToString(KnownDateTimeFormats.DateISO)}";
-            
-        return reportData;
-    }
+    public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
+        await GetReportDataAggregatedAnalyse(
+            await bondRepository.GetWatchListAsync(), 
+            request.From, 
+            request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
@@ -231,6 +185,71 @@ public class BondsReportService(
                     : new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+    
+        private async Task<ReportData> GetReportDataAggregatedAnalyse(
+        List<Bond> instruments,
+        DateOnly from,
+        DateOnly to)
+    {
+        var instrumentIds = instruments
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseTypes = new List<string>()
+        {
+            KnownAnalyseTypes.Supertrend,
+            KnownAnalyseTypes.CandleSequence,
+            KnownAnalyseTypes.CandleVolume
+        };
+            
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => analyseTypes.Contains(x.AnalyseType))
+            .ToList();
+        
+        var dates = reportHelper.GetDates(from, to);
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ Aggregated " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var instrument in instruments)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, instrument.Ticker)
+            };
+
+            foreach (var date in dates)
+            {
+                double resultNumber = analyseResults
+                    .Where(x => 
+                        x.InstrumentId == instrument.InstrumentId && 
+                        analyseTypes.Contains(x.AnalyseType) &&
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value)
+                    .Select(x => x.ResultNumber)
+                    .Sum();
+                    
+                data.Add(new ReportParameter(
+                    $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
+                    resultNumber.ToString("N2")));
             }
                 
             reportData.Data.Add(data);

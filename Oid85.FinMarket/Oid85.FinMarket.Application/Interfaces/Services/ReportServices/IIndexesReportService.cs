@@ -12,7 +12,7 @@ public interface IIndexesReportService
     /// Отчет Аггрегированный анализ
     /// </summary>
     Task<ReportData> GetAggregatedAnalyseAsync(
-        GetAnalyseByTickerRequest request);
+        GetAnalyseRequest request);
 
     /// <summary>
     /// Отчет Анализ Супертренд

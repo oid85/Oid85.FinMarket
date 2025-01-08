@@ -108,7 +108,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetAggregatedAnalyseAsync(
-        [FromBody] GetAnalyseByTickerRequest request) =>
+        [FromBody] GetAnalyseRequest request) =>
         GetResponseAsync(
             () => reportService.GetAggregatedAnalyseAsync(request),
             result => new BaseResponse<ReportData>
