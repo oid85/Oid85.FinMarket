@@ -65,6 +65,16 @@ public class Spread
     public double PriceDifferencePrc { get; set; }
     
     /// <summary>
+    /// Разница цен инструментов (средняя)
+    /// </summary>
+    public double PriceDifferenceAverage { get; set; }
+    
+    /// <summary>
+    /// Разница цен инструментов (средняя), %
+    /// </summary>
+    public double PriceDifferenceAveragePrc { get; set; }
+    
+    /// <summary>
     /// Фандинг
     /// </summary>
     public double Funding { get; set; }

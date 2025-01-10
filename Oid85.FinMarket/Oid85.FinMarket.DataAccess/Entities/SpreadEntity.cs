@@ -75,6 +75,18 @@ public class SpreadEntity : AuditableEntity
     public double PriceDifferencePrc { get; set; }
     
     /// <summary>
+    /// Разница цен инструментов (средняя)
+    /// </summary>
+    [Column("price_difference_average")]
+    public double PriceDifferenceAverage { get; set; }
+    
+    /// <summary>
+    /// Разница цен инструментов (средняя), %
+    /// </summary>
+    [Column("price_difference_average_prc")]
+    public double PriceDifferenceAveragePrc { get; set; }
+    
+    /// <summary>
     /// Фандинг
     /// </summary>
     [Column("funding")]

@@ -7,6 +7,7 @@ namespace Oid85.FinMarket.Application.Services;
 
 public class SpreadService(
     ISpreadRepository spreadRepository,
+    ICandleRepository candleRepository,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
     ICurrencyRepository currencyRepository) 
@@ -18,8 +19,8 @@ public class SpreadService(
 
         foreach (var spread in spreads)
         {
-            spread.FirstInstrumentPrice = await GetInstrumentPrice(spread.FirstInstrumentId);
-            spread.SecondInstrumentPrice = await GetInstrumentPrice(spread.SecondInstrumentId);
+            spread.FirstInstrumentPrice = await GetInstrumentPriceAsync(spread.FirstInstrumentId);
+            spread.SecondInstrumentPrice = await GetInstrumentPriceAsync(spread.SecondInstrumentId);
 
             if (spread is not
                 {
@@ -41,7 +42,15 @@ public class SpreadService(
         return spreads;
     }
 
-    private async ValueTask<double> GetInstrumentPrice(Guid instrumentId)
+    private async ValueTask<double> GetAverageSpreadAsync(
+        Guid firstInstrumentId, 
+        Guid secondInstrumentId, 
+        int period)
+    {
+        return 0.0;
+    }
+    
+    private async ValueTask<double> GetInstrumentPriceAsync(Guid instrumentId)
     {
         var share = await shareRepository.GetByInstrumentIdAsync(instrumentId);
 

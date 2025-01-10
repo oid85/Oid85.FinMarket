@@ -84,6 +84,8 @@ public class SpreadRepository(
         entity.SecondInstrumentPrice = model.SecondInstrumentPrice;
         entity.PriceDifference = model.PriceDifference;
         entity.PriceDifferencePrc = model.PriceDifferencePrc;
+        entity.PriceDifferenceAverage = model.PriceDifferenceAverage;
+        entity.PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc;
         entity.Funding = model.Funding;
         entity.SpreadPricePosition = model.SpreadPricePosition;
         entity.InWatchList = model.InWatchList;
@@ -107,6 +109,8 @@ public class SpreadRepository(
         model.SecondInstrumentPrice = entity.SecondInstrumentPrice;
         model.PriceDifference = entity.PriceDifference;
         model.PriceDifferencePrc = entity.PriceDifferencePrc;
+        model.PriceDifferenceAverage = entity.PriceDifferenceAverage;
+        model.PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc;
         model.Funding = entity.Funding;
         model.SpreadPricePosition = entity.SpreadPricePosition;
         model.InWatchList = entity.InWatchList;
