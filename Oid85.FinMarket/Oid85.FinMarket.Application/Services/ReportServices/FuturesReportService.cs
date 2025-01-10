@@ -75,6 +75,8 @@ public class FuturesReportService(
                 new ReportParameter(KnownDisplayTypes.String, "Тикер 2"),
                 new ReportParameter(KnownDisplayTypes.String, "Цена"),
                 new ReportParameter(KnownDisplayTypes.String, "Описание"),
+                new ReportParameter(KnownDisplayTypes.String, "Спред ср."),
+                new ReportParameter(KnownDisplayTypes.String, "Спред ср., %"),
                 new ReportParameter(KnownDisplayTypes.String, "Спред"),
                 new ReportParameter(KnownDisplayTypes.String, "Спред, %"),
                 new ReportParameter(KnownDisplayTypes.String, "Фандинг")
@@ -91,6 +93,8 @@ public class FuturesReportService(
                 new (KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
                 new (KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N5")),
                 new (KnownDisplayTypes.String, spread.SecondInstrumentRole),
+                new (KnownDisplayTypes.Ruble, spread.PriceDifferenceAverage.ToString("N5")),
+                new (KnownDisplayTypes.Percent, spread.PriceDifferenceAveragePrc.ToString("N5")),
                 new (KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N5")),
                 new (KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N5")),
                 new (KnownDisplayTypes.Ruble, spread.Funding.ToString("N5"))

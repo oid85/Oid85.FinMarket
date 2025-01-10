@@ -41,6 +41,16 @@ public class SpreadRepository(
                     .SetProperty(u => u.Funding, spread.Funding)
                     .SetProperty(u => u.SpreadPricePosition, spread.SpreadPricePosition));
 
+    public Task SetAsDeletedAsync(Spread spread) =>
+        context.SpreadEntities
+            .Where(x => 
+                x.FirstInstrumentId == spread.FirstInstrumentId && 
+                x.SecondInstrumentId == spread.SecondInstrumentId)
+            .ExecuteUpdateAsync(
+                s => s
+                    .SetProperty(u => u.IsDeleted, true)
+                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow));
+
     public async Task<List<Spread>> GetAllAsync() =>
         (await context.SpreadEntities
             .Where(x => !x.IsDeleted)
