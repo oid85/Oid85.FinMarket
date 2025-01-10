@@ -59,6 +59,11 @@ public class JobService(
         await analyseService.AnalyseIndexesAsync();
     }
 
+    public async Task FillingSpreadPairsAsync()
+    {
+        await spreadService.FillingSpreadPairsAsync();
+    }
+
     public async Task CalculateSpreadsAsync()
     {
         await spreadService.CalculateSpreadsAsync();

@@ -64,6 +64,16 @@ public class InstrumentRepository(
             : GetModel(entity);
     }
     
+    public async Task<Instrument?> GetByTickerAsync(string ticker)
+    {
+        var entity = await context.InstrumentEntities
+            .FirstOrDefaultAsync(x => x.Ticker == ticker);
+        
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+    
     private void SetEntity(ref InstrumentEntity? entity, Instrument model)
     {
         entity ??= new InstrumentEntity();

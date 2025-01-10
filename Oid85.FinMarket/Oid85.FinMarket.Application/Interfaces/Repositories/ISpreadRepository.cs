@@ -6,6 +6,7 @@ public interface ISpreadRepository
 {
     Task AddAsync(List<Spread> spreads);
     Task UpdateSpreadAsync(Spread spread);
+    Task SetAsDeletedAsync(Spread spread);
     Task<List<Spread>> GetAllAsync();
     Task<List<Spread>> GetWatchListAsync();
     Task<Spread?> GetByTickerAsync(string firstInstrumentTicker);

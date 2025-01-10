@@ -41,6 +41,16 @@ public class SpreadRepository(
                     .SetProperty(u => u.Funding, spread.Funding)
                     .SetProperty(u => u.SpreadPricePosition, spread.SpreadPricePosition));
 
+    public Task SetAsDeletedAsync(Spread spread) =>
+        context.SpreadEntities
+            .Where(x => 
+                x.FirstInstrumentId == spread.FirstInstrumentId && 
+                x.SecondInstrumentId == spread.SecondInstrumentId)
+            .ExecuteUpdateAsync(
+                s => s
+                    .SetProperty(u => u.IsDeleted, true)
+                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow));
+
     public async Task<List<Spread>> GetAllAsync() =>
         (await context.SpreadEntities
             .Where(x => !x.IsDeleted)
@@ -84,6 +94,8 @@ public class SpreadRepository(
         entity.SecondInstrumentPrice = model.SecondInstrumentPrice;
         entity.PriceDifference = model.PriceDifference;
         entity.PriceDifferencePrc = model.PriceDifferencePrc;
+        entity.PriceDifferenceAverage = model.PriceDifferenceAverage;
+        entity.PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc;
         entity.Funding = model.Funding;
         entity.SpreadPricePosition = model.SpreadPricePosition;
         entity.InWatchList = model.InWatchList;
@@ -107,6 +119,8 @@ public class SpreadRepository(
         model.SecondInstrumentPrice = entity.SecondInstrumentPrice;
         model.PriceDifference = entity.PriceDifference;
         model.PriceDifferencePrc = entity.PriceDifferencePrc;
+        model.PriceDifferenceAverage = entity.PriceDifferenceAverage;
+        model.PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc;
         model.Funding = entity.Funding;
         model.SpreadPricePosition = entity.SpreadPricePosition;
         model.InWatchList = entity.InWatchList;
