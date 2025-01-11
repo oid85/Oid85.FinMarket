@@ -36,9 +36,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDividendInfoRepository, DividendInfoRepository>();
         services.AddTransient<IAnalyseResultRepository, AnalyseResultRepository>();
         services.AddTransient<ICandleRepository, CandleRepository>();
+        services.AddTransient<IFiveMinuteCandleRepository, FiveMinuteCandleRepository>();
         services.AddTransient<IAssetFundamentalRepository, AssetFundamentalRepository>();
         services.AddTransient<IInstrumentRepository, InstrumentRepository>();
         services.AddTransient<ISpreadRepository, SpreadRepository>();
+        services.AddTransient<IMultiplicatorRepository, MultiplicatorRepository>();
     }
 
     public static async Task ApplyMigrations(this IHost host)

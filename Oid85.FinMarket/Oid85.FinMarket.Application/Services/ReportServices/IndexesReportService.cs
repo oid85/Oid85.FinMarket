@@ -50,11 +50,10 @@ public class IndexesReportService(
 
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
-        await GetReportDataByAnalyseType(
-            await indexRepository.GetWatchListAsync(),
-            request.From,
-            request.To,
-            KnownAnalyseTypes.YieldLtm);
+        await GetReportDataYieldLtmAnalyse(
+            await indexRepository.GetWatchListAsync(), 
+            request.From, 
+            request.To);
     
     private async Task<ReportData> GetReportDataByAnalyseType(
         List<FinIndex> instruments,
@@ -178,6 +177,15 @@ public class IndexesReportService(
             reportData.Data.Add(data);
         }
             
+        return reportData;
+    }
+    
+    private async Task<ReportData> GetReportDataYieldLtmAnalyse(
+        List<FinIndex> instruments, 
+        DateOnly from, 
+        DateOnly to)
+    {
+        var reportData = new ReportData();
         return reportData;
     }
 }

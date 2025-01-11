@@ -8,16 +8,22 @@ namespace Oid85.FinMarket.External.Tinkoff;
 public interface ITinkoffService
 {       
     /// <summary>
-    /// Получить свечи
+    /// Получить дневные свечи
     /// </summary>
     public Task<List<Candle>> GetCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to);
     
     /// <summary>
-    /// Получить свечи за конкретный год
+    /// Получить дневные свечи за конкретный год
     /// </summary>
     public Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year);
         
+    /// <summary>
+    /// Получить 5-минутные свечи за период
+    /// </summary>
+    Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
+        Guid instrumentId, DateTime from, DateTime to);
+    
     /// <summary>
     /// Получить последние цены
     /// </summary>

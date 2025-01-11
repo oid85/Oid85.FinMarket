@@ -2,10 +2,12 @@
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class SpreadRepository(
+    ILogService logService,
     FinMarketContext context) 
     : ISpreadRepository
 {
@@ -27,19 +29,35 @@ public class SpreadRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task UpdateSpreadAsync(Spread spread) =>
-        context.SpreadEntities
-            .Where(x => 
-                x.FirstInstrumentId == spread.FirstInstrumentId && 
-                x.SecondInstrumentId == spread.SecondInstrumentId)
-            .ExecuteUpdateAsync(
-                s => s
-                    .SetProperty(u => u.DateTime, spread.DateTime)
-                    .SetProperty(u => u.FirstInstrumentPrice, spread.FirstInstrumentPrice)
-                    .SetProperty(u => u.SecondInstrumentPrice, spread.SecondInstrumentPrice)
-                    .SetProperty(u => u.PriceDifference, spread.PriceDifference)
-                    .SetProperty(u => u.Funding, spread.Funding)
-                    .SetProperty(u => u.SpreadPricePosition, spread.SpreadPricePosition));
+    public async Task UpdateSpreadAsync(Spread spread)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.SpreadEntities
+                .Where(x => 
+                    x.FirstInstrumentId == spread.FirstInstrumentId && 
+                    x.SecondInstrumentId == spread.SecondInstrumentId)
+                .ExecuteUpdateAsync(
+                    s => s
+                        .SetProperty(u => u.DateTime, spread.DateTime)
+                        .SetProperty(u => u.FirstInstrumentPrice, spread.FirstInstrumentPrice)
+                        .SetProperty(u => u.SecondInstrumentPrice, spread.SecondInstrumentPrice)
+                        .SetProperty(u => u.PriceDifference, spread.PriceDifference)
+                        .SetProperty(u => u.Funding, spread.Funding)
+                        .SetProperty(u => u.SpreadPricePosition, spread.SpreadPricePosition));
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            await logService.LogException(exception);
+        }
+    }
 
     public Task SetAsDeletedAsync(Spread spread) =>
         context.SpreadEntities
@@ -54,15 +72,6 @@ public class SpreadRepository(
     public async Task<List<Spread>> GetAllAsync() =>
         (await context.SpreadEntities
             .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.FirstInstrumentTicker)
-            .ToListAsync())
-        .Select(GetModel)
-        .ToList();
-
-    public async Task<List<Spread>> GetWatchListAsync() =>
-        (await context.SpreadEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.InWatchList)
             .OrderBy(x => x.FirstInstrumentTicker)
             .ToListAsync())
         .Select(GetModel)
@@ -98,7 +107,6 @@ public class SpreadRepository(
         entity.PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc;
         entity.Funding = model.Funding;
         entity.SpreadPricePosition = model.SpreadPricePosition;
-        entity.InWatchList = model.InWatchList;
 
         return entity;
     }
@@ -123,7 +131,6 @@ public class SpreadRepository(
         model.PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc;
         model.Funding = entity.Funding;
         model.SpreadPricePosition = entity.SpreadPricePosition;
-        model.InWatchList = entity.InWatchList;
 
         return model;
     }

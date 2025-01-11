@@ -98,10 +98,4 @@ public class SpreadEntity : AuditableEntity
     /// </summary>
     [Column("price_position")]
     public int SpreadPricePosition { get; set; }
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    [Column("in_watch_list")]
-    public bool InWatchList { get; set; } = false; 
 }

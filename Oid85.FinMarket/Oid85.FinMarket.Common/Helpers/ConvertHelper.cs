@@ -28,4 +28,12 @@ public static class ConvertHelper
             
         return DateOnly.FromDateTime(timestamp.ToDateTime());
     }
+    
+    public static TimeOnly TimestampToTimeOnly(Timestamp timestamp)
+    {
+        if (timestamp is null)
+            return TimeOnly.MinValue;
+            
+        return TimeOnly.FromDateTime(timestamp.ToDateTime());
+    }
 }

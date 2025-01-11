@@ -43,7 +43,7 @@ public class CandleEntity : BaseEntity
     public long Volume { get; set; }
     
     /// <summary>
-    /// Время
+    /// Дата
     /// </summary>
     [Column("date", TypeName = "date")]
     public DateOnly Date { get; set; }

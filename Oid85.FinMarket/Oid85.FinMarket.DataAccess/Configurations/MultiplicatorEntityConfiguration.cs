@@ -5,13 +5,12 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class CandleEntityConfiguration : EntityConfigurationBase<CandleEntity>
+internal class MultiplicatorEntityConfiguration : EntityConfigurationBase<MultiplicatorEntity>
 {
-    public override void Configure(EntityTypeBuilder<CandleEntity> builder)
+    public override void Configure(EntityTypeBuilder<MultiplicatorEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("daily-candles", KnownDatabaseSchemas.Storage);
-        builder.HasIndex(x => x.InstrumentId);
+        builder.ToTable("multiplicators", KnownDatabaseSchemas.Default);
     }
 }

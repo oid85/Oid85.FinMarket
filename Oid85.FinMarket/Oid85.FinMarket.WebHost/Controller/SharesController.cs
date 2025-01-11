@@ -47,7 +47,7 @@ public class SharesController(
             loadService.LoadSharesAsync);
 
     /// <summary>
-    /// Подгрузить свечи по акциям
+    /// Подгрузить дневные свечи по акциям
     /// </summary>
     [HttpGet("load-daily-candles")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
@@ -57,6 +57,17 @@ public class SharesController(
         GetResponseAsync<object, BaseResponse<object>>(
             loadService.LoadShareDailyCandlesAsync);
 
+    /// <summary>
+    /// Подгрузить 5-минутные свечи по акциям
+    /// </summary>
+    [HttpGet("load-five-minute-candles")]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadShareFiveMinuteCandlesAsync() =>
+        GetResponseAsync<object, BaseResponse<object>>(
+            loadService.LoadShareFiveMinuteCandlesAsync);
+    
     /// <summary>
     /// Загрузить данные о дивидендах
     /// </summary>
@@ -230,4 +241,19 @@ public class SharesController(
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Отчет Мультипликаторы
+    /// </summary>
+    [HttpPost("report/multiplicator-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetMultiplicatorAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetMultiplicatorAnalyseAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });    
 }

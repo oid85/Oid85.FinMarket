@@ -5,7 +5,8 @@ namespace Oid85.FinMarket.Application.Services;
 public class JobService(
     ILoadService loadService,
     IAnalyseService analyseService,
-    ISpreadService spreadService) 
+    ISpreadService spreadService,
+    IMultiplicatorService multiplicatorService) 
     : IJobService
 {
     public async Task LoadInstrumentsAsync()
@@ -41,13 +42,20 @@ public class JobService(
         await loadService.LoadAssetFundamentalsAsync();
     }
 
-    public async Task LoadDailyCandlesAsync()
+    public async Task LoadCandlesAsync()
     {
         await loadService.LoadShareDailyCandlesAsync();
         await loadService.LoadBondDailyCandlesAsync();
         await loadService.LoadFutureDailyCandlesAsync();
         await loadService.LoadCurrencyDailyCandlesAsync();
         await loadService.LoadIndexDailyCandlesAsync();
+        
+        await loadService.LoadShareFiveMinuteCandlesAsync();
+    }
+
+    public async Task LoadFiveMinuteCandlesAsync()
+    {
+        await loadService.LoadShareFiveMinuteCandlesAsync();
     }
 
     public async Task AnalyseAsync()
@@ -59,13 +67,15 @@ public class JobService(
         await analyseService.AnalyseIndexesAsync();
     }
 
-    public async Task FillingSpreadPairsAsync()
-    {
-        await spreadService.FillingSpreadPairsAsync();
-    }
-
     public async Task CalculateSpreadsAsync()
     {
+        await spreadService.FillingSpreadPairsAsync();
         await spreadService.CalculateSpreadsAsync();
+    }
+
+    public async Task CalculateMultiplicatorsAsync()
+    {
+        await multiplicatorService.FillingMultiplicatorInstrumentsAsync();
+        await multiplicatorService.CalculateMultiplicatorsAsync();
     }
 }

@@ -62,6 +62,53 @@ public class TinkoffService(
     }
 
     /// <inheritdoc />
+    public async Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
+        Guid instrumentId, DateTime from, DateTime to)
+    {
+        try
+        {
+            var request = new GetCandlesRequest
+            {
+                InstrumentId = instrumentId.ToString(),
+                From = Timestamp.FromDateTime(from.ToUniversalTime()),
+                To = Timestamp.FromDateTime(to.ToUniversalTime())
+            };
+
+            request.Interval = CandleInterval._5Min;
+
+            var response = await client.MarketData.GetCandlesAsync(request);
+
+            var candles = new List<FiveMinuteCandle>();
+
+            for (var i = 0; i < response.Candles.Count; i++)
+            {
+                var candle = new FiveMinuteCandle
+                {
+                    InstrumentId = instrumentId,
+                    Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
+                    Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
+                    High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
+                    Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
+                    Volume = response.Candles[i].Volume,
+                    Date = ConvertHelper.TimestampToDateOnly(response.Candles[i].Time),
+                    Time = ConvertHelper.TimestampToTimeOnly(response.Candles[i].Time),
+                    IsComplete = response.Candles[i].IsComplete
+                };
+
+                candles.Add(candle);
+            }
+
+            return candles;
+        }
+
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return [];
+        }
+    }
+
+    /// <inheritdoc />
     public async Task<List<double>> GetPricesAsync(List<Guid> instrumentIds)
     {
         try
