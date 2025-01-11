@@ -50,6 +50,11 @@ public class JobService(
         await loadService.LoadIndexDailyCandlesAsync();
     }
 
+    public async Task LoadFiveMinuteCandlesAsync()
+    {
+        await loadService.LoadShareFiveMinuteCandlesAsync();
+    }
+
     public async Task AnalyseAsync()
     {
         await analyseService.AnalyseSharesAsync();

@@ -16,6 +16,7 @@ public class LoadService(
     IIndexRepository indexRepository,
     ICurrencyRepository currencyRepository,
     ICandleRepository candleRepository,
+    IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
     IAssetFundamentalRepository assetFundamentalRepository,
@@ -88,11 +89,44 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
             
-            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
+            await logService.LogTrace($"Загружены дневные свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
-    
-    
+
+    public async Task LoadShareFiveMinuteCandlesAsync()
+    {
+        var instruments = await shareRepository.GetWatchListAsync();
+
+        foreach (var instrument in instruments)
+        {
+            var lastCandle = await fiveMinuteCandleRepository.GetLastAsync(instrument.InstrumentId);
+
+            if (lastCandle is null || 
+                (lastCandle.Date.ToDateTime(TimeOnly.MinValue) - DateTime.Today).TotalDays > 5)
+            {
+                var candles = await tinkoffService.GetFiveMinuteCandlesAsync(
+                    instrument.InstrumentId,
+                    DateTime.UtcNow.AddDays(-5),
+                    DateTime.UtcNow);
+                    
+                await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
+            }
+
+            else
+            {
+                var candles = await tinkoffService.GetFiveMinuteCandlesAsync(
+                    instrument.InstrumentId,
+                    lastCandle.Date.ToDateTime(lastCandle.Time),
+                    DateTime.UtcNow);
+                    
+                await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
+            }
+            
+            await logService.LogTrace($"Загружены 5-минутные свечи по '{instrument.Ticker}' ({instrument.Name})");
+        }
+    }
+
+
     public async Task LoadFuturesAsync()
     {
         var futures = await tinkoffService.GetFuturesAsync();

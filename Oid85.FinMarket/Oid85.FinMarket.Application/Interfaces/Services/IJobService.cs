@@ -11,6 +11,7 @@ public interface IJobService
     Task LoadDividendInfosAsync();
     Task LoadAssetFundamentalsAsync();
     Task LoadDailyCandlesAsync();
+    Task LoadFiveMinuteCandlesAsync();
     Task AnalyseAsync();
     Task FillingSpreadPairsAsync();
     Task CalculateSpreadsAsync();

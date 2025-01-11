@@ -1,7 +1,7 @@
 ﻿namespace Oid85.FinMarket.Domain.Models;
 
 /// <summary>
-/// Свеча
+/// Дневная свеча
 /// </summary>
 public class Candle
 {
