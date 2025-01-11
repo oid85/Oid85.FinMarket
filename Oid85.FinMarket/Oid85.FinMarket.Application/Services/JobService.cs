@@ -5,7 +5,8 @@ namespace Oid85.FinMarket.Application.Services;
 public class JobService(
     ILoadService loadService,
     IAnalyseService analyseService,
-    ISpreadService spreadService) 
+    ISpreadService spreadService,
+    IMultiplicatorService multiplicatorService) 
     : IJobService
 {
     public async Task LoadInstrumentsAsync()
@@ -66,13 +67,15 @@ public class JobService(
         await analyseService.AnalyseIndexesAsync();
     }
 
-    public async Task FillingSpreadPairsAsync()
-    {
-        await spreadService.FillingSpreadPairsAsync();
-    }
-
     public async Task CalculateSpreadsAsync()
     {
+        await spreadService.FillingSpreadPairsAsync();
         await spreadService.CalculateSpreadsAsync();
+    }
+
+    public async Task CalculateMultiplicatorsAsync()
+    {
+        await multiplicatorService.FillingMultiplicatorInstrumentsAsync();
+        await multiplicatorService.CalculateMultiplicatorsAsync();
     }
 }

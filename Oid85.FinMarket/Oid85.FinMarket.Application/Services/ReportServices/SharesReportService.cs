@@ -16,6 +16,7 @@ public class SharesReportService(
     IShareRepository shareRepository,
     IDividendInfoRepository dividendInfoRepository,
     IAssetFundamentalRepository assetFundamentalRepository,
+    IMultiplicatorRepository multiplicatorRepository,
     ReportHelper reportHelper)
     : ISharesReportService
 {
@@ -170,7 +171,64 @@ public class SharesReportService(
         
         return reportData;
     }
-    
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetMultiplicatorAnalyseAsync()
+    {
+        var shares = await shareRepository
+            .GetWatchListAsync();
+            
+        var reportData = new ReportData
+        {
+            Title = "Мультипликаторы",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
+                new ReportParameter(KnownDisplayTypes.String, "Рыночная капитализация"),
+                new ReportParameter(KnownDisplayTypes.String, "Минимум за год"),
+                new ReportParameter(KnownDisplayTypes.String, "Максимум за год"),
+                new ReportParameter(KnownDisplayTypes.String, "Бета-коэффициент"),
+                new ReportParameter(KnownDisplayTypes.String, "Чистая прибыль"),
+                new ReportParameter(KnownDisplayTypes.String, "EBITDA"),
+                new ReportParameter(KnownDisplayTypes.String, "EPS"),
+                new ReportParameter(KnownDisplayTypes.String, "Свободный денежный поток"),
+                new ReportParameter(KnownDisplayTypes.String, "EV/EBITDA"),
+                new ReportParameter(KnownDisplayTypes.String, "Total Debt/EBITDA"),
+                new ReportParameter(KnownDisplayTypes.String, "Net Debt/EBITDA")
+            ]
+        };
+
+        foreach (var share in shares)
+        {
+            var multiplicator = await multiplicatorRepository.GetAsync(share.InstrumentId);
+            
+            if (multiplicator is null)
+                continue;
+            
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, share.Ticker),
+                new (KnownDisplayTypes.Sector, share.Sector),
+                new (KnownDisplayTypes.Number, multiplicator.MarketCapitalization.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.LowOfYear.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.HighOfYear.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.Beta.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.NetIncome.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.Ebitda.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.Eps.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.FreeCashFlow.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.EvToEbitda.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.TotalDebtToEbitda.ToString("N2")),
+                new (KnownDisplayTypes.Number, multiplicator.NetDebtToEbitda.ToString("N2"))
+            ];
+            
+            reportData.Data.Add(data);
+        }
+        
+        return reportData;
+    }
+
     private async Task<ReportData> GetReportDataByAnalyseType(
         List<Share> instruments, 
         DateOnly from, 

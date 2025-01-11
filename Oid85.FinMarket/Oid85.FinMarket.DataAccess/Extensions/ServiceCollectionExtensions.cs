@@ -40,6 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAssetFundamentalRepository, AssetFundamentalRepository>();
         services.AddTransient<IInstrumentRepository, InstrumentRepository>();
         services.AddTransient<ISpreadRepository, SpreadRepository>();
+        services.AddTransient<IMultiplicatorRepository, MultiplicatorRepository>();
     }
 
     public static async Task ApplyMigrations(this IHost host)

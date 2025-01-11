@@ -61,8 +61,7 @@ public class FuturesReportService(
 
     public async Task<ReportData> GetSpreadAnalyseAsync()
     {
-        var spreads = await spreadRepository
-            .GetWatchListAsync();
+        var spreads = await spreadRepository.GetAllAsync();
             
         var reportData = new ReportData
         {

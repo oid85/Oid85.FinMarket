@@ -241,4 +241,19 @@ public class SharesController(
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Отчет Мультипликаторы
+    /// </summary>
+    [HttpPost("report/multiplicator-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetMultiplicatorAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetMultiplicatorAnalyseAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });    
 }

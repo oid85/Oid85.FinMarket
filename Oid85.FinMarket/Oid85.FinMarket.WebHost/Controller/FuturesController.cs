@@ -71,21 +71,6 @@ public class FuturesController(
             loadService.LoadFutureLastPricesAsync);
     
     /// <summary>
-    /// Заполнить таблицу спредов
-    /// </summary>
-    [HttpGet("spreads/fill")]
-    [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> FillingSpreadPairsAsync() =>
-        GetResponseAsync(
-            spreadService.FillingSpreadPairsAsync,
-            result => new BaseResponse<List<Spread>>
-            {
-                Result = result
-            });
-    
-    /// <summary>
     /// Расчитать спреды
     /// </summary>
     [HttpGet("spreads")]

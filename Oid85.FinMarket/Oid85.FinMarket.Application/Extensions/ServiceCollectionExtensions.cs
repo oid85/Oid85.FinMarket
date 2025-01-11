@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ReportHelper>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
+        services.AddTransient<IMultiplicatorService, MultiplicatorService>();
     }
     
     public static async Task RegisterHangfireJobs(
@@ -44,7 +45,6 @@ public static class ServiceCollectionExtensions
         RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
         RegisterJob(KnownJobs.LoadCandles, () => jobService.LoadCandlesAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
-        RegisterJob(KnownJobs.FillingSpreadPairs, () => jobService.FillingSpreadPairsAsync());
         RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
         
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)

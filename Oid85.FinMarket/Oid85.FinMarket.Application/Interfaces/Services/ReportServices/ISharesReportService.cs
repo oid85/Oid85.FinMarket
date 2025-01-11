@@ -53,4 +53,9 @@ public interface ISharesReportService
     /// Отчет Фундаментальные данные
     /// </summary>
     Task<ReportData> GetAssetFundamentalAnalyseAsync();
+
+    /// <summary>
+    /// Отчет Мультипликаторы
+    /// </summary>
+    Task<ReportData> GetMultiplicatorAnalyseAsync();
 }

@@ -152,20 +152,20 @@ public class SpreadService(
     private static Guid GetBaseActiveInstrumentId(string ticker)
     {
         if (ticker == "CNY/RUB")
-            return Guid.Parse("4587ab1d-a9c9-4910-a0d6-86c7b9c42510");
+            return KnownInstrumentIds.CnyRub;
         
         if (ticker == "EUR/USD")
-            return Guid.Parse("980156e9-4f81-4ee2-af21-895b57a2b1bf");
+            return KnownInstrumentIds.EurUsd;
         
         if (ticker == "USD/RUB")
-            return Guid.Parse("a22a1263-8e1b-4546-a1aa-416463f104d3");
+            return KnownInstrumentIds.UsdRub;
         
         return Guid.Empty;
     }
     
     public async Task<List<Spread>> CalculateSpreadsAsync()
     {
-        var spreads = await spreadRepository.GetWatchListAsync();
+        var spreads = await spreadRepository.GetAllAsync();
 
         foreach (var spread in spreads)
         {
@@ -185,12 +185,6 @@ public class SpreadService(
             spread.DateTime = DateTime.UtcNow;
             
             FillSpreadPricePosition(spread);
-
-            spread.PriceDifferenceAverage = (await spreadRepository.GetAllAsync())
-                .Average(x => x.PriceDifference);
-            
-            spread.PriceDifferenceAveragePrc = (await spreadRepository.GetAllAsync())
-                .Average(x => x.PriceDifferencePrc);
             
             await spreadRepository.UpdateSpreadAsync(spread);
         }

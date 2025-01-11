@@ -59,15 +59,6 @@ public class SpreadRepository(
         .Select(GetModel)
         .ToList();
 
-    public async Task<List<Spread>> GetWatchListAsync() =>
-        (await context.SpreadEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.InWatchList)
-            .OrderBy(x => x.FirstInstrumentTicker)
-            .ToListAsync())
-        .Select(GetModel)
-        .ToList();
-
     public async Task<Spread?> GetByTickerAsync(string firstInstrumentTicker)
     {
         var entity = await context.SpreadEntities
@@ -98,7 +89,6 @@ public class SpreadRepository(
         entity.PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc;
         entity.Funding = model.Funding;
         entity.SpreadPricePosition = model.SpreadPricePosition;
-        entity.InWatchList = model.InWatchList;
 
         return entity;
     }
@@ -123,7 +113,6 @@ public class SpreadRepository(
         model.PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc;
         model.Funding = entity.Funding;
         model.SpreadPricePosition = entity.SpreadPricePosition;
-        model.InWatchList = entity.InWatchList;
 
         return model;
     }

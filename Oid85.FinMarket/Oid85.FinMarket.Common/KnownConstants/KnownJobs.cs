@@ -9,6 +9,6 @@ public static class KnownJobs
     public const string LoadCandles = "LoadCandles";
     public const string LoadAssetFundamentals = "LoadAssetFundamentals";
     public const string Analyse = "Analyse";
-    public const string FillingSpreadPairs = "FillingSpreadPairs";
+    public const string CalculateMultiplicators = "CalculateMultiplicators";
     public const string CalculateSpreads = "CalculateSpreads";
 }
