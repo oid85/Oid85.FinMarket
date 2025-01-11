@@ -41,13 +41,15 @@ public class JobService(
         await loadService.LoadAssetFundamentalsAsync();
     }
 
-    public async Task LoadDailyCandlesAsync()
+    public async Task LoadCandlesAsync()
     {
         await loadService.LoadShareDailyCandlesAsync();
         await loadService.LoadBondDailyCandlesAsync();
         await loadService.LoadFutureDailyCandlesAsync();
         await loadService.LoadCurrencyDailyCandlesAsync();
         await loadService.LoadIndexDailyCandlesAsync();
+        
+        await loadService.LoadShareFiveMinuteCandlesAsync();
     }
 
     public async Task LoadFiveMinuteCandlesAsync()

@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
         RegisterJob(KnownJobs.LoadBondCoupons, () => jobService.LoadBondCouponsAsync());
         RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
         RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
-        RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandlesAsync());
+        RegisterJob(KnownJobs.LoadCandles, () => jobService.LoadCandlesAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
         RegisterJob(KnownJobs.FillingSpreadPairs, () => jobService.FillingSpreadPairsAsync());
         RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());

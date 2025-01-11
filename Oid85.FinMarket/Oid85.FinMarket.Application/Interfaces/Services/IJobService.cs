@@ -10,8 +10,7 @@ public interface IJobService
     Task LoadBondCouponsAsync();
     Task LoadDividendInfosAsync();
     Task LoadAssetFundamentalsAsync();
-    Task LoadDailyCandlesAsync();
-    Task LoadFiveMinuteCandlesAsync();
+    Task LoadCandlesAsync();
     Task AnalyseAsync();
     Task FillingSpreadPairsAsync();
     Task CalculateSpreadsAsync();
