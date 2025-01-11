@@ -2,10 +2,12 @@
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class FutureRepository(
+    ILogService logService,
     FinMarketContext context) 
     : IFutureRepository
 {
@@ -25,12 +27,28 @@ public class FutureRepository(
         await context.SaveChangesAsync();
     }
     
-    public Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice) =>
-        context.FutureEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .ExecuteUpdateAsync(
-                s => s.SetProperty(
-                    u => u.LastPrice, lastPrice));
+    public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.FutureEntities
+                .Where(x => x.InstrumentId == instrumentId)
+                .ExecuteUpdateAsync(
+                    s => s.SetProperty(
+                        u => u.LastPrice, lastPrice));
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            await logService.LogException(exception);
+        }
+    }
 
     public async Task<List<Future>> GetAllAsync() =>
         (await context.FutureEntities

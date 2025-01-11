@@ -2,10 +2,12 @@
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class MultiplicatorRepository(
+    ILogService logService,
     FinMarketContext context) 
     : IMultiplicatorRepository
 {
@@ -26,24 +28,40 @@ public class MultiplicatorRepository(
         await context.SaveChangesAsync();
     }
 
-    public Task UpdateSpreadAsync(Multiplicator multiplicator) =>
-        context.MultiplicatorEntities
-            .Where(x => 
-                x.InstrumentId == multiplicator.InstrumentId)
-            .ExecuteUpdateAsync(
-                s => s
-                    .SetProperty(u => u.MarketCapitalization, multiplicator.MarketCapitalization)
-                    .SetProperty(u => u.LowOfYear, multiplicator.LowOfYear)
-                    .SetProperty(u => u.HighOfYear, multiplicator.HighOfYear)
-                    .SetProperty(u => u.Beta, multiplicator.Beta)
-                    .SetProperty(u => u.NetIncome, multiplicator.NetIncome)
-                    .SetProperty(u => u.Ebitda, multiplicator.Ebitda)
-                    .SetProperty(u => u.Eps, multiplicator.Eps)
-                    .SetProperty(u => u.FreeCashFlow, multiplicator.FreeCashFlow)
-                    .SetProperty(u => u.EvToEbitda, multiplicator.EvToEbitda)
-                    .SetProperty(u => u.TotalDebtToEbitda, multiplicator.TotalDebtToEbitda)
-                    .SetProperty(u => u.NetDebtToEbitda, multiplicator.NetDebtToEbitda));
-
+    public async Task UpdateSpreadAsync(Multiplicator multiplicator)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.MultiplicatorEntities
+                .Where(x => 
+                    x.InstrumentId == multiplicator.InstrumentId)
+                .ExecuteUpdateAsync(
+                    s => s
+                        .SetProperty(u => u.MarketCapitalization, multiplicator.MarketCapitalization)
+                        .SetProperty(u => u.LowOfYear, multiplicator.LowOfYear)
+                        .SetProperty(u => u.HighOfYear, multiplicator.HighOfYear)
+                        .SetProperty(u => u.Beta, multiplicator.Beta)
+                        .SetProperty(u => u.NetIncome, multiplicator.NetIncome)
+                        .SetProperty(u => u.Ebitda, multiplicator.Ebitda)
+                        .SetProperty(u => u.Eps, multiplicator.Eps)
+                        .SetProperty(u => u.FreeCashFlow, multiplicator.FreeCashFlow)
+                        .SetProperty(u => u.EvToEbitda, multiplicator.EvToEbitda)
+                        .SetProperty(u => u.TotalDebtToEbitda, multiplicator.TotalDebtToEbitda)
+                        .SetProperty(u => u.NetDebtToEbitda, multiplicator.NetDebtToEbitda));
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            await logService.LogException(exception);
+        }
+    }
+    
     public async Task<List<Multiplicator>> GetAllAsync() =>
         (await context.MultiplicatorEntities
             .Where(x => !x.IsDeleted)
