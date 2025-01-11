@@ -52,12 +52,12 @@ public class FuturesReportService(
             request.To, 
             KnownAnalyseTypes.Rsi);
 
+    /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
-        await GetReportDataByAnalyseType(
+        await GetReportDataYieldLtmAnalyse(
             await futureRepository.GetWatchListAsync(), 
             request.From, 
-            request.To, 
-            KnownAnalyseTypes.YieldLtm);
+            request.To);
 
     public async Task<ReportData> GetSpreadAnalyseAsync()
     {
@@ -230,4 +230,13 @@ public class FuturesReportService(
             
         return reportData;
     }    
+    
+    private async Task<ReportData> GetReportDataYieldLtmAnalyse(
+        List<Future> instruments, 
+        DateOnly from, 
+        DateOnly to)
+    {
+        var reportData = new ReportData();
+        return reportData;
+    }
 }

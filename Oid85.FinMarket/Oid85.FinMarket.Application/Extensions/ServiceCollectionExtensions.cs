@@ -45,6 +45,7 @@ public static class ServiceCollectionExtensions
         RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
         RegisterJob(KnownJobs.LoadCandles, () => jobService.LoadCandlesAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
+        RegisterJob(KnownJobs.CalculateMultiplicators, () => jobService.CalculateMultiplicatorsAsync());
         RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
         
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)

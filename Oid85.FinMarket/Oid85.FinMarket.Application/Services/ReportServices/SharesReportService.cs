@@ -61,11 +61,10 @@ public class SharesReportService(
 
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
-        await GetReportDataByAnalyseType(
+        await GetReportDataYieldLtmAnalyse(
             await shareRepository.GetWatchListAsync(), 
             request.From, 
-            request.To, 
-            KnownAnalyseTypes.YieldLtm);
+            request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetDividendAnalyseAsync()
@@ -388,6 +387,94 @@ public class SharesReportService(
                     data.Add(new ReportParameter(
                         $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
                         resultNumber.ToString("N2")));
+                }
+
+                else
+                {
+                    var dividendInfo = dividendInfos
+                        .FirstOrDefault(x => 
+                            x.Ticker == instrument.Ticker && 
+                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                    data.Add(dividendInfo is not null 
+                        ? new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            dividendInfo.DividendPrc.ToString("N1")) 
+                        : new ReportParameter(
+                            KnownDisplayTypes.Percent, 
+                            string.Empty));
+                }
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+
+    private async Task<ReportData> GetReportDataYieldLtmAnalyse(
+        List<Share> instruments, 
+        DateOnly from, 
+        DateOnly to)
+    {
+        var instrumentIds = instruments
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => x.AnalyseType == KnownAnalyseTypes.YieldLtm)
+            .ToList();
+
+        int outputWindowInDays = configuration
+            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
+        
+        var dividendInfos = await dividendInfoRepository
+            .GetAsync(instrumentIds, to.AddDays(1), to.AddDays(outputWindowInDays));
+            
+        var dates = reportHelper.GetDates(from, to.AddDays(outputWindowInDays));
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ {KnownAnalyseTypes.YieldLtm} " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var instrument in instruments)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, instrument.Ticker), 
+                new (KnownDisplayTypes.Sector, instrument.Sector)
+            };
+
+            foreach (var date in dates)
+            {
+                var currentDate = DateOnly.FromDateTime(Convert.ToDateTime(date.Value));
+                
+                if (currentDate <= to)
+                {
+                    var analyseResult = analyseResults
+                        .FirstOrDefault(x =>
+                            x.InstrumentId == instrument.InstrumentId &&
+                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                    data.Add(analyseResult is not null
+                        ? new ReportParameter(
+                            $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                            analyseResult.ResultString)
+                        : new ReportParameter(
+                            $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                            string.Empty));
                 }
 
                 else
