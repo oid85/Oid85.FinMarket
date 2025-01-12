@@ -612,4 +612,109 @@ public class TinkoffService(
             return [];
         }
     }
+
+    /// <inheritdoc />
+    public async Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId)
+    {
+        try
+        {
+            var request = new GetForecastRequest
+            {
+                InstrumentId = instrumentId.ToString()
+            };
+            
+            var response = await client.Instruments.GetForecastByAsync(request);
+
+            if (response is null)
+                return ([], new());
+
+            var targets = new List<ForecastTarget>();
+            
+            foreach (var targetItem in response.Targets)
+            {
+                var target = new ForecastTarget();
+
+                target.InstrumentId = Guid.Parse(targetItem.Uid);
+                target.Ticker = targetItem.Ticker;
+                target.Company = targetItem.Company;
+
+                switch (targetItem.Recommendation)
+                {
+                    case Recommendation.Unspecified:
+                        target.RecommendationString = KnownAnalyseRecommendations.Unknown;
+                        target.RecommendationNumber = 0;
+                        break;
+                    
+                    case Recommendation.Buy:
+                        target.RecommendationString = KnownAnalyseRecommendations.Buy;
+                        target.RecommendationNumber = 1;
+                        break;
+                    
+                    case Recommendation.Hold:
+                        target.RecommendationString = KnownAnalyseRecommendations.Hold;
+                        target.RecommendationNumber = 2;
+                        break;
+                    
+                    case Recommendation.Sell:
+                        target.RecommendationString = KnownAnalyseRecommendations.Sell;
+                        target.RecommendationNumber = 3;
+                        break;
+                }
+                
+                target.RecommendationDate = ConvertHelper.TimestampToDateOnly(targetItem.RecommendationDate);
+                target.Currency = targetItem.Currency;
+                target.CurrentPrice = ConvertHelper.QuotationToDouble(targetItem.CurrentPrice);
+                target.TargetPrice = ConvertHelper.QuotationToDouble(targetItem.TargetPrice);
+                target.PriceChange = ConvertHelper.QuotationToDouble(targetItem.PriceChange);
+                target.PriceChangeRel = ConvertHelper.QuotationToDouble(targetItem.PriceChangeRel);
+                target.ShowName = targetItem.ShowName;
+                
+                targets.Add(target);
+            }
+            
+            var consensus = new ForecastConsensus();
+            
+            consensus.InstrumentId = Guid.Parse(response.Consensus.Uid);
+            consensus.Ticker = response.Consensus.Ticker;
+
+            switch (response.Consensus.Recommendation)
+            {
+                case Recommendation.Unspecified:
+                    consensus.RecommendationString = KnownAnalyseRecommendations.Unknown;
+                    consensus.RecommendationNumber = 0;
+                    break;
+                    
+                case Recommendation.Buy:
+                    consensus.RecommendationString = KnownAnalyseRecommendations.Buy;
+                    consensus.RecommendationNumber = 1;
+                    break;
+                    
+                case Recommendation.Hold:
+                    consensus.RecommendationString = KnownAnalyseRecommendations.Hold;
+                    consensus.RecommendationNumber = 2;
+                    break;
+                    
+                case Recommendation.Sell:
+                    consensus.RecommendationString = KnownAnalyseRecommendations.Sell;
+                    consensus.RecommendationNumber = 3;
+                    break;
+            }
+            
+            consensus.Currency = response.Consensus.Currency;
+            consensus.CurrentPrice = ConvertHelper.QuotationToDouble(response.Consensus.CurrentPrice);
+            consensus.ConsensusPrice = ConvertHelper.QuotationToDouble(response.Consensus.Consensus);
+            consensus.MinTarget = ConvertHelper.QuotationToDouble(response.Consensus.MinTarget);
+            consensus.MaxTarget = ConvertHelper.QuotationToDouble(response.Consensus.MaxTarget);
+            consensus.PriceChange = ConvertHelper.QuotationToDouble(response.Consensus.PriceChange);
+            consensus.PriceChangeRel = ConvertHelper.QuotationToDouble(response.Consensus.PriceChangeRel);
+            
+            return (targets, consensus);
+        }
+        
+        catch (Exception exception)
+        {
+            await logService.LogException(exception);
+            return ([], new());
+        }
+    }
 }

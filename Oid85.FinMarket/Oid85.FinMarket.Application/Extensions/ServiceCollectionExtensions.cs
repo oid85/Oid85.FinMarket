@@ -44,6 +44,7 @@ public static class ServiceCollectionExtensions
         RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
         RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
         RegisterJob(KnownJobs.LoadCandles, () => jobService.LoadCandlesAsync());
+        RegisterJob(KnownJobs.LoadForecasts, () => jobService.LoadForecastsAsync());
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
         RegisterJob(KnownJobs.CalculateMultiplicators, () => jobService.CalculateMultiplicatorsAsync());
         RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());

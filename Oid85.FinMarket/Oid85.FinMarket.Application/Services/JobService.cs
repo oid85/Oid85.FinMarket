@@ -53,9 +53,9 @@ public class JobService(
         await loadService.LoadShareFiveMinuteCandlesAsync();
     }
 
-    public async Task LoadFiveMinuteCandlesAsync()
+    public async Task LoadForecastsAsync()
     {
-        await loadService.LoadShareFiveMinuteCandlesAsync();
+        await loadService.LoadForecastsAsync();
     }
 
     public async Task AnalyseAsync()

@@ -21,6 +21,8 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<AnalyseResultEntity> AnalyseResultEntities { get; set; }
     public DbSet<InstrumentEntity> InstrumentEntities { get; set; }
     public DbSet<SpreadEntity> SpreadEntities { get; set; }
+    public DbSet<ForecastTargetEntity> ForecastTargetEntities { get; set; }
+    public DbSet<ForecastConsensusEntity> ForecastConsensusEntities { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
     {

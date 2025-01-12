@@ -58,7 +58,7 @@ public class SharesController(
             loadService.LoadShareDailyCandlesAsync);
 
     /// <summary>
-    /// Подгрузить 5-минутные свечи по акциям
+    /// Загрузить 5-минутные свечи по акциям
     /// </summary>
     [HttpGet("load-five-minute-candles")]
     [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
@@ -67,6 +67,17 @@ public class SharesController(
     public Task<IActionResult> LoadShareFiveMinuteCandlesAsync() =>
         GetResponseAsync<object, BaseResponse<object>>(
             loadService.LoadShareFiveMinuteCandlesAsync);
+    
+    /// <summary>
+    /// Загрузить прогнозы
+    /// </summary>
+    [HttpGet("load-forecasts")]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadShareForecastsAsync() =>
+        GetResponseAsync<object, BaseResponse<object>>(
+            loadService.LoadForecastsAsync);
     
     /// <summary>
     /// Загрузить данные о дивидендах

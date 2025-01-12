@@ -41,6 +41,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IInstrumentRepository, InstrumentRepository>();
         services.AddTransient<ISpreadRepository, SpreadRepository>();
         services.AddTransient<IMultiplicatorRepository, MultiplicatorRepository>();
+        services.AddTransient<IForecastTargetRepository, ForecastTargetRepository>();
+        services.AddTransient<IForecastConsensusRepository, ForecastConsensusRepository>();
     }
 
     public static async Task ApplyMigrations(this IHost host)
