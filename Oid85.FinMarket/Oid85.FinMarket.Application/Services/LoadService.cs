@@ -20,7 +20,9 @@ public class LoadService(
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
     IAssetFundamentalRepository assetFundamentalRepository,
-    IInstrumentRepository instrumentRepository)
+    IInstrumentRepository instrumentRepository,
+    IForecastTargetRepository forecastTargetRepository,
+    IForecastConsensusRepository forecastConsensusRepository)
     : ILoadService
 {
     public async Task LoadSharesAsync()
@@ -123,6 +125,21 @@ public class LoadService(
             }
             
             await logService.LogTrace($"Загружены 5-минутные свечи по '{instrument.Ticker}' ({instrument.Name})");
+        }
+    }
+
+    public async Task LoadForecastsAsync()
+    {
+        var instruments = await shareRepository.GetWatchListAsync();
+
+        foreach (var instrument in instruments)
+        {
+            var (targets, consensus) = await tinkoffService.GetForecastAsync(instrument.InstrumentId);
+            
+            await forecastTargetRepository.AddAsync(targets);
+            await forecastConsensusRepository.AddAsync([consensus]);
+            
+            await logService.LogTrace($"Загружен прогноз по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
