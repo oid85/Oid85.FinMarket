@@ -266,5 +266,35 @@ public class SharesController(
             result => new BaseResponse<ReportData>
             {
                 Result = result
-            });    
+            });
+    
+    /// <summary>
+    /// Отчет Прогнозы
+    /// </summary>
+    [HttpPost("report/forecast-target-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetForecastTargetAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetForecastTargetAnalyseAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            }); 
+    
+    /// <summary>
+    /// Отчет Консенсус-прогнозы
+    /// </summary>
+    [HttpPost("report/forecast-consensus-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetForecastConsensusAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetForecastConsensusAnalyseAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            }); 
 }

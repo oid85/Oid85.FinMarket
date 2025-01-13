@@ -17,6 +17,8 @@ public class SharesReportService(
     IDividendInfoRepository dividendInfoRepository,
     IAssetFundamentalRepository assetFundamentalRepository,
     IMultiplicatorRepository multiplicatorRepository,
+    IForecastTargetRepository forecastTargetRepository,
+    IForecastConsensusRepository forecastConsensusRepository,
     ReportHelper reportHelper)
     : ISharesReportService
 {
@@ -228,6 +230,134 @@ public class SharesReportService(
         return reportData;
     }
 
+    /// <inheritdoc />
+    public async Task<ReportData> GetForecastTargetAnalyseAsync()
+    {
+        var forecastTargets = await forecastTargetRepository.GetAllAsync();
+            
+        var reportData = new ReportData
+        {
+            Title = "Прогнозы",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Прогноз от компании"),
+                new ReportParameter(KnownDisplayTypes.String, "Прогноз"),
+                new ReportParameter(KnownDisplayTypes.String, "Дата прогноза"),
+                new ReportParameter(KnownDisplayTypes.String, "Валюта"),
+                new ReportParameter(KnownDisplayTypes.String, "Текущая цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Прогнозируемая цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Изменение цены"),
+                new ReportParameter(KnownDisplayTypes.String, "Относительное изменение цены"),
+                new ReportParameter(KnownDisplayTypes.String, "Наименование инструмента")
+            ]
+        };
+
+        foreach (var forecastTarget in forecastTargets)
+        {
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, forecastTarget.Ticker),
+                new (KnownDisplayTypes.String, forecastTarget.Company),
+                new (KnownDisplayTypes.String, forecastTarget.RecommendationString, GetColor(forecastTarget.RecommendationNumber)),
+                new (KnownDisplayTypes.Date, forecastTarget.RecommendationDate.ToString(KnownDateTimeFormats.DateISO)),
+                new (KnownDisplayTypes.String, forecastTarget.Currency),
+                new (KnownDisplayTypes.Ruble, forecastTarget.CurrentPrice.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, forecastTarget.TargetPrice.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, forecastTarget.PriceChange.ToString("N2")),
+                new (KnownDisplayTypes.Percent, forecastTarget.PriceChangeRel.ToString("N2")),
+                new (KnownDisplayTypes.String, forecastTarget.ShowName)
+            ];
+            
+            reportData.Data.Add(data);
+        }
+        
+        string GetColor(int code)
+        {
+            switch (code)
+            {
+                case 0:
+                    return KnownColors.White;
+                
+                case 1:
+                    return KnownColors.Green;
+                
+                case 2:
+                    return KnownColors.Yellow;
+                
+                case 3:
+                    return KnownColors.Red;
+            }
+            
+            return KnownColors.Red;
+        }
+        
+        return reportData;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetForecastConsensusAnalyseAsync()
+    {
+        var forecastConsensuses = await forecastConsensusRepository.GetAllAsync();
+            
+        var reportData = new ReportData
+        {
+            Title = "Консенсус-прогнозы",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Прогноз"),
+                new ReportParameter(KnownDisplayTypes.String, "Валюта"),
+                new ReportParameter(KnownDisplayTypes.String, "Текущая цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Прогнозируемая цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Минимальная цена прогноза"),
+                new ReportParameter(KnownDisplayTypes.String, "Максимальная цена прогноза"),
+                new ReportParameter(KnownDisplayTypes.String, "Изменение цены"),
+                new ReportParameter(KnownDisplayTypes.String, "Относительное изменение цены")
+            ]
+        };
+
+        foreach (var forecastConsensus in forecastConsensuses)
+        {
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, forecastConsensus.Ticker),
+                new (KnownDisplayTypes.String, forecastConsensus.RecommendationString, GetColor(forecastConsensus.RecommendationNumber)),
+                new (KnownDisplayTypes.String, forecastConsensus.Currency),
+                new (KnownDisplayTypes.Ruble, forecastConsensus.CurrentPrice.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, forecastConsensus.ConsensusPrice.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, forecastConsensus.MinTarget.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, forecastConsensus.MaxTarget.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, forecastConsensus.PriceChange.ToString("N2")),
+                new (KnownDisplayTypes.Percent, forecastConsensus.PriceChangeRel.ToString("N2"))
+            ];
+            
+            reportData.Data.Add(data);
+        }
+
+        string GetColor(int code)
+        {
+            switch (code)
+            {
+                case 0:
+                    return KnownColors.White;
+                
+                case 1:
+                    return KnownColors.Green;
+                
+                case 2:
+                    return KnownColors.Yellow;
+                
+                case 3:
+                    return KnownColors.Red;
+            }
+            
+            return KnownColors.Red;
+        }
+        
+        return reportData;
+    }
+    
     private async Task<ReportData> GetReportDataByAnalyseType(
         List<Share> instruments, 
         DateOnly from, 

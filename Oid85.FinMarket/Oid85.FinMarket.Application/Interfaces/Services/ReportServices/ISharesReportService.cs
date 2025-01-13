@@ -58,4 +58,14 @@ public interface ISharesReportService
     /// Отчет Мультипликаторы
     /// </summary>
     Task<ReportData> GetMultiplicatorAnalyseAsync();
+
+    /// <summary>
+    /// Отчет Прогнозы
+    /// </summary>
+    Task<ReportData> GetForecastTargetAnalyseAsync();
+
+    /// <summary>
+    /// Отчет Консенсус-прогнозы
+    /// </summary>
+    Task<ReportData> GetForecastConsensusAnalyseAsync();
 }
