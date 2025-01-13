@@ -23,6 +23,7 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<SpreadEntity> SpreadEntities { get; set; }
     public DbSet<ForecastTargetEntity> ForecastTargetEntities { get; set; }
     public DbSet<ForecastConsensusEntity> ForecastConsensusEntities { get; set; }
+    public DbSet<MarketEventEntity> MarketEventEntities { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
     {
