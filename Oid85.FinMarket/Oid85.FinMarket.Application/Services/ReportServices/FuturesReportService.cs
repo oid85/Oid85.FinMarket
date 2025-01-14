@@ -236,7 +236,58 @@ public class FuturesReportService(
         DateOnly from, 
         DateOnly to)
     {
-        var reportData = new ReportData();
+        var instrumentIds = instruments
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => x.AnalyseType == KnownAnalyseTypes.YieldLtm)
+            .ToList();
+        
+        var dates = reportHelper.GetDates(from, to);
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ {KnownAnalyseTypes.YieldLtm} " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var instrument in instruments)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, instrument.Ticker)
+            };
+
+            foreach (var date in dates)
+            {
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x =>
+                        x.InstrumentId == instrument.InstrumentId &&
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(analyseResult is not null
+                    ? new ReportParameter(
+                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                        analyseResult.ResultNumber >= 0 ? KnownColors.Green : KnownColors.Red, 
+                        analyseResult.ResultString)
+                    : new ReportParameter(
+                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                        string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
         return reportData;
     }
 }
