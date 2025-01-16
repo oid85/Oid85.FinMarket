@@ -57,30 +57,40 @@ public class AnalyseResultRepository(
     public async Task<AnalyseResult?> GetLastAsync(
         Guid instrumentId, string analyseType)
     {
-        bool exists = await context.AnalyseResultEntities
-            .Where(x => 
-                x.InstrumentId == instrumentId
-                && x.AnalyseType == analyseType)
-            .AnyAsync();
-
-        if (!exists)
-            return null;
-        
-        var maxDate = await context.AnalyseResultEntities
-            .Where(x => 
-                x.InstrumentId == instrumentId
-                && x.AnalyseType == analyseType)
-            .MaxAsync(x => x.Date);
-
         var entity = await context.AnalyseResultEntities
             .Where(x => 
                 x.InstrumentId == instrumentId
                 && x.AnalyseType == analyseType)
-            .FirstAsync(x => x.Date == maxDate);
+            .OrderByDescending(x => x.Date)
+            .Take(1)
+            .FirstOrDefaultAsync();
+
+        if (entity is null)
+            return null;
         
-        var analyseResult = GetModel(entity);
+        var model = GetModel(entity);
         
-        return analyseResult;
+        return model;
+    }
+
+    public async Task<List<AnalyseResult>> GetTwoLastAsync(Guid instrumentId, string analyseType)
+    {
+        var entities = await context.AnalyseResultEntities
+            .Where(x => 
+                x.InstrumentId == instrumentId
+                && x.AnalyseType == analyseType)
+            .OrderByDescending(x => x.Date)
+            .Take(2)
+            .ToListAsync();
+
+        if (entities.Count < 2)
+            return [];
+        
+        var models = entities
+            .Select(GetModel)
+            .ToList();
+        
+        return models;
     }
 
     private AnalyseResultEntity GetEntity(AnalyseResult model)

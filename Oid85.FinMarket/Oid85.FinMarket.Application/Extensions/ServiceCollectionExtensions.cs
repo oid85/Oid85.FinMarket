@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
         services.AddTransient<IMultiplicatorService, MultiplicatorService>();
+        services.AddTransient<IMarketEventService, MarketEventService>();
     }
     
     public static async Task RegisterHangfireJobs(
