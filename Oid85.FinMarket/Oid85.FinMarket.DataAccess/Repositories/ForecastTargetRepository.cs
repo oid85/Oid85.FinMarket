@@ -102,41 +102,43 @@ public class ForecastTargetRepository(
     
     private ForecastTargetEntity GetEntity(ForecastTarget model)
     {
-        var entity = new ForecastTargetEntity();
+        var entity = new ForecastTargetEntity
+        {
+            Ticker = model.Ticker,
+            InstrumentId = model.InstrumentId,
+            Company = model.Company,
+            RecommendationString = model.RecommendationString,
+            RecommendationNumber = model.RecommendationNumber,
+            RecommendationDate = model.RecommendationDate,
+            Currency = model.Currency,
+            CurrentPrice = model.CurrentPrice,
+            TargetPrice = model.TargetPrice,
+            PriceChange = model.PriceChange,
+            PriceChangeRel = model.PriceChangeRel,
+            ShowName = model.ShowName
+        };
 
-        entity.Ticker = model.Ticker;
-        entity.InstrumentId = model.InstrumentId;
-        entity.Company = model.Company;
-        entity.RecommendationString = model.RecommendationString;
-        entity.RecommendationNumber = model.RecommendationNumber;
-        entity.RecommendationDate = model.RecommendationDate;
-        entity.Currency = model.Currency;
-        entity.CurrentPrice = model.CurrentPrice;
-        entity.TargetPrice = model.TargetPrice;
-        entity.PriceChange = model.PriceChange;
-        entity.PriceChangeRel = model.PriceChangeRel;
-        entity.ShowName = model.ShowName;
-        
         return entity;
     }
     
     private ForecastTarget GetModel(ForecastTargetEntity entity)
     {
-        var model = new ForecastTarget();
-        
-        model.Id = entity.Id;
-        model.Ticker = entity.Ticker;
-        model.InstrumentId = entity.InstrumentId;
-        model.Company = entity.Company;
-        model.RecommendationString = entity.RecommendationString;
-        model.RecommendationNumber = entity.RecommendationNumber;
-        model.RecommendationDate = entity.RecommendationDate;
-        model.Currency = entity.Currency;
-        model.CurrentPrice = entity.CurrentPrice;
-        model.TargetPrice = entity.TargetPrice;
-        model.PriceChange = entity.PriceChange;
-        model.PriceChangeRel = entity.PriceChangeRel;
-        model.ShowName = entity.ShowName;
+        var model = new ForecastTarget
+        {
+            Id = entity.Id,
+            Ticker = entity.Ticker,
+            InstrumentId = entity.InstrumentId,
+            Company = entity.Company,
+            RecommendationString = entity.RecommendationString,
+            RecommendationNumber = entity.RecommendationNumber,
+            RecommendationDate = entity.RecommendationDate,
+            Currency = entity.Currency,
+            CurrentPrice = entity.CurrentPrice,
+            TargetPrice = entity.TargetPrice,
+            PriceChange = entity.PriceChange,
+            PriceChangeRel = entity.PriceChangeRel,
+            ShowName = entity.ShowName
+        };
 
         return model;
     }

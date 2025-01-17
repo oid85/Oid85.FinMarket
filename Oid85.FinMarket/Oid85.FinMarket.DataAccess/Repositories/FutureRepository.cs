@@ -95,51 +95,53 @@ public class FutureRepository(
     
     private FutureEntity GetEntity(Future model)
     {
-        var entity = new FutureEntity();
-        
-        entity.Ticker = model.Ticker;
-        entity.LastPrice = model.LastPrice;
-        entity.Figi = model.Figi;
-        entity.InstrumentId = model.InstrumentId;
-        entity.Name = model.Name;
-        entity.ExpirationDate = model.ExpirationDate;
-        entity.InWatchList = model.InWatchList;
-        entity.Lot = model.Lot;
-        entity.FirstTradeDate = model.FirstTradeDate;
-        entity.LastTradeDate = model.LastTradeDate;
-        entity.FutureType = model.FutureType;
-        entity.AssetType = model.AssetType;
-        entity.BasicAsset = model.BasicAsset;
-        entity.BasicAssetSize = model.BasicAssetSize;
-        entity.InitialMarginOnBuy = model.InitialMarginOnBuy;
-        entity.InitialMarginOnSell = model.InitialMarginOnSell;
-        entity.MinPriceIncrementAmount = model.MinPriceIncrementAmount;
+        var entity = new FutureEntity
+        {
+            Ticker = model.Ticker,
+            LastPrice = model.LastPrice,
+            Figi = model.Figi,
+            InstrumentId = model.InstrumentId,
+            Name = model.Name,
+            ExpirationDate = model.ExpirationDate,
+            InWatchList = model.InWatchList,
+            Lot = model.Lot,
+            FirstTradeDate = model.FirstTradeDate,
+            LastTradeDate = model.LastTradeDate,
+            FutureType = model.FutureType,
+            AssetType = model.AssetType,
+            BasicAsset = model.BasicAsset,
+            BasicAssetSize = model.BasicAssetSize,
+            InitialMarginOnBuy = model.InitialMarginOnBuy,
+            InitialMarginOnSell = model.InitialMarginOnSell,
+            MinPriceIncrementAmount = model.MinPriceIncrementAmount
+        };
 
         return entity;
     }
     
     private Future GetModel(FutureEntity entity)
     {
-        var model = new Future();
-        
-        model.Id = entity.Id;
-        model.Ticker = entity.Ticker;
-        model.LastPrice = entity.LastPrice;
-        model.Figi = entity.Figi;
-        model.InstrumentId = entity.InstrumentId;
-        model.Name = entity.Name;
-        model.ExpirationDate = entity.ExpirationDate;
-        model.InWatchList = entity.InWatchList;
-        model.Lot = entity.Lot;
-        model.FirstTradeDate = entity.FirstTradeDate;
-        model.LastTradeDate = entity.LastTradeDate;
-        model.FutureType = entity.FutureType;
-        model.AssetType = entity.AssetType;
-        model.BasicAsset = entity.BasicAsset;
-        model.BasicAssetSize = entity.BasicAssetSize;
-        model.InitialMarginOnBuy = entity.InitialMarginOnBuy;
-        model.InitialMarginOnSell = entity.InitialMarginOnSell;
-        model.MinPriceIncrementAmount = entity.MinPriceIncrementAmount;
+        var model = new Future
+        {
+            Id = entity.Id,
+            Ticker = entity.Ticker,
+            LastPrice = entity.LastPrice,
+            Figi = entity.Figi,
+            InstrumentId = entity.InstrumentId,
+            Name = entity.Name,
+            ExpirationDate = entity.ExpirationDate,
+            InWatchList = entity.InWatchList,
+            Lot = entity.Lot,
+            FirstTradeDate = entity.FirstTradeDate,
+            LastTradeDate = entity.LastTradeDate,
+            FutureType = entity.FutureType,
+            AssetType = entity.AssetType,
+            BasicAsset = entity.BasicAsset,
+            BasicAssetSize = entity.BasicAssetSize,
+            InitialMarginOnBuy = entity.InitialMarginOnBuy,
+            InitialMarginOnSell = entity.InitialMarginOnSell,
+            MinPriceIncrementAmount = entity.MinPriceIncrementAmount
+        };
 
         return model;
     }

@@ -83,39 +83,41 @@ public class BondRepository(
     
     private BondEntity GetEntity(Bond model)
     {
-        var entity = new BondEntity();
-        
-        entity.Ticker = model.Ticker;
-        entity.LastPrice = model.LastPrice;
-        entity.Isin = model.Isin;
-        entity.Figi = model.Figi;
-        entity.InstrumentId = model.InstrumentId;
-        entity.Name = model.Name;
-        entity.Sector = model.Sector;
-        entity.InWatchList = model.InWatchList;
-        entity.Nkd = model.Nkd;
-        entity.MaturityDate = model.MaturityDate;
-        entity.FloatingCouponFlag = model.FloatingCouponFlag;
+        var entity = new BondEntity
+        {
+            Ticker = model.Ticker,
+            LastPrice = model.LastPrice,
+            Isin = model.Isin,
+            Figi = model.Figi,
+            InstrumentId = model.InstrumentId,
+            Name = model.Name,
+            Sector = model.Sector,
+            InWatchList = model.InWatchList,
+            Nkd = model.Nkd,
+            MaturityDate = model.MaturityDate,
+            FloatingCouponFlag = model.FloatingCouponFlag
+        };
 
         return entity;
     }
     
     private Bond GetModel(BondEntity entity)
     {
-        var model = new Bond();
-        
-        model.Id = entity.Id;
-        model.Ticker = entity.Ticker;
-        model.LastPrice = entity.LastPrice;
-        model.Isin = entity.Isin;
-        model.Figi = entity.Figi;
-        model.InstrumentId = entity.InstrumentId;
-        model.Name = entity.Name;
-        model.Sector = entity.Sector;
-        model.InWatchList = entity.InWatchList;
-        model.Nkd = entity.Nkd;
-        model.MaturityDate = entity.MaturityDate;
-        model.FloatingCouponFlag = entity.FloatingCouponFlag;
+        var model = new Bond
+        {
+            Id = entity.Id,
+            Ticker = entity.Ticker,
+            LastPrice = entity.LastPrice,
+            Isin = entity.Isin,
+            Figi = entity.Figi,
+            InstrumentId = entity.InstrumentId,
+            Name = entity.Name,
+            Sector = entity.Sector,
+            InWatchList = entity.InWatchList,
+            Nkd = entity.Nkd,
+            MaturityDate = entity.MaturityDate,
+            FloatingCouponFlag = entity.FloatingCouponFlag
+        };
 
         return model;
     }

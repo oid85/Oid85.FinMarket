@@ -51,29 +51,31 @@ public class DividendInfoRepository(
     
     private DividendInfoEntity GetEntity(DividendInfo model)
     {
-        var entity = new DividendInfoEntity();
-        
-        entity.InstrumentId = model.InstrumentId;
-        entity.Ticker = model.Ticker;
-        entity.RecordDate = model.RecordDate;
-        entity.DeclaredDate = model.DeclaredDate;
-        entity.Dividend = model.Dividend;
-        entity.DividendPrc = model.DividendPrc;
+        var entity = new DividendInfoEntity
+        {
+            InstrumentId = model.InstrumentId,
+            Ticker = model.Ticker,
+            RecordDate = model.RecordDate,
+            DeclaredDate = model.DeclaredDate,
+            Dividend = model.Dividend,
+            DividendPrc = model.DividendPrc
+        };
 
         return entity;
     }
     
     private DividendInfo GetModel(DividendInfoEntity entity)
     {
-        var model = new DividendInfo();
-        
-        model.Id = entity.Id;
-        model.InstrumentId = entity.InstrumentId;
-        model.Ticker = entity.Ticker;
-        model.RecordDate = entity.RecordDate;
-        model.DeclaredDate = entity.DeclaredDate;
-        model.Dividend = entity.Dividend;
-        model.DividendPrc = entity.DividendPrc;
+        var model = new DividendInfo
+        {
+            Id = entity.Id,
+            InstrumentId = entity.InstrumentId,
+            Ticker = entity.Ticker,
+            RecordDate = entity.RecordDate,
+            DeclaredDate = entity.DeclaredDate,
+            Dividend = entity.Dividend,
+            DividendPrc = entity.DividendPrc
+        };
 
         return model;
     }

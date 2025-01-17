@@ -93,27 +93,29 @@ public class AnalyseResultRepository(
 
     private AnalyseResultEntity GetEntity(AnalyseResult model)
     {
-        var entity = new AnalyseResultEntity();
+        var entity = new AnalyseResultEntity
+        {
+            Date = model.Date,
+            InstrumentId = model.InstrumentId,
+            AnalyseType = model.AnalyseType,
+            ResultString = model.ResultString,
+            ResultNumber = model.ResultNumber
+        };
 
-        entity.Date = model.Date;
-        entity.InstrumentId = model.InstrumentId;
-        entity.AnalyseType = model.AnalyseType;
-        entity.ResultString = model.ResultString;
-        entity.ResultNumber = model.ResultNumber;
-        
         return entity;
     }
     
     private AnalyseResult GetModel(AnalyseResultEntity entity)
     {
-        var model = new AnalyseResult();
-        
-        model.Id = entity.Id;
-        model.Date = entity.Date;
-        model.InstrumentId = entity.InstrumentId;
-        model.AnalyseType = entity.AnalyseType;
-        model.ResultString = entity.ResultString;
-        model.ResultNumber = entity.ResultNumber;
+        var model = new AnalyseResult
+        {
+            Id = entity.Id,
+            Date = entity.Date,
+            InstrumentId = entity.InstrumentId,
+            AnalyseType = entity.AnalyseType,
+            ResultString = entity.ResultString,
+            ResultNumber = entity.ResultNumber
+        };
 
         return model;
     }
