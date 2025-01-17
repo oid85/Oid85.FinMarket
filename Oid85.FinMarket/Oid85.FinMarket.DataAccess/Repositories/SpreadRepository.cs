@@ -73,6 +73,7 @@ public class SpreadRepository(
         (await context.SpreadEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.FirstInstrumentTicker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -81,6 +82,7 @@ public class SpreadRepository(
     {
         var entity = await context.SpreadEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.FirstInstrumentTicker == firstInstrumentTicker);
         
         return entity is null 

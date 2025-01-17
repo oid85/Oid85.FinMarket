@@ -40,6 +40,7 @@ public class InstrumentRepository(
     public async Task<List<Instrument>> GetAllAsync() =>
         (await context.InstrumentEntities
             .OrderBy(x => x.Name)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();

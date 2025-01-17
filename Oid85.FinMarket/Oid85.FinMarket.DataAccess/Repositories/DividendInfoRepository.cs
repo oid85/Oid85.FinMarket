@@ -31,6 +31,7 @@ public class DividendInfoRepository(
     public async Task<List<DividendInfo>> GetAllAsync() =>
         (await context.DividendInfoEntities
             .OrderBy(x => x.DividendPrc)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -43,6 +44,7 @@ public class DividendInfoRepository(
                 x.RecordDate >= from &&
                 x.RecordDate <= to)
             .OrderBy(x => x.DividendPrc)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();

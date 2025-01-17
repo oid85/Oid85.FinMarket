@@ -29,6 +29,7 @@ public class BondCouponRepository(
     
     public async Task<List<BondCoupon>> GetAllAsync() =>
         (await context.BondCouponEntities
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList(); 
@@ -39,6 +40,7 @@ public class BondCouponRepository(
             .Where(x => 
                 x.CouponDate >= from && 
                 x.CouponDate <= to)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();

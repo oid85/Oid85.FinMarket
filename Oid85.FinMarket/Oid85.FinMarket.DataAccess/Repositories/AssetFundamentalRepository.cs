@@ -31,30 +31,26 @@ public class AssetFundamentalRepository(
         (await context.AssetFundamentalEntities
             .Where(x => instrumentId == x.InstrumentId)
             .OrderBy(x => x.Date)
+            .AsNoTracking()
             .ToListAsync())
-            .Select(GetModel)
-            .ToList();
+        .Select(GetModel)
+        .ToList();
 
     public async Task<AssetFundamental?> GetLastAsync(Guid instrumentId)
     {
-        bool exists = await context.AssetFundamentalEntities
-            .Where(x => instrumentId == x.InstrumentId)
-            .AnyAsync();
+        var entity = await context.AssetFundamentalEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .OrderByDescending(x => x.Date)
+            .Take(1)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
 
-        if (!exists)
+        if (entity is null)
             return null;
         
-        var maxDate = await context.AssetFundamentalEntities
-            .Where(x => instrumentId == x.InstrumentId)
-            .MaxAsync(x => x.Date);
-
-        var entity = await context.AssetFundamentalEntities
-            .Where(x => instrumentId == x.InstrumentId)
-            .FirstAsync(x => x.Date == maxDate);
-
-        var assetFundamental = GetModel(entity);
+        var model = GetModel(entity);
         
-        return assetFundamental;
+        return model;
     }
     
     private AssetFundamentalEntity GetEntity(AssetFundamental model)

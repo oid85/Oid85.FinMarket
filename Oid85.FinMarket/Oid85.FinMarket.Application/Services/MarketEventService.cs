@@ -7,12 +7,17 @@ namespace Oid85.FinMarket.Application.Services;
 /// <inheritdoc />
 public class MarketEventService(
     IMarketEventRepository marketEventRepository,
-    IAnalyseResultRepository analyseResultRepository) 
+    IAnalyseResultRepository analyseResultRepository,
+    IShareRepository shareRepository) 
     : IMarketEventService
 {
     /// <inheritdoc />
-    public async Task CheckSupertrendMarketEventAsync(List<Guid> instrumentIds)
+    public async Task CheckSupertrendMarketEventAsync()
     {
+        var instrumentIds = (await shareRepository.GetWatchListAsync())
+            .Select(s => s.InstrumentId)
+            .ToList();
+        
         foreach (var instrumentId in instrumentIds)
         {
             var twoLastAnalyseResults = await analyseResultRepository

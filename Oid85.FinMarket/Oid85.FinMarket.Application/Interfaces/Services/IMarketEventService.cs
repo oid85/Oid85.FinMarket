@@ -8,5 +8,5 @@ public interface IMarketEventService
     /// <summary>
     /// Расчет рыночного события Супертренд
     /// </summary>
-    Task CheckSupertrendMarketEventAsync(List<Guid> instrumentIds);
+    Task CheckSupertrendMarketEventAsync();
 }

@@ -54,6 +54,7 @@ public class FutureRepository(
         (await context.FutureEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -63,6 +64,7 @@ public class FutureRepository(
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -71,6 +73,7 @@ public class FutureRepository(
     {
         var entity = await context.FutureEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 
         return entity is null 
@@ -82,6 +85,7 @@ public class FutureRepository(
     {
         var entity = await context.FutureEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
         return entity is null 

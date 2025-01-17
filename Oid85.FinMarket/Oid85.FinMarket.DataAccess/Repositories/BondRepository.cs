@@ -54,6 +54,7 @@ public class BondRepository(
         (await context.BondEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -63,6 +64,7 @@ public class BondRepository(
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -71,6 +73,7 @@ public class BondRepository(
     {
         var entity = await context.BondEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
         return entity is null 

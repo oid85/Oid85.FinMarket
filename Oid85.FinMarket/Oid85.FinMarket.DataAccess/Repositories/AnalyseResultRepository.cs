@@ -34,25 +34,21 @@ public class AnalyseResultRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
     
     public async Task<List<AnalyseResult>> GetAsync(
-        List<Guid> instrumentIds, DateOnly from, DateOnly to)
-    {
-        var entities = await context.AnalyseResultEntities
+        List<Guid> instrumentIds, DateOnly from, DateOnly to) =>
+        (await context.AnalyseResultEntities
             .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
-            .ToListAsync();
-        
-        var models = entities
-            .Select(GetModel)
-            .ToList();
-        
-        return models;
-    }
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(GetModel)
+        .ToList();
 
     public async Task<AnalyseResult?> GetLastAsync(
         Guid instrumentId, string analyseType)
@@ -63,6 +59,7 @@ public class AnalyseResultRepository(
                 && x.AnalyseType == analyseType)
             .OrderByDescending(x => x.Date)
             .Take(1)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
 
         if (entity is null)
@@ -81,6 +78,7 @@ public class AnalyseResultRepository(
                 && x.AnalyseType == analyseType)
             .OrderByDescending(x => x.Date)
             .Take(2)
+            .AsNoTracking()
             .ToListAsync();
 
         if (entities.Count < 2)

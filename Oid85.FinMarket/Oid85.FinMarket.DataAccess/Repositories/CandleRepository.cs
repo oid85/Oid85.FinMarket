@@ -55,30 +55,26 @@ public class CandleRepository(
         (await context.CandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .OrderBy(x => x.Date)
+            .AsNoTracking()
             .ToListAsync())
-            .Select(GetModel)
-            .ToList();
+        .Select(GetModel)
+        .ToList();
 
     public async Task<Candle?> GetLastAsync(Guid instrumentId)
     {
-        bool exists = await context.CandleEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .AnyAsync();
-
-        if (!exists)
-            return null;
-        
-        var maxDate = await context.CandleEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .MaxAsync(x => x.Date);
-
         var entity = await context.CandleEntities
             .Where(x => x.InstrumentId == instrumentId)
-            .FirstAsync(x => x.Date == maxDate);
+            .OrderByDescending(x => x.Date)
+            .Take(1)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
 
-        var candle = GetModel(entity);
+        if (entity is null)
+            return null;
         
-        return candle;
+        var model = GetModel(entity);
+        
+        return model;
     }
     
     private void SetEntity(ref CandleEntity? entity, Candle model)

@@ -65,6 +65,7 @@ public class ForecastTargetRepository(
         (await context.ForecastTargetEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -74,6 +75,7 @@ public class ForecastTargetRepository(
         var entities = await context.ForecastTargetEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.Ticker == ticker)
+            .AsNoTracking()
             .ToListAsync();
         
         var models = entities
@@ -88,6 +90,7 @@ public class ForecastTargetRepository(
         var entities = await context.ForecastTargetEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InstrumentId == instrumentId)
+            .AsNoTracking()
             .ToListAsync();
         
         var models = entities

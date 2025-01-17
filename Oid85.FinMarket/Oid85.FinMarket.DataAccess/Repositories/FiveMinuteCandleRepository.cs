@@ -58,6 +58,7 @@ public class FiveMinuteCandleRepository(
     public async Task<List<FiveMinuteCandle>> GetAsync(Guid instrumentId) =>
         (await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .OrderBy(x => x.Date.ToDateTime(x.Time))
@@ -81,6 +82,7 @@ public class FiveMinuteCandleRepository(
     {
         bool exists = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
+            .AsNoTracking()
             .AnyAsync();
 
         if (!exists)
@@ -88,11 +90,13 @@ public class FiveMinuteCandleRepository(
         
         var maxDate = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
+            .AsNoTracking()
             .MaxAsync(x => x.Date);
 
         var entitiesByMaxDate = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date == maxDate)
+            .AsNoTracking()
             .ToListAsync();
 
         var lastCandleEntity = entitiesByMaxDate
