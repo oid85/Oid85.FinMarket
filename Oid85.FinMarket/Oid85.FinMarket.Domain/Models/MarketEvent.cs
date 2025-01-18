@@ -33,6 +33,11 @@ public class MarketEvent
     public string MarketEventType { get; set; } = string.Empty;
     
     /// <summary>
+    /// Техт
+    /// </summary>
+    public string MarketEventText { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Активно/неактивно
     /// </summary>
     public bool IsActive { get; set; } = false;

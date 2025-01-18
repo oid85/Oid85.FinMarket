@@ -99,6 +99,8 @@ public class ShareRepository(
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
+            HighTargetPrice = model.HighTargetPrice,
+            LowTargetPrice = model.LowTargetPrice,
             Isin = model.Isin,
             Figi = model.Figi,
             InstrumentId = model.InstrumentId,
@@ -117,6 +119,8 @@ public class ShareRepository(
             Id = entity.Id,
             Ticker = entity.Ticker,
             LastPrice = entity.LastPrice,
+            HighTargetPrice = entity.HighTargetPrice,
+            LowTargetPrice = entity.LowTargetPrice,
             Isin = entity.Isin,
             Figi = entity.Figi,
             InstrumentId = entity.InstrumentId,

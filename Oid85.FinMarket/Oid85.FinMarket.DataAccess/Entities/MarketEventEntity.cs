@@ -37,6 +37,12 @@ public class MarketEventEntity : AuditableEntity
     public string MarketEventType { get; set; } = string.Empty;
     
     /// <summary>
+    /// Техт
+    /// </summary>
+    [Column("market_event_text"), MaxLength(400)]
+    public string MarketEventText { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Активно/неактивно
     /// </summary>
     [Column("is_active")]
