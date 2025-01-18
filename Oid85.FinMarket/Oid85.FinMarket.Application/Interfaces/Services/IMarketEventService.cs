@@ -9,4 +9,14 @@ public interface IMarketEventService
     /// Расчет рыночного события Супертренд
     /// </summary>
     Task CheckSupertrendMarketEventAsync();
+
+    /// <summary>
+    /// Расчет рыночного события Растущий объем
+    /// </summary>
+    Task CheckCandleVolumeMarketEventAsync();
+
+    /// <summary>
+    /// Расчет рыночного события Свечи одного цвета
+    /// </summary>
+    Task CheckCandleSequenceMarketEventAsync();
 }

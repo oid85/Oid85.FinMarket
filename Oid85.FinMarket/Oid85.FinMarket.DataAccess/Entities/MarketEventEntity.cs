@@ -41,4 +41,10 @@ public class MarketEventEntity : AuditableEntity
     /// </summary>
     [Column("is_active")]
     public bool IsActive { get; set; } = false;
+    
+    /// <summary>
+    /// Отправлено оповещение 
+    /// </summary>
+    [Column("sent_notification")]
+    public bool SentNotification { get; set; } = false;
 }

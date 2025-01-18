@@ -36,4 +36,9 @@ public class MarketEvent
     /// Активно/неактивно
     /// </summary>
     public bool IsActive { get; set; } = false;
+    
+    /// <summary>
+    /// Отправлено оповещение 
+    /// </summary>
+    public bool SentNotification { get; set; } = false;
 }

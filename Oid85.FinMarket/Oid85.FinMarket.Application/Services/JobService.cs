@@ -83,5 +83,7 @@ public class JobService(
     public async Task CheckMarketEventsAsync()
     {
         await marketEventService.CheckSupertrendMarketEventAsync();
+        await marketEventService.CheckCandleVolumeMarketEventAsync();
+        await marketEventService.CheckCandleSequenceMarketEventAsync();
     }
 }
