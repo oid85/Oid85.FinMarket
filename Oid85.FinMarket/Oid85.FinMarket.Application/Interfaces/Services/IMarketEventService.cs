@@ -49,4 +49,14 @@ public interface IMarketEventService
     /// Расчет рыночного события RSI (выход из зоны перепроданности)
     /// </summary>
     Task CheckRsiOverOverSoldOutputMarketEventAsync();
+    
+    /// <summary>
+    /// Расчет рыночного события Пересечение ценой уровня (вверх)
+    /// </summary>
+    Task CheckCrossUpTargetPriceMarketEventAsync();
+    
+    /// <summary>
+    /// Расчет рыночного события Пересечение ценой уровня (вниз)
+    /// </summary>
+    Task CheckCrossDownTargetPriceMarketEventAsync();
 }

@@ -91,5 +91,7 @@ public class JobService(
         await marketEventService.CheckRsiOverBoughtOutputMarketEventAsync();
         await marketEventService.CheckRsiOverOverSoldInputMarketEventAsync();
         await marketEventService.CheckRsiOverOverSoldOutputMarketEventAsync();
+        await marketEventService.CheckCrossUpTargetPriceMarketEventAsync();
+        await marketEventService.CheckCrossDownTargetPriceMarketEventAsync();
     }
 }
