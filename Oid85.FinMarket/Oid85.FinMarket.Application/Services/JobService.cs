@@ -82,8 +82,14 @@ public class JobService(
 
     public async Task CheckMarketEventsAsync()
     {
-        await marketEventService.CheckSupertrendMarketEventAsync();
-        await marketEventService.CheckCandleVolumeMarketEventAsync();
-        await marketEventService.CheckCandleSequenceMarketEventAsync();
+        await marketEventService.CheckSupertrendUpMarketEventAsync();
+        await marketEventService.CheckSupertrendDownMarketEventAsync();
+        await marketEventService.CheckCandleVolumeUpMarketEventAsync();
+        await marketEventService.CheckCandleSequenceWhiteMarketEventAsync();
+        await marketEventService.CheckCandleSequenceBlackMarketEventAsync();
+        await marketEventService.CheckRsiOverBoughtInputMarketEventAsync();
+        await marketEventService.CheckRsiOverBoughtOutputMarketEventAsync();
+        await marketEventService.CheckRsiOverOverSoldInputMarketEventAsync();
+        await marketEventService.CheckRsiOverOverSoldOutputMarketEventAsync();
     }
 }

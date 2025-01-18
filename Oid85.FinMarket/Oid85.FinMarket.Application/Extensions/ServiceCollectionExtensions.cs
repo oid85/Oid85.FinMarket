@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFuturesReportService, FuturesReportService>();
         services.AddTransient<ICurrenciesReportService, CurrenciesReportService>();
         services.AddTransient<IBondsReportService, BondsReportService>();
+        services.AddTransient<IMarketEventsReportService, MarketEventsReportService>();
         services.AddTransient<ReportHelper>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
