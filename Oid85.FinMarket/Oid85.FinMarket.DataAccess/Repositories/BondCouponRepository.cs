@@ -29,6 +29,7 @@ public class BondCouponRepository(
     
     public async Task<List<BondCoupon>> GetAllAsync() =>
         (await context.BondCouponEntities
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList(); 
@@ -39,39 +40,42 @@ public class BondCouponRepository(
             .Where(x => 
                 x.CouponDate >= from && 
                 x.CouponDate <= to)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
     
     private BondCouponEntity GetEntity(BondCoupon model)
     {
-        var entity = new BondCouponEntity();
-        
-        entity.InstrumentId = model.InstrumentId;
-        entity.Ticker = model.Ticker;
-        entity.CouponDate = model.CouponDate;
-        entity.CouponNumber = model.CouponNumber;
-        entity.CouponPeriod = model.CouponPeriod;
-        entity.CouponStartDate = model.CouponStartDate;
-        entity.CouponEndDate = model.CouponEndDate;
-        entity.PayOneBond = model.PayOneBond;
+        var entity = new BondCouponEntity
+        {
+            InstrumentId = model.InstrumentId,
+            Ticker = model.Ticker,
+            CouponDate = model.CouponDate,
+            CouponNumber = model.CouponNumber,
+            CouponPeriod = model.CouponPeriod,
+            CouponStartDate = model.CouponStartDate,
+            CouponEndDate = model.CouponEndDate,
+            PayOneBond = model.PayOneBond
+        };
 
         return entity;
     }
     
     private BondCoupon GetModel(BondCouponEntity entity)
     {
-        var model = new BondCoupon();
-        
-        model.Id = entity.Id;
-        model.InstrumentId = entity.InstrumentId;
-        model.Ticker = entity.Ticker;
-        model.CouponDate = entity.CouponDate;
-        model.CouponNumber = entity.CouponNumber;
-        model.CouponPeriod = entity.CouponPeriod;
-        model.CouponStartDate = entity.CouponStartDate;
-        model.CouponEndDate = entity.CouponEndDate;
-        model.PayOneBond = entity.PayOneBond;
+        var model = new BondCoupon
+        {
+            Id = entity.Id,
+            InstrumentId = entity.InstrumentId,
+            Ticker = entity.Ticker,
+            CouponDate = entity.CouponDate,
+            CouponNumber = entity.CouponNumber,
+            CouponPeriod = entity.CouponPeriod,
+            CouponStartDate = entity.CouponStartDate,
+            CouponEndDate = entity.CouponEndDate,
+            PayOneBond = entity.PayOneBond
+        };
 
         return model;
     }

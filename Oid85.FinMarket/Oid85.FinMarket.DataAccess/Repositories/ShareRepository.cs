@@ -54,6 +54,7 @@ public class ShareRepository(
         (await context.ShareEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -63,6 +64,7 @@ public class ShareRepository(
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -71,6 +73,7 @@ public class ShareRepository(
     {
         var entity = await context.ShareEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
         return entity is null 
@@ -82,6 +85,7 @@ public class ShareRepository(
     {
         var entity = await context.ShareEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
         return entity is null 
@@ -91,33 +95,35 @@ public class ShareRepository(
 
     private ShareEntity GetEntity(Share model)
     {
-        var entity = new ShareEntity();
-        
-        entity.Ticker = model.Ticker;
-        entity.LastPrice = model.LastPrice;
-        entity.Isin = model.Isin;
-        entity.Figi = model.Figi;
-        entity.InstrumentId = model.InstrumentId;
-        entity.Name = model.Name;
-        entity.Sector = model.Sector;
-        entity.InWatchList = model.InWatchList;
+        var entity = new ShareEntity
+        {
+            Ticker = model.Ticker,
+            LastPrice = model.LastPrice,
+            Isin = model.Isin,
+            Figi = model.Figi,
+            InstrumentId = model.InstrumentId,
+            Name = model.Name,
+            Sector = model.Sector,
+            InWatchList = model.InWatchList
+        };
 
         return entity;
     }
     
     private Share GetModel(ShareEntity entity)
     {
-        var model = new Share();
-        
-        model.Id = entity.Id;
-        model.Ticker = entity.Ticker;
-        model.LastPrice = entity.LastPrice;
-        model.Isin = entity.Isin;
-        model.Figi = entity.Figi;
-        model.InstrumentId = entity.InstrumentId;
-        model.Name = entity.Name;
-        model.Sector = entity.Sector;
-        model.InWatchList = entity.InWatchList;
+        var model = new Share
+        {
+            Id = entity.Id,
+            Ticker = entity.Ticker,
+            LastPrice = entity.LastPrice,
+            Isin = entity.Isin,
+            Figi = entity.Figi,
+            InstrumentId = entity.InstrumentId,
+            Name = entity.Name,
+            Sector = entity.Sector,
+            InWatchList = entity.InWatchList
+        };
 
         return model;
     }

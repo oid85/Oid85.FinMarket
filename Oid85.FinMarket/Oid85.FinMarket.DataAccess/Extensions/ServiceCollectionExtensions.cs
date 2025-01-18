@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Interceptors;
 using Oid85.FinMarket.DataAccess.Repositories;
@@ -43,13 +44,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMultiplicatorRepository, MultiplicatorRepository>();
         services.AddTransient<IForecastTargetRepository, ForecastTargetRepository>();
         services.AddTransient<IForecastConsensusRepository, ForecastConsensusRepository>();
-    }
-
-    public static async Task ApplyMigrations(this IHost host)
-    {
-        var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
-        await using var scope = scopeFactory.CreateAsyncScope();
-        await using var context = scope.ServiceProvider.GetRequiredService<FinMarketContext>();
-        await context.Database.MigrateAsync();
+        services.AddTransient<IMarketEventRepository, MarketEventRepository>();
     }
 }

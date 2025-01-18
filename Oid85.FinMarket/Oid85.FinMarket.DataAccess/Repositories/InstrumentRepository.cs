@@ -40,6 +40,7 @@ public class InstrumentRepository(
     public async Task<List<Instrument>> GetAllAsync() =>
         (await context.InstrumentEntities
             .OrderBy(x => x.Name)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -86,13 +87,14 @@ public class InstrumentRepository(
     
     private Instrument GetModel(InstrumentEntity entity)
     {
-        var model = new Instrument();
-        
-        model.Id = entity.Id;
-        model.InstrumentId = entity.InstrumentId;
-        model.Ticker = entity.Ticker;
-        model.Name = entity.Name;
-        model.Type = entity.Type;
+        var model = new Instrument
+        {
+            Id = entity.Id,
+            InstrumentId = entity.InstrumentId,
+            Ticker = entity.Ticker,
+            Name = entity.Name,
+            Type = entity.Type
+        };
 
         return model;
     }

@@ -58,6 +58,7 @@ public class FiveMinuteCandleRepository(
     public async Task<List<FiveMinuteCandle>> GetAsync(Guid instrumentId) =>
         (await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .OrderBy(x => x.Date.ToDateTime(x.Time))
@@ -81,6 +82,7 @@ public class FiveMinuteCandleRepository(
     {
         bool exists = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
+            .AsNoTracking()
             .AnyAsync();
 
         if (!exists)
@@ -88,11 +90,13 @@ public class FiveMinuteCandleRepository(
         
         var maxDate = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
+            .AsNoTracking()
             .MaxAsync(x => x.Date);
 
         var entitiesByMaxDate = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date == maxDate)
+            .AsNoTracking()
             .ToListAsync();
 
         var lastCandleEntity = entitiesByMaxDate
@@ -121,35 +125,37 @@ public class FiveMinuteCandleRepository(
     
     private FiveMinuteCandleEntity GetEntity(FiveMinuteCandle model)
     {
-        var entity = new FiveMinuteCandleEntity();
-        
-        entity.InstrumentId = model.InstrumentId;
-        entity.Open = model.Open;
-        entity.Close = model.Close;
-        entity.High = model.High;
-        entity.Low = model.Low;
-        entity.Volume = model.Volume;
-        entity.Date = model.Date;
-        entity.Time = model.Time;
-        entity.IsComplete = model.IsComplete;
+        var entity = new FiveMinuteCandleEntity
+        {
+            InstrumentId = model.InstrumentId,
+            Open = model.Open,
+            Close = model.Close,
+            High = model.High,
+            Low = model.Low,
+            Volume = model.Volume,
+            Date = model.Date,
+            Time = model.Time,
+            IsComplete = model.IsComplete
+        };
 
         return entity;
     }
     
     private FiveMinuteCandle GetModel(FiveMinuteCandleEntity entity)
     {
-        var model = new FiveMinuteCandle();
-        
-        model.Id = entity.Id;
-        model.InstrumentId = entity.InstrumentId;
-        model.Open = entity.Open;
-        model.Close = entity.Close;
-        model.High = entity.High;
-        model.Low = entity.Low;
-        model.Volume = entity.Volume;
-        model.Date = entity.Date;
-        model.Time = entity.Time;
-        model.IsComplete = entity.IsComplete;
+        var model = new FiveMinuteCandle
+        {
+            Id = entity.Id,
+            InstrumentId = entity.InstrumentId,
+            Open = entity.Open,
+            Close = entity.Close,
+            High = entity.High,
+            Low = entity.Low,
+            Volume = entity.Volume,
+            Date = entity.Date,
+            Time = entity.Time,
+            IsComplete = entity.IsComplete
+        };
 
         return model;
     }

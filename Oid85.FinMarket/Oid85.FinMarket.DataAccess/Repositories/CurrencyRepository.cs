@@ -54,6 +54,7 @@ public class CurrencyRepository(
         (await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -63,6 +64,7 @@ public class CurrencyRepository(
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -71,6 +73,7 @@ public class CurrencyRepository(
     {
         var entity = await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 
         return entity is null 
@@ -82,6 +85,7 @@ public class CurrencyRepository(
     {
         var entity = await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
         return entity is null 
@@ -91,35 +95,37 @@ public class CurrencyRepository(
     
     private CurrencyEntity GetEntity(Currency model)
     {
-        var entity = new CurrencyEntity();
-        
-        entity.Ticker = model.Ticker;
-        entity.LastPrice = model.LastPrice;
-        entity.Isin = model.Isin;
-        entity.Figi = model.Figi;
-        entity.ClassCode = model.ClassCode;
-        entity.Name = model.Name;
-        entity.IsoCurrencyName = model.IsoCurrencyName;
-        entity.InstrumentId = model.InstrumentId;
-        entity.InWatchList = model.InWatchList;
+        var entity = new CurrencyEntity
+        {
+            Ticker = model.Ticker,
+            LastPrice = model.LastPrice,
+            Isin = model.Isin,
+            Figi = model.Figi,
+            ClassCode = model.ClassCode,
+            Name = model.Name,
+            IsoCurrencyName = model.IsoCurrencyName,
+            InstrumentId = model.InstrumentId,
+            InWatchList = model.InWatchList
+        };
 
         return entity;
     }
     
     private Currency GetModel(CurrencyEntity entity)
     {
-        var model = new Currency();
-        
-        model.Id = entity.Id;
-        model.Ticker = entity.Ticker;
-        model.LastPrice = entity.LastPrice;
-        model.Isin = entity.Isin;
-        model.Figi = entity.Figi;
-        model.ClassCode = entity.ClassCode;
-        model.Name = entity.Name;
-        model.IsoCurrencyName = entity.IsoCurrencyName;
-        model.InstrumentId = entity.InstrumentId;
-        model.InWatchList = entity.InWatchList;
+        var model = new Currency
+        {
+            Id = entity.Id,
+            Ticker = entity.Ticker,
+            LastPrice = entity.LastPrice,
+            Isin = entity.Isin,
+            Figi = entity.Figi,
+            ClassCode = entity.ClassCode,
+            Name = entity.Name,
+            IsoCurrencyName = entity.IsoCurrencyName,
+            InstrumentId = entity.InstrumentId,
+            InWatchList = entity.InWatchList
+        };
 
         return model;
     }

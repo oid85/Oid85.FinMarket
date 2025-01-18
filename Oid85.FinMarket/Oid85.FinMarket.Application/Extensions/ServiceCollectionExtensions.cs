@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
         services.AddTransient<IMultiplicatorService, MultiplicatorService>();
+        services.AddTransient<IMarketEventService, MarketEventService>();
     }
     
     public static async Task RegisterHangfireJobs(
@@ -48,6 +49,7 @@ public static class ServiceCollectionExtensions
         RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
         RegisterJob(KnownJobs.CalculateMultiplicators, () => jobService.CalculateMultiplicatorsAsync());
         RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
+        RegisterJob(KnownJobs.CheckMarketEvents, () => jobService.CheckMarketEventsAsync());
         
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)
         {

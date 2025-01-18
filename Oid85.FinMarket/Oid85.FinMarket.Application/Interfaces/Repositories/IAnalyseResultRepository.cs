@@ -8,4 +8,5 @@ public interface IAnalyseResultRepository
     Task<List<AnalyseResult>> GetAsync(Guid instrumentId, DateOnly from, DateOnly to);
     Task<List<AnalyseResult>> GetAsync(List<Guid> instrumentIds, DateOnly from, DateOnly to);
     Task<AnalyseResult?> GetLastAsync(Guid instrumentId, string analyseType);
+    Task<List<AnalyseResult>> GetTwoLastAsync(Guid instrumentId, string analyseType);
 }

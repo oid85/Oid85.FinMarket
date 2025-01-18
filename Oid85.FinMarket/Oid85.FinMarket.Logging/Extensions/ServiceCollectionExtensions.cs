@@ -25,12 +25,4 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ILogRepository, LogRepository>();
         services.AddTransient<ILogService, LogService>();
     }
-
-    public static async Task ApplyLogMigrations(this IHost host)
-    {
-        var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
-        await using var scope = scopeFactory.CreateAsyncScope();
-        await using var context = scope.ServiceProvider.GetRequiredService<LogContext>();
-        await context.Database.MigrateAsync();
-    }
 }

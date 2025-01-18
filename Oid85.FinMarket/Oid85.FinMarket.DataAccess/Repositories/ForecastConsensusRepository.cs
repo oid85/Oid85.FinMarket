@@ -63,6 +63,7 @@ public class ForecastConsensusRepository(
         (await context.ForecastConsensusEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -71,6 +72,7 @@ public class ForecastConsensusRepository(
     {
         var entity = await context.ForecastConsensusEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
         return entity is null 
@@ -82,6 +84,7 @@ public class ForecastConsensusRepository(
     {
         var entity = await context.ForecastConsensusEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         
         return entity is null 
@@ -91,39 +94,41 @@ public class ForecastConsensusRepository(
     
     private ForecastConsensusEntity GetEntity(ForecastConsensus model)
     {
-        var entity = new ForecastConsensusEntity();
+        var entity = new ForecastConsensusEntity
+        {
+            Ticker = model.Ticker,
+            InstrumentId = model.InstrumentId,
+            RecommendationString = model.RecommendationString,
+            RecommendationNumber = model.RecommendationNumber,
+            Currency = model.Currency,
+            CurrentPrice = model.CurrentPrice,
+            ConsensusPrice = model.ConsensusPrice,
+            MinTarget = model.MinTarget,
+            MaxTarget = model.MaxTarget,
+            PriceChange = model.PriceChange,
+            PriceChangeRel = model.PriceChangeRel
+        };
 
-        entity.Ticker = model.Ticker;
-        entity.InstrumentId = model.InstrumentId;
-        entity.RecommendationString = model.RecommendationString;
-        entity.RecommendationNumber = model.RecommendationNumber;
-        entity.Currency = model.Currency;
-        entity.CurrentPrice = model.CurrentPrice;
-        entity.ConsensusPrice = model.ConsensusPrice;
-        entity.MinTarget = model.MinTarget;
-        entity.MaxTarget = model.MaxTarget;
-        entity.PriceChange = model.PriceChange;
-        entity.PriceChangeRel = model.PriceChangeRel;
-        
         return entity;
     }
     
     private ForecastConsensus GetModel(ForecastConsensusEntity entity)
     {
-        var model = new ForecastConsensus();
-        
-        model.Id = entity.Id;
-        model.Ticker = entity.Ticker;
-        model.InstrumentId = entity.InstrumentId;
-        model.RecommendationString = entity.RecommendationString;
-        model.RecommendationNumber = entity.RecommendationNumber;
-        model.Currency = entity.Currency;
-        model.CurrentPrice = entity.CurrentPrice;
-        model.ConsensusPrice = entity.ConsensusPrice;
-        model.MinTarget = entity.MinTarget;
-        model.MaxTarget = entity.MaxTarget;
-        model.PriceChange = entity.PriceChange;
-        model.PriceChangeRel = entity.PriceChangeRel;
+        var model = new ForecastConsensus
+        {
+            Id = entity.Id,
+            Ticker = entity.Ticker,
+            InstrumentId = entity.InstrumentId,
+            RecommendationString = entity.RecommendationString,
+            RecommendationNumber = entity.RecommendationNumber,
+            Currency = entity.Currency,
+            CurrentPrice = entity.CurrentPrice,
+            ConsensusPrice = entity.ConsensusPrice,
+            MinTarget = entity.MinTarget,
+            MaxTarget = entity.MaxTarget,
+            PriceChange = entity.PriceChange,
+            PriceChangeRel = entity.PriceChangeRel
+        };
 
         return model;
     }

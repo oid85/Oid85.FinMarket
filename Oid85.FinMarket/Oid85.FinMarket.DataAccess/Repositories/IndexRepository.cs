@@ -54,6 +54,7 @@ public class IndexRepository(
         (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -63,6 +64,7 @@ public class IndexRepository(
             .Where(x => !x.IsDeleted)
             .Where(x => x.InWatchList)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -71,6 +73,7 @@ public class IndexRepository(
     {
         var entity = await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 
         return entity is null 
@@ -80,37 +83,39 @@ public class IndexRepository(
     
     private FinIndexEntity GetEntity(FinIndex model)
     {
-        var entity = new FinIndexEntity();
-        
-        entity.Figi = model.Figi;
-        entity.InstrumentId = model.InstrumentId;
-        entity.Ticker = model.Ticker;
-        entity.LastPrice = model.LastPrice;
-        entity.ClassCode = model.ClassCode;
-        entity.Currency = model.Currency;
-        entity.InstrumentKind = model.InstrumentKind;
-        entity.Name = model.Name;
-        entity.Exchange = model.Exchange;
-        entity.InWatchList = model.InWatchList;
+        var entity = new FinIndexEntity
+        {
+            Figi = model.Figi,
+            InstrumentId = model.InstrumentId,
+            Ticker = model.Ticker,
+            LastPrice = model.LastPrice,
+            ClassCode = model.ClassCode,
+            Currency = model.Currency,
+            InstrumentKind = model.InstrumentKind,
+            Name = model.Name,
+            Exchange = model.Exchange,
+            InWatchList = model.InWatchList
+        };
 
         return entity;
     }
     
     private FinIndex GetModel(FinIndexEntity entity)
     {
-        var model = new FinIndex();
-        
-        model.Id = entity.Id;
-        model.Figi = entity.Figi;
-        model.InstrumentId = entity.InstrumentId;
-        model.Ticker = entity.Ticker;
-        model.LastPrice = entity.LastPrice;
-        model.ClassCode = entity.ClassCode;
-        model.Currency = entity.Currency;
-        model.InstrumentKind = entity.InstrumentKind;
-        model.Name = entity.Name;
-        model.Exchange = entity.Exchange;
-        model.InWatchList = entity.InWatchList;
+        var model = new FinIndex
+        {
+            Id = entity.Id,
+            Figi = entity.Figi,
+            InstrumentId = entity.InstrumentId,
+            Ticker = entity.Ticker,
+            LastPrice = entity.LastPrice,
+            ClassCode = entity.ClassCode,
+            Currency = entity.Currency,
+            InstrumentKind = entity.InstrumentKind,
+            Name = entity.Name,
+            Exchange = entity.Exchange,
+            InWatchList = entity.InWatchList
+        };
 
         return model;
     }

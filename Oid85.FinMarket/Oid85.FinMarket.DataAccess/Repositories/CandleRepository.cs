@@ -55,30 +55,26 @@ public class CandleRepository(
         (await context.CandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .OrderBy(x => x.Date)
+            .AsNoTracking()
             .ToListAsync())
-            .Select(GetModel)
-            .ToList();
+        .Select(GetModel)
+        .ToList();
 
     public async Task<Candle?> GetLastAsync(Guid instrumentId)
     {
-        bool exists = await context.CandleEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .AnyAsync();
-
-        if (!exists)
-            return null;
-        
-        var maxDate = await context.CandleEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .MaxAsync(x => x.Date);
-
         var entity = await context.CandleEntities
             .Where(x => x.InstrumentId == instrumentId)
-            .FirstAsync(x => x.Date == maxDate);
+            .OrderByDescending(x => x.Date)
+            .Take(1)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
 
-        var candle = GetModel(entity);
+        if (entity is null)
+            return null;
         
-        return candle;
+        var model = GetModel(entity);
+        
+        return model;
     }
     
     private void SetEntity(ref CandleEntity? entity, Candle model)
@@ -97,33 +93,35 @@ public class CandleRepository(
     
     private CandleEntity GetEntity(Candle model)
     {
-        var entity = new CandleEntity();
-        
-        entity.InstrumentId = model.InstrumentId;
-        entity.Open = model.Open;
-        entity.Close = model.Close;
-        entity.High = model.High;
-        entity.Low = model.Low;
-        entity.Volume = model.Volume;
-        entity.Date = model.Date;
-        entity.IsComplete = model.IsComplete;
+        var entity = new CandleEntity
+        {
+            InstrumentId = model.InstrumentId,
+            Open = model.Open,
+            Close = model.Close,
+            High = model.High,
+            Low = model.Low,
+            Volume = model.Volume,
+            Date = model.Date,
+            IsComplete = model.IsComplete
+        };
 
         return entity;
     }
     
     private Candle GetModel(CandleEntity entity)
     {
-        var model = new Candle();
-        
-        model.Id = entity.Id;
-        model.InstrumentId = entity.InstrumentId;
-        model.Open = entity.Open;
-        model.Close = entity.Close;
-        model.High = entity.High;
-        model.Low = entity.Low;
-        model.Volume = entity.Volume;
-        model.Date = entity.Date;
-        model.IsComplete = entity.IsComplete;
+        var model = new Candle
+        {
+            Id = entity.Id,
+            InstrumentId = entity.InstrumentId,
+            Open = entity.Open,
+            Close = entity.Close,
+            High = entity.High,
+            Low = entity.Low,
+            Volume = entity.Volume,
+            Date = entity.Date,
+            IsComplete = entity.IsComplete
+        };
 
         return model;
     }

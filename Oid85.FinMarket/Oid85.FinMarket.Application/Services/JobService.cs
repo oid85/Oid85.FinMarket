@@ -6,7 +6,8 @@ public class JobService(
     ILoadService loadService,
     IAnalyseService analyseService,
     ISpreadService spreadService,
-    IMultiplicatorService multiplicatorService) 
+    IMultiplicatorService multiplicatorService,
+    IMarketEventService marketEventService) 
     : IJobService
 {
     public async Task LoadInstrumentsAsync()
@@ -77,5 +78,10 @@ public class JobService(
     {
         await multiplicatorService.FillingMultiplicatorInstrumentsAsync();
         await multiplicatorService.CalculateMultiplicatorsAsync();
+    }
+
+    public async Task CheckMarketEventsAsync()
+    {
+        await marketEventService.CheckSupertrendMarketEventAsync();
     }
 }

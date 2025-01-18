@@ -66,6 +66,7 @@ public class MultiplicatorRepository(
         (await context.MultiplicatorEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -74,6 +75,7 @@ public class MultiplicatorRepository(
     {
         var entity = await context.MultiplicatorEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         
         return entity is null 
@@ -83,43 +85,45 @@ public class MultiplicatorRepository(
     
     private MultiplicatorEntity GetEntity(Multiplicator model)
     {
-        var entity = new MultiplicatorEntity();
-        
-        entity.Ticker = model.Ticker;
-        entity.InstrumentId = model.InstrumentId;
-        entity.MarketCapitalization = model.MarketCapitalization;
-        entity.LowOfYear = model.LowOfYear;
-        entity.HighOfYear = model.HighOfYear;
-        entity.Beta = model.Beta;
-        entity.NetIncome = model.NetIncome;
-        entity.Ebitda = model.Ebitda;
-        entity.Eps = model.Eps;
-        entity.FreeCashFlow = model.FreeCashFlow;
-        entity.EvToEbitda = model.EvToEbitda;
-        entity.TotalDebtToEbitda = model.TotalDebtToEbitda;
-        entity.NetDebtToEbitda = model.NetDebtToEbitda;
+        var entity = new MultiplicatorEntity
+        {
+            Ticker = model.Ticker,
+            InstrumentId = model.InstrumentId,
+            MarketCapitalization = model.MarketCapitalization,
+            LowOfYear = model.LowOfYear,
+            HighOfYear = model.HighOfYear,
+            Beta = model.Beta,
+            NetIncome = model.NetIncome,
+            Ebitda = model.Ebitda,
+            Eps = model.Eps,
+            FreeCashFlow = model.FreeCashFlow,
+            EvToEbitda = model.EvToEbitda,
+            TotalDebtToEbitda = model.TotalDebtToEbitda,
+            NetDebtToEbitda = model.NetDebtToEbitda
+        };
 
         return entity;
     }
     
     private Multiplicator GetModel(MultiplicatorEntity entity)
     {
-        var model = new Multiplicator();
-        
-        model.Id = entity.Id;
-        model.Ticker = entity.Ticker;
-        model.InstrumentId = entity.InstrumentId;
-        model.MarketCapitalization = entity.MarketCapitalization;
-        model.LowOfYear = entity.LowOfYear;
-        model.HighOfYear = entity.HighOfYear;
-        model.Beta = entity.Beta;
-        model.NetIncome = entity.NetIncome;
-        model.Ebitda = entity.Ebitda;
-        model.Eps = entity.Eps;
-        model.FreeCashFlow = entity.FreeCashFlow;
-        model.EvToEbitda = entity.EvToEbitda;
-        model.TotalDebtToEbitda = entity.TotalDebtToEbitda;
-        model.NetDebtToEbitda = entity.NetDebtToEbitda;
+        var model = new Multiplicator
+        {
+            Id = entity.Id,
+            Ticker = entity.Ticker,
+            InstrumentId = entity.InstrumentId,
+            MarketCapitalization = entity.MarketCapitalization,
+            LowOfYear = entity.LowOfYear,
+            HighOfYear = entity.HighOfYear,
+            Beta = entity.Beta,
+            NetIncome = entity.NetIncome,
+            Ebitda = entity.Ebitda,
+            Eps = entity.Eps,
+            FreeCashFlow = entity.FreeCashFlow,
+            EvToEbitda = entity.EvToEbitda,
+            TotalDebtToEbitda = entity.TotalDebtToEbitda,
+            NetDebtToEbitda = entity.NetDebtToEbitda
+        };
 
         return model;
     }

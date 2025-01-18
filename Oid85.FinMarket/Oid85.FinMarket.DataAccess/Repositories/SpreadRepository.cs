@@ -73,6 +73,7 @@ public class SpreadRepository(
         (await context.SpreadEntities
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.FirstInstrumentTicker)
+            .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
@@ -81,6 +82,7 @@ public class SpreadRepository(
     {
         var entity = await context.SpreadEntities
             .Where(x => !x.IsDeleted)
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.FirstInstrumentTicker == firstInstrumentTicker);
         
         return entity is null 
@@ -90,47 +92,49 @@ public class SpreadRepository(
     
     private SpreadEntity GetEntity(Spread model)
     {
-        var entity = new SpreadEntity();
-        
-        entity.DateTime = model.DateTime;
-        entity.FirstInstrumentId = model.FirstInstrumentId;
-        entity.FirstInstrumentTicker = model.FirstInstrumentTicker;
-        entity.FirstInstrumentRole = model.FirstInstrumentRole;
-        entity.FirstInstrumentPrice = model.FirstInstrumentPrice;
-        entity.SecondInstrumentId = model.SecondInstrumentId;
-        entity.SecondInstrumentTicker = model.SecondInstrumentTicker;
-        entity.SecondInstrumentRole = model.SecondInstrumentRole;
-        entity.SecondInstrumentPrice = model.SecondInstrumentPrice;
-        entity.PriceDifference = model.PriceDifference;
-        entity.PriceDifferencePrc = model.PriceDifferencePrc;
-        entity.PriceDifferenceAverage = model.PriceDifferenceAverage;
-        entity.PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc;
-        entity.Funding = model.Funding;
-        entity.SpreadPricePosition = model.SpreadPricePosition;
+        var entity = new SpreadEntity
+        {
+            DateTime = model.DateTime,
+            FirstInstrumentId = model.FirstInstrumentId,
+            FirstInstrumentTicker = model.FirstInstrumentTicker,
+            FirstInstrumentRole = model.FirstInstrumentRole,
+            FirstInstrumentPrice = model.FirstInstrumentPrice,
+            SecondInstrumentId = model.SecondInstrumentId,
+            SecondInstrumentTicker = model.SecondInstrumentTicker,
+            SecondInstrumentRole = model.SecondInstrumentRole,
+            SecondInstrumentPrice = model.SecondInstrumentPrice,
+            PriceDifference = model.PriceDifference,
+            PriceDifferencePrc = model.PriceDifferencePrc,
+            PriceDifferenceAverage = model.PriceDifferenceAverage,
+            PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc,
+            Funding = model.Funding,
+            SpreadPricePosition = model.SpreadPricePosition
+        };
 
         return entity;
     }
     
     private Spread GetModel(SpreadEntity entity)
     {
-        var model = new Spread();
-        
-        model.Id = entity.Id;
-        model.DateTime = entity.DateTime;
-        model.FirstInstrumentId = entity.FirstInstrumentId;
-        model.FirstInstrumentTicker = entity.FirstInstrumentTicker;
-        model.FirstInstrumentRole = entity.FirstInstrumentRole;
-        model.FirstInstrumentPrice = entity.FirstInstrumentPrice;
-        model.SecondInstrumentId = entity.SecondInstrumentId;
-        model.SecondInstrumentTicker = entity.SecondInstrumentTicker;
-        model.SecondInstrumentRole = entity.SecondInstrumentRole;
-        model.SecondInstrumentPrice = entity.SecondInstrumentPrice;
-        model.PriceDifference = entity.PriceDifference;
-        model.PriceDifferencePrc = entity.PriceDifferencePrc;
-        model.PriceDifferenceAverage = entity.PriceDifferenceAverage;
-        model.PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc;
-        model.Funding = entity.Funding;
-        model.SpreadPricePosition = entity.SpreadPricePosition;
+        var model = new Spread
+        {
+            Id = entity.Id,
+            DateTime = entity.DateTime,
+            FirstInstrumentId = entity.FirstInstrumentId,
+            FirstInstrumentTicker = entity.FirstInstrumentTicker,
+            FirstInstrumentRole = entity.FirstInstrumentRole,
+            FirstInstrumentPrice = entity.FirstInstrumentPrice,
+            SecondInstrumentId = entity.SecondInstrumentId,
+            SecondInstrumentTicker = entity.SecondInstrumentTicker,
+            SecondInstrumentRole = entity.SecondInstrumentRole,
+            SecondInstrumentPrice = entity.SecondInstrumentPrice,
+            PriceDifference = entity.PriceDifference,
+            PriceDifferencePrc = entity.PriceDifferencePrc,
+            PriceDifferenceAverage = entity.PriceDifferenceAverage,
+            PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc,
+            Funding = entity.Funding,
+            SpreadPricePosition = entity.SpreadPricePosition
+        };
 
         return model;
     }
