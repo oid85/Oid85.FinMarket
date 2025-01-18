@@ -3,6 +3,11 @@
 public class MarketEvent
 {
     /// <summary>
+    /// Id
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
     /// Дата
     /// </summary>
     public DateOnly Date { get; set; } 
