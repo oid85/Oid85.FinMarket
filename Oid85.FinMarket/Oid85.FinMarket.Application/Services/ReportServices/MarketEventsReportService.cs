@@ -52,8 +52,8 @@ public class MarketEventsReportService(
                 new ReportParameter(KnownDisplayTypes.CheckBox, MarketEventIsActive(KnownMarketEventTypes.CandleSequenceBlack)),
                 new ReportParameter(KnownDisplayTypes.CheckBox, MarketEventIsActive(KnownMarketEventTypes.RsiOverBoughtInput)),
                 new ReportParameter(KnownDisplayTypes.CheckBox, MarketEventIsActive(KnownMarketEventTypes.RsiOverBoughtOutput)),
-                new ReportParameter(KnownDisplayTypes.CheckBox, MarketEventIsActive(KnownMarketEventTypes.RsiOverOverSoldInput)),
-                new ReportParameter(KnownDisplayTypes.CheckBox, MarketEventIsActive(KnownMarketEventTypes.RsiOverOverSoldOutput))
+                new ReportParameter(KnownDisplayTypes.CheckBox, MarketEventIsActive(KnownMarketEventTypes.RsiOverSoldInput)),
+                new ReportParameter(KnownDisplayTypes.CheckBox, MarketEventIsActive(KnownMarketEventTypes.RsiOverSoldOutput))
             ]);
             
             continue;

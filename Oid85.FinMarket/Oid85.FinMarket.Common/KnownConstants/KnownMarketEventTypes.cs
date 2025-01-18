@@ -9,6 +9,6 @@ public static class KnownMarketEventTypes
     public const string CandleSequenceBlack = "CandleSequenceBlack";
     public const string RsiOverBoughtInput = "RsiOverBoughtInput";
     public const string RsiOverBoughtOutput = "RsiOverBoughtOutput";
-    public const string RsiOverOverSoldInput = "RsiOverOverSoldInput";
-    public const string RsiOverOverSoldOutput = "RsiOverOverSoldOutput";
+    public const string RsiOverSoldInput = "RsiOverSoldInput";
+    public const string RsiOverSoldOutput = "RsiOverSoldOutput";
 }
