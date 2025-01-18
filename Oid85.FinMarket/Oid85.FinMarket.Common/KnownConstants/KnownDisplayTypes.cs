@@ -9,9 +9,5 @@ public static class KnownDisplayTypes
     public const string Percent = "Percent";
     public const string Ruble = "Ruble";
     public const string Sector = "Sector";
-    public const string AnalyseResultSupertrend = "AnalyseResultSupertrend";
-    public const string AnalyseResultCandleSequence = "AnalyseResultCandleSequence";
-    public const string AnalyseResultCandleVolume = "AnalyseResultCandleVolume";
-    public const string AnalyseResultRsi = "AnalyseResultRsi";
-    public const string AnalyseResultYieldLtm = "AnalyseResultYieldLtm";
+    public const string CheckBox = "CheckBox";
 }

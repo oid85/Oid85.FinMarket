@@ -10,65 +10,223 @@ public class MarketEventService(
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
     IInstrumentRepository instrumentRepository,
-    IShareRepository shareRepository) 
+    IShareRepository shareRepository,
+    IFutureRepository futureRepository,
+    IBondRepository bondRepository,
+    ICurrencyRepository currencyRepository,
+    IIndexRepository indexRepository) 
     : IMarketEventService
 {
     /// <inheritdoc />
-    public async Task CheckSupertrendMarketEventAsync()
+    public async Task CheckSupertrendUpMarketEventAsync()
     {
         var instrumentIds = await GetInstrumentIds();
         
         foreach (var instrumentId in instrumentIds)
         {
-            var (marketEvent, marketEventReverse) = await CheckMarketEventAsync(
-                instrumentId,
-                KnownAnalyseTypes.Supertrend,
-                (KnownMarketEventTypes.SupertrendUpMarketEvent, KnownMarketEventTypes.SupertrendDownMarketEvent),
-                (KnownTrendDirections.Down, KnownTrendDirections.Up));
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Supertrend);
             
-            await SaveMarketEventAsync(marketEvent, marketEventReverse);
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.SupertrendUp);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
+            
+            marketEvent.IsActive = previous == KnownTrendDirections.Down && 
+                                   current == KnownTrendDirections.Up;
+            
+            marketEvent.IsActive |= previous == string.Empty && 
+                                    current == KnownTrendDirections.Up;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+    
+    /// <inheritdoc />
+    public async Task CheckSupertrendDownMarketEventAsync()
+    {
+        var instrumentIds = await GetInstrumentIds();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Supertrend);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.SupertrendDown);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
+            
+            marketEvent.IsActive = previous == KnownTrendDirections.Up && 
+                                   current == KnownTrendDirections.Down;
+            
+            marketEvent.IsActive |= previous == string.Empty && 
+                                    current == KnownTrendDirections.Down;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+    
+    /// <inheritdoc />
+    public async Task CheckCandleVolumeUpMarketEventAsync()
+    {
+        var instrumentIds = await GetInstrumentIds();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.CandleVolume);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.CandleVolumeUp);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
+            
+            marketEvent.IsActive = previous == string.Empty && 
+                                   current == KnownVolumeDirections.Up;
+            
+            await SaveMarketEventAsync(marketEvent);
         }
     }
 
     /// <inheritdoc />
-    public async Task CheckCandleVolumeMarketEventAsync()
+    public async Task CheckCandleSequenceWhiteMarketEventAsync()
     {
         var instrumentIds = await GetInstrumentIds();
         
         foreach (var instrumentId in instrumentIds)
         {
-            var (marketEvent, marketEventReverse) = await CheckMarketEventAsync(
-                instrumentId,
-                KnownAnalyseTypes.CandleVolume,
-                (
-                    KnownMarketEventTypes.CandleVolumeUpMarketEvent, 
-                    KnownMarketEventTypes.CandleVolumeDownMarketEvent),
-                (
-                    KnownVolumeDirections.Down, 
-                    KnownVolumeDirections.Up));
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.CandleSequence);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.CandleSequenceWhite);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
             
-            await SaveMarketEventAsync(marketEvent, marketEventReverse);
+            marketEvent.IsActive = previous == string.Empty && 
+                                   current == KnownCandleSequences.White;
+            
+            await SaveMarketEventAsync(marketEvent);
         }
     }
 
     /// <inheritdoc />
-    public async Task CheckCandleSequenceMarketEventAsync()
+    public async Task CheckCandleSequenceBlackMarketEventAsync()
     {
         var instrumentIds = await GetInstrumentIds();
         
         foreach (var instrumentId in instrumentIds)
         {
-            var (marketEvent, marketEventReverse) = await CheckMarketEventAsync(
-                instrumentId,
-                KnownAnalyseTypes.CandleSequence,
-                (
-                    KnownMarketEventTypes.CandleSequenceWhiteMarketEvent, 
-                    KnownMarketEventTypes.CandleSequenceBlackMarketEvent),
-                (
-                    KnownCandleSequences.Black, 
-                    KnownCandleSequences.White));
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.CandleSequence);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.CandleSequenceBlack);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
             
-            await SaveMarketEventAsync(marketEvent, marketEventReverse);
+            marketEvent.IsActive = previous == string.Empty && 
+                                   current == KnownCandleSequences.Black;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task CheckRsiOverBoughtInputMarketEventAsync()
+    {
+        var instrumentIds = await GetInstrumentIds();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.RsiOverBoughtInput);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
+            
+            marketEvent.IsActive = previous == string.Empty && 
+                                   current == KnownRsiInterpretations.OverBought;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+    
+    /// <inheritdoc />
+    public async Task CheckRsiOverBoughtOutputMarketEventAsync()
+    {
+        var instrumentIds = await GetInstrumentIds();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.RsiOverBoughtOutput);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
+            
+            marketEvent.IsActive = previous == KnownRsiInterpretations.OverBought && 
+                                   current == string.Empty;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+    
+    /// <inheritdoc />
+    public async Task CheckRsiOverOverSoldInputMarketEventAsync()
+    {
+        var instrumentIds = await GetInstrumentIds();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.RsiOverSoldInput);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
+            
+            marketEvent.IsActive = previous == string.Empty && 
+                                   current == KnownRsiInterpretations.OverSold;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+    
+    /// <inheritdoc />
+    public async Task CheckRsiOverOverSoldOutputMarketEventAsync()
+    {
+        var instrumentIds = await GetInstrumentIds();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var analyseResults = await analyseResultRepository
+                .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.RsiOverSoldOutput);
+
+            string previous = analyseResults[0].ResultString;
+            string current = analyseResults[1].ResultString;
+            
+            marketEvent.IsActive = previous == KnownRsiInterpretations.OverSold && 
+                                   current == string.Empty;
+            
+            await SaveMarketEventAsync(marketEvent);
         }
     }
 
@@ -76,81 +234,37 @@ public class MarketEventService(
     {
         var instrumentIds = new List<Guid>();
         
-        instrumentIds.AddRange(
-            (await shareRepository.GetWatchListAsync())
-            .Select(s => s.InstrumentId));
-
+        instrumentIds.AddRange((await shareRepository.GetWatchListAsync()).Select(s => s.InstrumentId));
+        instrumentIds.AddRange((await futureRepository.GetWatchListAsync()).Select(s => s.InstrumentId));
+        instrumentIds.AddRange((await bondRepository.GetWatchListAsync()).Select(s => s.InstrumentId));
+        instrumentIds.AddRange((await currencyRepository.GetWatchListAsync()).Select(s => s.InstrumentId));
+        instrumentIds.AddRange((await indexRepository.GetWatchListAsync()).Select(s => s.InstrumentId));
+        
         return instrumentIds;
-    }    
+    }
+
+    private async Task<MarketEvent> CreateMarketEvent(
+        Guid instrumentId,
+        string analyseType)
+    {
+        var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+        
+        return new MarketEvent
+        {
+            InstrumentId = instrumentId,
+            Ticker = instrument?.Ticker ?? string.Empty,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
+            Time = TimeOnly.FromDateTime(DateTime.UtcNow),
+            MarketEventType = analyseType
+        };
+    }
     
-    private async Task SaveMarketEventAsync(MarketEvent marketEvent, MarketEvent marketEventReverse)
+    private async Task SaveMarketEventAsync(MarketEvent marketEvent)
     {
         if (!marketEvent.IsActive)    
             await marketEventRepository.DeactivateAsync(marketEvent);
             
-        if (!marketEventReverse.IsActive)    
-            await marketEventRepository.DeactivateAsync(marketEventReverse);
-            
         if (marketEvent.IsActive)    
             await marketEventRepository.ActivateAsync(marketEvent);
-            
-        if (marketEventReverse.IsActive)    
-            await marketEventRepository.ActivateAsync(marketEventReverse);
-    }
-    
-    private async Task<(MarketEvent marketEvent, MarketEvent marketEventReverse)> CheckMarketEventAsync(
-        Guid instrumentId,
-        string analyseType,
-        (string MarketEventType1, string MarketEventType2) marketEventTypes,
-        (string MarketEventCondition1, string MarketEventCondition2) marketEventConditions)
-    {
-        var analyseResults = await analyseResultRepository
-            .GetTwoLastAsync(instrumentId, analyseType);
-
-        string ticker = (await instrumentRepository.GetByInstrumentIdAsync(instrumentId))!.Ticker;
-            
-        var marketEvent = new MarketEvent
-        {
-            InstrumentId = instrumentId,
-            Ticker = ticker,
-            Date = DateOnly.FromDateTime(DateTime.UtcNow),
-            Time = TimeOnly.FromDateTime(DateTime.UtcNow),
-            MarketEventType = marketEventTypes.MarketEventType1
-        };
-            
-        var marketEventReverse = new MarketEvent
-        {
-            InstrumentId = instrumentId,
-            Ticker = ticker,
-            Date = DateOnly.FromDateTime(DateTime.UtcNow),
-            Time = TimeOnly.FromDateTime(DateTime.UtcNow),
-            MarketEventType = marketEventTypes.MarketEventType2
-        };
-            
-        if ((analyseResults[0].ResultString == marketEventConditions.MarketEventCondition1 && 
-             analyseResults[1].ResultString == marketEventConditions.MarketEventCondition2) ||
-            (analyseResults[0].ResultString == string.Empty && 
-             analyseResults[1].ResultString == marketEventConditions.MarketEventCondition2))
-        {
-            marketEvent.IsActive = true;
-            marketEventReverse.IsActive = false;
-        }
-            
-        else if ((analyseResults[0].ResultString == marketEventConditions.MarketEventCondition2 && 
-                  analyseResults[1].ResultString == marketEventConditions.MarketEventCondition1) ||
-                 (analyseResults[0].ResultString == string.Empty &&
-                  analyseResults[1].ResultString == marketEventConditions.MarketEventCondition1))
-        {
-            marketEvent.IsActive = false;
-            marketEventReverse.IsActive = true;
-        }
-
-        else
-        {
-            marketEvent.IsActive = false;
-            marketEventReverse.IsActive = false;
-        }
-
-        return (marketEvent, marketEventReverse);
     }
 }
