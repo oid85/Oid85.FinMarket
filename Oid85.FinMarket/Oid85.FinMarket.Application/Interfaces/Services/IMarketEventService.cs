@@ -74,4 +74,9 @@ public interface IMarketEventService
     /// Расчет рыночного события Спред превышает 3 %
     /// </summary>
     Task CheckSpreadGreaterPercent3MarketEventAsync();
+    
+    /// <summary>
+    /// Расчет рыночного события Данные долгое время не обновлялись
+    /// </summary>
+    Task CheckDataHasNotBeenUpdatedMarketEventAsync();
 }

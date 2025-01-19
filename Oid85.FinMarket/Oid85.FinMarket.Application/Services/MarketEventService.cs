@@ -11,7 +11,8 @@ public class MarketEventService(
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
     IInstrumentRepository instrumentRepository,
-    ISpreadRepository spreadRepository) 
+    ISpreadRepository spreadRepository,
+    IMultiplicatorRepository multiplicatorRepository) 
     : IMarketEventService
 {
     /// <inheritdoc />
@@ -329,7 +330,7 @@ public class MarketEventService(
         foreach (var spread in spreads)
         {
             var marketEvent = await CreateMarketEvent(
-                spread.FirstInstrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
+                spread.FirstInstrumentId, KnownMarketEventTypes.SpreadGreaterPercent1);
             
             marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 1 %";
             
@@ -356,7 +357,7 @@ public class MarketEventService(
         foreach (var spread in spreads)
         {
             var marketEvent = await CreateMarketEvent(
-                spread.FirstInstrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
+                spread.FirstInstrumentId, KnownMarketEventTypes.SpreadGreaterPercent2);
             
             marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 2 %";
             
@@ -383,7 +384,7 @@ public class MarketEventService(
         foreach (var spread in spreads)
         {
             var marketEvent = await CreateMarketEvent(
-                spread.FirstInstrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
+                spread.FirstInstrumentId, KnownMarketEventTypes.SpreadGreaterPercent3);
             
             marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 3 %";
             
@@ -397,6 +398,23 @@ public class MarketEventService(
             
             else
                 marketEvent.IsActive = false;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+
+    public async Task CheckDataHasNotBeenUpdatedMarketEventAsync()
+    {
+        var multiplicators = (await multiplicatorRepository.GetAllAsync()).ToList();
+        
+        foreach (var multiplicator in multiplicators)
+        {
+            var marketEvent = await CreateMarketEvent(
+                multiplicator.InstrumentId, KnownMarketEventTypes.DataHasNotBeenUpdated);
+            
+            marketEvent.MarketEventText = $"Мультипликаторы не обновлялись дольше 30 дней";
+
+            marketEvent.IsActive = (DateTime.UtcNow - multiplicator.UpdatedAt).TotalDays >= 30.0;
             
             await SaveMarketEventAsync(marketEvent);
         }

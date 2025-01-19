@@ -122,7 +122,8 @@ public class MultiplicatorRepository(
             FreeCashFlow = entity.FreeCashFlow,
             EvToEbitda = entity.EvToEbitda,
             TotalDebtToEbitda = entity.TotalDebtToEbitda,
-            NetDebtToEbitda = entity.NetDebtToEbitda
+            NetDebtToEbitda = entity.NetDebtToEbitda,
+            UpdatedAt = entity.UpdatedAt
         };
 
         return model;

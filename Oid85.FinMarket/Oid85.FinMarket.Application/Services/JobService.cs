@@ -93,5 +93,9 @@ public class JobService(
         await marketEventService.CheckRsiOverOverSoldOutputMarketEventAsync();
         await marketEventService.CheckCrossUpTargetPriceMarketEventAsync();
         await marketEventService.CheckCrossDownTargetPriceMarketEventAsync();
+        await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
+        await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
+        await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
+        await marketEventService.CheckDataHasNotBeenUpdatedMarketEventAsync();
     }
 }
