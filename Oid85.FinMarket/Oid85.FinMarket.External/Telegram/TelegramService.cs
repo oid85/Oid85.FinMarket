@@ -6,6 +6,6 @@ public class TelegramService : ITelegramService
     /// <inheritdoc />
     public Task SendMessageAsync(string message)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }
