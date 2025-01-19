@@ -69,10 +69,9 @@ public class TinkoffService(
             {
                 InstrumentId = instrumentId.ToString(),
                 From = Timestamp.FromDateTime(from.ToUniversalTime()),
-                To = Timestamp.FromDateTime(to.ToUniversalTime())
+                To = Timestamp.FromDateTime(to.ToUniversalTime()),
+                Interval = CandleInterval._5Min
             };
-
-            request.Interval = CandleInterval._5Min;
 
             var response = await client.MarketData.GetCandlesAsync(request);
 
@@ -144,10 +143,9 @@ public class TinkoffService(
         {
             InstrumentId = instrumentId.ToString(),
             From = from,
-            To = to
+            To = to,
+            Interval = CandleInterval.Day
         };
-
-        request.Interval = CandleInterval.Day;
 
         var response = await client.MarketData.GetCandlesAsync(request);
 
