@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ICurrenciesReportService, CurrenciesReportService>();
         services.AddTransient<IBondsReportService, BondsReportService>();
         services.AddTransient<IMarketEventsReportService, MarketEventsReportService>();
+        services.AddTransient<ISendService, SendService>();
         services.AddTransient<ReportHelper>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
@@ -51,6 +52,7 @@ public static class ServiceCollectionExtensions
         RegisterJob(KnownJobs.CalculateMultiplicators, () => jobService.CalculateMultiplicatorsAsync());
         RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
         RegisterJob(KnownJobs.CheckMarketEvents, () => jobService.CheckMarketEventsAsync());
+        RegisterJob(KnownJobs.SendNotifications, () => jobService.SendNotificationsAsync());
         
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)
         {
