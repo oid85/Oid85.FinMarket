@@ -11,7 +11,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class IndexesReportService(
-    IConfiguration configuration,
     IAnalyseResultRepository analyseResultRepository,
     IIndexRepository indexRepository,
     ReportHelper reportHelper) 
@@ -226,11 +225,11 @@ public class IndexesReportService(
 
                 data.Add(analyseResult is not null
                     ? new ReportParameter(
-                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
-                        analyseResult.ResultNumber >= 0 ? KnownColors.Green : KnownColors.Red, 
-                        analyseResult.ResultString)
+                        KnownDisplayTypes.Percent,
+                        analyseResult.ResultString,
+                        reportHelper.GetColor(analyseResult.ResultNumber))
                     : new ReportParameter(
-                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                        KnownDisplayTypes.Percent,
                         string.Empty));
             }
                 

@@ -22,4 +22,9 @@ public class ReportHelper
 
         return dates;
     }
+    
+    public string GetColor(double value)
+    {
+        return value >= 0.0 ? KnownColors.Green : KnownColors.Red;
+    }
 }

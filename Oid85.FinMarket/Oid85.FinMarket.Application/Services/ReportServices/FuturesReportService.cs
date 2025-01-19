@@ -11,7 +11,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class FuturesReportService(
-    IConfiguration configuration,
     IAnalyseResultRepository analyseResultRepository,
     IFutureRepository futureRepository,
     ISpreadRepository spreadRepository,
@@ -277,11 +276,11 @@ public class FuturesReportService(
 
                 data.Add(analyseResult is not null
                     ? new ReportParameter(
-                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
-                        analyseResult.ResultNumber >= 0 ? KnownColors.Green : KnownColors.Red, 
-                        analyseResult.ResultString)
+                        KnownDisplayTypes.Percent,
+                        analyseResult.ResultString,
+                        reportHelper.GetColor(analyseResult.ResultNumber))
                     : new ReportParameter(
-                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                        KnownDisplayTypes.Percent,
                         string.Empty));
             }
                 

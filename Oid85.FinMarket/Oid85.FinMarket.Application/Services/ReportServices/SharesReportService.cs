@@ -600,11 +600,11 @@ public class SharesReportService(
 
                     data.Add(analyseResult is not null
                         ? new ReportParameter(
-                            $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
-                            analyseResult.ResultNumber >= 0 ? KnownColors.Green : KnownColors.Red, 
-                            analyseResult.ResultString)
+                            KnownDisplayTypes.Percent,
+                            analyseResult.ResultString,
+                            reportHelper.GetColor(analyseResult.ResultNumber))
                         : new ReportParameter(
-                            $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                            KnownDisplayTypes.Percent,
                             string.Empty));
                 }
 
