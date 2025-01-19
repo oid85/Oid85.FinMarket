@@ -10,7 +10,8 @@ public class MarketEventService(
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
-    IInstrumentRepository instrumentRepository) 
+    IInstrumentRepository instrumentRepository,
+    ISpreadRepository spreadRepository) 
     : IMarketEventService
 {
     /// <inheritdoc />
@@ -303,7 +304,7 @@ public class MarketEventService(
             var candles = await candleRepository.GetTwoLastAsync(instrumentId);
 
             var marketEvent = await CreateMarketEvent(
-                instrumentId, KnownMarketEventTypes.CrossUpTargetPrice);
+                instrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
 
             var target = await instrumentRepository.GetTargetPricesAsync(instrumentId);
             
@@ -319,7 +320,88 @@ public class MarketEventService(
             await SaveMarketEventAsync(marketEvent);
         }
     }
-    
+
+    /// <inheritdoc />
+    public async Task CheckSpreadGreaterPercent1MarketEventAsync()
+    {
+        var spreads = (await spreadRepository.GetAllAsync()).ToList();
+        
+        foreach (var spread in spreads)
+        {
+            var marketEvent = await CreateMarketEvent(
+                spread.FirstInstrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
+            
+            marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 1 %";
+            
+            if (spread is
+                {
+                    FirstInstrumentPrice: > 0, 
+                    SecondInstrumentPrice: > 0, 
+                    PriceDifference: > 0
+                })
+                marketEvent.IsActive = (spread.PriceDifference / spread.FirstInstrumentPrice) > 0.01;
+            
+            else
+                marketEvent.IsActive = false;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task CheckSpreadGreaterPercent2MarketEventAsync()
+    {
+        var spreads = (await spreadRepository.GetAllAsync()).ToList();
+        
+        foreach (var spread in spreads)
+        {
+            var marketEvent = await CreateMarketEvent(
+                spread.FirstInstrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
+            
+            marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 2 %";
+            
+            if (spread is
+                {
+                    FirstInstrumentPrice: > 0, 
+                    SecondInstrumentPrice: > 0, 
+                    PriceDifference: > 0
+                })
+                marketEvent.IsActive = (spread.PriceDifference / spread.FirstInstrumentPrice) > 0.02;
+            
+            else
+                marketEvent.IsActive = false;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task CheckSpreadGreaterPercent3MarketEventAsync()
+    {
+        var spreads = (await spreadRepository.GetAllAsync()).ToList();
+        
+        foreach (var spread in spreads)
+        {
+            var marketEvent = await CreateMarketEvent(
+                spread.FirstInstrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
+            
+            marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 3 %";
+            
+            if (spread is
+                {
+                    FirstInstrumentPrice: > 0, 
+                    SecondInstrumentPrice: > 0, 
+                    PriceDifference: > 0
+                })
+                marketEvent.IsActive = (spread.PriceDifference / spread.FirstInstrumentPrice) > 0.03;
+            
+            else
+                marketEvent.IsActive = false;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+
     private async Task<MarketEvent> CreateMarketEvent(
         Guid instrumentId,
         string analyseType)

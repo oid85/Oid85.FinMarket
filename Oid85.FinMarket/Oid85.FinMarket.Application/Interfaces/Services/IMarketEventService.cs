@@ -59,4 +59,19 @@ public interface IMarketEventService
     /// Расчет рыночного события Пересечение ценой уровня (вниз)
     /// </summary>
     Task CheckCrossDownTargetPriceMarketEventAsync();
+    
+    /// <summary>
+    /// Расчет рыночного события Спред превышает 1 %
+    /// </summary>
+    Task CheckSpreadGreaterPercent1MarketEventAsync();
+    
+    /// <summary>
+    /// Расчет рыночного события Спред превышает 2 %
+    /// </summary>
+    Task CheckSpreadGreaterPercent2MarketEventAsync();
+    
+    /// <summary>
+    /// Расчет рыночного события Спред превышает 3 %
+    /// </summary>
+    Task CheckSpreadGreaterPercent3MarketEventAsync();
 }

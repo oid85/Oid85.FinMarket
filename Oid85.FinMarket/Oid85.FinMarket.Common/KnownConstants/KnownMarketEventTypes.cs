@@ -13,4 +13,7 @@ public static class KnownMarketEventTypes
     public const string RsiOverSoldOutput = "RsiOverSoldOutput";
     public const string CrossUpTargetPrice = "CrossUpTargetPrice";
     public const string CrossDownTargetPrice = "CrossDownTargetPrice";
+    public const string SpreadGreaterPercent1 = "SpreadGreaterPercent1";
+    public const string SpreadGreaterPercent2 = "SpreadGreaterPercent2";
+    public const string SpreadGreaterPercent3 = "SpreadGreaterPercent3";
 }
