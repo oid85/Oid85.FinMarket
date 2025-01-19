@@ -9,4 +9,5 @@ public interface IBondRepository
     Task<List<Bond>> GetAllAsync();
     Task<List<Bond>> GetWatchListAsync();
     Task<Bond?> GetByTickerAsync(string ticker);
+    Task<Bond?> GetByInstrumentIdAsync(Guid instrumentId);
 }

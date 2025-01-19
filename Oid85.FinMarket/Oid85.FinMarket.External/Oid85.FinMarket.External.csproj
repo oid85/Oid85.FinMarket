@@ -8,6 +8,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Npgsql" />
+    <PackageReference Include="Telegram.Bot" />
     <PackageReference Include="Tinkoff.InvestApi" />
   </ItemGroup>
   <ItemGroup>

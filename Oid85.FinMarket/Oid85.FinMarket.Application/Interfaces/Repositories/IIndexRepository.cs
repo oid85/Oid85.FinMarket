@@ -9,4 +9,5 @@ public interface IIndexRepository
     Task<List<FinIndex>> GetAllAsync();
     Task<List<FinIndex>> GetWatchListAsync();
     Task<FinIndex?> GetByTickerAsync(string ticker);
+    Task<FinIndex?> GetByInstrumentIdAsync(Guid instrumentId);
 }

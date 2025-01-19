@@ -76,7 +76,26 @@ public class CandleRepository(
         
         return model;
     }
-    
+
+    public async Task<List<Candle>> GetTwoLastAsync(Guid instrumentId)
+    {
+        var entities = await context.CandleEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .OrderByDescending(x => x.Date)
+            .Take(2)
+            .AsNoTracking()
+            .ToListAsync();
+
+        if (entities.Count < 2)
+            return [];
+        
+        var models = entities
+            .Select(GetModel)
+            .ToList();
+        
+        return models;
+    }
+
     private void SetEntity(ref CandleEntity? entity, Candle model)
     {
         entity ??= new CandleEntity();

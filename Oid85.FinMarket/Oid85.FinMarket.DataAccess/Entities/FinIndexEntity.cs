@@ -25,6 +25,18 @@ public class FinIndexEntity : AuditableEntity
     public double LastPrice { get; set; }
     
     /// <summary>
+    /// Нижний целевой уровень
+    /// </summary>
+    [Column("high_target_price")]
+    public double HighTargetPrice { get; set; }
+    
+    /// <summary>
+    /// Верхний целевой уровень
+    /// </summary>
+    [Column("low_target_price")]
+    public double LowTargetPrice { get; set; }
+    
+    /// <summary>
     /// Класс-код инструмента
     /// </summary>
     [Column("class_code"), MaxLength(20)]

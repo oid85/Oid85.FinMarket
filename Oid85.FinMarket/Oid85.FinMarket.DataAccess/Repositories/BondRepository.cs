@@ -80,13 +80,27 @@ public class BondRepository(
             ? null 
             : GetModel(entity);
     }
-    
+
+    public async Task<Bond?> GetByInstrumentIdAsync(Guid instrumentId)
+    {
+        var entity = await context.BondEntities
+            .Where(x => !x.IsDeleted)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+        
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+
     private BondEntity GetEntity(Bond model)
     {
         var entity = new BondEntity
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
+            HighTargetPrice = model.HighTargetPrice,
+            LowTargetPrice = model.LowTargetPrice,
             Isin = model.Isin,
             Figi = model.Figi,
             InstrumentId = model.InstrumentId,
@@ -108,6 +122,8 @@ public class BondRepository(
             Id = entity.Id,
             Ticker = entity.Ticker,
             LastPrice = entity.LastPrice,
+            HighTargetPrice = entity.HighTargetPrice,
+            LowTargetPrice = entity.LowTargetPrice,
             Isin = entity.Isin,
             Figi = entity.Figi,
             InstrumentId = entity.InstrumentId,

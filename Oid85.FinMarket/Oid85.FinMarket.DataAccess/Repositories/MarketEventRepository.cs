@@ -90,6 +90,7 @@ public class MarketEventRepository(
             Time = model.Time,
             InstrumentId = model.InstrumentId,
             MarketEventType = model.MarketEventType,
+            MarketEventText = model.MarketEventText,
             IsActive = model.IsActive,
             SentNotification = model.SentNotification
         };
@@ -106,6 +107,7 @@ public class MarketEventRepository(
             Time = entity.Time,
             InstrumentId = entity.InstrumentId,
             MarketEventType = entity.MarketEventType,
+            MarketEventText = entity.MarketEventText,
             IsActive = entity.IsActive,
             SentNotification = entity.SentNotification
         };

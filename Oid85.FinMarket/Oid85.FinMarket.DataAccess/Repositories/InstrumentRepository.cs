@@ -6,7 +6,12 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class InstrumentRepository(
-    FinMarketContext context) 
+    FinMarketContext context,
+    IShareRepository shareRepository,
+    IFutureRepository futureRepository,
+    IBondRepository bondRepository,
+    ICurrencyRepository currencyRepository,
+    IIndexRepository indexRepository) 
     : IInstrumentRepository
 {
     public async Task AddOrUpdateAsync(List<Instrument> tickers)
@@ -45,6 +50,32 @@ public class InstrumentRepository(
         .Select(GetModel)
         .ToList();
 
+    public async Task<List<Instrument>> GetWatchListAsync()
+    {
+        var shareInstrumentIds = (await shareRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
+        var futureInstrumentIds = (await futureRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
+        var bondInstrumentIds = (await bondRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
+        var currencyInstrumentIds = (await currencyRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
+        var indexInstrumentIds = (await indexRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
+
+        bool InstrumentIdInWatchList(Guid instrumentId)
+        {
+            bool result = shareInstrumentIds.Contains(instrumentId);
+            result |= futureInstrumentIds.Contains(instrumentId);
+            result |= bondInstrumentIds.Contains(instrumentId);
+            result |= currencyInstrumentIds.Contains(instrumentId);
+            result |= indexInstrumentIds.Contains(instrumentId);
+
+            return result;
+        }
+
+        var instruments = (await GetAllAsync())
+            .Where(x => InstrumentIdInWatchList(x.InstrumentId))
+            .ToList();
+        
+        return instruments;
+    }
+
     public async Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId)
     {
         var entity = await context.InstrumentEntities
@@ -74,7 +105,37 @@ public class InstrumentRepository(
             ? null 
             : GetModel(entity);
     }
-    
+
+    public async Task<(double LowTargetPrice, double HighTargetPrice)> GetTargetPricesAsync(Guid instrumentId)
+    {
+        var share = await shareRepository.GetByInstrumentIdAsync(instrumentId);
+
+        if (share is not null)
+            return (share.LowTargetPrice, share.HighTargetPrice);
+        
+        var future = await futureRepository.GetByInstrumentIdAsync(instrumentId);
+
+        if (future is not null)
+            return (future.LowTargetPrice, future.HighTargetPrice);
+        
+        var currency = await currencyRepository.GetByInstrumentIdAsync(instrumentId);
+
+        if (currency is not null)
+            return (currency.LowTargetPrice, currency.HighTargetPrice);
+        
+        var bond = await bondRepository.GetByInstrumentIdAsync(instrumentId);
+
+        if (bond is not null)
+            return (bond.LowTargetPrice, bond.HighTargetPrice);
+        
+        var index = await indexRepository.GetByInstrumentIdAsync(instrumentId);
+
+        if (index is not null)
+            return (index.LowTargetPrice, index.HighTargetPrice);
+        
+        return (0.0, 0.0);
+    }
+
     private void SetEntity(ref InstrumentEntity? entity, Instrument model)
     {
         entity ??= new InstrumentEntity();

@@ -13,4 +13,5 @@ public static class KnownJobs
     public const string CalculateMultiplicators = "CalculateMultiplicators";
     public const string CalculateSpreads = "CalculateSpreads";
     public const string CheckMarketEvents = "CheckMarketEvents";
+    public const string SendNotifications = "SendNotifications";
 }

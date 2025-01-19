@@ -71,4 +71,9 @@ public class Multiplicator
     /// Чистый долг / EBITDA
     /// </summary>
     public double NetDebtToEbitda { get; set; }
+    
+    /// <summary>
+    /// Дата и время последнего обновления записи в БД
+    /// </summary>
+    public DateTime UpdatedAt { get; set; }
 }

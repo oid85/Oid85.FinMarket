@@ -16,4 +16,5 @@ public interface IJobService
     Task CalculateSpreadsAsync();
     Task CalculateMultiplicatorsAsync();
     Task CheckMarketEventsAsync();
+    Task SendNotificationsAsync();
 }

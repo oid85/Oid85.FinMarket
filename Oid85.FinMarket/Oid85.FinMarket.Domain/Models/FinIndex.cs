@@ -28,6 +28,16 @@ public class FinIndex
     public double LastPrice { get; set; }
     
     /// <summary>
+    /// Нижний целевой уровень
+    /// </summary>
+    public double HighTargetPrice { get; set; }
+    
+    /// <summary>
+    /// Верхний целевой уровень
+    /// </summary>
+    public double LowTargetPrice { get; set; }
+    
+    /// <summary>
     /// Класс-код инструмента
     /// </summary>
     public string ClassCode { get; set; } = string.Empty;
