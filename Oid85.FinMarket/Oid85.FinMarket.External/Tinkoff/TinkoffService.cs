@@ -1,5 +1,4 @@
 ﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
@@ -20,8 +19,7 @@ namespace Oid85.FinMarket.External.Tinkoff;
 /// <inheritdoc />
 public class TinkoffService(
     ILogService logService,
-    InvestApiClient client,
-    IConfiguration configuration)
+    InvestApiClient client)
     : ITinkoffService
 {
     // <inheritdoc />
