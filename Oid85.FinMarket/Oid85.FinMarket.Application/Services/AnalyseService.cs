@@ -132,20 +132,6 @@ public class AnalyseService(
     
     private async Task SupertrendAnalyseAsync(Guid instrumentId)
     {
-        (string, double) GetResult(SuperTrendResult result)
-        {
-            if (result.SuperTrend == null)
-                return (string.Empty, 0.0);
-
-            if (result.UpperBand == null && result.LowerBand != null)
-                return (KnownTrendDirections.Up, 1.0);
-
-            if (result.UpperBand != null && result.LowerBand == null)
-                return (KnownTrendDirections.Down, -1.0);
-
-            return (string.Empty, 0.0);
-        }
-            
         try
         {
             var candles = (await candleRepository.GetAsync(instrumentId))
@@ -153,7 +139,6 @@ public class AnalyseService(
                 .ToList();
 
             const int lookbackPeriods = 50;
-            const double multiplier = 3.0;
 
             var quotes = candles
                 .Select(x => new Quote()
@@ -166,12 +151,12 @@ public class AnalyseService(
                 })
                 .ToList();
 
-            var superTrendResults = quotes.GetSuperTrend(lookbackPeriods, multiplier);
+            var superTrendResults = quotes.GetSuperTrend(lookbackPeriods);
 
             var results = superTrendResults
                 .Select(x =>
                 {
-                    (string resultString, double resultNumber) = GetResult(x);
+                    var (resultString, resultNumber) = GetResult(x);
                     
                     return new AnalyseResult()
                     {
@@ -193,23 +178,26 @@ public class AnalyseService(
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
+
+        return;
+
+        (string, double) GetResult(SuperTrendResult result)
+        {
+            if (result is {SuperTrend: null})
+                return (string.Empty, 0.0);
+
+            if (result is {UpperBand: null, LowerBand: not null})
+                return (KnownTrendDirections.Up, 1.0);
+
+            if (result is {UpperBand: not null, LowerBand: null})
+                return (KnownTrendDirections.Down, -1.0);
+
+            return (string.Empty, 0.0);
+        }
     }
     
     private async Task CandleSequenceAnalyseAsync(Guid instrumentId)
     {
-        (string, double)  GetResult(List<Candle> candles)
-        {
-            // Свечи белые
-            if (candles.All(x => x.Close > x.Open))
-                return (KnownCandleSequences.White, 1.0);
-
-            // Свечи черные
-            if (candles.All(x => x.Close < x.Open))
-                return (KnownCandleSequences.Black, -1.0);
-
-            return (string.Empty, 0.0);
-        } 
-            
         try
         {
             var candles = (await candleRepository.GetAsync(instrumentId))
@@ -260,24 +248,25 @@ public class AnalyseService(
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
+
+        return;
+
+        (string, double)  GetResult(List<Candle> candles)
+        {
+            // Свечи белые
+            if (candles.All(x => x.Close > x.Open))
+                return (KnownCandleSequences.White, 1.0);
+
+            // Свечи черные
+            if (candles.All(x => x.Close < x.Open))
+                return (KnownCandleSequences.Black, -1.0);
+
+            return (string.Empty, 0.0);
+        }
     }
     
     private async Task CandleVolumeAnalyseAsync(Guid instrumentId)
     {
-        (string, double) GetResult(List<Candle> candles)
-        {
-            var lastVolume = candles.Last().Volume;
-            var prevVolumes = candles
-                .Select(x => x.Volume)
-                .Take(candles.Count - 1);
-
-            // Объем последней свечи выше, чем у всех предыдущих
-            if (lastVolume > prevVolumes.Max())
-                return (KnownVolumeDirections.Up, 1.0);
-
-            return (string.Empty, 0.0);
-        }
-            
         try
         {
             var candles = (await candleRepository.GetAsync(instrumentId))
@@ -336,27 +325,26 @@ public class AnalyseService(
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
+
+        return;
+
+        (string, double) GetResult(List<Candle> candles)
+        {
+            var lastVolume = candles.Last().Volume;
+            var prevVolumes = candles
+                .Select(x => x.Volume)
+                .Take(candles.Count - 1);
+
+            // Объем последней свечи выше, чем у всех предыдущих
+            if (lastVolume > prevVolumes.Max())
+                return (KnownVolumeDirections.Up, 1.0);
+
+            return (string.Empty, 0.0);
+        }
     }
     
     private async Task RsiAnalyseAsync(Guid instrumentId)
     {
-        (string, double) GetResult(RsiResult result)
-        {
-            const double upLimit = 60.0;
-            const double downLimit = 40.0;
-
-            if (result.Rsi == null)
-                return (string.Empty, 0.0);
-
-            if (result.Rsi >= upLimit)
-                return (KnownRsiInterpretations.OverBought, -1.0);
-
-            if (result.Rsi <= downLimit)
-                return (KnownRsiInterpretations.OverSold, 1.0);
-
-            return (string.Empty, 0.0);
-        }       
-        
         try
         {
             var candles = (await candleRepository.GetAsync(instrumentId))
@@ -403,21 +391,29 @@ public class AnalyseService(
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
+
+        return;
+
+        (string, double) GetResult(RsiResult result)
+        {
+            const double upLimit = 60.0;
+            const double downLimit = 40.0;
+
+            if (result.Rsi == null)
+                return (string.Empty, 0.0);
+
+            if (result.Rsi >= upLimit)
+                return (KnownRsiInterpretations.OverBought, -1.0);
+
+            if (result.Rsi <= downLimit)
+                return (KnownRsiInterpretations.OverSold, 1.0);
+
+            return (string.Empty, 0.0);
+        }
     }
     
     private async Task YieldLtmAnalyseAsync(Guid instrumentId)
     {
-        (string, double) GetResult(List<Candle> candles)
-        {
-            double firstPrice = candles.First().Close;
-            double lastPrice = candles.Last().Close;
-            double difference = lastPrice - firstPrice;
-            double yield = difference / firstPrice;
-            double yieldPrc = yield * 100.0;
-            
-            return (yieldPrc.ToString("N2"), yieldPrc);
-        }
-            
         try
         {
             var candles = (await candleRepository.GetAsync(instrumentId))
@@ -426,10 +422,10 @@ public class AnalyseService(
 
             var results = new List<AnalyseResult>();
             
-            for (int i = 0; i < candles.Count; i++)
+            foreach (var candle in candles)
             {
-                var yearAgoCandleDate = candles[i].Date.AddYears(-1);
-                var currentCandleDate = candles[i].Date;
+                var yearAgoCandleDate = candle.Date.AddYears(-1);
+                var currentCandleDate = candle.Date;
                 
                 var candlesForAnalyse = candles
                     .Where(x => 
@@ -438,7 +434,7 @@ public class AnalyseService(
                     .OrderBy(x => x.Date)
                     .ToList();
                 
-                (string resultString, double resultNumber) = GetResult(candlesForAnalyse);
+                var (resultString, resultNumber) = GetResult(candlesForAnalyse);
                 
                 results.Add(new AnalyseResult
                 {
@@ -458,6 +454,19 @@ public class AnalyseService(
         catch (Exception exception)
         {
             await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
+        }
+
+        return;
+
+        (string, double) GetResult(List<Candle> candles)
+        {
+            double firstPrice = candles.First().Close;
+            double lastPrice = candles.Last().Close;
+            double difference = lastPrice - firstPrice;
+            double yield = difference / firstPrice;
+            double yieldPrc = yield * 100.0;
+            
+            return (yieldPrc.ToString("N2"), yieldPrc);
         }
     }
 }
