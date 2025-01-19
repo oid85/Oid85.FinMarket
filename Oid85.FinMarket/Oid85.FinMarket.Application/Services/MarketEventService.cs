@@ -9,6 +9,7 @@ namespace Oid85.FinMarket.Application.Services;
 public class MarketEventService(
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
+    ICandleRepository candleRepository,
     IInstrumentRepository instrumentRepository) 
     : IMarketEventService
 {
@@ -260,7 +261,65 @@ public class MarketEventService(
             await SaveMarketEventAsync(marketEvent);
         }
     }
+    
+    /// <inheritdoc />
+    public async Task CheckCrossUpTargetPriceMarketEventAsync()
+    {
+        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
+            .Select(x => x.InstrumentId)
+            .ToList();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var candles = await candleRepository.GetTwoLastAsync(instrumentId);
 
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.CrossUpTargetPrice);
+
+            var target = await instrumentRepository.GetTargetPricesAsync(instrumentId);
+            
+            marketEvent.MarketEventText = $"Достижение ценой уровня '{target.HighTargetPrice}' (снизу-вверх)";
+
+            var previous = candles[0];
+            var current = candles[1];
+            
+            marketEvent.IsActive = target.HighTargetPrice != 0.0 && 
+                                   previous.High < target.HighTargetPrice &&
+                                   current.High >= target.HighTargetPrice;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+    
+    /// <inheritdoc />
+    public async Task CheckCrossDownTargetPriceMarketEventAsync()
+    {
+        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
+            .Select(x => x.InstrumentId)
+            .ToList();
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var candles = await candleRepository.GetTwoLastAsync(instrumentId);
+
+            var marketEvent = await CreateMarketEvent(
+                instrumentId, KnownMarketEventTypes.CrossUpTargetPrice);
+
+            var target = await instrumentRepository.GetTargetPricesAsync(instrumentId);
+            
+            marketEvent.MarketEventText = $"Достижение ценой уровня '{target.LowTargetPrice}' (сверху-вниз)";
+
+            var previous = candles[0];
+            var current = candles[1];
+            
+            marketEvent.IsActive = target.LowTargetPrice != 0.0 && 
+                                   previous.Low > target.LowTargetPrice &&
+                                   current.Low <= target.LowTargetPrice;
+            
+            await SaveMarketEventAsync(marketEvent);
+        }
+    }
+    
     private async Task<MarketEvent> CreateMarketEvent(
         Guid instrumentId,
         string analyseType)

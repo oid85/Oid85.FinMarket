@@ -80,7 +80,19 @@ public class IndexRepository(
             ? null 
             : GetModel(entity);
     }
-    
+
+    public async Task<FinIndex?> GetByInstrumentIdAsync(Guid instrumentId)
+    {
+        var entity = await context.IndicativeEntities
+            .Where(x => !x.IsDeleted)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+
     private FinIndexEntity GetEntity(FinIndex model)
     {
         var entity = new FinIndexEntity

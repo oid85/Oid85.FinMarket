@@ -80,7 +80,19 @@ public class BondRepository(
             ? null 
             : GetModel(entity);
     }
-    
+
+    public async Task<Bond?> GetByInstrumentIdAsync(Guid instrumentId)
+    {
+        var entity = await context.BondEntities
+            .Where(x => !x.IsDeleted)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+        
+        return entity is null 
+            ? null 
+            : GetModel(entity);
+    }
+
     private BondEntity GetEntity(Bond model)
     {
         var entity = new BondEntity

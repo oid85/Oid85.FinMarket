@@ -11,4 +11,6 @@ public static class KnownMarketEventTypes
     public const string RsiOverBoughtOutput = "RsiOverBoughtOutput";
     public const string RsiOverSoldInput = "RsiOverSoldInput";
     public const string RsiOverSoldOutput = "RsiOverSoldOutput";
+    public const string CrossUpTargetPrice = "CrossUpTargetPrice";
+    public const string CrossDownTargetPrice = "CrossDownTargetPrice";
 }
