@@ -96,29 +96,29 @@ public class SpreadService(
 
             // Вечный фьючерс - фьючерс
             if (!string.IsNullOrEmpty(foreverFutureTicker))
-                for (int i = 0; i < futures.Count; i++)
+                foreach (var future in futures)
                 {
                     spreads.Add(new Spread
                     {
                         FirstInstrumentId = foreverFutureInstrumentId,
                         FirstInstrumentTicker = foreverFutureTicker,
                         FirstInstrumentRole = KnownSpreadRoles.ForeverFuture,
-                        SecondInstrumentId = futures[i].InstrumentId,
-                        SecondInstrumentTicker = futures[i].Ticker,
+                        SecondInstrumentId = future.InstrumentId,
+                        SecondInstrumentTicker = future.Ticker,
                         SecondInstrumentRole = KnownSpreadRoles.Future
                     });
                 }
 
             // Базовый актив - фьючерс
-            for (int i = 0; i < futures.Count; i++)
+            foreach (var future in futures)
             {
                 spreads.Add(new Spread
                 {
                     FirstInstrumentId = baseAssetInstrumentId,
                     FirstInstrumentTicker = baseAssetTicker,
                     FirstInstrumentRole = KnownSpreadRoles.BaseActive,
-                    SecondInstrumentId = futures[i].InstrumentId,
-                    SecondInstrumentTicker = futures[i].Ticker,
+                    SecondInstrumentId = future.InstrumentId,
+                    SecondInstrumentTicker = future.Ticker,
                     SecondInstrumentRole = KnownSpreadRoles.Future
                 });
             }
@@ -149,20 +149,15 @@ public class SpreadService(
         }
     }
 
-    private static Guid GetBaseActiveInstrumentId(string ticker)
-    {
-        if (ticker == "CNY/RUB")
-            return KnownInstrumentIds.CnyRub;
-        
-        if (ticker == "EUR/USD")
-            return KnownInstrumentIds.EurUsd;
-        
-        if (ticker == "USD/RUB")
-            return KnownInstrumentIds.UsdRub;
-        
-        return Guid.Empty;
-    }
-    
+    private static Guid GetBaseActiveInstrumentId(string ticker) =>
+        ticker switch
+        {
+            "CNY/RUB" => KnownInstrumentIds.CnyRub,
+            "EUR/USD" => KnownInstrumentIds.EurUsd,
+            "USD/RUB" => KnownInstrumentIds.UsdRub,
+            _ => Guid.Empty
+        };
+
     public async Task<List<Spread>> CalculateSpreadsAsync()
     {
         var spreads = await spreadRepository.GetAllAsync();
