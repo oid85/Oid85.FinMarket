@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Interceptors;
 using Oid85.FinMarket.DataAccess.Repositories;

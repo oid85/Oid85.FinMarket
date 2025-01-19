@@ -1,6 +1,4 @@
-﻿using Oid85.FinMarket.Domain.Models;
-
-namespace Oid85.FinMarket.Application.Interfaces.Services;
+﻿namespace Oid85.FinMarket.Application.Interfaces.Services;
 
 /// <summary>
 /// Сервис анализа
