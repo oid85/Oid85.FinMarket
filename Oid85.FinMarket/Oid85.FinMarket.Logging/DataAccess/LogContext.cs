@@ -7,7 +7,7 @@ namespace Oid85.FinMarket.Logging.DataAccess;
 
 public class LogContext(DbContextOptions<LogContext> options) : DbContext(options)
 {
-    public DbSet<LogRecordEntity> LogEntities { get; set; }
+    public DbSet<LogRecordEntity> LogEntities { get; init; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
     {

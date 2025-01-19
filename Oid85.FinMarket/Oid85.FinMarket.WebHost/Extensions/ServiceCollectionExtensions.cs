@@ -13,12 +13,8 @@ public static class ServiceCollectionExtensions
             .Setup()
             .LoadConfigurationFromFile("nlog.config");
 
-        services.AddTransient(typeof(ILogger), factory =>
-        {
-            Logger logger = LogManager.GetLogger(AppDomain.CurrentDomain.FriendlyName);
-
-            return logger;
-        });
+        services.AddTransient(typeof(ILogger), _ => 
+            LogManager.GetLogger(AppDomain.CurrentDomain.FriendlyName));
     }
 
     public static void ConfigureSwagger(this IServiceCollection services, IConfiguration configuration)
@@ -46,15 +42,14 @@ public static class ServiceCollectionExtensions
                 builder.AllowAnyMethod();
                 builder.AllowAnyHeader();
                 builder.AllowAnyMethod();
-                builder.SetIsOriginAllowed(host => true);
+                builder.SetIsOriginAllowed(_ => true);
                 builder.AllowCredentials();
             });
         });
     }
 
     public static void ConfigureHangfire(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
         services.AddHangfire(config => config
             .UseInMemoryStorage());
