@@ -234,7 +234,31 @@ public class SharesReportService(
     public async Task<ReportData> GetForecastTargetAnalyseAsync()
     {
         var forecastTargets = await forecastTargetRepository.GetAllAsync();
-            
+
+        // Выбираем свежие прогнозы
+        var actualForecastTargets = new List<ForecastTarget>();
+
+        foreach (var forecastTarget in forecastTargets)
+        {
+            var target = forecastTargets
+                .Where(x =>
+                    x.InstrumentId == forecastTarget.InstrumentId &&
+                    x.Company == forecastTarget.Company)
+                .MaxBy(x => x.RecommendationDate);
+
+            if (target is not null)
+            {
+                var addedTarget = actualForecastTargets
+                    .FirstOrDefault(x =>
+                        x.InstrumentId == target.InstrumentId &&
+                        x.Company == target.Company &&
+                        x.RecommendationDate == target.RecommendationDate);
+
+                if (addedTarget is null) 
+                    actualForecastTargets.Add(target);
+            }
+        }
+        
         var reportData = new ReportData
         {
             Title = "Прогнозы",
@@ -253,7 +277,7 @@ public class SharesReportService(
             ]
         };
 
-        foreach (var forecastTarget in forecastTargets)
+        foreach (var forecastTarget in actualForecastTargets)
         {
             List<ReportParameter> data =
             [

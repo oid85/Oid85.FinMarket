@@ -505,8 +505,9 @@ public class TinkoffService(
                 return [];
             
             var request = new GetAssetFundamentalsRequest();
-                
-            request.Assets.AddRange(instrumentIds.Select(x => x.ToString()));
+
+            foreach (var instrumentId in instrumentIds) 
+                request.Assets.Add(instrumentId.ToString());
             
             var response = await client
                 .Instruments

@@ -12,8 +12,8 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    [Migration("20250108075637_AddColumnToTableAnalyseResults")]
-    partial class AddColumnToTableAnalyseResults
+    [Migration("20250120170925_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,7 +56,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("result");
+                        .HasColumnName("result_string");
 
                     b.HasKey("Id")
                         .HasName("pk_analyse_results");
@@ -418,6 +418,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("floating_coupon_flag");
 
+                    b.Property<double>("HighTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high_target_price");
+
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
@@ -439,6 +443,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("LastPrice")
                         .HasColumnType("double precision")
                         .HasColumnName("last_price");
+
+                    b.Property<double>("LowTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low_target_price");
 
                     b.Property<DateOnly>("MaturityDate")
                         .HasColumnType("date")
@@ -517,12 +525,12 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnName("volume");
 
                     b.HasKey("Id")
-                        .HasName("pk_candles");
+                        .HasName("pk_daily_candles");
 
                     b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_candles_instrument_id");
+                        .HasDatabaseName("ix_daily_candles_instrument_id");
 
-                    b.ToTable("candles", "storage");
+                    b.ToTable("daily-candles", "storage");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.CurrencyEntity", b =>
@@ -553,6 +561,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("figi");
 
+                    b.Property<double>("HighTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high_target_price");
+
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
@@ -580,6 +592,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("LastPrice")
                         .HasColumnType("double precision")
                         .HasColumnName("last_price");
+
+                    b.Property<double>("LowTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low_target_price");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -699,6 +715,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("figi");
 
+                    b.Property<double>("HighTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high_target_price");
+
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
@@ -721,6 +741,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("last_price");
 
+                    b.Property<double>("LowTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low_target_price");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -741,6 +765,227 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasName("pk_fin_indexes");
 
                     b.ToTable("fin_indexes", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.FiveMinuteCandleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<double>("Close")
+                        .HasColumnType("double precision")
+                        .HasColumnName("close");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<double>("High")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high");
+
+                    b.Property<Guid>("InstrumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_complete");
+
+                    b.Property<double>("Low")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low");
+
+                    b.Property<double>("Open")
+                        .HasColumnType("double precision")
+                        .HasColumnName("open");
+
+                    b.Property<TimeOnly>("Time")
+                        .HasColumnType("time")
+                        .HasColumnName("time");
+
+                    b.Property<long>("Volume")
+                        .HasColumnType("bigint")
+                        .HasColumnName("volume");
+
+                    b.HasKey("Id")
+                        .HasName("pk_five_minute_candles");
+
+                    b.HasIndex("InstrumentId")
+                        .HasDatabaseName("ix_five_minute_candles_instrument_id");
+
+                    b.ToTable("five-minute-candles", "storage");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.ForecastConsensusEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<double>("ConsensusPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("consensus_price");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("currency");
+
+                    b.Property<double>("CurrentPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("current_price");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("InstrumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<double>("MaxTarget")
+                        .HasColumnType("double precision")
+                        .HasColumnName("max_target");
+
+                    b.Property<double>("MinTarget")
+                        .HasColumnType("double precision")
+                        .HasColumnName("min_target");
+
+                    b.Property<double>("PriceChange")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price_change");
+
+                    b.Property<double>("PriceChangeRel")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price_change_rel");
+
+                    b.Property<int>("RecommendationNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("recommendation_number");
+
+                    b.Property<string>("RecommendationString")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("recommendation_string");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_forecast_consensuses");
+
+                    b.ToTable("forecast_consensuses", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.ForecastTargetEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Company")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("company");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("currency");
+
+                    b.Property<double>("CurrentPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("current_price");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("InstrumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<double>("PriceChange")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price_change");
+
+                    b.Property<double>("PriceChangeRel")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price_change_rel");
+
+                    b.Property<DateOnly>("RecommendationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("recommendation_date");
+
+                    b.Property<int>("RecommendationNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("recommendation_number");
+
+                    b.Property<string>("RecommendationString")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("recommendation_string");
+
+                    b.Property<string>("ShowName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("show_name");
+
+                    b.Property<double>("TargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("target_price");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_forecast_targets");
+
+                    b.ToTable("forecast_targets", "public");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.FutureEntity", b =>
@@ -795,6 +1040,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("future_type");
 
+                    b.Property<double>("HighTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high_target_price");
+
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
@@ -826,6 +1075,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<int>("Lot")
                         .HasColumnType("integer")
                         .HasColumnName("lot");
+
+                    b.Property<double>("LowTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low_target_price");
 
                     b.Property<double>("MinPriceIncrementAmount")
                         .HasColumnType("double precision")
@@ -889,6 +1142,158 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.ToTable("instruments", "dictionary");
                 });
 
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.MarketEventEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("InstrumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("MarketEventText")
+                        .IsRequired()
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)")
+                        .HasColumnName("market_event_text");
+
+                    b.Property<string>("MarketEventType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("market_event_type");
+
+                    b.Property<bool>("SentNotification")
+                        .HasColumnType("boolean")
+                        .HasColumnName("sent_notification");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker");
+
+                    b.Property<TimeOnly>("Time")
+                        .HasColumnType("time")
+                        .HasColumnName("time");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_market_events");
+
+                    b.ToTable("market_events", "dictionary");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.MultiplicatorEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<double>("Beta")
+                        .HasColumnType("double precision")
+                        .HasColumnName("beta");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<double>("Ebitda")
+                        .HasColumnType("double precision")
+                        .HasColumnName("ebitda");
+
+                    b.Property<double>("Eps")
+                        .HasColumnType("double precision")
+                        .HasColumnName("eps");
+
+                    b.Property<double>("EvToEbitda")
+                        .HasColumnType("double precision")
+                        .HasColumnName("ev_to_ebitda");
+
+                    b.Property<double>("FreeCashFlow")
+                        .HasColumnType("double precision")
+                        .HasColumnName("free_cash_flow");
+
+                    b.Property<double>("HighOfYear")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high_of_year");
+
+                    b.Property<Guid>("InstrumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<double>("LowOfYear")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low_of_year");
+
+                    b.Property<double>("MarketCapitalization")
+                        .HasColumnType("double precision")
+                        .HasColumnName("market_capitalization");
+
+                    b.Property<double>("NetDebtToEbitda")
+                        .HasColumnType("double precision")
+                        .HasColumnName("net_debt_to_ebitda");
+
+                    b.Property<double>("NetIncome")
+                        .HasColumnType("double precision")
+                        .HasColumnName("net_income");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker");
+
+                    b.Property<double>("TotalDebtToEbitda")
+                        .HasColumnType("double precision")
+                        .HasColumnName("total_debt_to_ebitda");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_multiplicators");
+
+                    b.ToTable("multiplicators", "public");
+                });
+
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.ShareEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -911,6 +1316,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("figi");
 
+                    b.Property<double>("HighTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high_target_price");
+
                     b.Property<bool>("InWatchList")
                         .HasColumnType("boolean")
                         .HasColumnName("in_watch_list");
@@ -932,6 +1341,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("LastPrice")
                         .HasColumnType("double precision")
                         .HasColumnName("last_price");
+
+                    b.Property<double>("LowTargetPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low_target_price");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1005,10 +1418,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("funding");
 
-                    b.Property<bool>("InWatchList")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_watch_list");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
@@ -1016,6 +1425,14 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("PriceDifference")
                         .HasColumnType("double precision")
                         .HasColumnName("price_difference");
+
+                    b.Property<double>("PriceDifferenceAverage")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price_difference_average");
+
+                    b.Property<double>("PriceDifferenceAveragePrc")
+                        .HasColumnType("double precision")
+                        .HasColumnName("price_difference_average_prc");
 
                     b.Property<double>("PriceDifferencePrc")
                         .HasColumnType("double precision")
