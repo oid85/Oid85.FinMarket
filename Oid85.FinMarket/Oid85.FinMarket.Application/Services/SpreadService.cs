@@ -22,13 +22,13 @@ public class SpreadService(
         var spreads = new List<Spread>();
         
         spreads.AddRange(await GetSpreadsAsync(
-            "IMOEX", "IMOEXF", "MX"));
+            "IMOEX", multiplier: 1000.0, "IMOEXF", "MX"));
         spreads.AddRange(await GetSpreadsAsync(
-            "CNY/RUB", "CNYRUBF", "CR"));
+            "CNY/RUB", multiplier: 1000.0, "CNYRUBF", "CR"));
         spreads.AddRange(await GetSpreadsAsync(
-            "EUR/USD", "", "ED"));
+            "EUR/USD", multiplier: 1000.0, "", "ED"));
         spreads.AddRange(await GetSpreadsAsync(
-            "USD/RUB", "USDRUBF", "Si"));
+            "USD/RUB", multiplier: 1000.0, "USDRUBF", "Si"));
         
         await spreadRepository.AddAsync(spreads);
         
@@ -57,6 +57,7 @@ public class SpreadService(
     
     private async Task<List<Spread>> GetSpreadsAsync(
         string baseAssetTicker,
+        double multiplier,
         string foreverFutureTicker,
         string futureTickerPrefix)
     {
@@ -91,7 +92,8 @@ public class SpreadService(
                     FirstInstrumentRole = KnownSpreadRoles.BaseActive,
                     SecondInstrumentId = foreverFutureInstrumentId,
                     SecondInstrumentTicker = foreverFutureTicker,
-                    SecondInstrumentRole = KnownSpreadRoles.ForeverFuture
+                    SecondInstrumentRole = KnownSpreadRoles.ForeverFuture,
+                    Multiplier = multiplier
                 });
 
             // Вечный фьючерс - фьючерс
@@ -105,7 +107,8 @@ public class SpreadService(
                         FirstInstrumentRole = KnownSpreadRoles.ForeverFuture,
                         SecondInstrumentId = future.InstrumentId,
                         SecondInstrumentTicker = future.Ticker,
-                        SecondInstrumentRole = KnownSpreadRoles.Future
+                        SecondInstrumentRole = KnownSpreadRoles.Future,
+                        Multiplier = multiplier
                     });
                 }
 
@@ -119,7 +122,8 @@ public class SpreadService(
                     FirstInstrumentRole = KnownSpreadRoles.BaseActive,
                     SecondInstrumentId = future.InstrumentId,
                     SecondInstrumentTicker = future.Ticker,
-                    SecondInstrumentRole = KnownSpreadRoles.Future
+                    SecondInstrumentRole = KnownSpreadRoles.Future,
+                    Multiplier = multiplier
                 });
             }
 
@@ -133,7 +137,8 @@ public class SpreadService(
                     FirstInstrumentRole = KnownSpreadRoles.NearFuture,
                     SecondInstrumentId = futures[i].InstrumentId,
                     SecondInstrumentTicker = futures[i].Ticker,
-                    SecondInstrumentRole = KnownSpreadRoles.FarFuture
+                    SecondInstrumentRole = KnownSpreadRoles.FarFuture,
+                    Multiplier = 1
                 });
             }
 
@@ -152,6 +157,7 @@ public class SpreadService(
     private static Guid GetBaseActiveInstrumentId(string ticker) =>
         ticker switch
         {
+            "IMOEX" => KnownInstrumentIds.IMoex,
             "CNY/RUB" => KnownInstrumentIds.CnyRub,
             "EUR/USD" => KnownInstrumentIds.EurUsd,
             "USD/RUB" => KnownInstrumentIds.UsdRub,
@@ -173,13 +179,26 @@ public class SpreadService(
                     SecondInstrumentPrice: > 0.0
                 }) 
                 continue;
+
+            // В зависимости от порядка цен, домножаем на коэффициент
+            spread.PriceDifference = spread.SecondInstrumentPrice / spread.FirstInstrumentPrice > 2.0
+                ? spread.SecondInstrumentPrice - spread.FirstInstrumentPrice * spread.Multiplier
+                : spread.SecondInstrumentPrice - spread.FirstInstrumentPrice;
             
-            spread.PriceDifference = spread.FirstInstrumentPrice - spread.SecondInstrumentPrice;
-            spread.PriceDifferencePrc = spread.PriceDifference / spread.FirstInstrumentPrice * 100.0;
+            spread.PriceDifferencePrc = spread.PriceDifference / spread.SecondInstrumentPrice * 100.0; 
             
             spread.DateTime = DateTime.UtcNow;
             
-            FillSpreadPricePosition(spread);
+            /*
+             Контанго
+                Цена контракта > цены базового актива
+                Цена дальнего контракта > цены ближнего контракта
+            */
+            
+            spread.SpreadPricePosition = 
+                spread.PriceDifference > 0.0 
+                    ? KnownSpreadPricePositions.Contango 
+                    : KnownSpreadPricePositions.Backwardation;
             
             await spreadRepository.UpdateSpreadAsync(spread);
         }
@@ -205,66 +224,5 @@ public class SpreadService(
             return currency.LastPrice;
 
         return 0.0;
-    }
-
-    private void FillSpreadPricePosition(Spread spread)
-    {
-        /*
-         Контанго
-            Цена контракта > цены базового актива
-            Цена дальнего контракта > цены ближнего контракта
-        */
-
-        // Цена контракта выше цены базового актива
-        if (spread is
-            {
-                FirstInstrumentRole: KnownSpreadRoles.BaseActive, 
-                SecondInstrumentRole: KnownSpreadRoles.ForeverFuture
-            })
-        {
-            spread.SpreadPricePosition = 
-                spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownSpreadPricePositions.Contango 
-                    : KnownSpreadPricePositions.Backwardation;
-        }
-        
-        // Цена контракта выше цены базового актива
-        else if (spread is
-                 {
-                     FirstInstrumentRole: KnownSpreadRoles.ForeverFuture, 
-                     SecondInstrumentRole: KnownSpreadRoles.BaseActive
-                 })
-        {
-            spread.SpreadPricePosition = 
-                spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownSpreadPricePositions.Contango 
-                    : KnownSpreadPricePositions.Backwardation;
-        }
-        
-        // Цена дальнего контракта больше цены ближнего
-        else if (spread is
-            {
-                FirstInstrumentRole: KnownSpreadRoles.NearFuture, 
-                SecondInstrumentRole: KnownSpreadRoles.FarFuture
-            })
-        {
-            spread.SpreadPricePosition = 
-                spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownSpreadPricePositions.Contango 
-                    : KnownSpreadPricePositions.Backwardation;
-        }
-        
-        // Цена дальнего контракта больше цены ближнего
-        else if (spread is
-                 {
-                     FirstInstrumentRole: KnownSpreadRoles.FarFuture, 
-                     SecondInstrumentRole: KnownSpreadRoles.NearFuture
-                 })
-        {
-            spread.SpreadPricePosition = 
-                spread.SecondInstrumentPrice > spread.FirstInstrumentPrice 
-                    ? KnownSpreadPricePositions.Contango 
-                    : KnownSpreadPricePositions.Backwardation;
-        }        
     }
 }

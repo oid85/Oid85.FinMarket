@@ -55,6 +55,11 @@ public class Spread
     public double SecondInstrumentPrice { get; set; }
     
     /// <summary>
+    /// Множитель (кол-во базовых активов в контракте)
+    /// </summary>
+    public double Multiplier { get; set; }
+    
+    /// <summary>
     /// Разница цен инструментов
     /// </summary>
     public double PriceDifference { get; set; }
