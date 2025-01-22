@@ -7,5 +7,6 @@ public static class KnownSettingsKeys
     public const string TelegramBotName = "Telegram:BotName";
     public const string TelegramDisplayName = "Telegram:DisplayName";
     public const string TelegramToken = "Telegram:Token";
+    public const string ResourceStorePath = "ResourceStore:Path";
     public const string ApplicationSettingsOutputWindowInDays = "ApplicationSettings:OutputWindowInDays";
 }
