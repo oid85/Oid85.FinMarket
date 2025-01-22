@@ -86,12 +86,7 @@ public class Spread
     
     /// <summary>
     /// Отношение цен инструменов, относительно друг друга
-    /// 1 - континго, 2 - бэквордация
+    /// 1 - контанго, 2 - бэквордация
     /// </summary>
     public int SpreadPricePosition { get; set; }
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    public bool InWatchList { get; set; } = false; 
 }
