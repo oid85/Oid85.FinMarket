@@ -1,4 +1,6 @@
-﻿namespace Oid85.FinMarket.External.ResourceStore;
+﻿using Oid85.FinMarket.External.ResourceStore.Models;
+
+namespace Oid85.FinMarket.External.ResourceStore;
 
 /// <summary>
 /// Сервис ресурсов
@@ -29,4 +31,9 @@ public interface IResourceStoreService
     /// Получить тикеры индексов из списка наблюдения
     /// </summary>
     Task<List<string>> GetIndexesWatchlistAsync();
+    
+    /// <summary>
+    /// Получить мультипликатор
+    /// </summary>
+    Task<MultiplicatorResource> GetMultiplicatorLtmAsync(string ticker);
 }

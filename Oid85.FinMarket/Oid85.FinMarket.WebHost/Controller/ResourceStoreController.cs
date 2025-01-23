@@ -2,6 +2,7 @@
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Responses;
 using Oid85.FinMarket.External.ResourceStore;
+using Oid85.FinMarket.External.ResourceStore.Models;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
@@ -83,6 +84,21 @@ public class ResourceStoreController(
         GetResponseAsync(
             resourceStoreService.GetIndexesWatchlistAsync,
             result => new BaseResponse<List<string>>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Получить мультипликатор LTM по тикеру
+    /// </summary>
+    [HttpGet("multiplicators/ltm/{ticker}")]
+    [ProducesResponseType(typeof(BaseResponse<MultiplicatorResource>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<MultiplicatorResource>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<MultiplicatorResource>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetMultiplicatorLtmAsync([FromRoute] string ticker) =>
+        GetResponseAsync(
+            () => resourceStoreService.GetMultiplicatorLtmAsync(ticker),
+            result => new BaseResponse<MultiplicatorResource>
             {
                 Result = result
             });

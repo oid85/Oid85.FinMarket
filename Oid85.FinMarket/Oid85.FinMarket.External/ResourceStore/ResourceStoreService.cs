@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.External.ResourceStore.Models;
 
 namespace Oid85.FinMarket.External.ResourceStore;
 
@@ -88,10 +89,35 @@ public class ResourceStoreService(
         
         return result;
     }
-    
+
+    /// <inheritdoc />
+    public async Task<MultiplicatorResource> GetMultiplicatorLtmAsync(string ticker)
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "multiplicators",
+            "ltm",
+            $"{ticker.ToLower()}.json");
+
+        var result = await ReadAsync<MultiplicatorResource>(path);
+
+        if (result is null)
+            return new();
+        
+        return result;
+    }
+
     private async Task<T?> ReadAsync<T>(string path)
     {
-        await using var stream = File.OpenRead(path);
-        return await JsonSerializer.DeserializeAsync<T>(stream);
+        try
+        {
+            await using var stream = File.OpenRead(path);
+            return await JsonSerializer.DeserializeAsync<T>(stream);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }
