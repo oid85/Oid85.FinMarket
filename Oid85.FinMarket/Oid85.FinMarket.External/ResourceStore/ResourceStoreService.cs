@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.ResourceStore.Models;
@@ -107,17 +108,24 @@ public class ResourceStoreService(
         return result;
     }
 
+    public async Task<List<PriceLevelResource>> GetPriceLevelsAsync(string ticker)
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "priceLevels",
+            $"{ticker.ToLower()}.json");
+
+        var result = await ReadAsync<List<PriceLevelResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
     private async Task<T?> ReadAsync<T>(string path)
     {
-        try
-        {
-            await using var stream = File.OpenRead(path);
-            return await JsonSerializer.DeserializeAsync<T>(stream);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        await using var stream = File.OpenRead(path);
+        return await JsonSerializer.DeserializeAsync<T>(stream);
     }
 }

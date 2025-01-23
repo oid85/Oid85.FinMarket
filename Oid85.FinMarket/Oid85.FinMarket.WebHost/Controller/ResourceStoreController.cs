@@ -102,4 +102,19 @@ public class ResourceStoreController(
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Получить ценовые уровни по тикеру
+    /// </summary>
+    [HttpGet("priceLevels/{ticker}")]
+    [ProducesResponseType(typeof(BaseResponse<List<PriceLevelResource>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<List<PriceLevelResource>>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<List<PriceLevelResource>>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetPriceLevelsAsync([FromRoute] string ticker) =>
+        GetResponseAsync(
+            () => resourceStoreService.GetPriceLevelsAsync(ticker),
+            result => new BaseResponse<List<PriceLevelResource>>
+            {
+                Result = result
+            });    
 }

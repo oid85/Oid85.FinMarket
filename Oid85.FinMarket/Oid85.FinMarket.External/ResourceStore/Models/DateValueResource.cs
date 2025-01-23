@@ -1,18 +1,22 @@
-﻿namespace Oid85.FinMarket.External.ResourceStore.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Oid85.FinMarket.External.ResourceStore.Models;
 
 /// <summary>
 /// Дата - значение
 /// </summary>
-public class DateValueResource
+public class DateValueResource<T>
 {
     /// <summary>
     /// Дата
     /// </summary>
-    public DateOnly Date { get; set; }
+    [JsonPropertyName("date")]
+    public DateOnly Date { get; set; } = DateOnly.MinValue;
     
     /// <summary>
     /// Значение
     /// </summary>
-    public double Value { get; set; }
+    [JsonPropertyName("value")]
+    public T? Value { get; set; } = default;
 }
 

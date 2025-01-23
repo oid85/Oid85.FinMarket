@@ -36,4 +36,9 @@ public interface IResourceStoreService
     /// Получить мультипликатор
     /// </summary>
     Task<MultiplicatorResource> GetMultiplicatorLtmAsync(string ticker);
+    
+    /// <summary>
+    /// Получить ценовые уровни
+    /// </summary>
+    Task<List<PriceLevelResource>> GetPriceLevelsAsync(string ticker);
 }
