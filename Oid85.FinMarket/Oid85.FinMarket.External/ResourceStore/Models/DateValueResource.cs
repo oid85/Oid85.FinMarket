@@ -1,7 +1,7 @@
 ﻿namespace Oid85.FinMarket.External.ResourceStore.Models;
 
 /// <summary>
-/// Дата-значение
+/// Дата - значение
 /// </summary>
 public class DateValueResource
 {

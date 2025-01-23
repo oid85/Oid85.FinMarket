@@ -6,92 +6,82 @@
 public class MultiplicatorResource
 {
     /// <summary>
-    /// Тикер
-    /// </summary>
-    public string Ticker { get; set; } = string.Empty;
-    
-    /// <summary>
     /// Количество акций обыкновенных
     /// </summary>
-    public int TotalSharesAo { get; set; }
+    public ValueUnitResource TotalSharesAo { get; set; } = new();
     
     /// <summary>
     /// Количество акций привелегированных
     /// </summary>
-    public int TotalSharesAp { get; set; }
+    public ValueUnitResource TotalSharesAp { get; set; } = new();
     
     /// <summary>
     /// Выручка
     /// </summary>
-    public double Revenue { get; set; }
+    public ValueUnitResource Revenue { get; set; } = new();
     
     /// <summary>
     /// Чистая прибыль
     /// </summary>
-    public double NetIncome { get; set; }
+    public ValueUnitResource NetIncome { get; set; } = new();
     
     /// <summary>
     /// Операционная прибыль
     /// </summary>
-    public double OperatingIncome { get; set; }
+    public ValueUnitResource OperatingIncome { get; set; } = new();
     
     /// <summary>
     /// EBITDA
     /// </summary>
-    public double Ebitda { get; set; }
+    public ValueUnitResource Ebitda { get; set; } = new();
     
     /// <summary>
     /// P/E
     /// </summary>
-    public double Pe { get; set; }
+    public ValueUnitResource Pe { get; set; } = new();
     
     /// <summary>
     /// P/B
     /// </summary>
-    public double Pb { get; set; }
+    public ValueUnitResource Pb { get; set; } = new();
+    
+    /// <summary>
+    /// P/BV
+    /// </summary>
+    public ValueUnitResource Pv { get; set; } = new();
     
     /// <summary>
     /// EV
     /// </summary>
-    public double Ev { get; set; }
+    public ValueUnitResource Ev { get; set; } = new();
     
     /// <summary>
     /// ROE
     /// </summary>
-    public double Roe { get; set; }
+    public ValueUnitResource Roe { get; set; } = new();
     
     /// <summary>
     /// ROA
     /// </summary>
-    public double Roa { get; set; }
+    public ValueUnitResource Roa { get; set; } = new();
     
     /// <summary>
     /// EPS
     /// </summary>
-    public double Eps { get; set; }
+    public ValueUnitResource Eps { get; set; } = new();
     
     /// <summary>
     /// Чистая процентная маржа
     /// </summary>
-    public double NetInterestMargin { get; set; }
+    public ValueUnitResource NetInterestMargin { get; set; } = new();
     
     /// <summary>
     /// Общий долг
     /// </summary>
-    public double TotalDebt { get; set; }
-    
+    public ValueUnitResource TotalDebt { get; set; } = new();
+
     /// <summary>
     /// Чистый долг
     /// </summary>
-    public double NetDebt { get; set; }
-    
-    /// <summary>
-    /// Прогноз див. доходности ао
-    /// </summary>
-    public double ForecastDividendAo { get; set; }
-    
-    /// <summary>
-    /// Прогноз див. доходности ап
-    /// </summary>
-    public double ForecastDividendAp { get; set; }
+    public ValueUnitResource NetDebt { get; set; } = new();
 }
