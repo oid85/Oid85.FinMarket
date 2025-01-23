@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.Telegram;
 using Oid85.FinMarket.External.Tinkoff;
 
@@ -14,10 +16,12 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<ITinkoffService, TinkoffService>();
         services.AddTransient<ITelegramService, TelegramService>();
+        services.AddTransient<IResourceStoreService, ResourceStoreService>();
         
         services.AddInvestApiClient((_, settings) =>
         {
-            settings.AccessToken = configuration.GetValue<string>(KnownSettingsKeys.TinkoffToken);
+            settings.AccessToken = ConvertHelper.Base64Decode(
+                configuration.GetValue<string>(KnownSettingsKeys.TinkoffToken)!);
         });
     }
 }

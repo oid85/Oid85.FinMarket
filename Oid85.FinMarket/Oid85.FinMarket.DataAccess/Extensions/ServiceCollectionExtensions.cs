@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Interceptors;
 using Oid85.FinMarket.DataAccess.Repositories;
@@ -21,8 +22,8 @@ public static class ServiceCollectionExtensions
             var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
                 
             options
-                .UseNpgsql(configuration
-                    .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString))
+                .UseNpgsql(ConvertHelper.Base64Decode(
+                    configuration.GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString)!))
                 .AddInterceptors(updateInterceptor);
         });
         

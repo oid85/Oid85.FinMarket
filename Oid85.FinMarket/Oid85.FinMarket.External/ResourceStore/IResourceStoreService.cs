@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Application.Interfaces.Services;
+﻿namespace Oid85.FinMarket.External.ResourceStore;
 
 /// <summary>
 /// Сервис ресурсов

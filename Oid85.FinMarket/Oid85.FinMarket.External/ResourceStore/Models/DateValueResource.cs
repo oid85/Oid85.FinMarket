@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Application.Models.Resources;
+﻿namespace Oid85.FinMarket.External.ResourceStore.Models;
 
 /// <summary>
 /// Дата-значение

@@ -1,9 +1,8 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
-using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 
-namespace Oid85.FinMarket.Application.Services;
+namespace Oid85.FinMarket.External.ResourceStore;
 
 /// <inheritdoc />
 public class ResourceStoreService(
