@@ -281,6 +281,22 @@ public class ResourceStoreService(
     }
 
     /// <inheritdoc />
+    public async Task<List<RangeColorResource>> GetColorPaletteYieldCouponAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "yieldCoupon.json");
+
+        var result = await ReadAsync<List<RangeColorResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
+    /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPaletteYieldLtmAsync()
     {
         string path = Path.Combine(

@@ -93,6 +93,11 @@ public interface IResourceStoreService
     Task<List<RangeColorResource>> GetColorPaletteYieldDividendAsync();
     
     /// <summary>
+    /// Получить цветовую палитру для YieldCoupon
+    /// </summary>
+    Task<List<RangeColorResource>> GetColorPaletteYieldCouponAsync();
+    
+    /// <summary>
     /// Получить цветовую палитру для YieldLtm
     /// </summary>
     Task<List<RangeColorResource>> GetColorPaletteYieldLtmAsync();
