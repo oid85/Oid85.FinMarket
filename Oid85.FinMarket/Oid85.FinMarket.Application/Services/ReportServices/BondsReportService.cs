@@ -6,6 +6,7 @@ using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services.ReportServices;
 
@@ -15,7 +16,8 @@ public class BondsReportService(
     IAnalyseResultRepository analyseResultRepository,
     IBondRepository bondRepository,
     IBondCouponRepository bondCouponRepository,
-    ReportHelper reportHelper) 
+    ReportHelper reportHelper,
+    IResourceStoreService resourceStoreService) 
     : IBondsReportService
 {
     /// <inheritdoc />
@@ -106,10 +108,17 @@ public class BondsReportService(
                 
             if (nextCoupon is not null)
                 profitPrc = (bond.LastPrice / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
-                
+
+            string color = (await resourceStoreService.GetColorPaletteYieldCouponAsync())
+                .FirstOrDefault(x => 
+                    profitPrc >= x.LowLevel && 
+                    profitPrc >= x.HighLevel)!
+                .ColorCode;
+            
             data.Add(new ReportParameter(
                 KnownDisplayTypes.Percent, 
-                profitPrc.ToString("N1")));
+                profitPrc.ToString("N1"),
+                color));
                 
             foreach (var date in dates)
             {
@@ -247,9 +256,15 @@ public class BondsReportService(
                     .Select(x => x.ResultNumber)
                     .Sum();
                     
+                string color = (await resourceStoreService.GetColorPaletteAggregatedAnalyseAsync())
+                    .FirstOrDefault(x => 
+                        (int) resultNumber == x.Value)!
+                    .ColorCode;                
+                
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
-                    resultNumber.ToString("N2")));
+                    resultNumber.ToString("N0"),
+                    color));
             }
                 
             reportData.Data.Add(data);

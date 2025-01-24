@@ -6,6 +6,7 @@ using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services.ReportServices;
 
@@ -19,7 +20,8 @@ public class SharesReportService(
     IMultiplicatorRepository multiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
-    ReportHelper reportHelper)
+    ReportHelper reportHelper,
+    IResourceStoreService resourceStoreService)
     : ISharesReportService
 {
     /// <inheritdoc />
@@ -89,6 +91,12 @@ public class SharesReportService(
             
         foreach (var dividendInfo in dividendInfos)
         {
+            string color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
+                .FirstOrDefault(x => 
+                    dividendInfo.DividendPrc >= x.LowLevel &&
+                    dividendInfo.DividendPrc >= x.HighLevel)!
+                .ColorCode;
+            
             reportData.Data.Add(
             [
                 new ReportParameter(
@@ -109,7 +117,8 @@ public class SharesReportService(
                     
                 new ReportParameter(
                     KnownDisplayTypes.Percent, 
-                    dividendInfo.DividendPrc.ToString("N1"))
+                    dividendInfo.DividendPrc.ToString("N1"),
+                    color)
             ]);
         }
             
@@ -538,9 +547,15 @@ public class SharesReportService(
                         .Select(x => x.ResultNumber)
                         .Sum();
                     
+                    string color = (await resourceStoreService.GetColorPaletteAggregatedAnalyseAsync())
+                        .FirstOrDefault(x => 
+                            (int) resultNumber == x.Value)!
+                        .ColorCode;                
+                
                     data.Add(new ReportParameter(
                         $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
-                        resultNumber.ToString("N2")));
+                        resultNumber.ToString("N0"),
+                        color));
                 }
 
                 else
