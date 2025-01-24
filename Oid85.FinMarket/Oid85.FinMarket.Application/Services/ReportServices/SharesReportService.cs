@@ -547,9 +547,15 @@ public class SharesReportService(
                         .Select(x => x.ResultNumber)
                         .Sum();
                     
+                    string color = (await resourceStoreService.GetColorPaletteAggregatedAnalyseAsync())
+                        .FirstOrDefault(x => 
+                            (int) resultNumber == x.Value)!
+                        .ColorCode;                
+                
                     data.Add(new ReportParameter(
                         $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
-                        resultNumber.ToString("N2")));
+                        resultNumber.ToString("N0"),
+                        color));
                 }
 
                 else

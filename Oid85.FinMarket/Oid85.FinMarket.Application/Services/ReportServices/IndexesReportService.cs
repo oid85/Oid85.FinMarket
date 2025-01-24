@@ -5,6 +5,7 @@ using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services.ReportServices;
 
@@ -12,7 +13,8 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 public class IndexesReportService(
     IAnalyseResultRepository analyseResultRepository,
     IIndexRepository indexRepository,
-    ReportHelper reportHelper) 
+    ReportHelper reportHelper,
+    IResourceStoreService resourceStoreService) 
     : IIndexesReportService
 {
     /// <inheritdoc />
@@ -167,9 +169,15 @@ public class IndexesReportService(
                     .Select(x => x.ResultNumber)
                     .Sum();
                     
+                string color = (await resourceStoreService.GetColorPaletteAggregatedAnalyseAsync())
+                    .FirstOrDefault(x => 
+                        (int) resultNumber == x.Value)!
+                    .ColorCode;                
+                
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
-                    resultNumber.ToString("N2")));
+                    resultNumber.ToString("N0"),
+                    color));
             }
                 
             reportData.Data.Add(data);
