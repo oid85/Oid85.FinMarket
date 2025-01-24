@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Hangfire" />
     <PackageReference Include="Hangfire.InMemory" />
     <PackageReference Include="Skender.Stock.Indicators" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />

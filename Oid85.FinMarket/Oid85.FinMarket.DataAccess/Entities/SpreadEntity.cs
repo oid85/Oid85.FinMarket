@@ -63,6 +63,12 @@ public class SpreadEntity : AuditableEntity
     public double SecondInstrumentPrice { get; set; }
     
     /// <summary>
+    /// Множитель (кол-во базовых активов в контракте)
+    /// </summary>
+    [Column("multiplier")]
+    public double Multiplier { get; set; }
+    
+    /// <summary>
     /// Разница цен инструментов
     /// </summary>
     [Column("price_difference")]

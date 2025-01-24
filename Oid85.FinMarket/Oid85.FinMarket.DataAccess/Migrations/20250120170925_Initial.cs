@@ -27,7 +27,8 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    result = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    result_string = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    result_number = table.Column<double>(type: "double precision", nullable: false),
                     analyse_type = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     date = table.Column<DateOnly>(type: "date", nullable: false)
                 },
@@ -117,7 +118,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
                     ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    price = table.Column<double>(type: "double precision", nullable: false),
                     coupon_date = table.Column<DateOnly>(type: "date", nullable: false),
                     coupon_number = table.Column<long>(type: "bigint", nullable: false),
                     coupon_period = table.Column<int>(type: "integer", nullable: false),
@@ -141,7 +141,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    price = table.Column<double>(type: "double precision", nullable: false),
+                    last_price = table.Column<double>(type: "double precision", nullable: false),
+                    high_target_price = table.Column<double>(type: "double precision", nullable: false),
+                    low_target_price = table.Column<double>(type: "double precision", nullable: false),
                     isin = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     figi = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -162,33 +164,15 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "candles",
-                schema: "storage",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    open = table.Column<double>(type: "double precision", nullable: false),
-                    close = table.Column<double>(type: "double precision", nullable: false),
-                    high = table.Column<double>(type: "double precision", nullable: false),
-                    low = table.Column<double>(type: "double precision", nullable: false),
-                    volume = table.Column<long>(type: "bigint", nullable: false),
-                    date = table.Column<DateOnly>(type: "date", nullable: false),
-                    is_complete = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_candles", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "currencies",
                 schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    price = table.Column<double>(type: "double precision", nullable: false),
+                    last_price = table.Column<double>(type: "double precision", nullable: false),
+                    high_target_price = table.Column<double>(type: "double precision", nullable: false),
+                    low_target_price = table.Column<double>(type: "double precision", nullable: false),
                     isin = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     figi = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     class_code = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -204,6 +188,26 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_currencies", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "daily-candles",
+                schema: "storage",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    open = table.Column<double>(type: "double precision", nullable: false),
+                    close = table.Column<double>(type: "double precision", nullable: false),
+                    high = table.Column<double>(type: "double precision", nullable: false),
+                    low = table.Column<double>(type: "double precision", nullable: false),
+                    volume = table.Column<long>(type: "bigint", nullable: false),
+                    date = table.Column<DateOnly>(type: "date", nullable: false),
+                    is_complete = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_daily_candles", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -236,7 +240,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     figi = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    price = table.Column<double>(type: "double precision", nullable: false),
+                    last_price = table.Column<double>(type: "double precision", nullable: false),
+                    high_target_price = table.Column<double>(type: "double precision", nullable: false),
+                    low_target_price = table.Column<double>(type: "double precision", nullable: false),
                     class_code = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     currency = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     instrument_kind = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -255,13 +261,91 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "five-minute-candles",
+                schema: "storage",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    open = table.Column<double>(type: "double precision", nullable: false),
+                    close = table.Column<double>(type: "double precision", nullable: false),
+                    high = table.Column<double>(type: "double precision", nullable: false),
+                    low = table.Column<double>(type: "double precision", nullable: false),
+                    volume = table.Column<long>(type: "bigint", nullable: false),
+                    date = table.Column<DateOnly>(type: "date", nullable: false),
+                    time = table.Column<TimeOnly>(type: "time", nullable: false),
+                    is_complete = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_five_minute_candles", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "forecast_consensuses",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    recommendation_string = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    recommendation_number = table.Column<int>(type: "integer", nullable: false),
+                    currency = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    current_price = table.Column<double>(type: "double precision", nullable: false),
+                    consensus_price = table.Column<double>(type: "double precision", nullable: false),
+                    min_target = table.Column<double>(type: "double precision", nullable: false),
+                    max_target = table.Column<double>(type: "double precision", nullable: false),
+                    price_change = table.Column<double>(type: "double precision", nullable: false),
+                    price_change_rel = table.Column<double>(type: "double precision", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_forecast_consensuses", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "forecast_targets",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    company = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    recommendation_string = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    recommendation_number = table.Column<int>(type: "integer", nullable: false),
+                    recommendation_date = table.Column<DateOnly>(type: "date", nullable: false),
+                    currency = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    current_price = table.Column<double>(type: "double precision", nullable: false),
+                    target_price = table.Column<double>(type: "double precision", nullable: false),
+                    price_change = table.Column<double>(type: "double precision", nullable: false),
+                    price_change_rel = table.Column<double>(type: "double precision", nullable: false),
+                    show_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_forecast_targets", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "futures",
                 schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    price = table.Column<double>(type: "double precision", nullable: false),
+                    last_price = table.Column<double>(type: "double precision", nullable: false),
+                    high_target_price = table.Column<double>(type: "double precision", nullable: false),
+                    low_target_price = table.Column<double>(type: "double precision", nullable: false),
                     figi = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
@@ -304,13 +388,68 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "market_events",
+                schema: "dictionary",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    date = table.Column<DateOnly>(type: "date", nullable: false),
+                    time = table.Column<TimeOnly>(type: "time", nullable: false),
+                    ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    market_event_type = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    market_event_text = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    sent_notification = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_market_events", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "multiplicators",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    market_capitalization = table.Column<double>(type: "double precision", nullable: false),
+                    low_of_year = table.Column<double>(type: "double precision", nullable: false),
+                    high_of_year = table.Column<double>(type: "double precision", nullable: false),
+                    beta = table.Column<double>(type: "double precision", nullable: false),
+                    net_income = table.Column<double>(type: "double precision", nullable: false),
+                    ebitda = table.Column<double>(type: "double precision", nullable: false),
+                    eps = table.Column<double>(type: "double precision", nullable: false),
+                    free_cash_flow = table.Column<double>(type: "double precision", nullable: false),
+                    ev_to_ebitda = table.Column<double>(type: "double precision", nullable: false),
+                    total_debt_to_ebitda = table.Column<double>(type: "double precision", nullable: false),
+                    net_debt_to_ebitda = table.Column<double>(type: "double precision", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_multiplicators", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "shares",
                 schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    price = table.Column<double>(type: "double precision", nullable: false),
+                    last_price = table.Column<double>(type: "double precision", nullable: false),
+                    high_target_price = table.Column<double>(type: "double precision", nullable: false),
+                    low_target_price = table.Column<double>(type: "double precision", nullable: false),
                     isin = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     figi = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -344,9 +483,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     second_instrument_price = table.Column<double>(type: "double precision", nullable: false),
                     price_difference = table.Column<double>(type: "double precision", nullable: false),
                     price_difference_prc = table.Column<double>(type: "double precision", nullable: false),
+                    price_difference_average = table.Column<double>(type: "double precision", nullable: false),
+                    price_difference_average_prc = table.Column<double>(type: "double precision", nullable: false),
                     funding = table.Column<double>(type: "double precision", nullable: false),
                     price_position = table.Column<int>(type: "integer", nullable: false),
-                    in_watch_list = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -364,9 +504,15 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 column: "instrument_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_candles_instrument_id",
+                name: "ix_daily_candles_instrument_id",
                 schema: "storage",
-                table: "candles",
+                table: "daily-candles",
+                column: "instrument_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_five_minute_candles_instrument_id",
+                schema: "storage",
+                table: "five-minute-candles",
                 column: "instrument_id");
         }
 
@@ -390,12 +536,12 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "candles",
-                schema: "storage");
-
-            migrationBuilder.DropTable(
                 name: "currencies",
                 schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "daily-candles",
+                schema: "storage");
 
             migrationBuilder.DropTable(
                 name: "dividend_infos",
@@ -406,12 +552,32 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
+                name: "five-minute-candles",
+                schema: "storage");
+
+            migrationBuilder.DropTable(
+                name: "forecast_consensuses",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "forecast_targets",
+                schema: "public");
+
+            migrationBuilder.DropTable(
                 name: "futures",
                 schema: "public");
 
             migrationBuilder.DropTable(
                 name: "instruments",
                 schema: "dictionary");
+
+            migrationBuilder.DropTable(
+                name: "market_events",
+                schema: "dictionary");
+
+            migrationBuilder.DropTable(
+                name: "multiplicators",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "shares",

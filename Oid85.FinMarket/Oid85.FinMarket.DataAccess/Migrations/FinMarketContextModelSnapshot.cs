@@ -1419,6 +1419,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
+                    b.Property<double>("Multiplier")
+                        .HasColumnType("double precision")
+                        .HasColumnName("multiplier");
+
                     b.Property<double>("PriceDifference")
                         .HasColumnType("double precision")
                         .HasColumnName("price_difference");

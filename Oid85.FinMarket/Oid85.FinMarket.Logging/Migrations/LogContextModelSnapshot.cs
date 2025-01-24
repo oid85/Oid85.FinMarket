@@ -37,7 +37,8 @@ namespace Oid85.FinMarket.Logging.Migrations
 
                     b.Property<string>("Level")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("level");
 
                     b.Property<string>("Message")

@@ -45,6 +45,7 @@ public class SpreadRepository(
                         .SetProperty(u => u.FirstInstrumentPrice, spread.FirstInstrumentPrice)
                         .SetProperty(u => u.SecondInstrumentPrice, spread.SecondInstrumentPrice)
                         .SetProperty(u => u.PriceDifference, spread.PriceDifference)
+                        .SetProperty(u => u.PriceDifferencePrc, spread.PriceDifferencePrc)
                         .SetProperty(u => u.Funding, spread.Funding)
                         .SetProperty(u => u.SpreadPricePosition, spread.SpreadPricePosition));
             
@@ -103,6 +104,7 @@ public class SpreadRepository(
             SecondInstrumentTicker = model.SecondInstrumentTicker,
             SecondInstrumentRole = model.SecondInstrumentRole,
             SecondInstrumentPrice = model.SecondInstrumentPrice,
+            Multiplier = model.Multiplier,
             PriceDifference = model.PriceDifference,
             PriceDifferencePrc = model.PriceDifferencePrc,
             PriceDifferenceAverage = model.PriceDifferenceAverage,
@@ -128,6 +130,7 @@ public class SpreadRepository(
             SecondInstrumentTicker = entity.SecondInstrumentTicker,
             SecondInstrumentRole = entity.SecondInstrumentRole,
             SecondInstrumentPrice = entity.SecondInstrumentPrice,
+            Multiplier = entity.Multiplier,
             PriceDifference = entity.PriceDifference,
             PriceDifferencePrc = entity.PriceDifferencePrc,
             PriceDifferenceAverage = entity.PriceDifferenceAverage,

@@ -22,7 +22,7 @@ public class Program
         builder.Services.ConfigureExternalServices(builder.Configuration);
         builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
         builder.Services.ConfigureLogs(builder.Configuration);
-        builder.Services.ConfigureHangfire(builder.Configuration);
+        builder.Services.ConfigureHangfire();
             
         builder.Services.AddWindowsService(options =>
         {

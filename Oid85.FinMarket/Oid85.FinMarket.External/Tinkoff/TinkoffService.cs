@@ -1,5 +1,4 @@
 ﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
@@ -20,8 +19,7 @@ namespace Oid85.FinMarket.External.Tinkoff;
 /// <inheritdoc />
 public class TinkoffService(
     ILogService logService,
-    InvestApiClient client,
-    IConfiguration configuration)
+    InvestApiClient client)
     : ITinkoffService
 {
     // <inheritdoc />
@@ -71,34 +69,25 @@ public class TinkoffService(
             {
                 InstrumentId = instrumentId.ToString(),
                 From = Timestamp.FromDateTime(from.ToUniversalTime()),
-                To = Timestamp.FromDateTime(to.ToUniversalTime())
+                To = Timestamp.FromDateTime(to.ToUniversalTime()),
+                Interval = CandleInterval._5Min
             };
-
-            request.Interval = CandleInterval._5Min;
 
             var response = await client.MarketData.GetCandlesAsync(request);
 
-            var candles = new List<FiveMinuteCandle>();
-
-            for (var i = 0; i < response.Candles.Count; i++)
-            {
-                var candle = new FiveMinuteCandle
+            return response.Candles.Select(historicCandle => new FiveMinuteCandle
                 {
                     InstrumentId = instrumentId,
-                    Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
-                    Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
-                    High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
-                    Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
-                    Volume = response.Candles[i].Volume,
-                    Date = ConvertHelper.TimestampToDateOnly(response.Candles[i].Time),
-                    Time = ConvertHelper.TimestampToTimeOnly(response.Candles[i].Time),
-                    IsComplete = response.Candles[i].IsComplete
-                };
-
-                candles.Add(candle);
-            }
-
-            return candles;
+                    Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
+                    Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
+                    High = ConvertHelper.QuotationToDouble(historicCandle.High),
+                    Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
+                    Volume = historicCandle.Volume,
+                    Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
+                    Time = ConvertHelper.TimestampToTimeOnly(historicCandle.Time),
+                    IsComplete = historicCandle.IsComplete
+                })
+                .ToList();
         }
 
         catch (Exception exception)
@@ -146,33 +135,24 @@ public class TinkoffService(
         {
             InstrumentId = instrumentId.ToString(),
             From = from,
-            To = to
+            To = to,
+            Interval = CandleInterval.Day
         };
-
-        request.Interval = CandleInterval.Day;
 
         var response = await client.MarketData.GetCandlesAsync(request);
 
-        var candles = new List<Candle>();
-
-        for (var i = 0; i < response.Candles.Count; i++)
-        {
-            var candle = new Candle
+        return response.Candles.Select(historicCandle => new Candle
             {
                 InstrumentId = instrumentId,
-                Open = ConvertHelper.QuotationToDouble(response.Candles[i].Open),
-                Close = ConvertHelper.QuotationToDouble(response.Candles[i].Close),
-                High = ConvertHelper.QuotationToDouble(response.Candles[i].High),
-                Low = ConvertHelper.QuotationToDouble(response.Candles[i].Low),
-                Volume = response.Candles[i].Volume,
-                Date = ConvertHelper.TimestampToDateOnly(response.Candles[i].Time),
-                IsComplete = response.Candles[i].IsComplete
-            };
-
-            candles.Add(candle);
-        }
-
-        return candles;
+                Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
+                Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
+                High = ConvertHelper.QuotationToDouble(historicCandle.High),
+                Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
+                Volume = historicCandle.Volume,
+                Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
+                IsComplete = historicCandle.IsComplete
+            })
+            .ToList();
     }
 
     /// <inheritdoc />
@@ -525,8 +505,9 @@ public class TinkoffService(
                 return [];
             
             var request = new GetAssetFundamentalsRequest();
-                
-            request.Assets.AddRange(instrumentIds.Select(x => x.ToString()));
+
+            foreach (var instrumentId in instrumentIds) 
+                request.Assets.Add(instrumentId.ToString());
             
             var response = await client
                 .Instruments
@@ -632,11 +613,12 @@ public class TinkoffService(
             
             foreach (var targetItem in response.Targets)
             {
-                var target = new ForecastTarget();
-
-                target.InstrumentId = Guid.Parse(targetItem.Uid);
-                target.Ticker = targetItem.Ticker;
-                target.Company = targetItem.Company;
+                var target = new ForecastTarget
+                {
+                    InstrumentId = Guid.Parse(targetItem.Uid),
+                    Ticker = targetItem.Ticker,
+                    Company = targetItem.Company
+                };
 
                 switch (targetItem.Recommendation)
                 {
@@ -672,10 +654,11 @@ public class TinkoffService(
                 targets.Add(target);
             }
             
-            var consensus = new ForecastConsensus();
-            
-            consensus.InstrumentId = Guid.Parse(response.Consensus.Uid);
-            consensus.Ticker = response.Consensus.Ticker;
+            var consensus = new ForecastConsensus
+            {
+                InstrumentId = Guid.Parse(response.Consensus.Uid),
+                Ticker = response.Consensus.Ticker
+            };
 
             switch (response.Consensus.Recommendation)
             {

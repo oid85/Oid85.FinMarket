@@ -12,7 +12,7 @@ using Oid85.FinMarket.Logging.DataAccess;
 namespace Oid85.FinMarket.Logging.Migrations
 {
     [DbContext(typeof(LogContext))]
-    [Migration("20250102120535_Initial")]
+    [Migration("20250120171126_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -40,7 +40,8 @@ namespace Oid85.FinMarket.Logging.Migrations
 
                     b.Property<string>("Level")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("level");
 
                     b.Property<string>("Message")

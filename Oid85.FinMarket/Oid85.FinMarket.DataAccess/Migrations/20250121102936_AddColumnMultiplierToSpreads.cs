@@ -5,15 +5,15 @@
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class AddColumnToTableAnalyseResults : Migration
+    public partial class AddColumnMultiplierToSpreads : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<double>(
-                name: "result_number",
+                name: "multiplier",
                 schema: "storage",
-                table: "analyse_results",
+                table: "spreads",
                 type: "double precision",
                 nullable: false,
                 defaultValue: 0.0);
@@ -23,9 +23,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "result_number",
+                name: "multiplier",
                 schema: "storage",
-                table: "analyse_results");
+                table: "spreads");
         }
     }
 }

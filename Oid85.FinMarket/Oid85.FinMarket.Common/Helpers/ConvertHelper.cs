@@ -7,6 +7,7 @@ public static class ConvertHelper
 {
     public static double QuotationToDouble(Quotation quotation)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (quotation is null)
             return 0.0;
         
@@ -15,6 +16,7 @@ public static class ConvertHelper
 
     public static double MoneyValueToDouble(MoneyValue moneyValue)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (moneyValue is null)
             return 0.0;
         
@@ -23,6 +25,7 @@ public static class ConvertHelper
 
     public static DateOnly TimestampToDateOnly(Timestamp timestamp)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (timestamp is null)
             return DateOnly.MinValue;
             
@@ -31,9 +34,18 @@ public static class ConvertHelper
     
     public static TimeOnly TimestampToTimeOnly(Timestamp timestamp)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (timestamp is null)
             return TimeOnly.MinValue;
             
         return TimeOnly.FromDateTime(timestamp.ToDateTime());
     }
+    
+    public static string Base64Encode(string text) => 
+        Convert.ToBase64String(
+            System.Text.Encoding.UTF8.GetBytes(text));
+
+    public static string Base64Decode(string base64) => 
+        System.Text.Encoding.UTF8.GetString(
+            Convert.FromBase64String(base64));
 }

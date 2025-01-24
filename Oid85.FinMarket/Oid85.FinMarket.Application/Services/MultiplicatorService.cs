@@ -25,11 +25,12 @@ public class MultiplicatorService(
 
         foreach (var share in shares)
         {
-            var multiplicator = new Multiplicator();
-            
-            multiplicator.InstrumentId = share.InstrumentId;
-            multiplicator.Ticker = share.Ticker;
-            
+            var multiplicator = new Multiplicator
+            {
+                InstrumentId = share.InstrumentId,
+                Ticker = share.Ticker
+            };
+
             multiplicators.Add(multiplicator);
         }
         

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Oid85.FinMarket.Logging.DataAccess.Entities;
 
@@ -16,7 +17,7 @@ public class LogRecordEntity
     /// <summary>
     /// Уровень логирования
     /// </summary>
-    [Column("level")]
+    [Column("level"), MaxLength(20)]
     public string Level { get; set; } = string.Empty;
 
     /// <summary>

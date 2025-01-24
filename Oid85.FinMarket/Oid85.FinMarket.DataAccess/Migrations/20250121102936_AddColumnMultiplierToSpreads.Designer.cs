@@ -12,8 +12,8 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    [Migration("20250118200222_AddColumnMarketEventTextToMarketEventTable")]
-    partial class AddColumnMarketEventTextToMarketEventTable
+    [Migration("20250121102936_AddColumnMultiplierToSpreads")]
+    partial class AddColumnMultiplierToSpreads
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1421,6 +1421,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
+
+                    b.Property<double>("Multiplier")
+                        .HasColumnType("double precision")
+                        .HasColumnName("multiplier");
 
                     b.Property<double>("PriceDifference")
                         .HasColumnType("double precision")

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Oid85.FinMarket.Application.Helpers;
+﻿using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
@@ -11,7 +10,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class CurrenciesReportService(
-    IConfiguration configuration,
     IAnalyseResultRepository analyseResultRepository,
     ICurrencyRepository currencyRepository,
     ReportHelper reportHelper) 
@@ -226,11 +224,11 @@ public class CurrenciesReportService(
 
                 data.Add(analyseResult is not null
                     ? new ReportParameter(
-                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
-                        analyseResult.ResultNumber >= 0 ? KnownColors.Green : KnownColors.Red, 
-                        analyseResult.ResultString)
+                        KnownDisplayTypes.Percent,
+                        analyseResult.ResultString,
+                        reportHelper.GetColor(analyseResult.ResultNumber))
                     : new ReportParameter(
-                        $"AnalyseResult{KnownAnalyseTypes.YieldLtm}",
+                        KnownDisplayTypes.Percent,
                         string.Empty));
             }
                 
