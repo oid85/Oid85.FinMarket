@@ -26,7 +26,7 @@ public class Program
             
         builder.Services.AddWindowsService(options =>
         {
-            options.ServiceName = "Oid85 FinMarket Service";
+            options.ServiceName = "Oid85.FinMarket";
         });
 
         var app = builder.Build();
