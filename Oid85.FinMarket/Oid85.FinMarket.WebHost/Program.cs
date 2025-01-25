@@ -28,7 +28,7 @@ public class Program
         {
             options.ServiceName = "Oid85.FinMarket";
         });
-
+        
         var app = builder.Build();
         
         app.UseRouting();
@@ -48,6 +48,8 @@ public class Program
         
         app.MapControllers();
 
+        app.Urls.Add("http://0.0.0.0:1001");
+        
         await app.RunAsync();
     }
 }
