@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Logging.DataAccess;
 using Oid85.FinMarket.Logging.DataAccess.Repositories;
@@ -17,8 +18,8 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<LogContext>((_, options) =>
         {
             options
-                .UseNpgsql(configuration
-                    .GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString));
+                .UseNpgsql(ConvertHelper.Base64Decode(
+                    configuration.GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString)!));
         });
             
         services.AddTransient<ILogRepository, LogRepository>();
