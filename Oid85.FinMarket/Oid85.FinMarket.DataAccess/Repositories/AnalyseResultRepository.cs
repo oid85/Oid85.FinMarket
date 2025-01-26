@@ -78,6 +78,7 @@ public class AnalyseResultRepository(
                 && x.AnalyseType == analyseType)
             .OrderByDescending(x => x.Date)
             .Take(2)
+            .OrderBy(x => x.Date)
             .AsNoTracking()
             .ToListAsync();
 
