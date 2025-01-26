@@ -83,6 +83,7 @@ public class CandleRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .OrderByDescending(x => x.Date)
             .Take(2)
+            .OrderBy(x => x.Date)
             .AsNoTracking()
             .ToListAsync();
 
