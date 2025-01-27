@@ -86,7 +86,6 @@ public class Spread
     
     /// <summary>
     /// Отношение цен инструменов, относительно друг друга
-    /// 1 - контанго, 2 - бэквордация
     /// </summary>
-    public int SpreadPricePosition { get; set; }
+    public string SpreadPricePosition { get; set; } = string.Empty;
 }

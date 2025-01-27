@@ -197,7 +197,7 @@ public class SpreadService(
             
             spread.SpreadPricePosition = 
                 spread.PriceDifference > 0.0 
-                    ? KnownSpreadPricePositions.Contango 
+                    ? KnownSpreadPricePositions.Contango
                     : KnownSpreadPricePositions.Backwardation;
             
             await spreadRepository.UpdateSpreadAsync(spread);

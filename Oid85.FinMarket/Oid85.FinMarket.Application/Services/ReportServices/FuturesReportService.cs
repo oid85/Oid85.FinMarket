@@ -91,15 +91,18 @@ public class FuturesReportService(
                 new (KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N2")),
                 new (KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N2")),
                 new (KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N2")),
-                new (KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N2")),
-                new (KnownDisplayTypes.String, 
-                    spread.SpreadPricePosition switch
-                    {
-                        KnownSpreadPricePositions.Contango => "Контанго",
-                        KnownSpreadPricePositions.Backwardation => "Бэквордация",
-                        _ => string.Empty
-                    })
+                new (KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N2"))
             ];
+            
+            string color = (await resourceStoreService.GetColorPaletteSpreadPricePositionAsync())
+                .FirstOrDefault(x => 
+                    spread.SpreadPricePosition == x.Value)!
+                .ColorCode; 
+            
+            data.Add(new (
+                KnownDisplayTypes.String, 
+                spread.SpreadPricePosition,
+                color));
             
             reportData.Data.Add(data);
         }

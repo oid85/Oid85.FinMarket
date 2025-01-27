@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oid85.FinMarket.DataAccess;
@@ -11,9 +12,11 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    partial class FinMarketContextModelSnapshot : ModelSnapshot
+    [Migration("20250127180747_ChangeTypeColumnPricePosition")]
+    partial class ChangeTypeColumnPricePosition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1136,7 +1139,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.HasKey("Id")
                         .HasName("pk_instruments");
 
-                    b.ToTable("instruments", "public");
+                    b.ToTable("instruments", "dictionary");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.MarketEventEntity", b =>
@@ -1204,7 +1207,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.HasKey("Id")
                         .HasName("pk_market_events");
 
-                    b.ToTable("market_events", "storage");
+                    b.ToTable("market_events", "dictionary");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.MultiplicatorEntity", b =>
