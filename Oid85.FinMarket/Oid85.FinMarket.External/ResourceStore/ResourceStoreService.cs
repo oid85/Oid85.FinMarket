@@ -312,6 +312,22 @@ public class ResourceStoreService(
         return result;
     }
 
+    /// <inheritdoc />
+    public async Task<List<ValueColorResource<string>>> GetColorPaletteSpreadPricePositionAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "spreadPricePosition.json");
+
+        var result = await ReadAsync<List<ValueColorResource<string>>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
     private async Task<T?> ReadAsync<T>(string path)
     {
         await using var stream = File.OpenRead(path);

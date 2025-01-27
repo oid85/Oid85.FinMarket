@@ -97,11 +97,10 @@ public class SpreadEntity : AuditableEntity
     /// </summary>
     [Column("funding")]
     public double Funding { get; set; }
-    
+
     /// <summary>
     /// Отношение цен инструменов, относительно друг друга
-    /// 1 - континго, 2 - бэквордация
     /// </summary>
-    [Column("price_position")]
-    public int SpreadPricePosition { get; set; }
+    [Column("price_position"), MaxLength(20)]
+    public string SpreadPricePosition { get; set; } = string.Empty;
 }

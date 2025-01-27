@@ -2,6 +2,6 @@
 
 public static class KnownSpreadPricePositions
 {
-    public const int Contango = 1;
-    public const int Backwardation = 2;
+    public const string Contango = "Контанго";
+    public const string Backwardation = "Бэквордация";
 }

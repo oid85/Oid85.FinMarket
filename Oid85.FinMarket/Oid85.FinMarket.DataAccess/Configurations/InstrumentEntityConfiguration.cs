@@ -11,6 +11,6 @@ internal class InstrumentEntityConfiguration : EntityConfigurationBase<Instrumen
     {
         base.Configure(builder);
         
-        builder.ToTable("instruments", KnownDatabaseSchemas.Dictionary);
+        builder.ToTable("instruments", KnownDatabaseSchemas.Default);
     }
 }
