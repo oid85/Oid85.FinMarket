@@ -5,8 +5,9 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.Application.Services;
 
 public class MultiplicatorService(
-    IShareRepository shareRepository,
-    IMultiplicatorRepository multiplicatorRepository) : IMultiplicatorService
+    IInstrumentService instrumentService,
+    IMultiplicatorRepository multiplicatorRepository) 
+    : IMultiplicatorService
 {
     public async Task<List<Multiplicator>> CalculateMultiplicatorsAsync()
     {
@@ -19,7 +20,7 @@ public class MultiplicatorService(
 
     public async Task FillingMultiplicatorInstrumentsAsync()
     {
-        var shares = await shareRepository.GetWatchListAsync();
+        var shares = await instrumentService.GetSharesInWatchlist();
 
         var multiplicators = new List<Multiplicator>();
 

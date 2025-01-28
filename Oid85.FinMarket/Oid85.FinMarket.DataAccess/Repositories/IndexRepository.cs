@@ -59,10 +59,10 @@ public class IndexRepository(
         .Select(GetModel)
         .ToList();
 
-    public async Task<List<FinIndex>> GetWatchListAsync() =>
+    public async Task<List<FinIndex>> GetByTickersAsync(List<string> tickers) =>
         (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
-            .Where(x => x.InWatchList)
+            .Where(x => tickers.Contains(x.Ticker))
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
@@ -107,8 +107,7 @@ public class IndexRepository(
             Currency = model.Currency,
             InstrumentKind = model.InstrumentKind,
             Name = model.Name,
-            Exchange = model.Exchange,
-            InWatchList = model.InWatchList
+            Exchange = model.Exchange
         };
 
         return entity;
@@ -129,8 +128,7 @@ public class IndexRepository(
             Currency = entity.Currency,
             InstrumentKind = entity.InstrumentKind,
             Name = entity.Name,
-            Exchange = entity.Exchange,
-            InWatchList = entity.InWatchList
+            Exchange = entity.Exchange
         };
 
         return model;

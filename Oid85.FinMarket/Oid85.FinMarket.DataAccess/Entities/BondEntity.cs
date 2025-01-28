@@ -61,12 +61,6 @@ public class BondEntity : AuditableEntity
     public string Sector { get; set; } = string.Empty;
     
     /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    [Column("in_watch_list")]
-    public bool InWatchList { get; set; }
-    
-    /// <summary>
     /// Значение НКД (накопленного купонного дохода) на дату
     /// </summary>
     [Column("nkd")]

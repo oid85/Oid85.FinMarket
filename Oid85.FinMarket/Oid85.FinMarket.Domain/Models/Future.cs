@@ -46,11 +46,6 @@ public class Future
     /// Дата истечения срока
     /// </summary>
     public DateOnly ExpirationDate = DateOnly.MinValue;
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    public bool InWatchList { get; set; } = false;
 
     /// <summary>
     /// Лотность инструмента

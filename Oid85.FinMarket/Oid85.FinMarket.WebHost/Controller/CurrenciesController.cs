@@ -15,7 +15,7 @@ public class CurrenciesController(
     ILoadService loadService,
     IAnalyseService analyseService,
     ICurrenciesReportService reportService,
-    ICurrencyRepository currencyRepository) 
+    IInstrumentService instrumentService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -27,7 +27,7 @@ public class CurrenciesController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetCurrenciesWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await currencyRepository.GetWatchListAsync())
+            async () => (await instrumentService.GetCurrenciesInWatchlist())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

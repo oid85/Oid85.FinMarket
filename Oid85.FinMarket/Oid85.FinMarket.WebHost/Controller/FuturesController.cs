@@ -17,7 +17,7 @@ public class FuturesController(
     IAnalyseService analyseService,
     IFuturesReportService reportService,
     ISpreadService spreadService, 
-    IFutureRepository futureRepository) 
+    IInstrumentService instrumentService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -29,7 +29,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetFuturesWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await futureRepository.GetWatchListAsync())
+            async () => (await instrumentService.GetFuturesInWatchlist())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
@@ -15,7 +14,7 @@ public class IndexesController(
     ILoadService loadService,
     IAnalyseService analyseService,
     IIndexesReportService reportService,
-    IIndexRepository indexRepository) 
+    IInstrumentService instrumentService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -27,7 +26,7 @@ public class IndexesController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetIndexesWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await indexRepository.GetWatchListAsync())
+            async () => (await instrumentService.GetFinIndexesInWatchlist())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

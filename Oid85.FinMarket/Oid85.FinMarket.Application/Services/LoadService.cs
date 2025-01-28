@@ -15,6 +15,7 @@ public class LoadService(
     IBondRepository bondRepository,
     IIndexRepository indexRepository,
     ICurrencyRepository currencyRepository,
+    IInstrumentService instrumentService,
     ICandleRepository candleRepository,
     IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IDividendInfoRepository dividendInfoRepository,
@@ -47,7 +48,7 @@ public class LoadService(
 
     public async Task LoadShareLastPricesAsync()
     {
-        var shares = await shareRepository.GetWatchListAsync();
+        var shares = await instrumentService.GetSharesInWatchlist();
             
         var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
             
@@ -61,7 +62,7 @@ public class LoadService(
 
     public async Task LoadShareDailyCandlesAsync()
     {
-        var instruments = await shareRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetSharesInWatchlist();
 
         foreach (var instrument in instruments)
         {
@@ -97,7 +98,7 @@ public class LoadService(
 
     public async Task LoadShareFiveMinuteCandlesAsync()
     {
-        var instruments = await shareRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetSharesInWatchlist();
 
         foreach (var instrument in instruments)
         {
@@ -130,7 +131,7 @@ public class LoadService(
 
     public async Task LoadForecastsAsync()
     {
-        var instruments = await shareRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetSharesInWatchlist();
 
         foreach (var instrument in instruments)
         {
@@ -166,7 +167,7 @@ public class LoadService(
 
     public async Task LoadFutureLastPricesAsync()
     {
-        var futures = await futureRepository.GetWatchListAsync();
+        var futures = await instrumentService.GetFuturesInWatchlist();
             
         var instrumentIds = futures
             .Select(x => x.InstrumentId)
@@ -182,7 +183,7 @@ public class LoadService(
 
     public async Task LoadFutureDailyCandlesAsync()
     {
-        var instruments = await futureRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetFuturesInWatchlist();
 
         foreach (var instrument in instruments)
         {
@@ -239,7 +240,7 @@ public class LoadService(
     
     public async Task LoadIndexLastPricesAsync()
     {
-        var indicatives = await indexRepository.GetWatchListAsync();
+        var indicatives = await instrumentService.GetFinIndexesInWatchlist();
             
         var instrumentIds = indicatives
             .Select(x => x.InstrumentId)
@@ -255,7 +256,7 @@ public class LoadService(
 
     public async Task LoadIndexDailyCandlesAsync()
     {
-        var instruments = await indexRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetFinIndexesInWatchlist();
 
         foreach (var instrument in instruments)
         {
@@ -313,7 +314,7 @@ public class LoadService(
 
     public async Task LoadCurrencyLastPricesAsync()
     {
-        var currencies = await currencyRepository.GetWatchListAsync();
+        var currencies = await instrumentService.GetCurrenciesInWatchlist();
             
         var instrumentIds = currencies
             .Select(x => x.InstrumentId)
@@ -329,7 +330,7 @@ public class LoadService(
 
     public async Task LoadCurrencyDailyCandlesAsync()
     {
-        var instruments = await currencyRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetCurrenciesInWatchlist();
 
         foreach (var instrument in instruments)
         {
@@ -367,7 +368,7 @@ public class LoadService(
     
     public async Task LoadAssetFundamentalsAsync()
     {
-        var shares = await shareRepository.GetWatchListAsync();
+        var shares = await instrumentService.GetSharesInWatchlist();
 
         var instrumentIds = new List<Guid>();
 
@@ -396,7 +397,7 @@ public class LoadService(
     
     public async Task LoadDividendInfosAsync()
     {
-        var shares = await shareRepository.GetWatchListAsync();
+        var shares = await instrumentService.GetSharesInWatchlist();
         var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
         await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
             
@@ -426,7 +427,7 @@ public class LoadService(
     
     public async Task LoadBondLastPricesAsync()
     {
-        var bonds = await bondRepository.GetWatchListAsync();
+        var bonds = await instrumentService.GetBondsInWatchlist();
             
         var instrumentIds = bonds
             .Select(x => x.InstrumentId)
@@ -442,7 +443,7 @@ public class LoadService(
 
     public async Task LoadBondDailyCandlesAsync()
     {
-        var instruments = await bondRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetBondsInWatchlist();
 
         foreach (var instrument in instruments)
         {
@@ -479,7 +480,7 @@ public class LoadService(
 
     public async Task LoadBondCouponsAsync()
     {
-        var bonds = await bondRepository.GetWatchListAsync();
+        var bonds = await instrumentService.GetBondsInWatchlist();
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
         await bondCouponRepository.AddAsync(bondCoupons);
             

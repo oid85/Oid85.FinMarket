@@ -61,9 +61,4 @@ public class FinIndex
     /// Tорговая площадка (секция биржи)
     /// </summary>
     public string Exchange { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    public bool InWatchList { get; set; } = false; 
 }

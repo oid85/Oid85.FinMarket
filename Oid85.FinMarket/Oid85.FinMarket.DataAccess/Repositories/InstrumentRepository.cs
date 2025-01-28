@@ -49,33 +49,7 @@ public class InstrumentRepository(
             .ToListAsync())
         .Select(GetModel)
         .ToList();
-
-    public async Task<List<Instrument>> GetWatchListAsync()
-    {
-        var shareInstrumentIds = (await shareRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
-        var futureInstrumentIds = (await futureRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
-        var bondInstrumentIds = (await bondRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
-        var currencyInstrumentIds = (await currencyRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
-        var indexInstrumentIds = (await indexRepository.GetWatchListAsync()).Select(x => x.InstrumentId).ToList();
-
-        bool InstrumentIdInWatchList(Guid instrumentId)
-        {
-            bool result = shareInstrumentIds.Contains(instrumentId);
-            result |= futureInstrumentIds.Contains(instrumentId);
-            result |= bondInstrumentIds.Contains(instrumentId);
-            result |= currencyInstrumentIds.Contains(instrumentId);
-            result |= indexInstrumentIds.Contains(instrumentId);
-
-            return result;
-        }
-
-        var instruments = (await GetAllAsync())
-            .Where(x => InstrumentIdInWatchList(x.InstrumentId))
-            .ToList();
-        
-        return instruments;
-    }
-
+    
     public async Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId)
     {
         var entity = await context.InstrumentEntities

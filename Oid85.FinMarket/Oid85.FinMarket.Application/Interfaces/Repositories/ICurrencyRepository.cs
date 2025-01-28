@@ -7,7 +7,7 @@ public interface ICurrencyRepository
     Task AddAsync(List<Currency> currencies);
     Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
     Task<List<Currency>> GetAllAsync();
-    Task<List<Currency>> GetWatchListAsync();
+    Task<List<Currency>> GetByTickersAsync(List<string> tickers);
     Task<Currency?> GetByTickerAsync(string ticker);
     Task<Currency?> GetByInstrumentIdAsync(Guid instrumentId);
 }

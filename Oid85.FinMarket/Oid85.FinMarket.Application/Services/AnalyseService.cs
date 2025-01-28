@@ -16,6 +16,7 @@ public class AnalyseService(
     IFutureRepository futureRepository,
     ICurrencyRepository currencyRepository,
     IIndexRepository indexRepository,
+    IInstrumentService instrumentService,
     ICandleRepository candleRepository,
     IAnalyseResultRepository analyseResultRepository)
     : IAnalyseService
@@ -23,7 +24,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> AnalyseSharesAsync()
     {
-        var instruments = await shareRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetSharesInWatchlist();
             
         for (int i = 0; i < instruments.Count; i++)
         {       
@@ -45,7 +46,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> AnalyseBondsAsync()
     {
-        var instruments = await bondRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetBondsInWatchlist();
             
         for (int i = 0; i < instruments.Count; i++)
         {                
@@ -67,7 +68,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> AnalyseCurrenciesAsync()
     {
-        var instruments = await currencyRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetCurrenciesInWatchlist();
             
         for (int i = 0; i < instruments.Count; i++)
         {                
@@ -89,7 +90,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> AnalyseFuturesAsync()
     {
-        var instruments = await futureRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetFuturesInWatchlist();
             
         for (int i = 0; i < instruments.Count; i++)
         {                
@@ -111,7 +112,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> AnalyseIndexesAsync()
     {
-        var instruments = await indexRepository.GetWatchListAsync();
+        var instruments = await instrumentService.GetFinIndexesInWatchlist();
             
         for (int i = 0; i < instruments.Count; i++)
         {                

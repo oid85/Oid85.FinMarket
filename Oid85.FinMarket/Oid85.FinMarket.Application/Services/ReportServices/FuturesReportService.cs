@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
@@ -15,39 +16,40 @@ public class FuturesReportService(
     IFutureRepository futureRepository,
     ISpreadRepository spreadRepository,
     ReportHelper reportHelper,
+    IInstrumentService instrumentService,
     IResourceStoreService resourceStoreService)
     : IFuturesReportService
 {
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataAggregatedAnalyse(
-            await futureRepository.GetWatchListAsync(), 
+            await instrumentService.GetFuturesInWatchlist(), 
             request.From, 
             request.To);
 
     public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await futureRepository.GetWatchListAsync(), 
+            await instrumentService.GetFuturesInWatchlist(), 
             request.From, 
             request.To, 
             KnownAnalyseTypes.Supertrend);
 
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await futureRepository.GetWatchListAsync(), 
+            await instrumentService.GetFuturesInWatchlist(), 
             request.From, 
             request.To, 
             KnownAnalyseTypes.CandleSequence);
 
     public async Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await futureRepository.GetWatchListAsync(), 
+            await instrumentService.GetFuturesInWatchlist(), 
             request.From, 
             request.To, 
             KnownAnalyseTypes.CandleVolume);
 
     public async Task<ReportData> GetRsiAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await futureRepository.GetWatchListAsync(), 
+            await instrumentService.GetFuturesInWatchlist(), 
             request.From, 
             request.To, 
             KnownAnalyseTypes.Rsi);
@@ -55,7 +57,7 @@ public class FuturesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataYieldLtmAnalyse(
-            await futureRepository.GetWatchListAsync(), 
+            await instrumentService.GetFuturesInWatchlist(), 
             request.From, 
             request.To);
 

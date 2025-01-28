@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
@@ -17,20 +18,21 @@ public class BondsReportService(
     IBondRepository bondRepository,
     IBondCouponRepository bondCouponRepository,
     ReportHelper reportHelper,
+    IInstrumentService instrumentService,
     IResourceStoreService resourceStoreService) 
     : IBondsReportService
 {
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataAggregatedAnalyse(
-            await bondRepository.GetWatchListAsync(), 
+            await instrumentService.GetBondsInWatchlist(), 
             request.From, 
             request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await bondRepository.GetWatchListAsync(), 
+            await instrumentService.GetBondsInWatchlist(), 
             request.From, 
             request.To, 
             KnownAnalyseTypes.Supertrend);
@@ -38,7 +40,7 @@ public class BondsReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await bondRepository.GetWatchListAsync(), 
+            await instrumentService.GetBondsInWatchlist(), 
             request.From, 
             request.To, 
             KnownAnalyseTypes.CandleSequence);
@@ -46,7 +48,7 @@ public class BondsReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await bondRepository.GetWatchListAsync(), 
+            await instrumentService.GetBondsInWatchlist(), 
             request.From, 
             request.To, 
             KnownAnalyseTypes.CandleVolume);
@@ -54,8 +56,7 @@ public class BondsReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetCouponAnalyseAsync()
     {
-        var bonds = await bondRepository
-            .GetWatchListAsync();
+        var bonds = await instrumentService.GetBondsInWatchlist();
             
         var reportData = new ReportData
         {
