@@ -59,10 +59,10 @@ public class CurrencyRepository(
         .Select(GetModel)
         .ToList();
 
-    public async Task<List<Currency>> GetWatchListAsync() =>
+    public async Task<List<Currency>> GetByTickersAsync(List<string> tickers) =>
         (await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
-            .Where(x => x.InWatchList)
+            .Where(x => tickers.Contains(x.Ticker))
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
@@ -106,8 +106,7 @@ public class CurrencyRepository(
             ClassCode = model.ClassCode,
             Name = model.Name,
             IsoCurrencyName = model.IsoCurrencyName,
-            InstrumentId = model.InstrumentId,
-            InWatchList = model.InWatchList
+            InstrumentId = model.InstrumentId
         };
 
         return entity;
@@ -127,8 +126,7 @@ public class CurrencyRepository(
             ClassCode = entity.ClassCode,
             Name = entity.Name,
             IsoCurrencyName = entity.IsoCurrencyName,
-            InstrumentId = entity.InstrumentId,
-            InWatchList = entity.InWatchList
+            InstrumentId = entity.InstrumentId
         };
 
         return model;

@@ -59,10 +59,10 @@ public class BondRepository(
         .Select(GetModel)
         .ToList();
 
-    public async Task<List<Bond>> GetWatchListAsync() =>
+    public async Task<List<Bond>> GetByTickersAsync(List<string> tickers) =>
         (await context.BondEntities
             .Where(x => !x.IsDeleted)
-            .Where(x => x.InWatchList)
+            .Where(x => tickers.Contains(x.Ticker))
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
@@ -106,7 +106,6 @@ public class BondRepository(
             InstrumentId = model.InstrumentId,
             Name = model.Name,
             Sector = model.Sector,
-            InWatchList = model.InWatchList,
             Nkd = model.Nkd,
             MaturityDate = model.MaturityDate,
             FloatingCouponFlag = model.FloatingCouponFlag
@@ -129,7 +128,6 @@ public class BondRepository(
             InstrumentId = entity.InstrumentId,
             Name = entity.Name,
             Sector = entity.Sector,
-            InWatchList = entity.InWatchList,
             Nkd = entity.Nkd,
             MaturityDate = entity.MaturityDate,
             FloatingCouponFlag = entity.FloatingCouponFlag

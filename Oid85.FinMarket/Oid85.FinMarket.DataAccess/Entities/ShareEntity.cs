@@ -59,10 +59,4 @@ public class ShareEntity : AuditableEntity
     /// </summary>
     [Column("sector"), MaxLength(20)]
     public string Sector { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    [Column("in_watch_list")]
-    public bool InWatchList { get; set; } = false; 
 }

@@ -6,7 +6,6 @@ public interface IInstrumentRepository
 {
     Task AddOrUpdateAsync(List<Instrument> tickers);
     Task<List<Instrument>> GetAllAsync();
-    Task<List<Instrument>> GetWatchListAsync();
     Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId);
     Task<Instrument?> GetByNameAsync(string name);
     Task<Instrument?> GetByTickerAsync(string ticker);

@@ -21,7 +21,7 @@ public class AssetFundamentalEntity : AuditableEntity
     /// <summary>
     /// Валюта
     /// </summary>
-    [Column("currency")]
+    [Column("currency"), MaxLength(20)]
     public string Currency { get; set; } = string.Empty;
     
     /// <summary>

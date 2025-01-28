@@ -51,11 +51,6 @@ public class Bond
     /// Сектор
     /// </summary>
     public string Sector { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    public bool InWatchList { get; set; }
 
     /// <summary>
     /// Значение НКД (накопленного купонного дохода) на дату

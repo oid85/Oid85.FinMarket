@@ -65,10 +65,4 @@ public class CurrencyEntity : AuditableEntity
     /// </summary>
     [Column("instrument_id")]
     public Guid InstrumentId { get; set; }
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    [Column("in_watch_list")]
-    public bool InWatchList { get; set; } = false; 
 }

@@ -59,10 +59,10 @@ public class ShareRepository(
         .Select(GetModel)
         .ToList();
 
-    public async Task<List<Share>> GetWatchListAsync() =>
+    public async Task<List<Share>> GetByTickersAsync(List<string> tickers) =>
         (await context.ShareEntities
             .Where(x => !x.IsDeleted)
-            .Where(x => x.InWatchList)
+            .Where(x => tickers.Contains(x.Ticker))
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
@@ -105,8 +105,7 @@ public class ShareRepository(
             Figi = model.Figi,
             InstrumentId = model.InstrumentId,
             Name = model.Name,
-            Sector = model.Sector,
-            InWatchList = model.InWatchList
+            Sector = model.Sector
         };
 
         return entity;
@@ -125,8 +124,7 @@ public class ShareRepository(
             Figi = entity.Figi,
             InstrumentId = entity.InstrumentId,
             Name = entity.Name,
-            Sector = entity.Sector,
-            InWatchList = entity.InWatchList
+            Sector = entity.Sector
         };
 
         return model;

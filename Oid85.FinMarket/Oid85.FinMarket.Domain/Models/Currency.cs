@@ -56,9 +56,4 @@ public class Currency
     /// Уникальный идентификатор инструмента
     /// </summary>
     public Guid InstrumentId { get; set; }
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    public bool InWatchList { get; set; } = false; 
 }

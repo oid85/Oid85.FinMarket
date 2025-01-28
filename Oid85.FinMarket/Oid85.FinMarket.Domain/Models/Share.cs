@@ -51,9 +51,4 @@ public class Share
     /// Сектор
     /// </summary>
     public string Sector { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Находится в списке наблюдения
-    /// </summary>
-    public bool InWatchList { get; set; } = false;
 }

@@ -15,7 +15,7 @@ public class BondsController(
     ILoadService loadService,
     IAnalyseService analyseService,
     IBondsReportService reportService,
-    IBondRepository bondRepository) 
+    IInstrumentService instrumentService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -27,7 +27,7 @@ public class BondsController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetBondsWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await bondRepository.GetWatchListAsync())
+            async () => (await instrumentService.GetBondsInWatchlist())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

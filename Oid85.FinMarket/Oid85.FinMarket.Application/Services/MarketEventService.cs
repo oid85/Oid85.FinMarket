@@ -7,6 +7,7 @@ namespace Oid85.FinMarket.Application.Services;
 
 /// <inheritdoc />
 public class MarketEventService(
+    IInstrumentService instrumentService,
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
@@ -18,9 +19,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckSupertrendUpMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -48,9 +47,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckSupertrendDownMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -78,9 +75,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckCandleVolumeUpMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -105,9 +100,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckCandleSequenceWhiteMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -132,9 +125,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckCandleSequenceBlackMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -159,9 +150,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckRsiOverBoughtInputMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -186,9 +175,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckRsiOverBoughtOutputMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -213,9 +200,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckRsiOverOverSoldInputMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -240,9 +225,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckRsiOverOverSoldOutputMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -267,9 +250,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckCrossUpTargetPriceMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
@@ -296,9 +277,7 @@ public class MarketEventService(
     /// <inheritdoc />
     public async Task CheckCrossDownTargetPriceMarketEventAsync()
     {
-        var instrumentIds = (await instrumentRepository.GetWatchListAsync())
-            .Select(x => x.InstrumentId)
-            .ToList();
+        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {

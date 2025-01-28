@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
@@ -14,20 +15,21 @@ public class IndexesReportService(
     IAnalyseResultRepository analyseResultRepository,
     IIndexRepository indexRepository,
     ReportHelper reportHelper,
+    IInstrumentService instrumentService,
     IResourceStoreService resourceStoreService) 
     : IIndexesReportService
 {
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataAggregatedAnalyse(
-            await indexRepository.GetWatchListAsync(), 
+            await instrumentService.GetFinIndexesInWatchlist(), 
             request.From, 
             request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await indexRepository.GetWatchListAsync(),
+            await instrumentService.GetFinIndexesInWatchlist(),
             request.From,
             request.To,
             KnownAnalyseTypes.Supertrend);
@@ -35,7 +37,7 @@ public class IndexesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await indexRepository.GetWatchListAsync(),
+            await instrumentService.GetFinIndexesInWatchlist(),
             request.From,
             request.To,
             KnownAnalyseTypes.CandleSequence);
@@ -43,7 +45,7 @@ public class IndexesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetRsiAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await indexRepository.GetWatchListAsync(),
+            await instrumentService.GetFinIndexesInWatchlist(),
             request.From,
             request.To,
             KnownAnalyseTypes.Rsi);
@@ -51,7 +53,7 @@ public class IndexesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataYieldLtmAnalyse(
-            await indexRepository.GetWatchListAsync(), 
+            await instrumentService.GetFinIndexesInWatchlist(), 
             request.From, 
             request.To);
     

@@ -59,10 +59,10 @@ public class FutureRepository(
         .Select(GetModel)
         .ToList();
 
-    public async Task<List<Future>> GetWatchListAsync() =>
+    public async Task<List<Future>> GetByTickersAsync(List<string> tickers) =>
         (await context.FutureEntities
             .Where(x => !x.IsDeleted)
-            .Where(x => x.InWatchList)
+            .Where(x => tickers.Contains(x.Ticker))
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
@@ -105,7 +105,6 @@ public class FutureRepository(
             InstrumentId = model.InstrumentId,
             Name = model.Name,
             ExpirationDate = model.ExpirationDate,
-            InWatchList = model.InWatchList,
             Lot = model.Lot,
             FirstTradeDate = model.FirstTradeDate,
             LastTradeDate = model.LastTradeDate,
@@ -134,7 +133,6 @@ public class FutureRepository(
             InstrumentId = entity.InstrumentId,
             Name = entity.Name,
             ExpirationDate = entity.ExpirationDate,
-            InWatchList = entity.InWatchList,
             Lot = entity.Lot,
             FirstTradeDate = entity.FirstTradeDate,
             LastTradeDate = entity.LastTradeDate,
