@@ -623,22 +623,22 @@ public class TinkoffService(
                 switch (targetItem.Recommendation)
                 {
                     case Recommendation.Unspecified:
-                        target.RecommendationString = KnownAnalyseRecommendations.Unknown;
+                        target.RecommendationString = KnownForecastRecommendations.Unknown;
                         target.RecommendationNumber = 0;
                         break;
                     
                     case Recommendation.Buy:
-                        target.RecommendationString = KnownAnalyseRecommendations.Buy;
+                        target.RecommendationString = KnownForecastRecommendations.Buy;
                         target.RecommendationNumber = 1;
                         break;
                     
                     case Recommendation.Hold:
-                        target.RecommendationString = KnownAnalyseRecommendations.Hold;
+                        target.RecommendationString = KnownForecastRecommendations.Hold;
                         target.RecommendationNumber = 2;
                         break;
                     
                     case Recommendation.Sell:
-                        target.RecommendationString = KnownAnalyseRecommendations.Sell;
+                        target.RecommendationString = KnownForecastRecommendations.Sell;
                         target.RecommendationNumber = 3;
                         break;
                 }
@@ -663,22 +663,22 @@ public class TinkoffService(
             switch (response.Consensus.Recommendation)
             {
                 case Recommendation.Unspecified:
-                    consensus.RecommendationString = KnownAnalyseRecommendations.Unknown;
+                    consensus.RecommendationString = KnownForecastRecommendations.Unknown;
                     consensus.RecommendationNumber = 0;
                     break;
                     
                 case Recommendation.Buy:
-                    consensus.RecommendationString = KnownAnalyseRecommendations.Buy;
+                    consensus.RecommendationString = KnownForecastRecommendations.Buy;
                     consensus.RecommendationNumber = 1;
                     break;
                     
                 case Recommendation.Hold:
-                    consensus.RecommendationString = KnownAnalyseRecommendations.Hold;
+                    consensus.RecommendationString = KnownForecastRecommendations.Hold;
                     consensus.RecommendationNumber = 2;
                     break;
                     
                 case Recommendation.Sell:
-                    consensus.RecommendationString = KnownAnalyseRecommendations.Sell;
+                    consensus.RecommendationString = KnownForecastRecommendations.Sell;
                     consensus.RecommendationNumber = 3;
                     break;
             }

@@ -247,6 +247,10 @@ public class SharesReportService(
         // Выбираем свежие прогнозы
         var actualForecastTargets = new List<ForecastTarget>();
 
+        // Получение цветовой палитры
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteForecastRecommendationAsync();
+        
         foreach (var forecastTarget in forecastTargets)
         {
             var target = forecastTargets
@@ -292,7 +296,11 @@ public class SharesReportService(
             [
                 new (KnownDisplayTypes.Ticker, forecastTarget.Ticker),
                 new (KnownDisplayTypes.String, forecastTarget.Company),
-                new (KnownDisplayTypes.String, forecastTarget.RecommendationString, GetColor(forecastTarget.RecommendationNumber)),
+                new (KnownDisplayTypes.String, 
+                    forecastTarget.RecommendationString, 
+                    colorPalette
+                        .FirstOrDefault(x => 
+                            x.Value == forecastTarget.RecommendationString)?.ColorCode ?? KnownColors.White),
                 new (KnownDisplayTypes.Date, forecastTarget.RecommendationDate.ToString(KnownDateTimeFormats.DateISO)),
                 new (KnownDisplayTypes.String, forecastTarget.Currency),
                 new (KnownDisplayTypes.Ruble, forecastTarget.CurrentPrice.ToString("N2")),
@@ -305,26 +313,6 @@ public class SharesReportService(
             reportData.Data.Add(data);
         }
         
-        string GetColor(int code)
-        {
-            switch (code)
-            {
-                case 0:
-                    return KnownColors.White;
-                
-                case 1:
-                    return KnownColors.Green;
-                
-                case 2:
-                    return KnownColors.Yellow;
-                
-                case 3:
-                    return KnownColors.Red;
-            }
-            
-            return KnownColors.Red;
-        }
-        
         return reportData;
     }
 
@@ -333,6 +321,10 @@ public class SharesReportService(
     {
         var forecastConsensuses = await forecastConsensusRepository.GetAllAsync();
             
+        // Получение цветовой палитры
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteForecastRecommendationAsync();
+        
         var reportData = new ReportData
         {
             Title = "Консенсус-прогнозы",
@@ -355,7 +347,11 @@ public class SharesReportService(
             List<ReportParameter> data =
             [
                 new (KnownDisplayTypes.Ticker, forecastConsensus.Ticker),
-                new (KnownDisplayTypes.String, forecastConsensus.RecommendationString, GetColor(forecastConsensus.RecommendationNumber)),
+                new (KnownDisplayTypes.String, 
+                    forecastConsensus.RecommendationString, 
+                    colorPalette
+                        .FirstOrDefault(x => 
+                            x.Value == forecastConsensus.RecommendationString)?.ColorCode ?? KnownColors.White),
                 new (KnownDisplayTypes.String, forecastConsensus.Currency),
                 new (KnownDisplayTypes.Ruble, forecastConsensus.CurrentPrice.ToString("N2")),
                 new (KnownDisplayTypes.Ruble, forecastConsensus.ConsensusPrice.ToString("N2")),
@@ -366,26 +362,6 @@ public class SharesReportService(
             ];
             
             reportData.Data.Add(data);
-        }
-
-        string GetColor(int code)
-        {
-            switch (code)
-            {
-                case 0:
-                    return KnownColors.White;
-                
-                case 1:
-                    return KnownColors.Green;
-                
-                case 2:
-                    return KnownColors.Yellow;
-                
-                case 3:
-                    return KnownColors.Red;
-            }
-            
-            return KnownColors.Red;
         }
         
         return reportData;
