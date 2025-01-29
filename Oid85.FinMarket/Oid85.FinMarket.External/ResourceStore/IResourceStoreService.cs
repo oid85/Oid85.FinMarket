@@ -106,4 +106,9 @@ public interface IResourceStoreService
     /// Получить цветовую палитру для YieldLtm
     /// </summary>
     Task<List<ValueColorResource<string>>> GetColorPaletteSpreadPricePositionAsync();
+    
+    /// <summary>
+    /// Получить цветовую палитру для ForecastRecommendation
+    /// </summary>
+    Task<List<ValueColorResource<string>>> GetColorPaletteForecastRecommendationAsync();
 }
