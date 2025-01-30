@@ -15,7 +15,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 public class SharesReportService(
     IConfiguration configuration,
     IAnalyseResultRepository analyseResultRepository,
-    IShareRepository shareRepository,
     IDividendInfoRepository dividendInfoRepository,
     IAssetFundamentalRepository assetFundamentalRepository,
     IMultiplicatorRepository multiplicatorRepository,

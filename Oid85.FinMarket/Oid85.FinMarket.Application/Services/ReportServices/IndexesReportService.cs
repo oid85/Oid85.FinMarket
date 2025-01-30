@@ -6,17 +6,14 @@ using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class IndexesReportService(
     IAnalyseResultRepository analyseResultRepository,
-    IIndexRepository indexRepository,
     ReportHelper reportHelper,
-    IInstrumentService instrumentService,
-    IResourceStoreService resourceStoreService) 
+    IInstrumentService instrumentService) 
     : IIndexesReportService
 {
     /// <inheritdoc />

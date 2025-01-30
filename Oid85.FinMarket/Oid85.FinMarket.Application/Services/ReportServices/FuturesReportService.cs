@@ -13,7 +13,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 /// <inheritdoc />
 public class FuturesReportService(
     IAnalyseResultRepository analyseResultRepository,
-    IFutureRepository futureRepository,
     ISpreadRepository spreadRepository,
     ReportHelper reportHelper,
     IInstrumentService instrumentService,

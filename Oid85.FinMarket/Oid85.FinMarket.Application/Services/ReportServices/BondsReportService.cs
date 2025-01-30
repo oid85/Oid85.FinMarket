@@ -15,7 +15,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 public class BondsReportService(
     IConfiguration configuration,
     IAnalyseResultRepository analyseResultRepository,
-    IBondRepository bondRepository,
     IBondCouponRepository bondCouponRepository,
     ReportHelper reportHelper,
     IInstrumentService instrumentService,
