@@ -442,10 +442,22 @@ public class SharesReportService(
                             x.Ticker == instrument.Ticker && 
                             x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
+                    string color = KnownColors.White;
+                    
+                    if (dividendInfo is not null)
+                    {
+                        color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
+                            .FirstOrDefault(x => 
+                                dividendInfo.DividendPrc >= x.LowLevel &&
+                                dividendInfo.DividendPrc >= x.HighLevel)!
+                            .ColorCode;
+                    }
+                    
                     data.Add(dividendInfo is not null 
                         ? new ReportParameter(
                             KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString("N1")) 
+                            dividendInfo.DividendPrc.ToString("N1"),
+                            color) 
                         : new ReportParameter(
                             KnownDisplayTypes.Percent, 
                             string.Empty));
@@ -540,10 +552,22 @@ public class SharesReportService(
                             x.Ticker == instrument.Ticker && 
                             x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
+                    string color = KnownColors.White;
+                    
+                    if (dividendInfo is not null)
+                    {
+                        color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
+                            .FirstOrDefault(x => 
+                                dividendInfo.DividendPrc >= x.LowLevel &&
+                                dividendInfo.DividendPrc >= x.HighLevel)!
+                            .ColorCode;
+                    }
+                    
                     data.Add(dividendInfo is not null 
                         ? new ReportParameter(
                             KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString("N1")) 
+                            dividendInfo.DividendPrc.ToString("N1"),
+                            color) 
                         : new ReportParameter(
                             KnownDisplayTypes.Percent, 
                             string.Empty));
@@ -631,10 +655,22 @@ public class SharesReportService(
                             x.Ticker == instrument.Ticker && 
                             x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
+                    string color = KnownColors.White;
+                    
+                    if (dividendInfo is not null)
+                    {
+                        color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
+                            .FirstOrDefault(x => 
+                                dividendInfo.DividendPrc >= x.LowLevel &&
+                                dividendInfo.DividendPrc >= x.HighLevel)!
+                            .ColorCode;
+                    }
+                    
                     data.Add(dividendInfo is not null 
                         ? new ReportParameter(
                             KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString("N1")) 
+                            dividendInfo.DividendPrc.ToString("N1"),
+                            color) 
                         : new ReportParameter(
                             KnownDisplayTypes.Percent, 
                             string.Empty));
