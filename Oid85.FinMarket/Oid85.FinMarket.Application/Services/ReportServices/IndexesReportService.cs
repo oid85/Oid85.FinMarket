@@ -103,7 +103,7 @@ public class IndexesReportService(
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         analyseResult.ResultString,
-                        reportHelper.GetColor(
+                        await reportHelper.GetColor(
                             analyseType, 
                             analyseResult)) 
                     : new ReportParameter(
@@ -174,7 +174,7 @@ public class IndexesReportService(
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
                     resultNumber.ToString("N0"),
-                    reportHelper.GetColor(
+                    await reportHelper.GetColor(
                         KnownAnalyseTypes.Aggregated, 
                         new AnalyseResult { ResultNumber = resultNumber})));
             }
@@ -233,7 +233,7 @@ public class IndexesReportService(
                     ? new ReportParameter(
                         KnownDisplayTypes.Percent,
                         analyseResult.ResultString,
-                        reportHelper.GetColor(
+                        await reportHelper.GetColor(
                             KnownAnalyseTypes.YieldLtm, 
                             analyseResult))
                     : new ReportParameter(

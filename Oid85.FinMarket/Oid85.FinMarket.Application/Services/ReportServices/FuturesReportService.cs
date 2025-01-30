@@ -160,7 +160,7 @@ public class FuturesReportService(
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         analyseResult.ResultString,
-                        reportHelper.GetColor(
+                        await reportHelper.GetColor(
                             analyseType, 
                             analyseResult)) 
                     : new ReportParameter(
@@ -232,7 +232,7 @@ public class FuturesReportService(
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
                     resultNumber.ToString("N0"),
-                    reportHelper.GetColor(
+                    await  reportHelper.GetColor(
                         KnownAnalyseTypes.Aggregated, 
                         new AnalyseResult { ResultNumber = resultNumber})));
             }
@@ -291,7 +291,7 @@ public class FuturesReportService(
                     ? new ReportParameter(
                         KnownDisplayTypes.Percent,
                         analyseResult.ResultString,
-                        reportHelper.GetColor(
+                        await reportHelper.GetColor(
                             KnownAnalyseTypes.YieldLtm, 
                             analyseResult))
                     : new ReportParameter(
