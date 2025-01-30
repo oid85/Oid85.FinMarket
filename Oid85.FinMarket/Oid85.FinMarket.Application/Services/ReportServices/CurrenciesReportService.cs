@@ -105,7 +105,10 @@ public class CurrenciesReportService(
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
-                        analyseResult.ResultString) 
+                        analyseResult.ResultString,
+                        reportHelper.GetColor(
+                            analyseType, 
+                            analyseResult)) 
                     : new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         string.Empty));
@@ -117,7 +120,7 @@ public class CurrenciesReportService(
         return reportData;
     }
     
-        private async Task<ReportData> GetReportDataAggregatedAnalyse(
+    private async Task<ReportData> GetReportDataAggregatedAnalyse(
         List<Currency> instruments,
         DateOnly from,
         DateOnly to)
@@ -132,7 +135,7 @@ public class CurrenciesReportService(
             KnownAnalyseTypes.CandleSequence,
             KnownAnalyseTypes.Rsi
         };
-            
+        
         var analyseResults = (await analyseResultRepository
                 .GetAsync(instrumentIds, from, to))
             .Where(x => analyseTypes.Contains(x.AnalyseType))
@@ -170,16 +173,13 @@ public class CurrenciesReportService(
                         x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value)
                     .Select(x => x.ResultNumber)
                     .Sum();
-                    
-                string color = (await resourceStoreService.GetColorPaletteAggregatedAnalyseAsync())
-                    .FirstOrDefault(x => 
-                        (int) resultNumber == x.Value)!
-                    .ColorCode;                
                 
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
                     resultNumber.ToString("N0"),
-                    color));
+                    reportHelper.GetColor(
+                        KnownAnalyseTypes.Aggregated, 
+                        new AnalyseResult { ResultNumber = resultNumber })));
             }
                 
             reportData.Data.Add(data);
@@ -236,7 +236,9 @@ public class CurrenciesReportService(
                     ? new ReportParameter(
                         KnownDisplayTypes.Percent,
                         analyseResult.ResultString,
-                        reportHelper.GetColor(analyseResult.ResultNumber))
+                        reportHelper.GetColor(
+                            KnownAnalyseTypes.YieldLtm, 
+                            analyseResult))
                     : new ReportParameter(
                         KnownDisplayTypes.Percent,
                         string.Empty));

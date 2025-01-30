@@ -105,7 +105,10 @@ public class IndexesReportService(
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
-                        analyseResult.ResultString) 
+                        analyseResult.ResultString,
+                        reportHelper.GetColor(
+                            analyseType, 
+                            analyseResult)) 
                     : new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         string.Empty));
@@ -170,16 +173,13 @@ public class IndexesReportService(
                         x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value)
                     .Select(x => x.ResultNumber)
                     .Sum();
-                    
-                string color = (await resourceStoreService.GetColorPaletteAggregatedAnalyseAsync())
-                    .FirstOrDefault(x => 
-                        (int) resultNumber == x.Value)!
-                    .ColorCode;                
                 
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
                     resultNumber.ToString("N0"),
-                    color));
+                    reportHelper.GetColor(
+                        KnownAnalyseTypes.Aggregated, 
+                        new AnalyseResult { ResultNumber = resultNumber})));
             }
                 
             reportData.Data.Add(data);
@@ -236,7 +236,9 @@ public class IndexesReportService(
                     ? new ReportParameter(
                         KnownDisplayTypes.Percent,
                         analyseResult.ResultString,
-                        reportHelper.GetColor(analyseResult.ResultNumber))
+                        reportHelper.GetColor(
+                            KnownAnalyseTypes.YieldLtm, 
+                            analyseResult))
                     : new ReportParameter(
                         KnownDisplayTypes.Percent,
                         string.Empty));

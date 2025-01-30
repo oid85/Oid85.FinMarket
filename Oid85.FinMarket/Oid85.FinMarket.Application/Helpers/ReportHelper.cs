@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.Application.Helpers;
 
@@ -23,8 +24,8 @@ public class ReportHelper
         return dates;
     }
     
-    public string GetColor(double value)
+    public string GetColor(string analyseType, AnalyseResult analyseResult)
     {
-        return value >= 0.0 ? KnownColors.Green : KnownColors.Red;
+        return KnownColors.White;
     }
 }
