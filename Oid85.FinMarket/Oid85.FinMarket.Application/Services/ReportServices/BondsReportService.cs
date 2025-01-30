@@ -15,7 +15,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 public class BondsReportService(
     IConfiguration configuration,
     IAnalyseResultRepository analyseResultRepository,
-    IBondRepository bondRepository,
     IBondCouponRepository bondCouponRepository,
     ReportHelper reportHelper,
     IInstrumentService instrumentService,
@@ -191,7 +190,10 @@ public class BondsReportService(
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
-                        analyseResult.ResultString) 
+                        analyseResult.ResultString,
+                        await reportHelper.GetColor(
+                            analyseType, 
+                            analyseResult)) 
                     : new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         string.Empty));
@@ -203,7 +205,7 @@ public class BondsReportService(
         return reportData;
     }
     
-        private async Task<ReportData> GetReportDataAggregatedAnalyse(
+    private async Task<ReportData> GetReportDataAggregatedAnalyse(
         List<Bond> instruments,
         DateOnly from,
         DateOnly to)
@@ -256,16 +258,13 @@ public class BondsReportService(
                         x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value)
                     .Select(x => x.ResultNumber)
                     .Sum();
-                    
-                string color = (await resourceStoreService.GetColorPaletteAggregatedAnalyseAsync())
-                    .FirstOrDefault(x => 
-                        (int) resultNumber == x.Value)!
-                    .ColorCode;                
                 
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
                     resultNumber.ToString("N0"),
-                    color));
+                    await reportHelper.GetColor(
+                        KnownAnalyseTypes.Aggregated, 
+                        new AnalyseResult { ResultNumber = resultNumber})));
             }
                 
             reportData.Data.Add(data);
