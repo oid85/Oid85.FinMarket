@@ -2,6 +2,7 @@
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.Application.Services;
@@ -12,23 +13,24 @@ public class SpreadService(
     ISpreadRepository spreadRepository,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
-    ICurrencyRepository currencyRepository) 
+    ICurrencyRepository currencyRepository,
+    IResourceStoreService resourceStoreService) 
     : ISpreadService
 {
     public async Task<List<Spread>> FillingSpreadPairsAsync()
     {
         await DeleteExpiratedFuturesAsync();
+
+        var spreadResources = await resourceStoreService.GetSpreadsAsync();
         
         var spreads = new List<Spread>();
-        
-        spreads.AddRange(await GetSpreadsAsync(
-            "IMOEX", multiplier: 1000.0, "IMOEXF", "MX"));
-        spreads.AddRange(await GetSpreadsAsync(
-            "CNY/RUB", multiplier: 1000.0, "CNYRUBF", "CR"));
-        spreads.AddRange(await GetSpreadsAsync(
-            "EUR/USD", multiplier: 1000.0, "", "ED"));
-        spreads.AddRange(await GetSpreadsAsync(
-            "USD/RUB", multiplier: 1000.0, "USDRUBF", "Si"));
+
+        foreach (var resource in spreadResources)
+            spreads.AddRange(await GetSpreadsAsync(
+                resource.BaseAssetTicker, 
+                resource.Multiplier, 
+                resource.ForeverFutureTicker, 
+                resource.FutureTickerPrefix));
         
         await spreadRepository.AddAsync(spreads);
         
