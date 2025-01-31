@@ -40,7 +40,7 @@ public interface IResourceStoreService
     /// <summary>
     /// Получить мультипликатор
     /// </summary>
-    Task<MultiplicatorResource> GetMultiplicatorLtmAsync(string ticker);
+    Task<MultiplicatorResource?> GetMultiplicatorLtmAsync(string ticker);
     
     /// <summary>
     /// Получить ценовые уровни

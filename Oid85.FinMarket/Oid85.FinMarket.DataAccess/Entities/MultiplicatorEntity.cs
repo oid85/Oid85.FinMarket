@@ -19,6 +19,90 @@ public class MultiplicatorEntity : AuditableEntity
     public Guid InstrumentId { get; set; }
     
     /// <summary>
+    /// Количество обыкновенных акций
+    /// </summary>
+    [Column("total_shares_ao")]
+    public double TotalSharesAo { get; set; }
+    
+    /// <summary>
+    /// Количество привелегированных акций
+    /// </summary>
+    [Column("total_shares_ap")]
+    public double TotalSharesAp { get; set; }
+    
+    /// <summary>
+    /// Бета-коэффициент
+    /// </summary>
+    [Column("beta")]
+    public double Beta { get; set; }
+    
+    /// <summary>
+    /// Выручка
+    /// </summary>
+    [Column("revenue")]
+    public double Revenue { get; set; }
+    
+    /// <summary>
+    /// Операционная прибыль
+    /// </summary>
+    [Column("operating_income")]
+    public double OperatingIncome { get; set; }
+    
+    /// <summary>
+    /// P/E
+    /// </summary>
+    [Column("pe")]
+    public double Pe { get; set; }
+    
+    /// <summary>
+    /// P/B
+    /// </summary>
+    [Column("pb")]
+    public double Pb { get; set; }
+    
+    /// <summary>
+    /// P/BV
+    /// </summary>
+    [Column("pbv")]
+    public double Pbv { get; set; }
+    
+    /// <summary>
+    /// EV
+    /// </summary>
+    [Column("ev")]
+    public double Ev { get; set; }
+    
+    /// <summary>
+    /// ROE
+    /// </summary>
+    [Column("roe")]
+    public double Roe { get; set; }
+    
+    /// <summary>
+    /// ROA
+    /// </summary>
+    [Column("roa")]
+    public double Roa { get; set; }
+    
+    /// <summary>
+    /// Чистая процентная маржа
+    /// </summary>
+    [Column("net_interest_margin")]
+    public double NetInterestMargin { get; set; }
+    
+    /// <summary>
+    /// Долг
+    /// </summary>
+    [Column("total_debt")]
+    public double TotalDebt { get; set; }
+    
+    /// <summary>
+    /// Чистый долг
+    /// </summary>
+    [Column("net_debt")]
+    public double NetDebt { get; set; }
+    
+    /// <summary>
     /// Рыночная капитализация
     /// </summary>
     [Column("market_capitalization")]
@@ -35,12 +119,6 @@ public class MultiplicatorEntity : AuditableEntity
     /// </summary>
     [Column("high_of_year")]
     public double HighOfYear { get; set; }
-    
-    /// <summary>
-    /// Бета-коэффициент
-    /// </summary>
-    [Column("beta")]
-    public double Beta { get; set; }
     
     /// <summary>
     /// Чистая прибыль

@@ -18,6 +18,76 @@ public class Multiplicator
     public Guid InstrumentId { get; set; }
     
     /// <summary>
+    /// Количество обыкновенных акций
+    /// </summary>
+    public double TotalSharesAo { get; set; }
+    
+    /// <summary>
+    /// Количество привелегированных акций
+    /// </summary>
+    public double TotalSharesAp { get; set; }
+    
+    /// <summary>
+    /// Бета-коэффициент
+    /// </summary>
+    public double Beta { get; set; }
+    
+    /// <summary>
+    /// Выручка
+    /// </summary>
+    public double Revenue { get; set; }
+    
+    /// <summary>
+    /// Операционная прибыль
+    /// </summary>
+    public double OperatingIncome { get; set; }
+    
+    /// <summary>
+    /// P/E
+    /// </summary>
+    public double Pe { get; set; }
+    
+    /// <summary>
+    /// P/B
+    /// </summary>
+    public double Pb { get; set; }
+    
+    /// <summary>
+    /// P/BV
+    /// </summary>
+    public double Pbv { get; set; }
+    
+    /// <summary>
+    /// EV
+    /// </summary>
+    public double Ev { get; set; }
+    
+    /// <summary>
+    /// ROE
+    /// </summary>
+    public double Roe { get; set; }
+    
+    /// <summary>
+    /// ROA
+    /// </summary>
+    public double Roa { get; set; }
+    
+    /// <summary>
+    /// Чистая процентная маржа
+    /// </summary>
+    public double NetInterestMargin { get; set; }
+    
+    /// <summary>
+    /// Долг
+    /// </summary>
+    public double TotalDebt { get; set; }
+    
+    /// <summary>
+    /// Чистый долг
+    /// </summary>
+    public double NetDebt { get; set; }
+    
+    /// <summary>
     /// Рыночная капитализация
     /// </summary>
     public double MarketCapitalization { get; set; }
@@ -31,11 +101,6 @@ public class Multiplicator
     /// Годовой максимум
     /// </summary>
     public double HighOfYear { get; set; }
-    
-    /// <summary>
-    /// Бета-коэффициент
-    /// </summary>
-    public double Beta { get; set; }
     
     /// <summary>
     /// Чистая прибыль
@@ -71,9 +136,4 @@ public class Multiplicator
     /// Чистый долг / EBITDA
     /// </summary>
     public double NetDebtToEbitda { get; set; }
-    
-    /// <summary>
-    /// Дата и время последнего обновления записи в БД
-    /// </summary>
-    public DateTime UpdatedAt { get; set; }
 }

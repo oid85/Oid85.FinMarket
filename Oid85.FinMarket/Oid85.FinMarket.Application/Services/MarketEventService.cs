@@ -12,8 +12,7 @@ public class MarketEventService(
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
     IInstrumentRepository instrumentRepository,
-    ISpreadRepository spreadRepository,
-    IMultiplicatorRepository multiplicatorRepository) 
+    ISpreadRepository spreadRepository) 
     : IMarketEventService
 {
     /// <inheritdoc />
@@ -377,23 +376,6 @@ public class MarketEventService(
             
             else
                 marketEvent.IsActive = false;
-            
-            await SaveMarketEventAsync(marketEvent);
-        }
-    }
-
-    public async Task CheckDataHasNotBeenUpdatedMarketEventAsync()
-    {
-        var multiplicators = (await multiplicatorRepository.GetAllAsync()).ToList();
-        
-        foreach (var multiplicator in multiplicators)
-        {
-            var marketEvent = await CreateMarketEvent(
-                multiplicator.InstrumentId, KnownMarketEventTypes.DataHasNotBeenUpdated);
-            
-            marketEvent.MarketEventText = $"Мультипликаторы не обновлялись дольше 30 дней";
-
-            marketEvent.IsActive = (DateTime.UtcNow - multiplicator.UpdatedAt).TotalDays >= 30.0;
             
             await SaveMarketEventAsync(marketEvent);
         }

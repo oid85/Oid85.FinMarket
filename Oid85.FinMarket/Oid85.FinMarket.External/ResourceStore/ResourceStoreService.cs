@@ -107,7 +107,7 @@ public class ResourceStoreService(
     }
 
     /// <inheritdoc />
-    public async Task<MultiplicatorResource> GetMultiplicatorLtmAsync(string ticker)
+    public async Task<MultiplicatorResource?> GetMultiplicatorLtmAsync(string ticker)
     {
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
@@ -116,9 +116,6 @@ public class ResourceStoreService(
             $"{ticker.ToLower()}.json");
 
         var result = await ReadAsync<MultiplicatorResource>(path);
-
-        if (result is null)
-            return new();
         
         return result;
     }
