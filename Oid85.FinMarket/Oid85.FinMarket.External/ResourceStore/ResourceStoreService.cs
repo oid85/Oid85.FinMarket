@@ -318,6 +318,51 @@ public class ResourceStoreService(
         return result;
     }
 
+    public async Task<List<RangeColorResource>> GetColorPalettePeAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "peLimits.json");
+
+        var result = await ReadAsync<List<RangeColorResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
+    public async Task<List<RangeColorResource>> GetColorPaletteEvToEbitdaAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "evEbitdaLimits.json");
+
+        var result = await ReadAsync<List<RangeColorResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
+    public async Task<List<RangeColorResource>> GetColorPaletteNetDebtToEbitdaAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "netDebtEbitdaLimits.json");
+
+        var result = await ReadAsync<List<RangeColorResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
     /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteSpreadPricePositionAsync()
     {

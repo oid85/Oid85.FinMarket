@@ -205,7 +205,7 @@ public class SharesReportService(
                 new ReportParameter(KnownDisplayTypes.String, "Net Debt/EBITDA")
             ]
         };
-
+        
         foreach (var share in shares)
         {
             var multiplicator = await multiplicatorRepository.GetAsync(share.Ticker);
@@ -223,9 +223,15 @@ public class SharesReportService(
                 new (KnownDisplayTypes.Number, multiplicator.Ebitda.ToString("N2")),
                 new (KnownDisplayTypes.Number, multiplicator.Eps.ToString("N2")),
                 new (KnownDisplayTypes.Number, multiplicator.FreeCashFlow.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.EvToEbitda.ToString("N2")),
+                new (
+                    KnownDisplayTypes.Number, 
+                    multiplicator.EvToEbitda.ToString("N2"), 
+                    await reportHelper.GetColorEvToEbitda(multiplicator.EvToEbitda)),
                 new (KnownDisplayTypes.Number, multiplicator.TotalDebtToEbitda.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.NetDebtToEbitda.ToString("N2"))
+                new (
+                    KnownDisplayTypes.Number, 
+                    multiplicator.NetDebtToEbitda.ToString("N2"), 
+                    await reportHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda))
             ];
             
             reportData.Data.Add(data);
