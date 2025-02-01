@@ -1,8 +1,8 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using NLog;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.Logging.Services;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -18,7 +18,7 @@ namespace Oid85.FinMarket.External.Tinkoff;
 
 /// <inheritdoc />
 public class TinkoffService(
-    ILogService logService,
+    ILogger logger,
     InvestApiClient client)
     : ITinkoffService
 {
@@ -36,7 +36,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -54,7 +54,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -92,7 +92,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -123,7 +123,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -191,7 +191,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -240,7 +240,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -280,7 +280,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -321,7 +321,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -361,7 +361,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -425,7 +425,7 @@ public class TinkoffService(
             
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -483,7 +483,7 @@ public class TinkoffService(
                 }
 
                 double percent = ((i + 1) / (double) bonds.Count) * 100;
-                await logService.LogTrace($"Загружены купоны для облигации '{bonds[i].Ticker}'. {i + 1} из {bonds.Count}. {percent:N2} % загружено");
+                logger.Trace($"Загружены купоны для облигации '{bonds[i].Ticker}'. {i + 1} из {bonds.Count}. {percent:N2} % загружено");
             }
 
             return bondCoupons;
@@ -491,7 +491,7 @@ public class TinkoffService(
             
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -589,7 +589,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }
@@ -696,7 +696,7 @@ public class TinkoffService(
         
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return ([], new());
         }
     }

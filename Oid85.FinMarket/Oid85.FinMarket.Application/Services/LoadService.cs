@@ -1,14 +1,14 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using NLog;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Tinkoff;
-using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.Application.Services;
 
 public class LoadService(
-    ILogService logService,
+    ILogger logger,
     ITinkoffService tinkoffService,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
@@ -43,7 +43,7 @@ public class LoadService(
         
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
-        await logService.LogTrace($"Загружены акции. {shares.Count} шт.");
+        logger.Trace($"Загружены акции. {shares.Count} шт.");
     }
 
     public async Task LoadShareLastPricesAsync()
@@ -57,7 +57,7 @@ public class LoadService(
         for (int i = 0; i < instrumentIds.Count; i++) 
             await shareRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
-        await logService.LogTrace($"Загружены последние цены по акциям. {shares.Count} шт.");
+        logger.Trace($"Загружены последние цены по акциям. {shares.Count} шт.");
     }
 
     public async Task LoadShareDailyCandlesAsync()
@@ -92,7 +92,7 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
             
-            await logService.LogTrace($"Загружены дневные свечи по '{instrument.Ticker}' ({instrument.Name})");
+            logger.Trace($"Загружены дневные свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -125,7 +125,7 @@ public class LoadService(
                 await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
             }
             
-            await logService.LogTrace($"Загружены 5-минутные свечи по '{instrument.Ticker}' ({instrument.Name})");
+            logger.Trace($"Загружены 5-минутные свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -140,7 +140,7 @@ public class LoadService(
             await forecastTargetRepository.AddAsync(targets);
             await forecastConsensusRepository.AddAsync([consensus]);
             
-            await logService.LogTrace($"Загружен прогноз по '{instrument.Ticker}' ({instrument.Name})");
+            logger.Trace($"Загружен прогноз по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -162,7 +162,7 @@ public class LoadService(
         
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
-        await logService.LogTrace($"Загружены фьючерсы. {futures.Count} шт.");
+        logger.Trace($"Загружены фьючерсы. {futures.Count} шт.");
     }
 
     public async Task LoadFutureLastPricesAsync()
@@ -178,7 +178,7 @@ public class LoadService(
         for (int i = 0; i < instrumentIds.Count; i++) 
             await futureRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
-        await logService.LogTrace($"Загружены последние цены по фьючерсам. {futures.Count} шт.");
+        logger.Trace($"Загружены последние цены по фьючерсам. {futures.Count} шт.");
     }
 
     public async Task LoadFutureDailyCandlesAsync()
@@ -213,7 +213,7 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
             
-            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
+            logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -235,7 +235,7 @@ public class LoadService(
         
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
-        await logService.LogTrace($"Загружены индикативные инструменты. {indicatives.Count} шт.");
+        logger.Trace($"Загружены индикативные инструменты. {indicatives.Count} шт.");
     }
     
     public async Task LoadIndexLastPricesAsync()
@@ -251,7 +251,7 @@ public class LoadService(
         for (int i = 0; i < instrumentIds.Count; i++) 
             await indexRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
-        await logService.LogTrace($"Загружены последние цены по индикативам. {indicatives.Count} шт.");
+        logger.Trace($"Загружены последние цены по индикативам. {indicatives.Count} шт.");
     }
 
     public async Task LoadIndexDailyCandlesAsync()
@@ -287,7 +287,7 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
             
-            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
+            logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -309,7 +309,7 @@ public class LoadService(
         
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
-        await logService.LogTrace($"Загружены валюты. {currencies.Count} шт.");
+        logger.Trace($"Загружены валюты. {currencies.Count} шт.");
     }
 
     public async Task LoadCurrencyLastPricesAsync()
@@ -325,7 +325,7 @@ public class LoadService(
         for (int i = 0; i < instrumentIds.Count; i++) 
             await currencyRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
-        await logService.LogTrace($"Загружены последние цены по валютам. {currencies.Count} шт.");
+        logger.Trace($"Загружены последние цены по валютам. {currencies.Count} шт.");
     }
 
     public async Task LoadCurrencyDailyCandlesAsync()
@@ -361,7 +361,7 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
             
-            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
+            logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -391,7 +391,7 @@ public class LoadService(
         
         await assetFundamentalRepository.AddAsync(assetFundamentals);
             
-        await logService.LogTrace($"Загружены фундаментальные данные. {assetFundamentals.Count} шт.");
+        logger.Trace($"Загружены фундаментальные данные. {assetFundamentals.Count} шт.");
     }
 
     
@@ -401,7 +401,7 @@ public class LoadService(
         var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
         await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
             
-        await logService.LogTrace($"Загружена информация по дивидендам. {dividendInfos.Count} шт.");
+        logger.Trace($"Загружена информация по дивидендам. {dividendInfos.Count} шт.");
     }
     
     
@@ -422,7 +422,7 @@ public class LoadService(
         
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
-        await logService.LogTrace($"Загружены облигации. {bonds.Count} шт.");
+        logger.Trace($"Загружены облигации. {bonds.Count} шт.");
     }
     
     public async Task LoadBondLastPricesAsync()
@@ -438,7 +438,7 @@ public class LoadService(
         for (int i = 0; i < instrumentIds.Count; i++) 
             await bondRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
-        await logService.LogTrace($"Загружены последние цены по облигациям. {bonds.Count} шт.");
+        logger.Trace($"Загружены последние цены по облигациям. {bonds.Count} шт.");
     }
 
     public async Task LoadBondDailyCandlesAsync()
@@ -474,7 +474,7 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
             
-            await logService.LogTrace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
+            logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
     }
 
@@ -484,6 +484,6 @@ public class LoadService(
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
         await bondCouponRepository.AddAsync(bondCoupons);
             
-        await logService.LogTrace($"Загружена информация по купонам облигаций. {bondCoupons.Count} шт.");
+        logger.Trace($"Загружена информация по купонам облигаций. {bondCoupons.Count} шт.");
     }
 }

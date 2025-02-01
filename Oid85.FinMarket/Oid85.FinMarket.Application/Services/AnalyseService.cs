@@ -1,21 +1,16 @@
-﻿using Oid85.FinMarket.Common.KnownConstants;
+﻿using NLog;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Skender.Stock.Indicators;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Logging.Services;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
 
 namespace Oid85.FinMarket.Application.Services;
 
 /// <inheritdoc />
 public class AnalyseService(
-    ILogService logService,
-    IShareRepository shareRepository,
-    IBondRepository bondRepository,
-    IFutureRepository futureRepository,
-    ICurrencyRepository currencyRepository,
-    IIndexRepository indexRepository,
+    ILogger logger,
     IInstrumentService instrumentService,
     ICandleRepository candleRepository,
     IAnalyseResultRepository analyseResultRepository)
@@ -37,7 +32,7 @@ public class AnalyseService(
 
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ акций, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            logger.Trace($"Анализ акций, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -59,7 +54,7 @@ public class AnalyseService(
             
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ облигаций, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            logger.Trace($"Анализ облигаций, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -81,7 +76,7 @@ public class AnalyseService(
             
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ валют, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            logger.Trace($"Анализ валют, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -103,7 +98,7 @@ public class AnalyseService(
 
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ фьючерсов, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            logger.Trace($"Анализ фьючерсов, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -125,7 +120,7 @@ public class AnalyseService(
 
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            await logService.LogTrace($"Анализ индексов, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            logger.Trace($"Анализ индексов, {i + 1} из {instruments.Count} ({percent:N2} %)");
         }
 
         return true;
@@ -172,12 +167,12 @@ public class AnalyseService(
 
             await analyseResultRepository.AddAsync(results);
             
-            await logService.LogTrace($"Анализ 'Supertrend' выполнен. InstrumentId = '{instrumentId}'");
+            logger.Trace($"Анализ 'Supertrend' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
-            await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
+            logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
 
         return;
@@ -242,12 +237,12 @@ public class AnalyseService(
 
             await analyseResultRepository.AddAsync(results);
             
-            await logService.LogTrace($"Анализ 'CandleSequence' выполнен. InstrumentId = '{instrumentId}'");
+            logger.Trace($"Анализ 'CandleSequence' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
-            await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
+            logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
 
         return;
@@ -319,12 +314,12 @@ public class AnalyseService(
 
             await analyseResultRepository.AddAsync(results);
             
-            await logService.LogTrace($"Анализ 'CandleVolume' выполнен. InstrumentId = '{instrumentId}'");
+            logger.Trace($"Анализ 'CandleVolume' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
-            await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
+            logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
 
         return;
@@ -385,12 +380,12 @@ public class AnalyseService(
 
             await analyseResultRepository.AddAsync(results);
             
-            await logService.LogTrace($"Анализ 'Rsi' выполнен. InstrumentId = '{instrumentId}'");
+            logger.Trace($"Анализ 'Rsi' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
-            await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
+            logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
 
         return;
@@ -449,12 +444,12 @@ public class AnalyseService(
 
             await analyseResultRepository.AddAsync(results);
             
-            await logService.LogTrace($"Анализ 'YieldLtm' выполнен. InstrumentId = '{instrumentId}'");
+            logger.Trace($"Анализ 'YieldLtm' выполнен. InstrumentId = '{instrumentId}'");
         }
 
         catch (Exception exception)
         {
-            await logService.LogError($"Не удалось прочитать данные из БД finmarket. {exception}");
+            logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
         }
 
         return;

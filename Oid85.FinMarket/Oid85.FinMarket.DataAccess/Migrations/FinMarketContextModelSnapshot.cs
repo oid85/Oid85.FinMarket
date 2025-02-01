@@ -98,7 +98,8 @@ namespace Oid85.FinMarket.DataAccess.Migrations
 
                     b.Property<string>("Currency")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("currency");
 
                     b.Property<double>("CurrentRatioMrq")
@@ -419,10 +420,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("high_target_price");
 
-                    b.Property<bool>("InWatchList")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_watch_list");
-
                     b.Property<Guid>("InstrumentId")
                         .HasColumnType("uuid")
                         .HasColumnName("instrument_id");
@@ -561,10 +558,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("HighTargetPrice")
                         .HasColumnType("double precision")
                         .HasColumnName("high_target_price");
-
-                    b.Property<bool>("InWatchList")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_watch_list");
 
                     b.Property<Guid>("InstrumentId")
                         .HasColumnType("uuid")
@@ -715,10 +708,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("HighTargetPrice")
                         .HasColumnType("double precision")
                         .HasColumnName("high_target_price");
-
-                    b.Property<bool>("InWatchList")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_watch_list");
 
                     b.Property<Guid>("InstrumentId")
                         .HasColumnType("uuid")
@@ -1041,10 +1030,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("high_target_price");
 
-                    b.Property<bool>("InWatchList")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_watch_list");
-
                     b.Property<double>("InitialMarginOnBuy")
                         .HasColumnType("double precision")
                         .HasColumnName("initial_margin_on_buy");
@@ -1235,6 +1220,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("eps");
 
+                    b.Property<double>("Ev")
+                        .HasColumnType("double precision")
+                        .HasColumnName("ev");
+
                     b.Property<double>("EvToEbitda")
                         .HasColumnType("double precision")
                         .HasColumnName("ev_to_ebitda");
@@ -1243,25 +1232,17 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("free_cash_flow");
 
-                    b.Property<double>("HighOfYear")
-                        .HasColumnType("double precision")
-                        .HasColumnName("high_of_year");
-
-                    b.Property<Guid>("InstrumentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("instrument_id");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
-                    b.Property<double>("LowOfYear")
-                        .HasColumnType("double precision")
-                        .HasColumnName("low_of_year");
-
                     b.Property<double>("MarketCapitalization")
                         .HasColumnType("double precision")
                         .HasColumnName("market_capitalization");
+
+                    b.Property<double>("NetDebt")
+                        .HasColumnType("double precision")
+                        .HasColumnName("net_debt");
 
                     b.Property<double>("NetDebtToEbitda")
                         .HasColumnType("double precision")
@@ -1271,15 +1252,65 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("net_income");
 
-                    b.Property<string>("Ticker")
+                    b.Property<double>("NetInterestMargin")
+                        .HasColumnType("double precision")
+                        .HasColumnName("net_interest_margin");
+
+                    b.Property<double>("OperatingIncome")
+                        .HasColumnType("double precision")
+                        .HasColumnName("operating_income");
+
+                    b.Property<double>("Pb")
+                        .HasColumnType("double precision")
+                        .HasColumnName("pb");
+
+                    b.Property<double>("Pbv")
+                        .HasColumnType("double precision")
+                        .HasColumnName("pbv");
+
+                    b.Property<double>("Pe")
+                        .HasColumnType("double precision")
+                        .HasColumnName("pe");
+
+                    b.Property<double>("Revenue")
+                        .HasColumnType("double precision")
+                        .HasColumnName("revenue");
+
+                    b.Property<double>("Roa")
+                        .HasColumnType("double precision")
+                        .HasColumnName("roa");
+
+                    b.Property<double>("Roe")
+                        .HasColumnType("double precision")
+                        .HasColumnName("roe");
+
+                    b.Property<string>("TickerAo")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
-                        .HasColumnName("ticker");
+                        .HasColumnName("ticker_ao");
+
+                    b.Property<string>("TickerAp")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker_ap");
+
+                    b.Property<double>("TotalDebt")
+                        .HasColumnType("double precision")
+                        .HasColumnName("total_debt");
 
                     b.Property<double>("TotalDebtToEbitda")
                         .HasColumnType("double precision")
                         .HasColumnName("total_debt_to_ebitda");
+
+                    b.Property<double>("TotalSharesAo")
+                        .HasColumnType("double precision")
+                        .HasColumnName("total_shares_ao");
+
+                    b.Property<double>("TotalSharesAp")
+                        .HasColumnType("double precision")
+                        .HasColumnName("total_shares_ap");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -1316,10 +1347,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("HighTargetPrice")
                         .HasColumnType("double precision")
                         .HasColumnName("high_target_price");
-
-                    b.Property<bool>("InWatchList")
-                        .HasColumnType("boolean")
-                        .HasColumnName("in_watch_list");
 
                     b.Property<Guid>("InstrumentId")
                         .HasColumnType("uuid")

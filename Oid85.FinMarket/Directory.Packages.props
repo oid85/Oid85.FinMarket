@@ -20,6 +20,7 @@
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
     <PackageVersion Include="NLog" Version="5.3.4" />
     <PackageVersion Include="NLog.Web.AspNetCore" Version="5.3.13" />
+	<PackageVersion Include="NLog.Targets.Seq" Version="4.0.1" />
     <PackageVersion Include="Npgsql" Version="8.0.5" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
     <PackageVersion Include="Skender.Stock.Indicators" Version="2.5.0" />

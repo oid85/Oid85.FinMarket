@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="NLog.Targets.Seq" />
     <PackageReference Include="Tinkoff.InvestApi" />
   </ItemGroup>
 </Project>

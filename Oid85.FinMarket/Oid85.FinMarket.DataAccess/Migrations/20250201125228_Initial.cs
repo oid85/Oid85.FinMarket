@@ -17,9 +17,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
             migrationBuilder.EnsureSchema(
                 name: "public");
 
-            migrationBuilder.EnsureSchema(
-                name: "dictionary");
-
             migrationBuilder.CreateTable(
                 name: "analyse_results",
                 schema: "storage",
@@ -45,7 +42,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     date = table.Column<DateOnly>(type: "date", nullable: false),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    currency = table.Column<string>(type: "text", nullable: false),
+                    currency = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     market_capitalization = table.Column<double>(type: "double precision", nullable: false),
                     high_price_last_52_weeks = table.Column<double>(type: "double precision", nullable: false),
                     low_price_last_52_weeks = table.Column<double>(type: "double precision", nullable: false),
@@ -149,7 +146,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     sector = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    in_watch_list = table.Column<bool>(type: "boolean", nullable: false),
                     nkd = table.Column<double>(type: "double precision", nullable: false),
                     maturity_date = table.Column<DateOnly>(type: "date", nullable: false),
                     floating_coupon_flag = table.Column<bool>(type: "boolean", nullable: false),
@@ -179,7 +175,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     iso_currency_name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    in_watch_list = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -249,7 +244,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     exchange = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    in_watch_list = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -350,7 +344,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     expiration_date = table.Column<DateOnly>(type: "date", nullable: false),
-                    in_watch_list = table.Column<bool>(type: "boolean", nullable: false),
                     lot = table.Column<int>(type: "integer", nullable: false),
                     first_trade_date = table.Column<DateOnly>(type: "date", nullable: false),
                     last_tradedate = table.Column<DateOnly>(name: "last_trade-date", type: "date", nullable: false),
@@ -373,7 +366,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
 
             migrationBuilder.CreateTable(
                 name: "instruments",
-                schema: "dictionary",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
@@ -389,7 +382,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
 
             migrationBuilder.CreateTable(
                 name: "market_events",
-                schema: "dictionary",
+                schema: "storage",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
@@ -417,12 +410,23 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    market_capitalization = table.Column<double>(type: "double precision", nullable: false),
-                    low_of_year = table.Column<double>(type: "double precision", nullable: false),
-                    high_of_year = table.Column<double>(type: "double precision", nullable: false),
+                    ticker_ao = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    ticker_ap = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    total_shares_ao = table.Column<double>(type: "double precision", nullable: false),
+                    total_shares_ap = table.Column<double>(type: "double precision", nullable: false),
                     beta = table.Column<double>(type: "double precision", nullable: false),
+                    revenue = table.Column<double>(type: "double precision", nullable: false),
+                    operating_income = table.Column<double>(type: "double precision", nullable: false),
+                    pe = table.Column<double>(type: "double precision", nullable: false),
+                    pb = table.Column<double>(type: "double precision", nullable: false),
+                    pbv = table.Column<double>(type: "double precision", nullable: false),
+                    ev = table.Column<double>(type: "double precision", nullable: false),
+                    roe = table.Column<double>(type: "double precision", nullable: false),
+                    roa = table.Column<double>(type: "double precision", nullable: false),
+                    net_interest_margin = table.Column<double>(type: "double precision", nullable: false),
+                    total_debt = table.Column<double>(type: "double precision", nullable: false),
+                    net_debt = table.Column<double>(type: "double precision", nullable: false),
+                    market_capitalization = table.Column<double>(type: "double precision", nullable: false),
                     net_income = table.Column<double>(type: "double precision", nullable: false),
                     ebitda = table.Column<double>(type: "double precision", nullable: false),
                     eps = table.Column<double>(type: "double precision", nullable: false),
@@ -455,7 +459,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     instrument_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     sector = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    in_watch_list = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -481,12 +484,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     second_instrument_ticker = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     second_instrument_role = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     second_instrument_price = table.Column<double>(type: "double precision", nullable: false),
+                    multiplier = table.Column<double>(type: "double precision", nullable: false),
                     price_difference = table.Column<double>(type: "double precision", nullable: false),
                     price_difference_prc = table.Column<double>(type: "double precision", nullable: false),
                     price_difference_average = table.Column<double>(type: "double precision", nullable: false),
                     price_difference_average_prc = table.Column<double>(type: "double precision", nullable: false),
                     funding = table.Column<double>(type: "double precision", nullable: false),
-                    price_position = table.Column<int>(type: "integer", nullable: false),
+                    price_position = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -569,11 +573,11 @@ namespace Oid85.FinMarket.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "instruments",
-                schema: "dictionary");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "market_events",
-                schema: "dictionary");
+                schema: "storage");
 
             migrationBuilder.DropTable(
                 name: "multiplicators",
