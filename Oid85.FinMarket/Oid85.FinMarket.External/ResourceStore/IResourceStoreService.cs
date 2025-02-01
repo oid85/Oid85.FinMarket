@@ -40,7 +40,7 @@ public interface IResourceStoreService
     /// <summary>
     /// Получить мультипликатор
     /// </summary>
-    Task<MultiplicatorResource> GetMultiplicatorLtmAsync(string ticker);
+    Task<List<MultiplicatorResource>> GetMultiplicatorsLtmAsync();
     
     /// <summary>
     /// Получить ценовые уровни
@@ -103,7 +103,22 @@ public interface IResourceStoreService
     Task<List<RangeColorResource>> GetColorPaletteYieldLtmAsync();
     
     /// <summary>
-    /// Получить цветовую палитру для YieldLtm
+    /// Получить цветовую палитру для PE
+    /// </summary>
+    Task<List<RangeColorResource>> GetColorPalettePeAsync();
+    
+    /// <summary>
+    /// Получить цветовую палитру для EV / EBITDA
+    /// </summary>
+    Task<List<RangeColorResource>> GetColorPaletteEvToEbitdaAsync();
+    
+    /// <summary>
+    /// Получить цветовую палитру для NetDebt / EBITDA
+    /// </summary>
+    Task<List<RangeColorResource>> GetColorPaletteNetDebtToEbitdaAsync();
+    
+    /// <summary>
+    /// Получить цветовую палитру для SpreadPricePosition
     /// </summary>
     Task<List<ValueColorResource<string>>> GetColorPaletteSpreadPricePositionAsync();
     

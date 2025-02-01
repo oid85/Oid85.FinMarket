@@ -107,20 +107,26 @@ public class ResourceStoreService(
     }
 
     /// <inheritdoc />
-    public async Task<MultiplicatorResource> GetMultiplicatorLtmAsync(string ticker)
+    public async Task<List<MultiplicatorResource>> GetMultiplicatorsLtmAsync()
     {
-        string path = Path.Combine(
+        string directoryPath = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "multiplicators",
-            "ltm",
-            $"{ticker.ToLower()}.json");
+            "ltm");
 
-        var result = await ReadAsync<MultiplicatorResource>(path);
+        var filePathes = Directory.GetFiles(directoryPath);
 
-        if (result is null)
-            return new();
-        
-        return result;
+        var resources = new List<MultiplicatorResource>();
+
+        foreach (var filePath in filePathes)
+        {
+            var resource = await ReadAsync<MultiplicatorResource>(filePath);
+            
+            if (resource is not null) 
+                resources.Add(resource);
+        }
+
+        return resources;
     }
 
     /// <inheritdoc />
@@ -303,6 +309,51 @@ public class ResourceStoreService(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "colorPalettes",
             "yieldLtm.json");
+
+        var result = await ReadAsync<List<RangeColorResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
+    public async Task<List<RangeColorResource>> GetColorPalettePeAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "peLimits.json");
+
+        var result = await ReadAsync<List<RangeColorResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
+    public async Task<List<RangeColorResource>> GetColorPaletteEvToEbitdaAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "evEbitdaLimits.json");
+
+        var result = await ReadAsync<List<RangeColorResource>>(path);
+
+        if (result is null)
+            return [];
+        
+        return result;
+    }
+
+    public async Task<List<RangeColorResource>> GetColorPaletteNetDebtToEbitdaAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "colorPalettes",
+            "netDebtEbitdaLimits.json");
 
         var result = await ReadAsync<List<RangeColorResource>>(path);
 

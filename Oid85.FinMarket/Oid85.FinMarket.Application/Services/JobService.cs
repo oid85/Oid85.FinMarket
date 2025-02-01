@@ -97,7 +97,6 @@ public class JobService(
         await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
         await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
         await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
-        await marketEventService.CheckDataHasNotBeenUpdatedMarketEventAsync();
     }
 
     public async Task SendNotificationsAsync()

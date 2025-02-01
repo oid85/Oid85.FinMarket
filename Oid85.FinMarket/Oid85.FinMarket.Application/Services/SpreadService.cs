@@ -36,7 +36,49 @@ public class SpreadService(
         
         return spreads;
     }
+    
+    public async Task<List<Spread>> CalculateSpreadsAsync()
+    {
+        var spreads = await spreadRepository.GetAllAsync();
 
+        foreach (var spread in spreads)
+        {
+            spread.FirstInstrumentPrice = await GetInstrumentPriceAsync(spread.FirstInstrumentId);
+            spread.SecondInstrumentPrice = await GetInstrumentPriceAsync(spread.SecondInstrumentId);
+
+            if (spread is not
+                {
+                    FirstInstrumentPrice: > 0.0,
+                    SecondInstrumentPrice: > 0.0
+                }) 
+                continue;
+
+            // В зависимости от порядка цен, домножаем на коэффициент
+            spread.PriceDifference = spread.SecondInstrumentPrice / spread.FirstInstrumentPrice > 2.0
+                ? spread.SecondInstrumentPrice - spread.FirstInstrumentPrice * spread.Multiplier
+                : spread.SecondInstrumentPrice - spread.FirstInstrumentPrice;
+            
+            spread.PriceDifferencePrc = spread.PriceDifference / spread.SecondInstrumentPrice * 100.0; 
+            
+            spread.DateTime = DateTime.UtcNow;
+            
+            /*
+             Контанго
+                Цена контракта > цены базового актива
+                Цена дальнего контракта > цены ближнего контракта
+            */
+            
+            spread.SpreadPricePosition = 
+                spread.PriceDifference > 0.0 
+                    ? KnownSpreadPricePositions.Contango
+                    : KnownSpreadPricePositions.Backwardation;
+            
+            await spreadRepository.UpdateSpreadAsync(spread);
+        }
+        
+        return spreads;
+    }
+    
     private async Task DeleteExpiratedFuturesAsync()
     {
         var spreads = await spreadRepository.GetAllAsync();
@@ -166,48 +208,6 @@ public class SpreadService(
             _ => Guid.Empty
         };
 
-    public async Task<List<Spread>> CalculateSpreadsAsync()
-    {
-        var spreads = await spreadRepository.GetAllAsync();
-
-        foreach (var spread in spreads)
-        {
-            spread.FirstInstrumentPrice = await GetInstrumentPriceAsync(spread.FirstInstrumentId);
-            spread.SecondInstrumentPrice = await GetInstrumentPriceAsync(spread.SecondInstrumentId);
-
-            if (spread is not
-                {
-                    FirstInstrumentPrice: > 0.0,
-                    SecondInstrumentPrice: > 0.0
-                }) 
-                continue;
-
-            // В зависимости от порядка цен, домножаем на коэффициент
-            spread.PriceDifference = spread.SecondInstrumentPrice / spread.FirstInstrumentPrice > 2.0
-                ? spread.SecondInstrumentPrice - spread.FirstInstrumentPrice * spread.Multiplier
-                : spread.SecondInstrumentPrice - spread.FirstInstrumentPrice;
-            
-            spread.PriceDifferencePrc = spread.PriceDifference / spread.SecondInstrumentPrice * 100.0; 
-            
-            spread.DateTime = DateTime.UtcNow;
-            
-            /*
-             Контанго
-                Цена контракта > цены базового актива
-                Цена дальнего контракта > цены ближнего контракта
-            */
-            
-            spread.SpreadPricePosition = 
-                spread.PriceDifference > 0.0 
-                    ? KnownSpreadPricePositions.Contango
-                    : KnownSpreadPricePositions.Backwardation;
-            
-            await spreadRepository.UpdateSpreadAsync(spread);
-        }
-        
-        return spreads;
-    }
-    
     private async ValueTask<double> GetInstrumentPriceAsync(Guid instrumentId)
     {
         var share = await shareRepository.GetByInstrumentIdAsync(instrumentId);

@@ -132,4 +132,38 @@ public class ReportHelper(
         
         return color;
     }
+    
+    public async Task<string> GetColorEvToEbitda(double value)
+    {
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteEvToEbitdaAsync();
+
+        var resource = colorPalette
+            .FirstOrDefault(
+                x => 
+                    value >= x.LowLevel &&
+                    value <= x.HighLevel);
+
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
+    }
+    
+    public async Task<string> GetColorNetDebtToEbitda(double value)
+    {
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteNetDebtToEbitdaAsync();
+
+        var resource = colorPalette
+            .FirstOrDefault(
+                x => 
+                    value >= x.LowLevel &&
+                    value <= x.HighLevel);
+
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
+    }
 }

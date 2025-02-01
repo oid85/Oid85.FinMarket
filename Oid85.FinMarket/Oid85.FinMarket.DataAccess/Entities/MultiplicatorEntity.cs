@@ -7,40 +7,106 @@ namespace Oid85.FinMarket.DataAccess.Entities;
 public class MultiplicatorEntity : AuditableEntity
 {
     /// <summary>
-    /// Тикер
+    /// Тикер, ао
     /// </summary>
-    [Column("ticker"), MaxLength(20)]
-    public string Ticker { get; set; } = string.Empty;
+    [Column("ticker_ao"), MaxLength(20)]
+    public string TickerAo { get; set; } = string.Empty;
     
     /// <summary>
-    /// Уникальный идентификатор инструмента
+    /// Тикер, ап
     /// </summary>
-    [Column("instrument_id")]
-    public Guid InstrumentId { get; set; }
+    [Column("ticker_ap"), MaxLength(20)]
+    public string TickerAp { get; set; } = string.Empty;
     
     /// <summary>
-    /// Рыночная капитализация
+    /// Количество обыкновенных акций
     /// </summary>
-    [Column("market_capitalization")]
-    public double MarketCapitalization { get; set; }
+    [Column("total_shares_ao")]
+    public double TotalSharesAo { get; set; }
     
     /// <summary>
-    /// Годовой минимум
+    /// Количество привелегированных акций
     /// </summary>
-    [Column("low_of_year")]
-    public double LowOfYear { get; set; }
-    
-    /// <summary>
-    /// Годовой максимум
-    /// </summary>
-    [Column("high_of_year")]
-    public double HighOfYear { get; set; }
+    [Column("total_shares_ap")]
+    public double TotalSharesAp { get; set; }
     
     /// <summary>
     /// Бета-коэффициент
     /// </summary>
     [Column("beta")]
     public double Beta { get; set; }
+    
+    /// <summary>
+    /// Выручка
+    /// </summary>
+    [Column("revenue")]
+    public double Revenue { get; set; }
+    
+    /// <summary>
+    /// Операционная прибыль
+    /// </summary>
+    [Column("operating_income")]
+    public double OperatingIncome { get; set; }
+    
+    /// <summary>
+    /// P/E
+    /// </summary>
+    [Column("pe")]
+    public double Pe { get; set; }
+    
+    /// <summary>
+    /// P/B
+    /// </summary>
+    [Column("pb")]
+    public double Pb { get; set; }
+    
+    /// <summary>
+    /// P/BV
+    /// </summary>
+    [Column("pbv")]
+    public double Pbv { get; set; }
+    
+    /// <summary>
+    /// EV
+    /// </summary>
+    [Column("ev")]
+    public double Ev { get; set; }
+    
+    /// <summary>
+    /// ROE
+    /// </summary>
+    [Column("roe")]
+    public double Roe { get; set; }
+    
+    /// <summary>
+    /// ROA
+    /// </summary>
+    [Column("roa")]
+    public double Roa { get; set; }
+    
+    /// <summary>
+    /// Чистая процентная маржа
+    /// </summary>
+    [Column("net_interest_margin")]
+    public double NetInterestMargin { get; set; }
+    
+    /// <summary>
+    /// Долг
+    /// </summary>
+    [Column("total_debt")]
+    public double TotalDebt { get; set; }
+    
+    /// <summary>
+    /// Чистый долг
+    /// </summary>
+    [Column("net_debt")]
+    public double NetDebt { get; set; }
+    
+    /// <summary>
+    /// Рыночная капитализация
+    /// </summary>
+    [Column("market_capitalization")]
+    public double MarketCapitalization { get; set; }
     
     /// <summary>
     /// Чистая прибыль

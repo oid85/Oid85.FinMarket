@@ -11,7 +11,7 @@ public class MultiplicatorRepository(
     FinMarketContext context) 
     : IMultiplicatorRepository
 {
-    public async Task AddAsync(List<Multiplicator> multiplicators)
+    public async Task AddOrUpdateAsync(List<Multiplicator> multiplicators)
     {
         if (multiplicators is [])
             return;
@@ -21,8 +21,11 @@ public class MultiplicatorRepository(
         foreach (var multiplicator in multiplicators)
             if (!await context.MultiplicatorEntities
                     .AnyAsync(x => 
-                        x.InstrumentId == multiplicator.InstrumentId))
+                        x.TickerAo == multiplicator.TickerAo ||
+                        x.TickerAp == multiplicator.TickerAp))
                 entities.Add(GetEntity(multiplicator));
+            else
+                await UpdateSpreadAsync(multiplicator);
 
         await context.MultiplicatorEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -36,13 +39,25 @@ public class MultiplicatorRepository(
         {
             await context.MultiplicatorEntities
                 .Where(x => 
-                    x.InstrumentId == multiplicator.InstrumentId)
+                    x.TickerAo == multiplicator.TickerAo ||
+                    x.TickerAp == multiplicator.TickerAp)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.MarketCapitalization, multiplicator.MarketCapitalization)
-                        .SetProperty(u => u.LowOfYear, multiplicator.LowOfYear)
-                        .SetProperty(u => u.HighOfYear, multiplicator.HighOfYear)
+                        .SetProperty(u => u.TotalSharesAo, multiplicator.TotalSharesAo)
+                        .SetProperty(u => u.TotalSharesAp, multiplicator.TotalSharesAp)
                         .SetProperty(u => u.Beta, multiplicator.Beta)
+                        .SetProperty(u => u.Revenue, multiplicator.Revenue)
+                        .SetProperty(u => u.OperatingIncome, multiplicator.OperatingIncome)
+                        .SetProperty(u => u.Pe, multiplicator.Pe)
+                        .SetProperty(u => u.Pb, multiplicator.Pb)
+                        .SetProperty(u => u.Pbv, multiplicator.Pbv)
+                        .SetProperty(u => u.Ev, multiplicator.Ev)
+                        .SetProperty(u => u.Roe, multiplicator.Roe)
+                        .SetProperty(u => u.Roa, multiplicator.Roa)
+                        .SetProperty(u => u.NetInterestMargin, multiplicator.NetInterestMargin)
+                        .SetProperty(u => u.TotalDebt, multiplicator.TotalDebt)
+                        .SetProperty(u => u.NetDebt, multiplicator.NetDebt)
+                        .SetProperty(u => u.MarketCapitalization, multiplicator.MarketCapitalization)
                         .SetProperty(u => u.NetIncome, multiplicator.NetIncome)
                         .SetProperty(u => u.Ebitda, multiplicator.Ebitda)
                         .SetProperty(u => u.Eps, multiplicator.Eps)
@@ -65,18 +80,20 @@ public class MultiplicatorRepository(
     public async Task<List<Multiplicator>> GetAllAsync() =>
         (await context.MultiplicatorEntities
             .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
+            .OrderBy(x => x.TickerAo)
             .AsNoTracking()
             .ToListAsync())
         .Select(GetModel)
         .ToList();
 
-    public async Task<Multiplicator?> GetAsync(Guid instrumentId)
+    public async Task<Multiplicator?> GetAsync(string ticker)
     {
         var entity = await context.MultiplicatorEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+            .FirstOrDefaultAsync(x => 
+                x.TickerAo == ticker ||
+                x.TickerAp == ticker);
         
         return entity is null 
             ? null 
@@ -87,12 +104,23 @@ public class MultiplicatorRepository(
     {
         var entity = new MultiplicatorEntity
         {
-            Ticker = model.Ticker,
-            InstrumentId = model.InstrumentId,
-            MarketCapitalization = model.MarketCapitalization,
-            LowOfYear = model.LowOfYear,
-            HighOfYear = model.HighOfYear,
+            TickerAo = model.TickerAo,
+            TickerAp = model.TickerAp,
+            TotalSharesAo = model.TotalSharesAo,
+            TotalSharesAp = model.TotalSharesAp,
             Beta = model.Beta,
+            Revenue = model.Revenue,
+            OperatingIncome = model.OperatingIncome,
+            Pe = model.Pe,
+            Pb = model.Pb,
+            Pbv = model.Pbv,
+            Ev = model.Ev,
+            Roe = model.Roe,
+            Roa = model.Roa,
+            NetInterestMargin = model.NetInterestMargin,
+            TotalDebt = model.TotalDebt,
+            NetDebt = model.NetDebt,
+            MarketCapitalization = model.MarketCapitalization,
             NetIncome = model.NetIncome,
             Ebitda = model.Ebitda,
             Eps = model.Eps,
@@ -110,20 +138,30 @@ public class MultiplicatorRepository(
         var model = new Multiplicator
         {
             Id = entity.Id,
-            Ticker = entity.Ticker,
-            InstrumentId = entity.InstrumentId,
-            MarketCapitalization = entity.MarketCapitalization,
-            LowOfYear = entity.LowOfYear,
-            HighOfYear = entity.HighOfYear,
+            TickerAo = entity.TickerAo,
+            TickerAp = entity.TickerAp,
+            TotalSharesAo = entity.TotalSharesAo,
+            TotalSharesAp = entity.TotalSharesAp,
             Beta = entity.Beta,
+            Revenue = entity.Revenue,
+            OperatingIncome = entity.OperatingIncome,
+            Pe = entity.Pe,
+            Pb = entity.Pb,
+            Pbv = entity.Pbv,
+            Ev = entity.Ev,
+            Roe = entity.Roe,
+            Roa = entity.Roa,
+            NetInterestMargin = entity.NetInterestMargin,
+            TotalDebt = entity.TotalDebt,
+            NetDebt = entity.NetDebt,
+            MarketCapitalization = entity.MarketCapitalization,
             NetIncome = entity.NetIncome,
             Ebitda = entity.Ebitda,
             Eps = entity.Eps,
             FreeCashFlow = entity.FreeCashFlow,
             EvToEbitda = entity.EvToEbitda,
             TotalDebtToEbitda = entity.TotalDebtToEbitda,
-            NetDebtToEbitda = entity.NetDebtToEbitda,
-            UpdatedAt = entity.UpdatedAt
+            NetDebtToEbitda = entity.NetDebtToEbitda
         };
 
         return model;
