@@ -1,14 +1,14 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using NLog;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
-using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.Application.Services;
 
 public class SpreadService(
-    ILogService logService,
+    ILogger logger,
     IInstrumentRepository instrumentRepository,
     ISpreadRepository spreadRepository,
     IShareRepository shareRepository,
@@ -186,14 +186,14 @@ public class SpreadService(
                 });
             }
 
-            await logService.LogTrace($"Добавление спредов по базовому активу '{baseAssetTicker}'");
+            logger.Trace($"Добавление спредов по базовому активу '{baseAssetTicker}'");
             
             return spreads;
         }
         
         catch (Exception exception)
         {
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
             return [];
         }
     }

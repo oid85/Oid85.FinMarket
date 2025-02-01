@@ -4,7 +4,6 @@ using Oid85.FinMarket.External.Extensions;
 using Oid85.FinMarket.Application.Extensions;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Extensions;
-using Oid85.FinMarket.Logging.Extensions;
 
 namespace Oid85.FinMarket.WebHost;
 
@@ -22,7 +21,6 @@ public class Program
         builder.Services.ConfigureApplicationServices();
         builder.Services.ConfigureExternalServices(builder.Configuration);
         builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
-        builder.Services.ConfigureLogs(builder.Configuration);
         builder.Services.ConfigureHangfire();
             
         builder.Services.AddWindowsService(options =>
@@ -35,11 +33,8 @@ public class Program
         
         var app = builder.Build();
         
-        if (applyMigrations)
-        {
+        if (applyMigrations) 
             await app.ApplyMigrations();
-            await app.ApplyLogMigrations();
-        }
         
         app.UseRouting();
 

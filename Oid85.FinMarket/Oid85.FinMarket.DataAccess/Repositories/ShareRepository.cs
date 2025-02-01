@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.Logging.Services;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class ShareRepository(
-    ILogService logService,
+    ILogger logger,
     FinMarketContext context) 
     : IShareRepository
 {
@@ -46,7 +46,7 @@ public class ShareRepository(
         catch (Exception exception)
         {
             await transaction.RollbackAsync();
-            await logService.LogException(exception);
+            logger.Error(exception.Message);
         }
     }
 
