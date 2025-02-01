@@ -7,5 +7,5 @@ public interface IMultiplicatorRepository
     Task AddOrUpdateAsync(List<Multiplicator> multiplicators);
     Task UpdateSpreadAsync(Multiplicator multiplicator);
     Task<List<Multiplicator>> GetAllAsync();
-    Task<Multiplicator?> GetAsync(Guid instrumentId);
+    Task<Multiplicator?> GetAsync(string ticker);
 }

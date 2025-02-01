@@ -7,16 +7,16 @@ namespace Oid85.FinMarket.DataAccess.Entities;
 public class MultiplicatorEntity : AuditableEntity
 {
     /// <summary>
-    /// Тикер
+    /// Тикер, ао
     /// </summary>
-    [Column("ticker"), MaxLength(20)]
-    public string Ticker { get; set; } = string.Empty;
+    [Column("ticker_ao"), MaxLength(20)]
+    public string TickerAo { get; set; } = string.Empty;
     
     /// <summary>
-    /// Уникальный идентификатор инструмента
+    /// Тикер, ап
     /// </summary>
-    [Column("instrument_id")]
-    public Guid InstrumentId { get; set; }
+    [Column("ticker_ap"), MaxLength(20)]
+    public string TickerAp { get; set; } = string.Empty;
     
     /// <summary>
     /// Количество обыкновенных акций
@@ -107,18 +107,6 @@ public class MultiplicatorEntity : AuditableEntity
     /// </summary>
     [Column("market_capitalization")]
     public double MarketCapitalization { get; set; }
-    
-    /// <summary>
-    /// Годовой минимум
-    /// </summary>
-    [Column("low_of_year")]
-    public double LowOfYear { get; set; }
-    
-    /// <summary>
-    /// Годовой максимум
-    /// </summary>
-    [Column("high_of_year")]
-    public double HighOfYear { get; set; }
     
     /// <summary>
     /// Чистая прибыль

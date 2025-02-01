@@ -195,8 +195,6 @@ public class SharesReportService(
                 new ReportParameter(KnownDisplayTypes.String, "Тикер"),
                 new ReportParameter(KnownDisplayTypes.String, "Сектор"),
                 new ReportParameter(KnownDisplayTypes.String, "Рыночная капитализация"),
-                new ReportParameter(KnownDisplayTypes.String, "Минимум за год"),
-                new ReportParameter(KnownDisplayTypes.String, "Максимум за год"),
                 new ReportParameter(KnownDisplayTypes.String, "Бета-коэффициент"),
                 new ReportParameter(KnownDisplayTypes.String, "Чистая прибыль"),
                 new ReportParameter(KnownDisplayTypes.String, "EBITDA"),
@@ -210,7 +208,7 @@ public class SharesReportService(
 
         foreach (var share in shares)
         {
-            var multiplicator = await multiplicatorRepository.GetAsync(share.InstrumentId);
+            var multiplicator = await multiplicatorRepository.GetAsync(share.Ticker);
             
             if (multiplicator is null)
                 continue;
@@ -220,8 +218,6 @@ public class SharesReportService(
                 new (KnownDisplayTypes.Ticker, share.Ticker),
                 new (KnownDisplayTypes.Sector, share.Sector),
                 new (KnownDisplayTypes.Number, multiplicator.MarketCapitalization.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.LowOfYear.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.HighOfYear.ToString("N2")),
                 new (KnownDisplayTypes.Number, multiplicator.Beta.ToString("N2")),
                 new (KnownDisplayTypes.Number, multiplicator.NetIncome.ToString("N2")),
                 new (KnownDisplayTypes.Number, multiplicator.Ebitda.ToString("N2")),

@@ -6,48 +6,44 @@ using Oid85.FinMarket.External.ResourceStore;
 namespace Oid85.FinMarket.Application.Services;
 
 public class MultiplicatorService(
-    IInstrumentRepository instrumenRepository,
+    IShareRepository shareRepository,
     IMultiplicatorRepository multiplicatorRepository,
     IResourceStoreService resourceStoreService) 
     : IMultiplicatorService
 {
     public async Task FillingMultiplicatorInstrumentsAsync()
     {
-        var tickers = await resourceStoreService.GetSharesWatchlistAsync();
-
         var multiplicators = new List<Multiplicator>();
+
+        var multiplicatorResources = await resourceStoreService
+            .GetMultiplicatorsLtmAsync();
         
-        foreach (var ticker in tickers)
+        foreach (var multiplicatorResource in multiplicatorResources)
         {
-            var multiplicatorResource = await resourceStoreService
-                .GetMultiplicatorLtmAsync(ticker);
-
-            if (multiplicatorResource is not null)
+            var multiplicator = new Multiplicator
             {
-                var multiplicator = new Multiplicator();
+                TickerAo = multiplicatorResource.TickerAo.Value ?? string.Empty,
+                TickerAp = multiplicatorResource.TickerAp.Value ?? string.Empty,
+                TotalSharesAo = multiplicatorResource.TotalSharesAo.Value,
+                TotalSharesAp = multiplicatorResource.TotalSharesAp.Value,
+                Beta = multiplicatorResource.Beta.Value,
+                Revenue = multiplicatorResource.Revenue.Value,
+                NetIncome = multiplicatorResource.NetIncome.Value,
+                OperatingIncome = multiplicatorResource.OperatingIncome.Value,
+                Ebitda = multiplicatorResource.Ebitda.Value,
+                Pe = multiplicatorResource.Pe.Value,
+                Pb = multiplicatorResource.Pb.Value,
+                Pbv = multiplicatorResource.Pbv.Value,
+                Ev = multiplicatorResource.Ev.Value,
+                Roe = multiplicatorResource.Roe.Value,
+                Roa = multiplicatorResource.Roa.Value,
+                Eps = multiplicatorResource.Eps.Value,
+                NetInterestMargin = multiplicatorResource.NetInterestMargin.Value,
+                TotalDebt = multiplicatorResource.TotalDebt.Value,
+                NetDebt = multiplicatorResource.NetDebt.Value
+            };
 
-                multiplicator.InstrumentId = (await instrumenRepository.GetByTickerAsync(ticker))!.InstrumentId;
-                multiplicator.Ticker = ticker;
-                multiplicator.TotalSharesAo = multiplicatorResource.TotalSharesAo.Value;
-                multiplicator.TotalSharesAp = multiplicatorResource.TotalSharesAp.Value;
-                multiplicator.Beta = multiplicatorResource.Beta.Value;
-                multiplicator.Revenue = multiplicatorResource.Revenue.Value;
-                multiplicator.NetIncome = multiplicatorResource.NetIncome.Value;
-                multiplicator.OperatingIncome = multiplicatorResource.OperatingIncome.Value;
-                multiplicator.Ebitda = multiplicatorResource.Ebitda.Value;
-                multiplicator.Pe = multiplicatorResource.Pe.Value;
-                multiplicator.Pb = multiplicatorResource.Pb.Value;
-                multiplicator.Pbv = multiplicatorResource.Pbv.Value;
-                multiplicator.Ev = multiplicatorResource.Ev.Value;
-                multiplicator.Roe = multiplicatorResource.Roe.Value;
-                multiplicator.Roa = multiplicatorResource.Roa.Value;
-                multiplicator.Eps = multiplicatorResource.Eps.Value;
-                multiplicator.NetInterestMargin = multiplicatorResource.NetInterestMargin.Value;
-                multiplicator.TotalDebt = multiplicatorResource.TotalDebt.Value;
-                multiplicator.NetDebt = multiplicatorResource.NetDebt.Value;
-                
-                multiplicators.Add(multiplicator);
-            }
+            multiplicators.Add(multiplicator);
         }
 
         await multiplicatorRepository.AddOrUpdateAsync(multiplicators);
@@ -59,44 +55,65 @@ public class MultiplicatorService(
 
         foreach (var multiplicator in multiplicators)
         {
-            FillMarketCapitalization(multiplicator);
-            FillLowOfYear(multiplicator);
-            FillHighOfYear(multiplicator);
-            FillEvToEbitda(multiplicator);
-            FillTotalDebtToEbitda(multiplicator);
-            FillNetDebtToEbitda(multiplicator);
+            multiplicator.MarketCapitalization = await GetMarketCapitalization(multiplicator);
+            multiplicator.EvToEbitda = GetEvToEbitda(multiplicator);
+            multiplicator.TotalDebtToEbitda = GetTotalDebtToEbitda(multiplicator);
+            multiplicator.NetDebtToEbitda = GetNetDebtToEbitda(multiplicator);
         }
         
         return multiplicators;
         
-        void FillMarketCapitalization(Multiplicator multiplicator)
+        // РАсчет рыночной капитализации
+        async Task<double> GetMarketCapitalization(Multiplicator multiplicator)
         {
-            throw new NotImplementedException();
+            var shareAo = await shareRepository
+                .GetByTickerAsync(multiplicator.TickerAo);
+            
+            var shareAp = await shareRepository
+                .GetByTickerAsync(multiplicator.TickerAp);
+
+            double priceAo = shareAo?.LastPrice ?? 0.0;
+            double priceAp = shareAp?.LastPrice ?? 0.0;
+
+            double mCap = multiplicator.TotalSharesAo * priceAo + multiplicator.TotalSharesAp * priceAp;
+            
+            return mCap;
         }
         
-        void FillLowOfYear(Multiplicator multiplicator)
+        // Расчет EV / EBITDA
+        double GetEvToEbitda(Multiplicator multiplicator)
         {
-            throw new NotImplementedException();
+            if (multiplicator.Ev == 0.0)
+                return 0.0;
+            
+            if (multiplicator.Ebitda == 0.0)
+                return 0.0;
+            
+            return multiplicator.EvToEbitda = multiplicator.Ev / multiplicator.Ebitda;
         }
         
-        void FillHighOfYear(Multiplicator multiplicator)
+        // Расчет TotalDebt / EBITDA
+        double GetTotalDebtToEbitda(Multiplicator multiplicator)
         {
-            throw new NotImplementedException();
+            if (multiplicator.TotalDebt == 0.0)
+                return 0.0;
+            
+            if (multiplicator.Ebitda == 0.0)
+                return 0.0;
+            
+            return multiplicator.TotalDebtToEbitda = multiplicator.TotalDebt / multiplicator.Ebitda;
         }
         
-        void FillEvToEbitda(Multiplicator multiplicator)
+        // Расчет NetDebt / EBITDA
+        double GetNetDebtToEbitda(Multiplicator multiplicator)
         {
-            throw new NotImplementedException();
-        }
-        
-        void FillTotalDebtToEbitda(Multiplicator multiplicator)
-        {
-            throw new NotImplementedException();
-        }
-        
-        void FillNetDebtToEbitda(Multiplicator multiplicator)
-        {
-            throw new NotImplementedException();
+            if (multiplicator.NetDebt == 0.0)
+                return 0.0;
+            
+            if (multiplicator.Ebitda == 0.0)
+                return 0.0;
+            
+            return multiplicator.NetDebtToEbitda = multiplicator.NetDebt / multiplicator.Ebitda;
         }
     }
 }

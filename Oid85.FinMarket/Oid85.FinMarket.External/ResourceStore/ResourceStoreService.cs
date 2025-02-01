@@ -107,17 +107,26 @@ public class ResourceStoreService(
     }
 
     /// <inheritdoc />
-    public async Task<MultiplicatorResource?> GetMultiplicatorLtmAsync(string ticker)
+    public async Task<List<MultiplicatorResource>> GetMultiplicatorsLtmAsync()
     {
-        string path = Path.Combine(
+        string directoryPath = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "multiplicators",
-            "ltm",
-            $"{ticker.ToLower()}.json");
+            "ltm");
 
-        var result = await ReadAsync<MultiplicatorResource>(path);
-        
-        return result;
+        var filePathes = Directory.GetFiles(directoryPath);
+
+        var resources = new List<MultiplicatorResource>();
+
+        foreach (var filePath in filePathes)
+        {
+            var resource = await ReadAsync<MultiplicatorResource>(filePath);
+            
+            if (resource is not null) 
+                resources.Add(resource);
+        }
+
+        return resources;
     }
 
     /// <inheritdoc />

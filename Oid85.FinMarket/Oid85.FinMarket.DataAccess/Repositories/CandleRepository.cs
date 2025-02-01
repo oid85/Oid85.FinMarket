@@ -97,6 +97,30 @@ public class CandleRepository(
         return models;
     }
 
+    public async Task<List<Candle>> GetLastYearAsync(Guid instrumentId)
+    {
+        var from = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+        var to = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddYears(-1));
+        
+        var entities = await context.CandleEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .Where(x => 
+                x.Date >= from &&
+                x.Date <= to)
+            .OrderBy(x => x.Date)
+            .AsNoTracking()
+            .ToListAsync();
+
+        if (entities.Count < 2)
+            return [];
+        
+        var models = entities
+            .Select(GetModel)
+            .ToList();
+        
+        return models;
+    }
+
     private void SetEntity(ref CandleEntity? entity, Candle model)
     {
         entity ??= new CandleEntity();

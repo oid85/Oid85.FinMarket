@@ -8,14 +8,14 @@ public class Multiplicator
     public Guid Id { get; set; }
     
     /// <summary>
-    /// Тикер
+    /// Тикер, ао
     /// </summary>
-    public string Ticker { get; set; } = string.Empty;
+    public string TickerAo { get; set; } = string.Empty;
     
     /// <summary>
-    /// Уникальный идентификатор инструмента
+    /// Тикер, ап
     /// </summary>
-    public Guid InstrumentId { get; set; }
+    public string TickerAp { get; set; } = string.Empty;
     
     /// <summary>
     /// Количество обыкновенных акций
@@ -91,16 +91,6 @@ public class Multiplicator
     /// Рыночная капитализация
     /// </summary>
     public double MarketCapitalization { get; set; }
-    
-    /// <summary>
-    /// Годовой минимум
-    /// </summary>
-    public double LowOfYear { get; set; }
-    
-    /// <summary>
-    /// Годовой максимум
-    /// </summary>
-    public double HighOfYear { get; set; }
     
     /// <summary>
     /// Чистая прибыль
