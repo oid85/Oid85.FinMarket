@@ -99,8 +99,6 @@ public class FutureRepository(
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
-            HighTargetPrice = model.HighTargetPrice,
-            LowTargetPrice = model.LowTargetPrice,
             Figi = model.Figi,
             InstrumentId = model.InstrumentId,
             Name = model.Name,
@@ -127,8 +125,6 @@ public class FutureRepository(
             Id = entity.Id,
             Ticker = entity.Ticker,
             LastPrice = entity.LastPrice,
-            HighTargetPrice = entity.HighTargetPrice,
-            LowTargetPrice = entity.LowTargetPrice,
             Figi = entity.Figi,
             InstrumentId = entity.InstrumentId,
             Name = entity.Name,

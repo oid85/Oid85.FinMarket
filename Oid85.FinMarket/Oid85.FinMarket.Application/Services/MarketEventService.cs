@@ -2,6 +2,7 @@
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -12,7 +13,8 @@ public class MarketEventService(
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
     IInstrumentRepository instrumentRepository,
-    ISpreadRepository spreadRepository) 
+    ISpreadRepository spreadRepository,
+    IResourceStoreService resourceStoreService) 
     : IMarketEventService
 {
     /// <inheritdoc />
@@ -247,56 +249,32 @@ public class MarketEventService(
     }
     
     /// <inheritdoc />
-    public async Task CheckCrossUpTargetPriceMarketEventAsync()
+    public async Task CheckCrossPriceLevelMarketEventAsync()
     {
         var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
         
         foreach (var instrumentId in instrumentIds)
         {
-            var candles = await candleRepository.GetTwoLastAsync(instrumentId);
-
-            var marketEvent = await CreateMarketEvent(
-                instrumentId, KnownMarketEventTypes.CrossUpTargetPrice);
-
-            var target = await instrumentRepository.GetTargetPricesAsync(instrumentId);
+            string ticker = (await instrumentRepository.GetByInstrumentIdAsync(instrumentId))!.Ticker;
+            var priceLevels = await resourceStoreService.GetPriceLevelsAsync(ticker);
             
-            marketEvent.MarketEventText = $"Достижение ценой уровня '{target.HighTargetPrice}' (снизу-вверх)";
+            foreach (var priceLevel in priceLevels)
+            {
+                var marketEvent = await CreateMarketEvent(
+                    instrumentId, KnownMarketEventTypes.CrossPriceLevel);
+                
+                marketEvent.MarketEventText = $"Пересечение ценой уровня '{priceLevel}'";
 
-            var previous = candles[0];
-            var current = candles[1];
+                var lastCandle = await candleRepository.GetLastAsync(instrumentId);
+                
+                marketEvent.IsActive =
+                    lastCandle is not null &&
+                    priceLevel.Enable &&
+                    lastCandle.Low <= priceLevel.Value && 
+                    lastCandle.High >= priceLevel.Value;
             
-            marketEvent.IsActive = target.HighTargetPrice != 0.0 && 
-                                   previous.High < target.HighTargetPrice &&
-                                   current.High >= target.HighTargetPrice;
-            
-            await SaveMarketEventAsync(marketEvent);
-        }
-    }
-    
-    /// <inheritdoc />
-    public async Task CheckCrossDownTargetPriceMarketEventAsync()
-    {
-        var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
-        
-        foreach (var instrumentId in instrumentIds)
-        {
-            var candles = await candleRepository.GetTwoLastAsync(instrumentId);
-
-            var marketEvent = await CreateMarketEvent(
-                instrumentId, KnownMarketEventTypes.CrossDownTargetPrice);
-
-            var target = await instrumentRepository.GetTargetPricesAsync(instrumentId);
-            
-            marketEvent.MarketEventText = $"Достижение ценой уровня '{target.LowTargetPrice}' (сверху-вниз)";
-
-            var previous = candles[0];
-            var current = candles[1];
-            
-            marketEvent.IsActive = target.LowTargetPrice != 0.0 && 
-                                   previous.Low > target.LowTargetPrice &&
-                                   current.Low <= target.LowTargetPrice;
-            
-            await SaveMarketEventAsync(marketEvent);
+                await SaveMarketEventAsync(marketEvent);
+            }
         }
     }
 

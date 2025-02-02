@@ -51,14 +51,9 @@ public interface IMarketEventService
     Task CheckRsiOverOverSoldOutputMarketEventAsync();
     
     /// <summary>
-    /// Расчет рыночного события Пересечение ценой уровня (вверх)
+    /// Расчет рыночного события Пересечение ценой уровня
     /// </summary>
-    Task CheckCrossUpTargetPriceMarketEventAsync();
-    
-    /// <summary>
-    /// Расчет рыночного события Пересечение ценой уровня (вниз)
-    /// </summary>
-    Task CheckCrossDownTargetPriceMarketEventAsync();
+    Task CheckCrossPriceLevelMarketEventAsync();
     
     /// <summary>
     /// Расчет рыночного события Спред превышает 1 %
