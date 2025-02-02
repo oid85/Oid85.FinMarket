@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
@@ -39,45 +38,61 @@ public class BondsController(
     /// Загрузить справочник облигаций
     /// </summary>
     [HttpGet("load-catalog")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadBondsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadBondsAsync);
+        GetResponseAsync(
+            loadService.LoadBondsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
         
     /// <summary>
     /// Подгрузить свечи по облигаций
     /// </summary>
     [HttpGet("load-daily-candles")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadBondDailyCandlesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadBondDailyCandlesAsync);
+        GetResponseAsync(
+            loadService.LoadBondDailyCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Загрузить последние цены облигаций
     /// </summary>
     [HttpGet("load-last-prices")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadBondLastPricesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadBondLastPricesAsync);
+        GetResponseAsync(
+            loadService.LoadBondLastPricesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Загрузить данные о купонах
     /// </summary>
     [HttpGet("load-bond-coupons")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadBondCouponsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadBondCouponsAsync);
+        GetResponseAsync(
+            loadService.LoadBondCouponsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Выполнить анализ облигаций

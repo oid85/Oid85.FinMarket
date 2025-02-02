@@ -15,131 +15,179 @@ public class JobsController(
     /// Запустить load-instruments
     /// </summary>
     [HttpGet("run/load-instruments")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadInstrumentsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.LoadInstrumentsAsync);
+        GetResponseAsync(
+            jobService.LoadInstrumentsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить load-prices
     /// </summary>
     [HttpGet("run/load-prices")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadLastPricesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.LoadLastPricesAsync);
+        GetResponseAsync(
+            jobService.LoadLastPricesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить load-bond-coupons
     /// </summary>
     [HttpGet("run/load-bond-coupons")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadBondCouponsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.LoadBondCouponsAsync);
+        GetResponseAsync(
+            jobService.LoadBondCouponsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить load-dividend-infos
     /// </summary>
     [HttpGet("run/load-dividend-infos")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadDividendInfosAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.LoadDividendInfosAsync);
+        GetResponseAsync(
+            jobService.LoadDividendInfosAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить load-asset-fundamentals
     /// </summary>
     [HttpGet("run/load-asset-fundamentals")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadAssetFundamentalsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.LoadAssetFundamentalsAsync);
+        GetResponseAsync(
+            jobService.LoadAssetFundamentalsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить load-forecasts
     /// </summary>
     [HttpGet("run/load-forecasts")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadForecastsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.LoadForecastsAsync);
+        GetResponseAsync(
+            jobService.LoadForecastsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить load-candles
     /// </summary>
     [HttpGet("run/load-candles")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadCandlesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.LoadCandlesAsync);
+        GetResponseAsync(
+            jobService.LoadCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить calculate-spreads
     /// </summary>
     [HttpGet("run/calculate-spreads")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> CalculateSpreadsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.CalculateSpreadsAsync);
+        GetResponseAsync(
+            jobService.CalculateSpreadsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить calculate-multiplicators
     /// </summary>
     [HttpGet("run/calculate-multiplicators")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> CalculateMultiplicatorsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.CalculateMultiplicatorsAsync);
+        GetResponseAsync(
+            jobService.CalculateMultiplicatorsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить analyse
     /// </summary>
     [HttpGet("run/analyse")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> AnalyseAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.AnalyseAsync);
+        GetResponseAsync(
+            jobService.AnalyseAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить check-market-events
     /// </summary>
     [HttpGet("run/check-market-events")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> CheckMarketEventsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.CheckMarketEventsAsync);
+        GetResponseAsync(
+            jobService.CheckMarketEventsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Запустить send-notifications
     /// </summary>
     [HttpGet("run/send-notifications")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> SendNotificationsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.SendNotificationsAsync);
+        GetResponseAsync(
+            jobService.SendNotificationsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
 }

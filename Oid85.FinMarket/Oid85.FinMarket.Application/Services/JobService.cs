@@ -11,40 +11,50 @@ public class JobService(
     ISendService sendService) 
     : IJobService
 {
-    public async Task LoadInstrumentsAsync()
+    public async Task<bool> LoadInstrumentsAsync()
     {
         await loadService.LoadSharesAsync();
         await loadService.LoadBondsAsync();
         await loadService.LoadFuturesAsync();
         await loadService.LoadCurrenciesAsync();
         await loadService.LoadIndexesAsync();
+
+        return true;
     }
 
-    public async Task LoadLastPricesAsync()
+    public async Task<bool> LoadLastPricesAsync()
     {
         await loadService.LoadShareLastPricesAsync();
         await loadService.LoadBondLastPricesAsync();
         await loadService.LoadFutureLastPricesAsync();
         await loadService.LoadCurrencyLastPricesAsync();
         await loadService.LoadIndexLastPricesAsync();
+        
+        return true;
     }
 
-    public async Task LoadBondCouponsAsync()
+    public async Task<bool> LoadBondCouponsAsync()
     {
         await loadService.LoadBondCouponsAsync();
+        
+        return true;
     }
 
-    public async Task LoadDividendInfosAsync()
+    public async Task<bool> LoadDividendInfosAsync()
     {
         await loadService.LoadDividendInfosAsync();
+        
+        return true;
     }
 
-    public async Task LoadAssetFundamentalsAsync()
+    public async Task<bool> LoadAssetFundamentalsAsync()
     {
         await loadService.LoadAssetFundamentalsAsync();
+        
+        return true;
     }
 
-    public async Task LoadCandlesAsync()
+    public async Task<bool> LoadCandlesAsync()
     {
         await loadService.LoadShareDailyCandlesAsync();
         await loadService.LoadBondDailyCandlesAsync();
@@ -53,35 +63,45 @@ public class JobService(
         await loadService.LoadIndexDailyCandlesAsync();
         
         await loadService.LoadShareFiveMinuteCandlesAsync();
+        
+        return true;
     }
 
-    public async Task LoadForecastsAsync()
+    public async Task<bool> LoadForecastsAsync()
     {
         await loadService.LoadForecastsAsync();
+        
+        return true;
     }
 
-    public async Task AnalyseAsync()
+    public async Task<bool> AnalyseAsync()
     {
         await analyseService.AnalyseSharesAsync();
         await analyseService.AnalyseBondsAsync();
         await analyseService.AnalyseFuturesAsync();
         await analyseService.AnalyseCurrenciesAsync();
         await analyseService.AnalyseIndexesAsync();
+        
+        return true;
     }
 
-    public async Task CalculateSpreadsAsync()
+    public async Task<bool> CalculateSpreadsAsync()
     {
         await spreadService.FillingSpreadPairsAsync();
         await spreadService.CalculateSpreadsAsync();
+        
+        return true;
     }
 
-    public async Task CalculateMultiplicatorsAsync()
+    public async Task<bool> CalculateMultiplicatorsAsync()
     {
         await multiplicatorService.FillingMultiplicatorInstrumentsAsync();
         await multiplicatorService.CalculateMultiplicatorsAsync();
+        
+        return true;
     }
 
-    public async Task CheckMarketEventsAsync()
+    public async Task<bool> CheckMarketEventsAsync()
     {
         await marketEventService.CheckSupertrendUpMarketEventAsync();
         await marketEventService.CheckSupertrendDownMarketEventAsync();
@@ -96,10 +116,14 @@ public class JobService(
         await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
         await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
         await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
+        
+        return true;
     }
 
-    public async Task SendNotificationsAsync()
+    public async Task<bool> SendNotificationsAsync()
     {
         await sendService.SendNotificationsAsync();
+        
+        return true;
     }
 }

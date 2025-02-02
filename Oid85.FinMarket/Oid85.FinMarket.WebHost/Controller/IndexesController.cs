@@ -38,34 +38,46 @@ public class IndexesController(
     /// Загрузить справочник индексов
     /// </summary>
     [HttpGet("load-catalog")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadIndexesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadIndexesAsync);
+        GetResponseAsync(
+            loadService.LoadIndexesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
         
     /// <summary>
     /// Подгрузить свечи по индексов
     /// </summary>
     [HttpGet("load-daily-candles")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadIndexDailyCandlesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadIndexDailyCandlesAsync);
+        GetResponseAsync(
+            loadService.LoadIndexDailyCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Загрузить последние цены индексов
     /// </summary>
     [HttpGet("load-last-prices")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadIndexLastPricesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadIndexLastPricesAsync);
+        GetResponseAsync(
+            loadService.LoadIndexLastPricesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Выполнить анализ индексов
