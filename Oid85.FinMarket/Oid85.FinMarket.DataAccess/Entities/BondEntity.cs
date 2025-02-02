@@ -19,18 +19,6 @@ public class BondEntity : AuditableEntity
     public double LastPrice { get; set; }
     
     /// <summary>
-    /// Нижний целевой уровень
-    /// </summary>
-    [Column("high_target_price")]
-    public double HighTargetPrice { get; set; }
-    
-    /// <summary>
-    /// Верхний целевой уровень
-    /// </summary>
-    [Column("low_target_price")]
-    public double LowTargetPrice { get; set; }
-    
-    /// <summary>
     /// Идентификатор ISIN
     /// </summary>
     [Column("isin"), MaxLength(20)]

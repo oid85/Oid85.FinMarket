@@ -99,8 +99,6 @@ public class CurrencyRepository(
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
-            HighTargetPrice = model.HighTargetPrice,
-            LowTargetPrice = model.LowTargetPrice,
             Isin = model.Isin,
             Figi = model.Figi,
             ClassCode = model.ClassCode,
@@ -119,8 +117,6 @@ public class CurrencyRepository(
             Id = entity.Id,
             Ticker = entity.Ticker,
             LastPrice = entity.LastPrice,
-            HighTargetPrice = entity.HighTargetPrice,
-            LowTargetPrice = entity.LowTargetPrice,
             Isin = entity.Isin,
             Figi = entity.Figi,
             ClassCode = entity.ClassCode,

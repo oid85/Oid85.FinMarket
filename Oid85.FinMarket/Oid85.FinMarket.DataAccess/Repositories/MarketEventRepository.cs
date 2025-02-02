@@ -17,6 +17,7 @@ public class MarketEventRepository(
                 .AnyAsync(x => 
                     x.InstrumentId == marketEvent.InstrumentId &&
                     x.MarketEventType == marketEvent.MarketEventType &&
+                    x.MarketEventText == marketEvent.MarketEventText &&
                     x.IsActive))
             await context.AddAsync(GetEntity(marketEvent));
 
@@ -29,7 +30,8 @@ public class MarketEventRepository(
                 await context.MarketEventEntities
                     .Where(x => 
                         x.InstrumentId == marketEvent.InstrumentId &&
-                        x.MarketEventType == marketEvent.MarketEventType)
+                        x.MarketEventType == marketEvent.MarketEventType &&
+                        x.MarketEventText == marketEvent.MarketEventText)
                     .ExecuteUpdateAsync(
                         s => s
                             .SetProperty(u => u.IsActive, true));

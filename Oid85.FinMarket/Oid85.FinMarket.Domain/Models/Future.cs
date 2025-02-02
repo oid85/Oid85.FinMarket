@@ -16,16 +16,6 @@ public class Future
     /// Цена инструмента
     /// </summary>
     public double LastPrice { get; set; }
-
-    /// <summary>
-    /// Нижний целевой уровень
-    /// </summary>
-    public double HighTargetPrice { get; set; }
-    
-    /// <summary>
-    /// Верхний целевой уровень
-    /// </summary>
-    public double LowTargetPrice { get; set; }
     
     /// <summary>
     /// Идентификатор FIGI

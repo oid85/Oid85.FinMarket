@@ -9,5 +9,4 @@ public interface IInstrumentRepository
     Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId);
     Task<Instrument?> GetByNameAsync(string name);
     Task<Instrument?> GetByTickerAsync(string ticker);
-    Task<(double LowTargetPrice, double HighTargetPrice)> GetTargetPricesAsync(Guid instrumentId);
 }

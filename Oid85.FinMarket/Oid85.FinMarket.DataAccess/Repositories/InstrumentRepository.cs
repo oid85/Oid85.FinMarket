@@ -6,12 +6,7 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class InstrumentRepository(
-    FinMarketContext context,
-    IShareRepository shareRepository,
-    IFutureRepository futureRepository,
-    IBondRepository bondRepository,
-    ICurrencyRepository currencyRepository,
-    IIndexRepository indexRepository) 
+    FinMarketContext context) 
     : IInstrumentRepository
 {
     public async Task AddOrUpdateAsync(List<Instrument> tickers)
@@ -79,37 +74,7 @@ public class InstrumentRepository(
             ? null 
             : GetModel(entity);
     }
-
-    public async Task<(double LowTargetPrice, double HighTargetPrice)> GetTargetPricesAsync(Guid instrumentId)
-    {
-        var share = await shareRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (share is not null)
-            return (share.LowTargetPrice, share.HighTargetPrice);
-        
-        var future = await futureRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (future is not null)
-            return (future.LowTargetPrice, future.HighTargetPrice);
-        
-        var currency = await currencyRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (currency is not null)
-            return (currency.LowTargetPrice, currency.HighTargetPrice);
-        
-        var bond = await bondRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (bond is not null)
-            return (bond.LowTargetPrice, bond.HighTargetPrice);
-        
-        var index = await indexRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (index is not null)
-            return (index.LowTargetPrice, index.HighTargetPrice);
-        
-        return (0.0, 0.0);
-    }
-
+    
     private void SetEntity(ref InstrumentEntity? entity, Instrument model)
     {
         entity ??= new InstrumentEntity();
