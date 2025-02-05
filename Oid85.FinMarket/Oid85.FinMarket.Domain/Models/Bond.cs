@@ -56,4 +56,14 @@ public class Bond
     /// Признак облигации с плавающим купоном
     /// </summary>
     public bool FloatingCouponFlag { get; set; }
+    
+    /// <summary>
+    /// Уровень риска облигации
+    /// </summary>
+    public int RiskLevel { get; set; }
+
+    /// <summary>
+    /// Валюта расчетов
+    /// </summary>
+    public string Currency { get; set; } = string.Empty;
 }

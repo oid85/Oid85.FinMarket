@@ -187,4 +187,19 @@ public class BondsController(
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Отчет Подборка облигаций
+    /// </summary>
+    [HttpPost("report/bond-selection")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetBondSelectionAsync() =>
+        GetResponseAsync(
+            reportService.GetBondSelectionAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
 }

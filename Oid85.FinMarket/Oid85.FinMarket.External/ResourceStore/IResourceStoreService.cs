@@ -126,4 +126,9 @@ public interface IResourceStoreService
     /// Получить цветовую палитру для ForecastRecommendation
     /// </summary>
     Task<List<ValueColorResource<string>>> GetColorPaletteForecastRecommendationAsync();
+    
+    /// <summary>
+    /// Получить фильтр для облигаций
+    /// </summary>
+    Task<FilterBondsResource?> GetFilterBondsResourceAsync();
 }
