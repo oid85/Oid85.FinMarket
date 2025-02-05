@@ -26,7 +26,7 @@ public class LoadService(
     IForecastConsensusRepository forecastConsensusRepository)
     : ILoadService
 {
-    public async Task LoadSharesAsync()
+    public async Task<bool> LoadSharesAsync()
     {
         var shares = await tinkoffService.GetSharesAsync();
         await shareRepository.AddAsync(shares);
@@ -44,9 +44,11 @@ public class LoadService(
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
         logger.Trace($"Загружены акции. {shares.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadShareLastPricesAsync()
+    public async Task<bool> LoadShareLastPricesAsync()
     {
         var shares = await instrumentService.GetSharesInWatchlist();
             
@@ -58,9 +60,11 @@ public class LoadService(
             await shareRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         logger.Trace($"Загружены последние цены по акциям. {shares.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadShareDailyCandlesAsync()
+    public async Task<bool> LoadShareDailyCandlesAsync()
     {
         var instruments = await instrumentService.GetSharesInWatchlist();
 
@@ -94,9 +98,11 @@ public class LoadService(
             
             logger.Trace($"Загружены дневные свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
+        
+        return true;
     }
 
-    public async Task LoadShareFiveMinuteCandlesAsync()
+    public async Task<bool> LoadShareFiveMinuteCandlesAsync()
     {
         var instruments = await instrumentService.GetSharesInWatchlist();
 
@@ -127,9 +133,11 @@ public class LoadService(
             
             logger.Trace($"Загружены 5-минутные свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
+        
+        return true;
     }
 
-    public async Task LoadForecastsAsync()
+    public async Task<bool> LoadForecastsAsync()
     {
         var instruments = await instrumentService.GetSharesInWatchlist();
 
@@ -142,10 +150,12 @@ public class LoadService(
             
             logger.Trace($"Загружен прогноз по '{instrument.Ticker}' ({instrument.Name})");
         }
+        
+        return true;
     }
 
 
-    public async Task LoadFuturesAsync()
+    public async Task<bool> LoadFuturesAsync()
     {
         var futures = await tinkoffService.GetFuturesAsync();
         await futureRepository.AddAsync(futures);
@@ -163,9 +173,11 @@ public class LoadService(
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
         logger.Trace($"Загружены фьючерсы. {futures.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadFutureLastPricesAsync()
+    public async Task<bool> LoadFutureLastPricesAsync()
     {
         var futures = await instrumentService.GetFuturesInWatchlist();
             
@@ -179,9 +191,11 @@ public class LoadService(
             await futureRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         logger.Trace($"Загружены последние цены по фьючерсам. {futures.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadFutureDailyCandlesAsync()
+    public async Task<bool> LoadFutureDailyCandlesAsync()
     {
         var instruments = await instrumentService.GetFuturesInWatchlist();
 
@@ -215,10 +229,12 @@ public class LoadService(
             
             logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
+        
+        return true;
     }
 
     
-    public async Task LoadIndexesAsync()
+    public async Task<bool> LoadIndexesAsync()
     {
         var indicatives = await tinkoffService.GetIndexesAsync();
         await indexRepository.AddAsync(indicatives);
@@ -236,9 +252,11 @@ public class LoadService(
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
         logger.Trace($"Загружены индикативные инструменты. {indicatives.Count} шт.");
+        
+        return true;
     }
     
-    public async Task LoadIndexLastPricesAsync()
+    public async Task<bool> LoadIndexLastPricesAsync()
     {
         var indicatives = await instrumentService.GetFinIndexesInWatchlist();
             
@@ -252,9 +270,11 @@ public class LoadService(
             await indexRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         logger.Trace($"Загружены последние цены по индикативам. {indicatives.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadIndexDailyCandlesAsync()
+    public async Task<bool> LoadIndexDailyCandlesAsync()
     {
         var instruments = await instrumentService.GetFinIndexesInWatchlist();
 
@@ -289,10 +309,12 @@ public class LoadService(
             
             logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
+        
+        return true;
     }
 
     
-    public async Task LoadCurrenciesAsync()
+    public async Task<bool> LoadCurrenciesAsync()
     {
         var currencies = await tinkoffService.GetCurrenciesAsync();
         await currencyRepository.AddAsync(currencies);
@@ -310,9 +332,11 @@ public class LoadService(
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
         logger.Trace($"Загружены валюты. {currencies.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadCurrencyLastPricesAsync()
+    public async Task<bool> LoadCurrencyLastPricesAsync()
     {
         var currencies = await instrumentService.GetCurrenciesInWatchlist();
             
@@ -326,9 +350,11 @@ public class LoadService(
             await currencyRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         logger.Trace($"Загружены последние цены по валютам. {currencies.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadCurrencyDailyCandlesAsync()
+    public async Task<bool> LoadCurrencyDailyCandlesAsync()
     {
         var instruments = await instrumentService.GetCurrenciesInWatchlist();
 
@@ -363,10 +389,12 @@ public class LoadService(
             
             logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
+        
+        return true;
     }
 
     
-    public async Task LoadAssetFundamentalsAsync()
+    public async Task<bool> LoadAssetFundamentalsAsync()
     {
         var shares = await instrumentService.GetSharesInWatchlist();
 
@@ -392,20 +420,23 @@ public class LoadService(
         await assetFundamentalRepository.AddAsync(assetFundamentals);
             
         logger.Trace($"Загружены фундаментальные данные. {assetFundamentals.Count} шт.");
+        
+        return true;
     }
 
     
-    public async Task LoadDividendInfosAsync()
+    public async Task<bool> LoadDividendInfosAsync()
     {
         var shares = await instrumentService.GetSharesInWatchlist();
         var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
         await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
             
         logger.Trace($"Загружена информация по дивидендам. {dividendInfos.Count} шт.");
+        
+        return true;
     }
     
-    
-    public async Task LoadBondsAsync()
+    public async Task<bool> LoadBondsAsync()
     {
         var bonds = await tinkoffService.GetBondsAsync();
         await bondRepository.AddAsync(bonds);
@@ -423,9 +454,11 @@ public class LoadService(
         await instrumentRepository.AddOrUpdateAsync(tickers);
         
         logger.Trace($"Загружены облигации. {bonds.Count} шт.");
+        
+        return true;
     }
     
-    public async Task LoadBondLastPricesAsync()
+    public async Task<bool> LoadBondLastPricesAsync()
     {
         var bonds = await instrumentService.GetBondsInWatchlist();
             
@@ -439,9 +472,11 @@ public class LoadService(
             await bondRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
             
         logger.Trace($"Загружены последние цены по облигациям. {bonds.Count} шт.");
+        
+        return true;
     }
 
-    public async Task LoadBondDailyCandlesAsync()
+    public async Task<bool> LoadBondDailyCandlesAsync()
     {
         var instruments = await instrumentService.GetBondsInWatchlist();
 
@@ -476,14 +511,18 @@ public class LoadService(
             
             logger.Trace($"Загружены свечи по '{instrument.Ticker}' ({instrument.Name})");
         }
+        
+        return true;
     }
 
-    public async Task LoadBondCouponsAsync()
+    public async Task<bool> LoadBondCouponsAsync()
     {
-        var bonds = await instrumentService.GetBondsInWatchlist();
+        var bonds = await instrumentService.GetBondsByFilter();
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
         await bondCouponRepository.AddAsync(bondCoupons);
             
         logger.Trace($"Загружена информация по купонам облигаций. {bondCoupons.Count} шт.");
+
+        return true;
     }
 }

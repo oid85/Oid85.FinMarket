@@ -250,9 +250,9 @@ public class TinkoffService(
     {
         try
         {
-            List<TinkoffBond> bonds = (await client.Instruments
-                    .BondsAsync()).Instruments
-                .Where(x => x.CountryOfRisk.ToLower() == "ru")
+            List<TinkoffBond> bonds = (await client.Instruments.BondsAsync())
+                .Instruments
+                //.Where(x => x.CountryOfRisk.ToLower() == "ru")
                 .ToList();
 
             var result = new List<Bond>();
@@ -267,9 +267,18 @@ public class TinkoffService(
                     Name = bond.Name,
                     InstrumentId = Guid.Parse(bond.Uid),
                     Sector = bond.Sector,
+                    Currency = bond.Currency,
                     Nkd = ConvertHelper.MoneyValueToDouble(bond.AciValue),
                     MaturityDate = ConvertHelper.TimestampToDateOnly(bond.MaturityDate),
-                    FloatingCouponFlag = bond.FloatingCouponFlag
+                    FloatingCouponFlag = bond.FloatingCouponFlag,
+                    RiskLevel = bond.RiskLevel switch
+                    {
+                        RiskLevel.Low => 1,
+                        RiskLevel.Moderate => 2,
+                        RiskLevel.High => 3,
+                        RiskLevel.Unspecified => 0,
+                        _ => 0
+                    }
                 };
 
                 result.Add(instrument);

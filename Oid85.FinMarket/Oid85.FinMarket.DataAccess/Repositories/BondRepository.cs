@@ -103,9 +103,11 @@ public class BondRepository(
             InstrumentId = model.InstrumentId,
             Name = model.Name,
             Sector = model.Sector,
+            Currency = model.Currency,
             Nkd = model.Nkd,
             MaturityDate = model.MaturityDate,
-            FloatingCouponFlag = model.FloatingCouponFlag
+            FloatingCouponFlag = model.FloatingCouponFlag,
+            RiskLevel = model.RiskLevel
         };
 
         return entity;
@@ -123,9 +125,11 @@ public class BondRepository(
             InstrumentId = entity.InstrumentId,
             Name = entity.Name,
             Sector = entity.Sector,
+            Currency = entity.Currency,
             Nkd = entity.Nkd,
             MaturityDate = entity.MaturityDate,
-            FloatingCouponFlag = entity.FloatingCouponFlag
+            FloatingCouponFlag = entity.FloatingCouponFlag,
+            RiskLevel = entity.RiskLevel
         };
 
         return model;

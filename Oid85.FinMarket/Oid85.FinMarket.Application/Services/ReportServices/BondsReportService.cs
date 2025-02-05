@@ -141,7 +141,104 @@ public class BondsReportService(
             
         return reportData;
     }
-    
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetBondSelectionAsync()
+    {
+        var bonds = await instrumentService.GetBondsByFilter();
+            
+        var reportData = new ReportData
+        {
+            Title = "Информация по облигациям",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
+                new ReportParameter(KnownDisplayTypes.String, "Плав. купон"),
+                new ReportParameter(KnownDisplayTypes.String, "До погаш., дней"),
+                new ReportParameter(KnownDisplayTypes.String, "Дох-ть., %")
+            ]
+        };
+            
+        int outputWindowInDays = configuration
+            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
+        
+        var bondCoupons = await bondCouponRepository
+            .GetAsync(
+                DateOnly.FromDateTime(DateTime.Today), 
+                DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays));
+            
+        var dates = reportHelper.GetDates(
+            DateOnly.FromDateTime(DateTime.Today), 
+            DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays));
+            
+        reportData.Header.AddRange(dates);
+
+        var filter = await resourceStoreService.GetFilterBondsResourceAsync();
+        
+        foreach (var bond in bonds)
+        {
+            // Вычисляем полную доходность облигации
+            var nextCoupon = bondCoupons
+                .FirstOrDefault(x => x.Ticker == bond.Ticker);
+                
+            double profitPrc = 0.0;
+                
+            if (nextCoupon is not null)
+                profitPrc = (bond.LastPrice / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+            
+            // Добавляем облигации с подходящей доходностью
+            if (profitPrc < filter!.Yield.Min || 
+                profitPrc > filter.Yield.Max)
+                continue;
+            
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, 
+                    bond.Ticker),
+                    
+                new (KnownDisplayTypes.Sector, bond.Sector),
+                    
+                new (KnownDisplayTypes.String, 
+                    bond.FloatingCouponFlag ? "Да" : string.Empty),
+                    
+                new (KnownDisplayTypes.Number, 
+                    (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString())
+            ];
+            
+            string color = (await resourceStoreService.GetColorPaletteYieldCouponAsync())
+                .FirstOrDefault(x => 
+                    profitPrc >= x.LowLevel && 
+                    profitPrc >= x.HighLevel)!
+                .ColorCode;
+            
+            data.Add(new ReportParameter(
+                KnownDisplayTypes.Percent, 
+                profitPrc.ToString("N1"),
+                color));
+                
+            foreach (var date in dates)
+            {
+                var bondCoupon = bondCoupons
+                    .FirstOrDefault(x => 
+                        x.Ticker == bond.Ticker &&
+                        x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(bondCoupon is not null 
+                    ? new ReportParameter(
+                        KnownDisplayTypes.Ruble, 
+                        bondCoupon.PayOneBond.ToString("N1")) 
+                    : new ReportParameter(
+                        KnownDisplayTypes.Ruble, 
+                        string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+
     private async Task<ReportData> GetReportDataByAnalyseType(
         List<Bond> bonds,
         DateOnly from,

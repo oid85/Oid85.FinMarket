@@ -65,4 +65,16 @@ public class BondEntity : AuditableEntity
     /// </summary>
     [Column("floating_coupon_flag")]
     public bool FloatingCouponFlag { get; set; }
+    
+    /// <summary>
+    /// Уровень риска облигации
+    /// </summary>
+    [Column("risk_level")]
+    public int RiskLevel { get; set; }
+    
+    /// <summary>
+    /// Валюта расчетов
+    /// </summary>
+    [Column("currency"), MaxLength(10)]
+    public string Currency { get; set; } = string.Empty;
 }

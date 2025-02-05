@@ -41,34 +41,46 @@ public class FuturesController(
     /// Загрузить справочник фьючерсов
     /// </summary>
     [HttpGet("load-catalog")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadFuturesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadFuturesAsync);
+        GetResponseAsync(
+            loadService.LoadFuturesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
         
     /// <summary>
     /// Подгрузить свечи по фьючерсов
     /// </summary>
     [HttpGet("load-daily-candles")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadFutureDailyCandlesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadFutureDailyCandlesAsync);
+        GetResponseAsync(
+            loadService.LoadFutureDailyCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Загрузить последние цены фьючерсов
     /// </summary>
     [HttpGet("load-last-prices")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadFutureLastPricesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadFutureLastPricesAsync);
+        GetResponseAsync(
+            loadService.LoadFutureLastPricesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Расчитать спреды

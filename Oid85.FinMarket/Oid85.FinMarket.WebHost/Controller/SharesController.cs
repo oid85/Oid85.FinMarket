@@ -38,78 +38,106 @@ public class SharesController(
     /// Загрузить справочник акций
     /// </summary>
     [HttpGet("load-catalog")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadSharesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadSharesAsync);
+        GetResponseAsync(
+            loadService.LoadSharesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
 
     /// <summary>
     /// Подгрузить дневные свечи по акциям
     /// </summary>
     [HttpGet("load-daily-candles")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadShareDailyCandlesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadShareDailyCandlesAsync);
+        GetResponseAsync(
+            loadService.LoadShareDailyCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
 
     /// <summary>
     /// Загрузить 5-минутные свечи по акциям
     /// </summary>
     [HttpGet("load-five-minute-candles")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadShareFiveMinuteCandlesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadShareFiveMinuteCandlesAsync);
+        GetResponseAsync(
+            loadService.LoadShareFiveMinuteCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Загрузить прогнозы
     /// </summary>
     [HttpGet("load-forecasts")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadShareForecastsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadForecastsAsync);
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadForecastsAsync() =>
+        GetResponseAsync(
+            loadService.LoadForecastsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
     
     /// <summary>
     /// Загрузить данные о дивидендах
     /// </summary>
     [HttpGet("load-dividends")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadDividendInfosAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadDividendInfosAsync);
+        GetResponseAsync(
+            loadService.LoadDividendInfosAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
 
     /// <summary>
     /// Загрузить фундаментальные данные по акциям
     /// </summary>
     [HttpGet("load-asset-fundamentals")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadAssetFundamentalsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadAssetFundamentalsAsync);
+        GetResponseAsync(
+            loadService.LoadAssetFundamentalsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
 
     /// <summary>
     /// Загрузить последние цены акций
     /// </summary>
     [HttpGet("load-last-prices")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadShareLastPricesAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            loadService.LoadShareLastPricesAsync);
+        GetResponseAsync(
+            loadService.LoadShareLastPricesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
 
     /// <summary>
     /// Выполнить анализ акций

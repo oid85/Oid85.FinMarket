@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using Hangfire.Server;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
@@ -42,6 +43,29 @@ public class InstrumentService(
     {
         var tickers = await resourceStoreService.GetBondsWatchlistAsync();
         var items = await bondRepository.GetByTickersAsync(tickers);
+        return items;
+    }
+
+    /// <inheritdoc />
+    public async Task<List<Bond>> GetBondsByFilter()
+    {
+        var filter = await resourceStoreService.GetFilterBondsResourceAsync();
+
+        var from = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddYears(filter!.YearsToMaturity.Min));
+        var to = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddYears(filter.YearsToMaturity.Max));
+        
+        var items = (await bondRepository.GetAllAsync())
+            .Where(x => filter.Sectors.Contains(x.Sector))
+            .Where(x => filter.Currencies.Contains(x.Currency))
+            .Where(x => 
+                x.MaturityDate >= from && 
+                x.MaturityDate <= to)
+            .Where(x => 
+                (x.RiskLevel == 1 && filter.RiskLevels.Low) || 
+                (x.RiskLevel == 2 && filter.RiskLevels.Middle) || 
+                (x.RiskLevel == 3 && filter.RiskLevels.High))
+            .ToList();
+        
         return items;
     }
 

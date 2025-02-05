@@ -5,16 +5,16 @@
 /// </summary>
 public interface IJobService
 {
-    Task LoadInstrumentsAsync();
-    Task LoadLastPricesAsync();
-    Task LoadBondCouponsAsync();
-    Task LoadDividendInfosAsync();
-    Task LoadAssetFundamentalsAsync();
-    Task LoadCandlesAsync();
-    Task LoadForecastsAsync();
-    Task AnalyseAsync();
-    Task CalculateSpreadsAsync();
-    Task CalculateMultiplicatorsAsync();
-    Task CheckMarketEventsAsync();
-    Task SendNotificationsAsync();
+    Task<bool> LoadInstrumentsAsync();
+    Task<bool> LoadLastPricesAsync();
+    Task<bool> LoadBondCouponsAsync();
+    Task<bool> LoadDividendInfosAsync();
+    Task<bool> LoadAssetFundamentalsAsync();
+    Task<bool> LoadCandlesAsync();
+    Task<bool> LoadForecastsAsync();
+    Task<bool> AnalyseAsync();
+    Task<bool> CalculateSpreadsAsync();
+    Task<bool> CalculateMultiplicatorsAsync();
+    Task<bool> CheckMarketEventsAsync();
+    Task<bool> SendNotificationsAsync();
 }

@@ -5,30 +5,30 @@
 /// </summary>
 public interface ILoadService
 {
-    Task LoadSharesAsync();
-    Task LoadShareLastPricesAsync();
-    Task LoadShareDailyCandlesAsync();
-    Task LoadShareFiveMinuteCandlesAsync();
-    Task LoadForecastsAsync();
+    Task<bool> LoadSharesAsync();
+    Task<bool> LoadShareLastPricesAsync();
+    Task<bool> LoadShareDailyCandlesAsync();
+    Task<bool> LoadShareFiveMinuteCandlesAsync();
+    Task<bool> LoadForecastsAsync();
     
-    Task LoadFuturesAsync();
-    Task LoadFutureLastPricesAsync();
-    Task LoadFutureDailyCandlesAsync();
+    Task<bool> LoadFuturesAsync();
+    Task<bool> LoadFutureLastPricesAsync();
+    Task<bool> LoadFutureDailyCandlesAsync();
     
-    Task LoadBondsAsync();
-    Task LoadBondCouponsAsync();
-    Task LoadBondLastPricesAsync();
-    Task LoadBondDailyCandlesAsync();
+    Task<bool> LoadBondsAsync();
+    Task<bool> LoadBondCouponsAsync();
+    Task<bool> LoadBondLastPricesAsync();
+    Task<bool> LoadBondDailyCandlesAsync();
     
-    Task LoadDividendInfosAsync();
+    Task<bool> LoadDividendInfosAsync();
     
-    Task LoadIndexesAsync();
-    Task LoadIndexLastPricesAsync();
-    Task LoadIndexDailyCandlesAsync();
+    Task<bool> LoadIndexesAsync();
+    Task<bool> LoadIndexLastPricesAsync();
+    Task<bool> LoadIndexDailyCandlesAsync();
     
-    Task LoadCurrenciesAsync();
-    Task LoadCurrencyLastPricesAsync();
-    Task LoadCurrencyDailyCandlesAsync();
+    Task<bool> LoadCurrenciesAsync();
+    Task<bool> LoadCurrencyLastPricesAsync();
+    Task<bool> LoadCurrencyDailyCandlesAsync();
     
-    Task LoadAssetFundamentalsAsync();
+    Task<bool> LoadAssetFundamentalsAsync();
 }

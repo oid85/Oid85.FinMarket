@@ -23,6 +23,11 @@ public interface IInstrumentService
     Task<List<Bond>> GetBondsInWatchlist();
     
     /// <summary>
+    /// Получить облигации, подходящие под фильтр
+    /// </summary>
+    Task<List<Bond>> GetBondsByFilter();
+    
+    /// <summary>
     /// Получить фьючерсы из списка наблюдения
     /// </summary>
     Task<List<Future>> GetFuturesInWatchlist();

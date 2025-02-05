@@ -36,4 +36,9 @@ public interface IBondsReportService
     /// Отчет Купоны
     /// </summary>
     Task<ReportData> GetCouponAnalyseAsync();
+
+    /// <summary>
+    /// Отчет Подборка облигаций
+    /// </summary>
+    Task<ReportData> GetBondSelectionAsync();
 }

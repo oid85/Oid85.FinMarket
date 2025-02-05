@@ -150,7 +150,7 @@ public class ResourceStoreService(
     {
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "futureCodes");
+            "futureCodes.json");
 
         var result = await ReadAsync<List<FutureCodeResource>>(path);
 
@@ -165,7 +165,7 @@ public class ResourceStoreService(
     {
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "keyRates");
+            "keyRates.json");
 
         var result = await ReadAsync<List<DateValueResource<double>>>(path);
 
@@ -180,7 +180,7 @@ public class ResourceStoreService(
     {
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "spreads");
+            "spreads.json");
 
         var result = await ReadAsync<List<SpreadResource>>(path);
 
@@ -391,6 +391,18 @@ public class ResourceStoreService(
 
         if (result is null)
             return [];
+        
+        return result;
+    }
+
+    public async Task<FilterBondsResource?> GetFilterBondsResourceAsync()
+    {
+        string path = Path.Combine(
+            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+            "filters",
+            "filterBonds.json");
+
+        var result = await ReadAsync<FilterBondsResource>(path);
         
         return result;
     }
