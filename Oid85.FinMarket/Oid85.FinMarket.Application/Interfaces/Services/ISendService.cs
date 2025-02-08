@@ -8,5 +8,5 @@ public interface ISendService
     /// <summary>
     /// Отправить оповещения
     /// </summary>
-    Task SendNotificationsAsync();
+    Task<bool> SendMessageAsync(string message);
 }

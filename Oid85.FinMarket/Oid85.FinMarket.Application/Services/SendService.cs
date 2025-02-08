@@ -11,10 +11,10 @@ public class SendService(
     : ISendService
 {
     /// <inheritdoc />
-    public async Task SendNotificationsAsync()
+    public async Task<bool> SendMessageAsync(string message)
     {
-        var marketEvents = await marketEventRepository.GetActivatedAsync();
+        await telegramService.SendMessageAsync(message);   
         
-        
+        return true;
     }
 }
