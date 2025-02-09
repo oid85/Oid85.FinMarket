@@ -1,4 +1,7 @@
-﻿namespace Oid85.FinMarket.External.Telegram;
+﻿using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+
+namespace Oid85.FinMarket.External.Telegram;
 
 /// <summary>
 /// Сервис работы с мессенджером Телеграм
@@ -9,4 +12,6 @@ public interface ITelegramService
     /// Отправить сообщение
     /// </summary>
     Task SendMessageAsync(string message);
+
+    Task MessageHandleAsync(Message message, UpdateType type);
 }

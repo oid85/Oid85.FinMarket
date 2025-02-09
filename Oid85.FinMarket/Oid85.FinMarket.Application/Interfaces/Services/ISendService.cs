@@ -6,7 +6,12 @@
 public interface ISendService
 {
     /// <summary>
+    /// Отправить сообщение
+    /// </summary>
+    Task<bool> SendMessageAsync(string message);
+    
+    /// <summary>
     /// Отправить оповещения
     /// </summary>
-    Task SendNotificationsAsync();
+    Task<bool> SendNotificationsAsync();
 }

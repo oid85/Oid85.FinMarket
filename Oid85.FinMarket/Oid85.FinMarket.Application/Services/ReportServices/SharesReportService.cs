@@ -451,7 +451,7 @@ public class SharesReportService(
                         color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
                             .FirstOrDefault(x => 
                                 dividendInfo.DividendPrc >= x.LowLevel &&
-                                dividendInfo.DividendPrc >= x.HighLevel)!
+                                dividendInfo.DividendPrc <= x.HighLevel)!
                             .ColorCode;
                     }
                     

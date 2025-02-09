@@ -83,7 +83,30 @@ public class MarketEventRepository(
             .ToListAsync())
         .Select(GetModel)
         .ToList();
-    
+
+    public async Task SetSentNotificationAsync(Guid marketEventId)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.MarketEventEntities
+                .Where(x => x.Id == marketEventId)
+                .ExecuteUpdateAsync(
+                    s => s.SetProperty(
+                        u => u.SentNotification, true));
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            logger.Error(exception.Message);
+        }
+    }
+
     private MarketEventEntity GetEntity(MarketEvent model)
     {
         var entity = new MarketEventEntity
