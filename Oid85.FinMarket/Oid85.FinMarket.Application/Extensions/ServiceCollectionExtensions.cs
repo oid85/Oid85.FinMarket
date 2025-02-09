@@ -3,7 +3,9 @@ using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Oid85.FinMarket.Application.Factories;
 using Oid85.FinMarket.Application.Helpers;
+using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Services;
@@ -32,6 +34,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMultiplicatorService, MultiplicatorService>();
         services.AddTransient<IMarketEventService, MarketEventService>();
         services.AddTransient<IInstrumentService, InstrumentService>();
+        
+        services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
     }
     
     public static async Task RegisterHangfireJobs(

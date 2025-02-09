@@ -7,4 +7,5 @@ public interface IMarketEventRepository
     Task ActivateAsync(MarketEvent marketEvent);
     Task DeactivateAsync(MarketEvent marketEvent);
     Task<List<MarketEvent>> GetActivatedAsync();
+    Task SetSentNotificationAsync(Guid marketEventId);
 }

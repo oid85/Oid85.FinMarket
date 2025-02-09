@@ -122,6 +122,8 @@ public class JobService(
 
     public async Task<bool> SendNotificationsAsync()
     {
+        await sendService.SendNotificationsAsync();
+        
         return true;
     }
 }
