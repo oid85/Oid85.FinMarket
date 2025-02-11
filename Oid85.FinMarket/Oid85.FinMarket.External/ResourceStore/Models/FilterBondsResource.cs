@@ -21,4 +21,7 @@ public class FilterBondsResource
     
     [JsonPropertyName("yearsToMaturity")]
     public Range<int> YearsToMaturity { get; set; } = new();
+    
+    [JsonPropertyName("price")]
+    public Range<double> Price { get; set; } = new();
 }

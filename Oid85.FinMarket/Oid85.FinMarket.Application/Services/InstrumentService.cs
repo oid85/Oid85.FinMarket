@@ -64,6 +64,9 @@ public class InstrumentService(
                 (x.RiskLevel == 1 && filter.RiskLevels.Low) || 
                 (x.RiskLevel == 2 && filter.RiskLevels.Middle) || 
                 (x.RiskLevel == 3 && filter.RiskLevels.High))
+            .Where(x => 
+                x.LastPrice >= filter.Price.Min && 
+                x.LastPrice <= filter.Price.Max)
             .ToList();
         
         return items;
