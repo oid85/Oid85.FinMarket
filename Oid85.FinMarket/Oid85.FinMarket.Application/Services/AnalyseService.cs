@@ -19,107 +19,152 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> AnalyseSharesAsync()
     {
-        var instruments = await instrumentService.GetSharesInWatchlist();
+        try
+        {
+            var instruments = await instrumentService.GetSharesInWatchlist();
             
-        for (int i = 0; i < instruments.Count; i++)
-        {       
-            // Вызов методов анализа
-            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
-            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
-            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
-            await RsiAnalyseAsync(instruments[i].InstrumentId);
-            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+            for (int i = 0; i < instruments.Count; i++)
+            {       
+                // Вызов методов анализа
+                await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+                await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+                await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+                await RsiAnalyseAsync(instruments[i].InstrumentId);
+                await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
 
-            double percent = ((i + 1) / (double) instruments.Count) * 100;
+                double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            logger.Trace($"Анализ акций, {i + 1} из {instruments.Count} ({percent:N2} %)");
+                logger.Trace($"Анализ акций, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            }
+
+            return true;
         }
-
-        return true;
+        
+        catch (Exception exception)
+        {
+            logger.Trace(exception.Message);
+            return false;
+        }
     }
 
     /// <inheritdoc />
     public async Task<bool> AnalyseBondsAsync()
     {
-        var instruments = await instrumentService.GetBondsInWatchlist();
+        try
+        {
+            var instruments = await instrumentService.GetBondsInWatchlist();
             
-        for (int i = 0; i < instruments.Count; i++)
-        {                
-            // Вызов методов анализа
-            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
-            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
-            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+            for (int i = 0; i < instruments.Count; i++)
+            {                
+                // Вызов методов анализа
+                await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+                await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+                await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
             
-            double percent = ((i + 1) / (double) instruments.Count) * 100;
+                double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            logger.Trace($"Анализ облигаций, {i + 1} из {instruments.Count} ({percent:N2} %)");
+                logger.Trace($"Анализ облигаций, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            }
+
+            return true;
         }
-
-        return true;
+        
+        catch (Exception exception)
+        {
+            logger.Trace(exception.Message);
+            return false;
+        }
     }
 
     /// <inheritdoc />
     public async Task<bool> AnalyseCurrenciesAsync()
     {
-        var instruments = await instrumentService.GetCurrenciesInWatchlist();
+        try
+        {
+            var instruments = await instrumentService.GetCurrenciesInWatchlist();
             
-        for (int i = 0; i < instruments.Count; i++)
-        {                
-            // Вызов методов анализа
-            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
-            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
-            await RsiAnalyseAsync(instruments[i].InstrumentId);
-            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+            for (int i = 0; i < instruments.Count; i++)
+            {                
+                // Вызов методов анализа
+                await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+                await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+                await RsiAnalyseAsync(instruments[i].InstrumentId);
+                await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
             
-            double percent = ((i + 1) / (double) instruments.Count) * 100;
+                double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            logger.Trace($"Анализ валют, {i + 1} из {instruments.Count} ({percent:N2} %)");
+                logger.Trace($"Анализ валют, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            }
+
+            return true;
         }
-
-        return true;
+        
+        catch (Exception exception)
+        {
+            logger.Trace(exception.Message);
+            return false;
+        }
     }
 
     /// <inheritdoc />
     public async Task<bool> AnalyseFuturesAsync()
     {
-        var instruments = await instrumentService.GetFuturesInWatchlist();
+        try
+        {
+            var instruments = await instrumentService.GetFuturesInWatchlist();
             
-        for (int i = 0; i < instruments.Count; i++)
-        {                
-            // Вызов методов анализа
-            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
-            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
-            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
-            await RsiAnalyseAsync(instruments[i].InstrumentId);
-            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+            for (int i = 0; i < instruments.Count; i++)
+            {                
+                // Вызов методов анализа
+                await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+                await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+                await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
+                await RsiAnalyseAsync(instruments[i].InstrumentId);
+                await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
 
-            double percent = ((i + 1) / (double) instruments.Count) * 100;
+                double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            logger.Trace($"Анализ фьючерсов, {i + 1} из {instruments.Count} ({percent:N2} %)");
+                logger.Trace($"Анализ фьючерсов, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            }
+
+            return true;
         }
-
-        return true;
+        
+        catch (Exception exception)
+        {
+            logger.Trace(exception.Message);
+            return false;
+        }
     }
 
     /// <inheritdoc />
     public async Task<bool> AnalyseIndexesAsync()
     {
-        var instruments = await instrumentService.GetFinIndexesInWatchlist();
+        try
+        {
+            var instruments = await instrumentService.GetFinIndexesInWatchlist();
             
-        for (int i = 0; i < instruments.Count; i++)
-        {                
-            // Вызов методов анализа
-            await SupertrendAnalyseAsync(instruments[i].InstrumentId);
-            await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
-            await RsiAnalyseAsync(instruments[i].InstrumentId);
-            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+            for (int i = 0; i < instruments.Count; i++)
+            {                
+                // Вызов методов анализа
+                await SupertrendAnalyseAsync(instruments[i].InstrumentId);
+                await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
+                await RsiAnalyseAsync(instruments[i].InstrumentId);
+                await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
 
-            double percent = ((i + 1) / (double) instruments.Count) * 100;
+                double percent = ((i + 1) / (double) instruments.Count) * 100;
 
-            logger.Trace($"Анализ индексов, {i + 1} из {instruments.Count} ({percent:N2} %)");
+                logger.Trace($"Анализ индексов, {i + 1} из {instruments.Count} ({percent:N2} %)");
+            }
+
+            return true;
         }
-
-        return true;
+        
+        catch (Exception exception)
+        {
+            logger.Trace(exception.Message);
+            return false;
+        }
     }
     
     private async Task SupertrendAnalyseAsync(Guid instrumentId)

@@ -19,64 +19,82 @@ public class SpreadService(
 {
     public async Task<List<Spread>> FillingSpreadPairsAsync()
     {
-        await DeleteExpiratedFuturesAsync();
+        try
+        {
+            await DeleteExpiratedFuturesAsync();
 
-        var spreadResources = await resourceStoreService.GetSpreadsAsync();
+            var spreadResources = await resourceStoreService.GetSpreadsAsync();
         
-        var spreads = new List<Spread>();
+            var spreads = new List<Spread>();
 
-        foreach (var resource in spreadResources)
-            spreads.AddRange(await GetSpreadsAsync(
-                resource.BaseAssetTicker, 
-                resource.Multiplier, 
-                resource.ForeverFutureTicker, 
-                resource.FutureTickerPrefix));
+            foreach (var resource in spreadResources)
+                spreads.AddRange(await GetSpreadsAsync(
+                    resource.BaseAssetTicker, 
+                    resource.Multiplier, 
+                    resource.ForeverFutureTicker, 
+                    resource.FutureTickerPrefix));
         
-        await spreadRepository.AddAsync(spreads);
+            await spreadRepository.AddAsync(spreads);
         
-        return spreads;
+            return spreads;
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Trace(exception.Message);
+            return [];
+        }
     }
     
     public async Task<List<Spread>> CalculateSpreadsAsync()
     {
-        var spreads = await spreadRepository.GetAllAsync();
-
-        foreach (var spread in spreads)
+        try
         {
-            spread.FirstInstrumentPrice = await GetInstrumentPriceAsync(spread.FirstInstrumentId);
-            spread.SecondInstrumentPrice = await GetInstrumentPriceAsync(spread.SecondInstrumentId);
+            var spreads = await spreadRepository.GetAllAsync();
 
-            if (spread is not
-                {
-                    FirstInstrumentPrice: > 0.0,
-                    SecondInstrumentPrice: > 0.0
-                }) 
-                continue;
+            foreach (var spread in spreads)
+            {
+                spread.FirstInstrumentPrice = await GetInstrumentPriceAsync(spread.FirstInstrumentId);
+                spread.SecondInstrumentPrice = await GetInstrumentPriceAsync(spread.SecondInstrumentId);
 
-            // В зависимости от порядка цен, домножаем на коэффициент
-            spread.PriceDifference = spread.SecondInstrumentPrice / spread.FirstInstrumentPrice > 2.0
-                ? spread.SecondInstrumentPrice - spread.FirstInstrumentPrice * spread.Multiplier
-                : spread.SecondInstrumentPrice - spread.FirstInstrumentPrice;
+                if (spread is not
+                    {
+                        FirstInstrumentPrice: > 0.0,
+                        SecondInstrumentPrice: > 0.0
+                    }) 
+                    continue;
+
+                // В зависимости от порядка цен, домножаем на коэффициент
+                spread.PriceDifference = spread.SecondInstrumentPrice / spread.FirstInstrumentPrice > 2.0
+                    ? spread.SecondInstrumentPrice - spread.FirstInstrumentPrice * spread.Multiplier
+                    : spread.SecondInstrumentPrice - spread.FirstInstrumentPrice;
             
-            spread.PriceDifferencePrc = spread.PriceDifference / spread.SecondInstrumentPrice * 100.0; 
+                spread.PriceDifferencePrc = spread.PriceDifference / spread.SecondInstrumentPrice * 100.0; 
             
-            spread.DateTime = DateTime.UtcNow;
+                spread.DateTime = DateTime.UtcNow;
             
-            /*
+                /*
              Контанго
                 Цена контракта > цены базового актива
                 Цена дальнего контракта > цены ближнего контракта
             */
             
-            spread.SpreadPricePosition = 
-                spread.PriceDifference > 0.0 
-                    ? KnownSpreadPricePositions.Contango
-                    : KnownSpreadPricePositions.Backwardation;
+                spread.SpreadPricePosition = 
+                    spread.PriceDifference > 0.0 
+                        ? KnownSpreadPricePositions.Contango
+                        : KnownSpreadPricePositions.Backwardation;
             
-            await spreadRepository.UpdateSpreadAsync(spread);
+                await spreadRepository.UpdateSpreadAsync(spread);
+            }
+        
+            return spreads;
         }
         
-        return spreads;
+        catch (Exception exception)
+        {
+            logger.Trace(exception.Message);
+            return [];
+        }
     }
     
     private async Task DeleteExpiratedFuturesAsync()
