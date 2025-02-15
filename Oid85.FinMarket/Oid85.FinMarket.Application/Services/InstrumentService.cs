@@ -55,8 +55,12 @@ public class InstrumentService(
         var to = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddYears(filter.YearsToMaturity.Max));
         
         var items = (await bondRepository.GetAllAsync())
-            .Where(x => filter.Sectors.Contains(x.Sector))
-            .Where(x => filter.Currencies.Contains(x.Currency))
+            .Where(x => 
+                filter.Currencies.Contains("all") || 
+                filter.Currencies.Contains(x.Currency))
+            .Where(x => 
+                filter.Sectors.Contains("all") || 
+                filter.Sectors.Contains(x.Sector))
             .Where(x => 
                 x.MaturityDate >= from && 
                 x.MaturityDate <= to)

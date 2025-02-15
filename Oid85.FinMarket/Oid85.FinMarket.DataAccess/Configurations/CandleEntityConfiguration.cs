@@ -11,7 +11,7 @@ internal class CandleEntityConfiguration : EntityConfigurationBase<CandleEntity>
     {
         base.Configure(builder);
         
-        builder.ToTable("daily-candles", KnownDatabaseSchemas.Storage);
+        builder.ToTable("daily_candles", KnownDatabaseSchemas.Storage);
         builder.HasIndex(x => x.InstrumentId);
     }
 }

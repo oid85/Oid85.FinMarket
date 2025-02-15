@@ -11,7 +11,7 @@ internal class FiveMinuteCandleEntityConfiguration : EntityConfigurationBase<Fiv
     {
         base.Configure(builder);
         
-        builder.ToTable("five-minute-candles", KnownDatabaseSchemas.Storage);
+        builder.ToTable("five_minute_candles", KnownDatabaseSchemas.Storage);
         builder.HasIndex(x => x.InstrumentId);
     }
 }
