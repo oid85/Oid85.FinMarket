@@ -36,15 +36,4 @@ public static class ServiceCollectionExtensions
         
         
     }
-    
-    public static async Task TelegramBotSubscribe(this IHost host)
-    {
-        var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
-        await using var scope = scopeFactory.CreateAsyncScope();
-        var botClient = scope.ServiceProvider.GetRequiredService<TelegramBotClient>();
-        var telegramService = scope.ServiceProvider.GetRequiredService<ITelegramService>();
-
-        botClient.OnMessage += async (message, type) => 
-            await telegramService.MessageHandleAsync(message, type);
-    }
 }

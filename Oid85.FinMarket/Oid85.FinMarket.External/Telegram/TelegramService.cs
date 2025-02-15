@@ -2,8 +2,6 @@
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace Oid85.FinMarket.External.Telegram;
 
@@ -20,10 +18,5 @@ public class TelegramService(
             configuration.GetValue<string>(KnownSettingsKeys.TelegramChatId)!);
         
         await botClient.SendMessage(chatId, message);
-    }
-
-    public async Task MessageHandleAsync(Message message, UpdateType type)
-    {
-        await SendMessageAsync("...");
     }
 }

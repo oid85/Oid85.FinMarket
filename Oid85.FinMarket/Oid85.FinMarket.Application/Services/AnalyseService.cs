@@ -22,7 +22,13 @@ public class AnalyseService(
         try
         {
             var instruments = await instrumentService.GetSharesInWatchlist();
-            
+
+            if (instruments is [])
+            {
+                logger.Warn("В БД нет ни одной акции");
+                return true;
+            }
+
             for (int i = 0; i < instruments.Count; i++)
             {       
                 // Вызов методов анализа
@@ -54,6 +60,12 @@ public class AnalyseService(
         {
             var instruments = await instrumentService.GetBondsInWatchlist();
             
+            if (instruments is [])
+            {
+                logger.Warn("В БД нет ни одной облигации");
+                return true;
+            }
+            
             for (int i = 0; i < instruments.Count; i++)
             {                
                 // Вызов методов анализа
@@ -82,6 +94,12 @@ public class AnalyseService(
         try
         {
             var instruments = await instrumentService.GetCurrenciesInWatchlist();
+            
+            if (instruments is [])
+            {
+                logger.Warn("В БД нет ни одной валюты");
+                return true;
+            }
             
             for (int i = 0; i < instruments.Count; i++)
             {                
@@ -112,6 +130,12 @@ public class AnalyseService(
         try
         {
             var instruments = await instrumentService.GetFuturesInWatchlist();
+            
+            if (instruments is [])
+            {
+                logger.Warn("В БД нет ни одного фьючерса");
+                return true;
+            }
             
             for (int i = 0; i < instruments.Count; i++)
             {                
@@ -144,6 +168,12 @@ public class AnalyseService(
         {
             var instruments = await instrumentService.GetFinIndexesInWatchlist();
             
+            if (instruments is [])
+            {
+                logger.Warn("В БД нет ни одного индекса");
+                return true;
+            }
+            
             for (int i = 0; i < instruments.Count; i++)
             {                
                 // Вызов методов анализа
@@ -175,6 +205,12 @@ public class AnalyseService(
                 .Where(x => x.IsComplete)
                 .ToList();
 
+            if (candles is [])
+            {
+                logger.Warn($"По инструменту '{instrumentId}' нет ни одной свечи");
+                return;
+            }
+            
             const int lookbackPeriods = 50;
 
             var quotes = candles
@@ -241,6 +277,12 @@ public class AnalyseService(
                 .Where(x => x.IsComplete)
                 .ToList();
 
+            if (candles is [])
+            {
+                logger.Warn($"По инструменту '{instrumentId}' нет ни одной свечи");
+                return;
+            }
+            
             var results = new List<AnalyseResult>();
 
             for (int i = 0; i < candles.Count; i++)
@@ -310,6 +352,12 @@ public class AnalyseService(
                 .Where(x => x.IsComplete)
                 .ToList();
 
+            if (candles is [])
+            {
+                logger.Warn($"По инструменту '{instrumentId}' нет ни одной свечи");
+                return;
+            }
+            
             var results = new List<AnalyseResult>();
 
             for (int i = 0; i < candles.Count; i++)
@@ -388,6 +436,12 @@ public class AnalyseService(
                 .Where(x => x.IsComplete)
                 .ToList();
 
+            if (candles is [])
+            {
+                logger.Warn($"По инструменту '{instrumentId}' нет ни одной свечи");
+                return;
+            }
+            
             int lookbackPeriods = 14;
 
             var quotes = candles
@@ -457,6 +511,12 @@ public class AnalyseService(
                 .Where(x => x.IsComplete)
                 .ToList();
 
+            if (candles is [])
+            {
+                logger.Warn($"По инструменту '{instrumentId}' нет ни одной свечи");
+                return;
+            }
+            
             var results = new List<AnalyseResult>();
             
             foreach (var candle in candles)

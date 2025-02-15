@@ -11,6 +11,8 @@ using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Application.Services.ReportServices;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.External.Telegram;
+using Telegram.Bot;
 
 namespace Oid85.FinMarket.Application.Extensions;
 
@@ -68,5 +70,16 @@ public static class ServiceCollectionExtensions
             if (enable)
                 RecurringJob.AddOrUpdate(jobId, methodCall, cron);
         }        
+    }
+    
+    public static async Task TelegramBotSubscribe(this IHost host)
+    {
+        var scopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var botClient = scope.ServiceProvider.GetRequiredService<TelegramBotClient>();
+        var sendService = scope.ServiceProvider.GetRequiredService<ISendService>();
+
+        botClient.OnMessage += async (message, type) => 
+            await sendService.MessageHandleAsync(message, type);
     }
 }

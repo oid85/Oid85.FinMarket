@@ -205,10 +205,7 @@ public class ResourceStoreService(
     private async Task<T?> ReadAsync<T>(string path)
     {
         if (!File.Exists(path))
-        {
-            logger.Error(@$"Файл не существует. {path}");
             return default;
-        }
 
         await using var stream = File.OpenRead(path);
         return await JsonSerializer.DeserializeAsync<T>(stream);
