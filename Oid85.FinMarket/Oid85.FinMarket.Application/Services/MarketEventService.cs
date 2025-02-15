@@ -30,7 +30,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.SupertrendUp);
 
-            marketEvent.MarketEventText = "Направление тренда - вверх";
+            marketEvent.MarketEventText = "Тренд вверх";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -58,7 +58,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.SupertrendDown);
 
-            marketEvent.MarketEventText = "Направление тренда - вниз";
+            marketEvent.MarketEventText = "Тренд вниз";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -86,7 +86,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.CandleVolumeUp);
 
-            marketEvent.MarketEventText = "Рост дневных объемов";
+            marketEvent.MarketEventText = "Рост днев. объемов";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -111,7 +111,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.CandleSequenceWhite);
 
-            marketEvent.MarketEventText = "Последовательность белых дневных свечей";
+            marketEvent.MarketEventText = "3 белых свечи";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -136,7 +136,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.CandleSequenceBlack);
 
-            marketEvent.MarketEventText = "Последовательность черных дневных свечей";
+            marketEvent.MarketEventText = "3 черных свечи";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -161,7 +161,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.RsiOverBoughtInput);
 
-            marketEvent.MarketEventText = "RSI - вход в зону перекупленности";
+            marketEvent.MarketEventText = "RSI - вход в перекуп.";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -186,7 +186,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.RsiOverBoughtOutput);
 
-            marketEvent.MarketEventText = "RSI - выход из зоны перекупленности";
+            marketEvent.MarketEventText = "RSI - выход из перекуп.";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -211,7 +211,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.RsiOverSoldInput);
 
-            marketEvent.MarketEventText = "RSI - вход в зону перепроданности";
+            marketEvent.MarketEventText = "RSI - вход в перепрод.";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -236,7 +236,7 @@ public class MarketEventService(
             var marketEvent = await CreateMarketEvent(
                 instrumentId, KnownMarketEventTypes.RsiOverSoldOutput);
 
-            marketEvent.MarketEventText = "RSI - выход из зоны перепроданности";
+            marketEvent.MarketEventText = "RSI - выход из перепрод.";
             
             string previous = analyseResults[0].ResultString;
             string current = analyseResults[1].ResultString;
@@ -263,7 +263,7 @@ public class MarketEventService(
                 var marketEvent = await CreateMarketEvent(
                     instrumentId, KnownMarketEventTypes.CrossPriceLevel);
                 
-                marketEvent.MarketEventText = $"Пересечение ценой уровня '{priceLevel}'";
+                marketEvent.MarketEventText = $"Достигнут уровнь '{priceLevel}'";
 
                 var lastCandle = await candleRepository.GetLastAsync(instrumentId);
                 

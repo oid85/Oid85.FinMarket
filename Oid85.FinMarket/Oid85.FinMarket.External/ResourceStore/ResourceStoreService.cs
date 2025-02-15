@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.ResourceStore.Models;
 
@@ -7,6 +8,7 @@ namespace Oid85.FinMarket.External.ResourceStore;
 
 /// <inheritdoc />
 public class ResourceStoreService(
+    ILogger logger,
     IConfiguration configuration) 
     : IResourceStoreService
 {
@@ -276,7 +278,8 @@ public class ResourceStoreService(
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "colorPalettes",
-            "yieldDividend.json");
+            "limits",
+            "yieldDividendLimits.json");
 
         var result = await ReadAsync<List<RangeColorResource>>(path);
 
@@ -292,7 +295,8 @@ public class ResourceStoreService(
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "colorPalettes",
-            "yieldCoupon.json");
+            "limits",
+            "yieldCouponLimits.json");
 
         var result = await ReadAsync<List<RangeColorResource>>(path);
 
@@ -308,7 +312,8 @@ public class ResourceStoreService(
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "colorPalettes",
-            "yieldLtm.json");
+            "limits",
+            "yieldLtmLimits.json");
 
         var result = await ReadAsync<List<RangeColorResource>>(path);
 
@@ -323,6 +328,7 @@ public class ResourceStoreService(
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "colorPalettes",
+            "limits",
             "peLimits.json");
 
         var result = await ReadAsync<List<RangeColorResource>>(path);
@@ -338,6 +344,7 @@ public class ResourceStoreService(
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "colorPalettes",
+            "limits",
             "evEbitdaLimits.json");
 
         var result = await ReadAsync<List<RangeColorResource>>(path);
@@ -353,6 +360,7 @@ public class ResourceStoreService(
         string path = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "colorPalettes",
+            "limits",
             "netDebtEbitdaLimits.json");
 
         var result = await ReadAsync<List<RangeColorResource>>(path);
@@ -409,6 +417,12 @@ public class ResourceStoreService(
 
     private async Task<T?> ReadAsync<T>(string path)
     {
+        if (!File.Exists(path))
+        {
+            logger.Error(@$"Файл не существует. {path}");
+            return default;
+        }
+
         await using var stream = File.OpenRead(path);
         return await JsonSerializer.DeserializeAsync<T>(stream);
     }

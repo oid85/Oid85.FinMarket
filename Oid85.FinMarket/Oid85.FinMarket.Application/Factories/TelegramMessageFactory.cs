@@ -14,8 +14,6 @@ public class TelegramMessageFactory
 
         foreach (var marketEvent in marketEvents)
             message.AppendLine(
-                $"{marketEvent.Date.ToString(KnownDateTimeFormats.DateISO)} " +
-                $"{marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO)} " +
                 $"{marketEvent.Ticker} " +
                 $"{marketEvent.MarketEventText}");
         
