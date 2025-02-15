@@ -49,8 +49,6 @@ public class AnalyseService(
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
             await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
-            await RsiAnalyseAsync(instruments[i].InstrumentId);
-            await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
             
             double percent = ((i + 1) / (double) instruments.Count) * 100;
 
@@ -70,7 +68,6 @@ public class AnalyseService(
             // Вызов методов анализа
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
-            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
             await RsiAnalyseAsync(instruments[i].InstrumentId);
             await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
             
@@ -114,7 +111,6 @@ public class AnalyseService(
             // Вызов методов анализа
             await SupertrendAnalyseAsync(instruments[i].InstrumentId);
             await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
-            await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
             await RsiAnalyseAsync(instruments[i].InstrumentId);
             await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
 
