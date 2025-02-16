@@ -25,13 +25,13 @@ public class MultiplicatorRepository(
                         x.TickerAp == multiplicator.TickerAp))
                 entities.Add(GetEntity(multiplicator));
             else
-                await UpdateSpreadAsync(multiplicator);
+                await UpdateStaticFieldsAsync(multiplicator);
 
         await context.MultiplicatorEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateSpreadAsync(Multiplicator multiplicator)
+    public async Task UpdateStaticFieldsAsync(Multiplicator multiplicator)
     {
         await using var transaction = await context.Database.BeginTransactionAsync();
         
@@ -57,11 +57,35 @@ public class MultiplicatorRepository(
                         .SetProperty(u => u.NetInterestMargin, multiplicator.NetInterestMargin)
                         .SetProperty(u => u.TotalDebt, multiplicator.TotalDebt)
                         .SetProperty(u => u.NetDebt, multiplicator.NetDebt)
-                        .SetProperty(u => u.MarketCapitalization, multiplicator.MarketCapitalization)
                         .SetProperty(u => u.NetIncome, multiplicator.NetIncome)
                         .SetProperty(u => u.Ebitda, multiplicator.Ebitda)
                         .SetProperty(u => u.Eps, multiplicator.Eps)
-                        .SetProperty(u => u.FreeCashFlow, multiplicator.FreeCashFlow)
+                        .SetProperty(u => u.FreeCashFlow, multiplicator.FreeCashFlow));
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            logger.Error(exception);
+        }
+    }
+
+    public async Task UpdateCalculateFieldsAsync(Multiplicator multiplicator)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.MultiplicatorEntities
+                .Where(x => 
+                    x.TickerAo == multiplicator.TickerAo ||
+                    x.TickerAp == multiplicator.TickerAp)
+                .ExecuteUpdateAsync(
+                    s => s
+                        .SetProperty(u => u.MarketCapitalization, multiplicator.MarketCapitalization)
                         .SetProperty(u => u.EvToEbitda, multiplicator.EvToEbitda)
                         .SetProperty(u => u.TotalDebtToEbitda, multiplicator.TotalDebtToEbitda)
                         .SetProperty(u => u.NetDebtToEbitda, multiplicator.NetDebtToEbitda));
@@ -76,7 +100,7 @@ public class MultiplicatorRepository(
             logger.Error(exception);
         }
     }
-    
+
     public async Task<List<Multiplicator>> GetAllAsync() =>
         (await context.MultiplicatorEntities
             .Where(x => !x.IsDeleted)

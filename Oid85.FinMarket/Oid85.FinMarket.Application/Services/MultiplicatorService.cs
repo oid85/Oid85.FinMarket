@@ -73,9 +73,12 @@ public class MultiplicatorService(
                 multiplicator.NetDebtToEbitda = GetNetDebtToEbitda(multiplicator);
             }
         
+            foreach (var multiplicator in multiplicators) 
+                await multiplicatorRepository.UpdateCalculateFieldsAsync(multiplicator);
+            
             return multiplicators;
         
-            // РАсчет рыночной капитализации
+            // Расчет рыночной капитализации
             async Task<double> GetMarketCapitalization(Multiplicator multiplicator)
             {
                 var shareAo = await shareRepository
