@@ -107,7 +107,7 @@ public class BondsReportService(
             double profitPrc = 0.0;
                 
             if (nextCoupon is not null)
-                profitPrc = (bond.LastPrice / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+                profitPrc = ((bond.LastPrice * 10.0) / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
 
             string color = (await resourceStoreService.GetColorPaletteYieldCouponAsync())
                 .FirstOrDefault(x => 
