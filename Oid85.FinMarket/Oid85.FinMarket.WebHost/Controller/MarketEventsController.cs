@@ -15,17 +15,6 @@ public class MarketEventsController(
     : FinMarketBaseController
 {
     /// <summary>
-    /// Расчет рыночных событий
-    /// </summary>
-    [HttpGet("check-market-events")]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> CheckMarketEventsAsync() =>
-        GetResponseAsync<object, BaseResponse<object>>(
-            jobService.CheckMarketEventsAsync);
-    
-    /// <summary>
     /// Отчет Активные рыночные события
     /// </summary>
     [HttpPost("report/active-market-events-analyse")]

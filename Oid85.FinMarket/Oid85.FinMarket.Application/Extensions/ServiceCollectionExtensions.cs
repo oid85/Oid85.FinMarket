@@ -48,19 +48,9 @@ public static class ServiceCollectionExtensions
         await using var scope = scopeFactory.CreateAsyncScope();
         var jobService = scope.ServiceProvider.GetRequiredService<IJobService>();
         
-        RegisterJob(KnownJobs.LoadInstruments, () => jobService.LoadInstrumentsAsync());
-        RegisterJob(KnownJobs.LoadPrices, () => jobService.LoadLastPricesAsync());
-        RegisterJob(KnownJobs.LoadBondCoupons, () => jobService.LoadBondCouponsAsync());
-        RegisterJob(KnownJobs.LoadDividendInfos, () => jobService.LoadDividendInfosAsync());
-        RegisterJob(KnownJobs.LoadAssetFundamentals, () => jobService.LoadAssetFundamentalsAsync());
-        RegisterJob(KnownJobs.LoadCandles, () => jobService.LoadCandlesAsync());
-        RegisterJob(KnownJobs.LoadForecasts, () => jobService.LoadForecastsAsync());
-        RegisterJob(KnownJobs.Analyse, () => jobService.AnalyseAsync());
-        RegisterJob(KnownJobs.CalculateMultiplicators, () => jobService.CalculateMultiplicatorsAsync());
-        RegisterJob(KnownJobs.CalculateSpreads, () => jobService.CalculateSpreadsAsync());
-        RegisterJob(KnownJobs.CheckMarketEvents, () => jobService.CheckMarketEventsAsync());
-        RegisterJob(KnownJobs.SendNotifications, () => jobService.SendNotificationsAsync());
-        
+        RegisterJob(KnownJobs.Load, () => jobService.LoadAsync());
+        RegisterJob(KnownJobs.Calculate, () => jobService.CalculateAsync());
+
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)
         {
             bool enable = configuration.GetValue<bool>($"Hangfire:{configurationSection}:Enable");

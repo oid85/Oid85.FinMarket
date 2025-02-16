@@ -11,97 +11,107 @@ public class JobService(
     ISendService sendService) 
     : IJobService
 {
-    public async Task<bool> LoadInstrumentsAsync()
+    /// <inheritdoc />
+    public async Task<bool> LoadAsync()
+    {
+        await LoadInstrumentsAsync();
+        await LoadLastPricesAsync();
+        await LoadBondCouponsAsync();
+        await LoadDividendInfosAsync();
+        await LoadAssetFundamentalsAsync();
+        await LoadDailyCandlesAsync();
+        await LoadFiveMinuteCandlesAsync();
+        await LoadForecastsAsync();
+        
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> CalculateAsync()
+    {
+        await AnalyseAsync();
+        await CalculateSpreadsAsync();
+        await CalculateMultiplicatorsAsync();
+        await CheckMarketEventsAsync();
+        await SendNotificationsAsync();
+        
+        return true;
+    }
+    
+    private async Task LoadInstrumentsAsync()
     {
         await loadService.LoadSharesAsync();
         await loadService.LoadBondsAsync();
         await loadService.LoadFuturesAsync();
         await loadService.LoadCurrenciesAsync();
         await loadService.LoadIndexesAsync();
-
-        return true;
     }
 
-    public async Task<bool> LoadLastPricesAsync()
+    private async Task LoadLastPricesAsync()
     {
         await loadService.LoadShareLastPricesAsync();
         await loadService.LoadBondLastPricesAsync();
         await loadService.LoadFutureLastPricesAsync();
         await loadService.LoadCurrencyLastPricesAsync();
         await loadService.LoadIndexLastPricesAsync();
-        
-        return true;
     }
 
-    public async Task<bool> LoadBondCouponsAsync()
+    private async Task LoadBondCouponsAsync()
     {
         await loadService.LoadBondCouponsAsync();
-        
-        return true;
     }
 
-    public async Task<bool> LoadDividendInfosAsync()
+    private async Task LoadDividendInfosAsync()
     {
         await loadService.LoadDividendInfosAsync();
-        
-        return true;
     }
 
-    public async Task<bool> LoadAssetFundamentalsAsync()
+    private async Task LoadAssetFundamentalsAsync()
     {
         await loadService.LoadAssetFundamentalsAsync();
-        
-        return true;
     }
 
-    public async Task<bool> LoadCandlesAsync()
+    private async Task LoadDailyCandlesAsync()
     {
         await loadService.LoadShareDailyCandlesAsync();
         await loadService.LoadBondDailyCandlesAsync();
         await loadService.LoadFutureDailyCandlesAsync();
         await loadService.LoadCurrencyDailyCandlesAsync();
         await loadService.LoadIndexDailyCandlesAsync();
-        
-        await loadService.LoadShareFiveMinuteCandlesAsync();
-        
-        return true;
     }
 
-    public async Task<bool> LoadForecastsAsync()
+    private async Task LoadFiveMinuteCandlesAsync()
+    {
+        await loadService.LoadShareFiveMinuteCandlesAsync();
+    }
+    
+    private async Task LoadForecastsAsync()
     {
         await loadService.LoadForecastsAsync();
-        
-        return true;
     }
 
-    public async Task<bool> AnalyseAsync()
+    private async Task AnalyseAsync()
     {
         await analyseService.AnalyseSharesAsync();
         await analyseService.AnalyseBondsAsync();
         await analyseService.AnalyseFuturesAsync();
         await analyseService.AnalyseCurrenciesAsync();
         await analyseService.AnalyseIndexesAsync();
-        
-        return true;
     }
 
-    public async Task<bool> CalculateSpreadsAsync()
+    private async Task CalculateSpreadsAsync()
     {
         await spreadService.FillingSpreadPairsAsync();
         await spreadService.CalculateSpreadsAsync();
-        
-        return true;
     }
 
-    public async Task<bool> CalculateMultiplicatorsAsync()
+    private async Task CalculateMultiplicatorsAsync()
     {
         await multiplicatorService.FillingMultiplicatorInstrumentsAsync();
         await multiplicatorService.CalculateMultiplicatorsAsync();
-        
-        return true;
     }
 
-    public async Task<bool> CheckMarketEventsAsync()
+    private async Task CheckMarketEventsAsync()
     {
         await marketEventService.CheckSupertrendUpMarketEventAsync();
         await marketEventService.CheckSupertrendDownMarketEventAsync();
@@ -116,14 +126,10 @@ public class JobService(
         await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
         await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
         await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
-        
-        return true;
     }
 
-    public async Task<bool> SendNotificationsAsync()
+    private async Task SendNotificationsAsync()
     {
         await sendService.SendNotificationsAsync();
-        
-        return true;
     }
 }
