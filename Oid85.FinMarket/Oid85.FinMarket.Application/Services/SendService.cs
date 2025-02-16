@@ -2,10 +2,7 @@
 using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.Telegram;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -61,19 +58,6 @@ public class SendService(
             logger.Error(exception);
             return false;
         }
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> MessageHandleAsync(Message message, UpdateType type)
-    {
-        switch (message.Text)
-        {
-            case KnownTelegramCommand.ActiveMarketEvents:
-                await SendActiveMarketEvents();
-                break;
-        }
-        
-        return true;
     }
     
     private async Task SendActiveMarketEvents()

@@ -35,8 +35,6 @@ public class Program
         
         if (applyMigrations) 
             await app.ApplyMigrations();
-
-        await app.TelegramBotSubscribe();
         
         app.UseRouting();
 
