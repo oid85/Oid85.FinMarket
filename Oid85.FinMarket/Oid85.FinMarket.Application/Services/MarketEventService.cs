@@ -32,9 +32,9 @@ public class MarketEventService(
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Supertrend);
             
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.SupertrendUp);
-
-                marketEvent.MarketEventText = "Тренд вверх";
+                    instrumentId, 
+                    KnownMarketEventTypes.SupertrendUp,
+                    "Тренд вверх");
             
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
@@ -51,7 +51,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
     
@@ -67,10 +67,13 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Supertrend);
 
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.SupertrendDown);
-
-                marketEvent.MarketEventText = "Тренд вниз";
+                    instrumentId, 
+                    KnownMarketEventTypes.SupertrendDown, 
+                    "Тренд вниз");
             
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
@@ -87,7 +90,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
     
@@ -102,11 +105,14 @@ public class MarketEventService(
             {
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.CandleVolume);
-
+                
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.CandleVolumeUp);
-
-                marketEvent.MarketEventText = "Рост днев. объемов";
+                    instrumentId, 
+                    KnownMarketEventTypes.CandleVolumeUp, 
+                    "Рост днев. объемов");
             
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
@@ -120,7 +126,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 
@@ -136,11 +142,14 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.CandleSequence);
 
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.CandleSequenceWhite);
-
-                marketEvent.MarketEventText = "3 белых свечи";
-            
+                    instrumentId, 
+                    KnownMarketEventTypes.CandleSequenceWhite, 
+                    "3 белых свечи");
+                
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
             
@@ -153,7 +162,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 
@@ -169,11 +178,14 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.CandleSequence);
 
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.CandleSequenceBlack);
-
-                marketEvent.MarketEventText = "3 черных свечи";
-            
+                    instrumentId, 
+                    KnownMarketEventTypes.CandleSequenceBlack, 
+                    "3 черных свечи");
+                
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
             
@@ -186,7 +198,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 
@@ -202,11 +214,14 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
 
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.RsiOverBoughtInput);
-
-                marketEvent.MarketEventText = "RSI - вход в перекуп.";
-            
+                    instrumentId, 
+                    KnownMarketEventTypes.RsiOverBoughtInput,
+                    "RSI - вход в перекуп.");
+                
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
             
@@ -219,7 +234,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
     
@@ -235,11 +250,14 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
 
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.RsiOverBoughtOutput);
-
-                marketEvent.MarketEventText = "RSI - выход из перекуп.";
-            
+                    instrumentId, 
+                    KnownMarketEventTypes.RsiOverBoughtOutput,
+                    "RSI - выход из перекуп.");
+                
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
             
@@ -252,7 +270,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
     
@@ -268,11 +286,14 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
 
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.RsiOverSoldInput);
-
-                marketEvent.MarketEventText = "RSI - вход в перепрод.";
-            
+                    instrumentId, 
+                    KnownMarketEventTypes.RsiOverSoldInput,
+                    "RSI - вход в перепрод.");
+                
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
             
@@ -285,7 +306,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
     
@@ -301,11 +322,14 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Rsi);
 
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
-                    instrumentId, KnownMarketEventTypes.RsiOverSoldOutput);
+                    instrumentId, 
+                    KnownMarketEventTypes.RsiOverSoldOutput,
+                    "RSI - выход из перепрод.");
 
-                marketEvent.MarketEventText = "RSI - выход из перепрод.";
-            
                 string previous = analyseResults[0].ResultString;
                 string current = analyseResults[1].ResultString;
             
@@ -318,7 +342,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
     
@@ -337,10 +361,10 @@ public class MarketEventService(
                 foreach (var priceLevel in priceLevels)
                 {
                     var marketEvent = await CreateMarketEvent(
-                        instrumentId, KnownMarketEventTypes.CrossPriceLevel);
-                
-                    marketEvent.MarketEventText = $"Достигнут уровнь '{priceLevel}'";
-
+                        instrumentId, 
+                        KnownMarketEventTypes.CrossPriceLevel,
+                        $"Достигнут уровень '{priceLevel.Value}'");
+                    
                     var lastCandle = await candleRepository.GetLastAsync(instrumentId);
                 
                     marketEvent.IsActive =
@@ -356,7 +380,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 
@@ -370,9 +394,9 @@ public class MarketEventService(
             foreach (var spread in spreads)
             {
                 var marketEvent = await CreateMarketEvent(
-                    spread.FirstInstrumentId, KnownMarketEventTypes.SpreadGreaterPercent1);
-            
-                marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 1 %";
+                    spread.FirstInstrumentId, 
+                    KnownMarketEventTypes.SpreadGreaterPercent1,
+                    $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 1 %");
             
                 if (spread is
                     {
@@ -391,7 +415,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 
@@ -405,9 +429,9 @@ public class MarketEventService(
             foreach (var spread in spreads)
             {
                 var marketEvent = await CreateMarketEvent(
-                    spread.FirstInstrumentId, KnownMarketEventTypes.SpreadGreaterPercent2);
-            
-                marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 2 %";
+                    spread.FirstInstrumentId, 
+                    KnownMarketEventTypes.SpreadGreaterPercent2,
+                    $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 2 %");
             
                 if (spread is
                     {
@@ -426,7 +450,7 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 
@@ -440,10 +464,10 @@ public class MarketEventService(
             foreach (var spread in spreads)
             {
                 var marketEvent = await CreateMarketEvent(
-                    spread.FirstInstrumentId, KnownMarketEventTypes.SpreadGreaterPercent3);
-            
-                marketEvent.MarketEventText = $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 3 %";
-            
+                    spread.FirstInstrumentId, 
+                    KnownMarketEventTypes.SpreadGreaterPercent3,
+                    $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 3 %");
+                
                 if (spread is
                     {
                         FirstInstrumentPrice: > 0, 
@@ -461,37 +485,35 @@ public class MarketEventService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 
     private async Task<MarketEvent> CreateMarketEvent(
         Guid instrumentId,
-        string analyseType)
+        string marketEventType,
+        string marketEventText)
     {
         var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
         
-        return new MarketEvent
+        var marketEvent =  new MarketEvent
         {
             InstrumentId = instrumentId,
             Ticker = instrument?.Ticker ?? string.Empty,
             Date = DateOnly.FromDateTime(DateTime.UtcNow),
             Time = TimeOnly.FromDateTime(DateTime.UtcNow),
-            MarketEventType = analyseType
+            MarketEventType = marketEventType,
+            MarketEventText = marketEventText,
+            IsActive = false
         };
+
+        await marketEventRepository.AddIfNotExistsAsync(marketEvent);
+        
+        return marketEvent;
     }
-    
-    private async Task SaveMarketEventAsync(MarketEvent marketEvent)
-    {
-        switch (marketEvent.IsActive)
-        {
-            case true:
-                await marketEventRepository.ActivateAsync(marketEvent);
-                break;
-            
-            case false:
-                await marketEventRepository.DeactivateAsync(marketEvent);
-                break;
-        }
-    }
+
+    private Task SaveMarketEventAsync(MarketEvent marketEvent) =>
+        marketEvent.IsActive
+            ? marketEventRepository.ActivateAsync(marketEvent)
+            : marketEventRepository.DeactivateAsync(marketEvent);
 }

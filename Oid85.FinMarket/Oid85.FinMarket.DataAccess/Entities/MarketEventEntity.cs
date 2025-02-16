@@ -33,13 +33,13 @@ public class MarketEventEntity : AuditableEntity
     /// <summary>
     /// Тип события
     /// </summary>
-    [Column("market_event_type"), MaxLength(20)]
+    [Column("market_event_type"), MaxLength(100)]
     public string MarketEventType { get; set; } = string.Empty;
     
     /// <summary>
     /// Техт
     /// </summary>
-    [Column("market_event_text"), MaxLength(400)]
+    [Column("market_event_text"), MaxLength(1000)]
     public string MarketEventText { get; set; } = string.Empty;
     
     /// <summary>

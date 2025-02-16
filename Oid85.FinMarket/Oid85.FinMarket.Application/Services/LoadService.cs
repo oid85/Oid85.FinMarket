@@ -52,7 +52,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -77,7 +77,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -124,7 +124,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -168,7 +168,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -194,7 +194,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -226,7 +226,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -253,7 +253,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -300,7 +300,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -332,7 +332,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -359,7 +359,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -407,7 +407,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -439,7 +439,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -466,7 +466,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -514,7 +514,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -554,7 +554,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -575,7 +575,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -606,7 +606,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -633,7 +633,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -681,7 +681,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -701,7 +701,7 @@ public class LoadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }

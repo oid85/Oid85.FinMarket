@@ -55,7 +55,7 @@ public class MultiplicatorService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
     
@@ -131,7 +131,7 @@ public class MultiplicatorService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }

@@ -41,7 +41,7 @@ public class SpreadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -92,7 +92,7 @@ public class SpreadService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -211,7 +211,7 @@ public class SpreadService(
         
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }

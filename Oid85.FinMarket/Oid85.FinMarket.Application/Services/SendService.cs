@@ -28,7 +28,7 @@ public class SendService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -47,7 +47,7 @@ public class SendService(
                 return true;
             
             foreach (var marketEvent in marketEvents) 
-                await marketEventRepository.SetSentNotificationAsync(marketEvent.Id);
+                await marketEventRepository.MarkAsSentAsync(marketEvent);
 
             string message = telegramMessageFactory.CreateTelegramMessage(marketEvents);
         
@@ -58,7 +58,7 @@ public class SendService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
             return false;
         }
     }
@@ -80,12 +80,10 @@ public class SendService(
     {
         try
         {
-            var marketEvents = (await marketEventRepository
-                    .GetActivatedAsync())
-                .ToList();
+            var marketEvents = (await marketEventRepository.GetActivatedAsync()).ToList();
 
             foreach (var marketEvent in marketEvents) 
-                await marketEventRepository.SetSentNotificationAsync(marketEvent.Id);
+                await marketEventRepository.MarkAsSentAsync(marketEvent);
 
             string message = telegramMessageFactory.CreateTelegramMessage(marketEvents);
         
@@ -94,7 +92,7 @@ public class SendService(
         
         catch (Exception exception)
         {
-            logger.Trace(exception.Message);
+            logger.Error(exception);
         }
     }
 }

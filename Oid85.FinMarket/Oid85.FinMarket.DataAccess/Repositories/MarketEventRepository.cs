@@ -11,70 +11,28 @@ public class MarketEventRepository(
     FinMarketContext context) 
     : IMarketEventRepository
 {
-    public async Task ActivateAsync(MarketEvent marketEvent)
+    public async Task AddIfNotExistsAsync(MarketEvent marketEvent)
     {
-        if (!await context.MarketEventEntities
-                .AnyAsync(x => 
+        if (await context.MarketEventEntities
+                .AnyAsync(x =>
                     x.InstrumentId == marketEvent.InstrumentId &&
                     x.MarketEventType == marketEvent.MarketEventType &&
-                    x.MarketEventText == marketEvent.MarketEventText &&
-                    x.IsActive))
-            await context.AddAsync(GetEntity(marketEvent));
-
-        else
-        {
-            await using var transaction = await context.Database.BeginTransactionAsync();
+                    x.MarketEventText == marketEvent.MarketEventText)) 
+            return;
         
-            try
-            {
-                await context.MarketEventEntities
-                    .Where(x => 
-                        x.InstrumentId == marketEvent.InstrumentId &&
-                        x.MarketEventType == marketEvent.MarketEventType &&
-                        x.MarketEventText == marketEvent.MarketEventText)
-                    .ExecuteUpdateAsync(
-                        s => s
-                            .SetProperty(u => u.IsActive, true));
-            
-                await context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            
-            catch (Exception exception)
-            {
-                await transaction.RollbackAsync();
-                logger.Error(exception.Message);
-            }
-        }
-        
+        await context.AddAsync(GetEntity(marketEvent));
         await context.SaveChangesAsync();
     }
 
-    public async Task DeactivateAsync(MarketEvent marketEvent)
-    {
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        
-        try
-        {
-            await context.MarketEventEntities
-                .Where(x => 
-                    x.InstrumentId == marketEvent.InstrumentId &&
-                    x.MarketEventType == marketEvent.MarketEventType)
-                .ExecuteUpdateAsync(
-                    s => s
-                        .SetProperty(u => u.IsActive, false));
-            
-            await context.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-            
-        catch (Exception exception)
-        {
-            await transaction.RollbackAsync();
-            logger.Error(exception.Message);
-        }
-    }
+    public Task ActivateAsync(MarketEvent marketEvent) =>
+        SetIsActiveFlagAsync(marketEvent, true);
 
+    public Task DeactivateAsync(MarketEvent marketEvent) =>
+        SetIsActiveFlagAsync(marketEvent, false);
+
+    public Task MarkAsSentAsync(MarketEvent marketEvent) =>
+        SetSentNotificationFlagAsync(marketEvent, true);
+    
     public async Task<List<MarketEvent>> GetActivatedAsync() =>
         (await context.MarketEventEntities
             .Where(x => x.IsActive)
@@ -84,17 +42,17 @@ public class MarketEventRepository(
         .Select(GetModel)
         .ToList();
 
-    public async Task SetSentNotificationAsync(Guid marketEventId)
+    private async Task SetSentNotificationFlagAsync(MarketEvent marketEvent, bool value)
     {
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
         {
             await context.MarketEventEntities
-                .Where(x => x.Id == marketEventId)
+                .Where(x => x.Id == marketEvent.Id)
                 .ExecuteUpdateAsync(
                     s => s.SetProperty(
-                        u => u.SentNotification, true));
+                        u => u.SentNotification, value));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -103,10 +61,36 @@ public class MarketEventRepository(
         catch (Exception exception)
         {
             await transaction.RollbackAsync();
-            logger.Error(exception.Message);
+            logger.Error(exception);
         }
     }
 
+    private async Task SetIsActiveFlagAsync(MarketEvent marketEvent, bool value)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.MarketEventEntities
+                .Where(x => 
+                    x.InstrumentId == marketEvent.InstrumentId &&
+                    x.MarketEventType == marketEvent.MarketEventType &&
+                    x.MarketEventText == marketEvent.MarketEventText)
+                .ExecuteUpdateAsync(
+                    s => s
+                        .SetProperty(u => u.IsActive, value));
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            logger.Error(exception);
+        }
+    }
+    
     private MarketEventEntity GetEntity(MarketEvent model)
     {
         var entity = new MarketEventEntity

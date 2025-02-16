@@ -4,8 +4,9 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 
 public interface IMarketEventRepository
 {
-    Task ActivateAsync(MarketEvent marketEvent);
+    Task AddIfNotExistsAsync(MarketEvent marketEvent);
     Task DeactivateAsync(MarketEvent marketEvent);
+    Task ActivateAsync(MarketEvent marketEvent);
+    Task MarkAsSentAsync(MarketEvent marketEvent);
     Task<List<MarketEvent>> GetActivatedAsync();
-    Task SetSentNotificationAsync(Guid marketEventId);
 }

@@ -56,7 +56,7 @@ public class SpreadRepository(
         catch (Exception exception)
         {
             await transaction.RollbackAsync();
-            logger.Error(exception.Message);
+            logger.Error(exception);
         }
     }
 

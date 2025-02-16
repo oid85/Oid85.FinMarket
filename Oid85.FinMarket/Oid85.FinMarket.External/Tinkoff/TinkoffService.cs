@@ -36,7 +36,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -54,7 +54,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -92,7 +92,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -123,7 +123,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -191,7 +191,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -240,7 +240,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -289,7 +289,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -330,7 +330,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -370,7 +370,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -434,7 +434,7 @@ public class TinkoffService(
             
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -500,7 +500,7 @@ public class TinkoffService(
             
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -598,7 +598,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return [];
         }
     }
@@ -705,7 +705,7 @@ public class TinkoffService(
         
         catch (Exception exception)
         {
-            logger.Error(exception.Message);
+            logger.Error(exception);
             return ([], new());
         }
     }
