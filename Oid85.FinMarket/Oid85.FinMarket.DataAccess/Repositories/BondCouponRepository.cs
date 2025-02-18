@@ -45,6 +45,15 @@ public class BondCouponRepository(
         .Select(GetModel)
         .ToList();
     
+    public async Task<List<BondCoupon>> GetByInstrumentIdsAsync(List<Guid> instrumentIds) =>
+        (await context.BondCouponEntities
+            .Where(x => 
+                instrumentIds.Contains(x.InstrumentId))
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(GetModel)
+        .ToList();
+    
     private BondCouponEntity GetEntity(BondCoupon model)
     {
         var entity = new BondCouponEntity

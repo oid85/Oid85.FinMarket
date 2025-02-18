@@ -53,84 +53,113 @@ public class ReportHelper(
         }
     }
 
-    private async Task<string> GetColorAggregated(int value)
+    public async Task<string> GetColorAggregated(int value)
     {
         var colorPalette = await resourceStoreService
             .GetColorPaletteAggregatedAnalyseAsync();
 
-        var color = colorPalette
+        var resource = colorPalette
             .FirstOrDefault(
-                x => x.Value == value)!
-            .ColorCode;
+                x => x.Value == value);
         
-        return color;
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
     }
 
-    private async Task<string> GetColorYieldLtm(double value)
+    public async Task<string> GetColorYieldLtm(double value)
     {
         var colorPalette = await resourceStoreService
             .GetColorPaletteYieldLtmAsync();
 
-        var color = colorPalette
+        var resource = colorPalette
             .FirstOrDefault(
                 x => 
                     value >= x.LowLevel && 
-                    value <= x.HighLevel)!
-            .ColorCode;
+                    value <= x.HighLevel);
         
-        return color;
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
     }
 
-    private async Task<string> GetColorRsi(string value)
+    public async Task<string> GetColorYieldCoupon(double value)
+    {
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteYieldCouponAsync();
+
+        var resource = colorPalette
+            .FirstOrDefault(
+                x => 
+                    value >= x.LowLevel && 
+                    value <= x.HighLevel);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
+    }
+    
+    public async Task<string> GetColorRsi(string value)
     {
         var colorPalette = await resourceStoreService
             .GetColorPaletteRsiInterpretationAsync();
 
-        var color = colorPalette
+        var resource = colorPalette
             .FirstOrDefault(
-                x => x.Value == value)!
-            .ColorCode;
+                x => x.Value == value);
         
-        return color;
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
     }
 
-    private async Task<string> GetColorCandleVolume(string value)
+    public async Task<string> GetColorCandleVolume(string value)
     {
         var colorPalette = await resourceStoreService
             .GetColorPaletteVolumeDirectionAsync();
 
-        var color = colorPalette
+        var resource = colorPalette
             .FirstOrDefault(
-                x => x.Value == value)!
-            .ColorCode;
+                x => x.Value == value);
         
-        return color;
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
     }
 
-    private async Task<string> GetColorCandleSequence(string value)
+    public async Task<string> GetColorCandleSequence(string value)
     {
         var colorPalette = await resourceStoreService
             .GetColorPaletteCandleSequenceAsync();
 
-        var color = colorPalette
+        var resource = colorPalette
             .FirstOrDefault(
-                x => x.Value == value)!
-            .ColorCode;
+                x => x.Value == value);
         
-        return color;
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
     }
 
-    private async Task<string> GetColorSupertrend(string value)
+    public async Task<string> GetColorSupertrend(string value)
     {
         var colorPalette = await resourceStoreService
             .GetColorPaletteTrendDirectionAsync();
 
-        var color = colorPalette
+        var resource = colorPalette
             .FirstOrDefault(
-                x => x.Value == value)!
-            .ColorCode;
+                x => x.Value == value);
         
-        return color;
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
     }
     
     public async Task<string> GetColorEvToEbitda(double value)

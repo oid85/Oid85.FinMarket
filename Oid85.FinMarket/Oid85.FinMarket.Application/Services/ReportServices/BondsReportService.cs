@@ -72,15 +72,22 @@ public class BondsReportService(
             
         int outputWindowInDays = configuration
             .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
-        
-        var bondCoupons = await bondCouponRepository
-            .GetAsync(
-                DateOnly.FromDateTime(DateTime.Today), 
-                DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays));
+
+        var instrumentIds = bonds
+            .Select(x => x.InstrumentId)
+            .ToList();
+
+        var startDate = DateOnly.FromDateTime(DateTime.Today);
+        var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays);
+
+        var bondCoupons = (await bondCouponRepository
+            .GetByInstrumentIdsAsync(instrumentIds))
+            .Where(x =>
+                x.CouponDate >= startDate &&
+                x.CouponDate <= endDate)
+            .ToList();
             
-        var dates = reportHelper.GetDates(
-            DateOnly.FromDateTime(DateTime.Today), 
-            DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays));
+        var dates = reportHelper.GetDates(startDate, endDate);
             
         reportData.Header.AddRange(dates);
             
@@ -109,11 +116,7 @@ public class BondsReportService(
             if (nextCoupon is not null)
                 profitPrc = ((bond.LastPrice * 10.0) / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
 
-            string color = (await resourceStoreService.GetColorPaletteYieldCouponAsync())
-                .FirstOrDefault(x => 
-                    profitPrc >= x.LowLevel && 
-                    profitPrc >= x.HighLevel)!
-                .ColorCode;
+            string color = await reportHelper.GetColorYieldCoupon(profitPrc);
             
             data.Add(new ReportParameter(
                 KnownDisplayTypes.Percent, 
@@ -124,7 +127,7 @@ public class BondsReportService(
             {
                 var bondCoupon = bondCoupons
                     .FirstOrDefault(x => 
-                        x.Ticker == bond.Ticker &&
+                        x.InstrumentId == bond.InstrumentId &&
                         x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                 data.Add(bondCoupon is not null 
@@ -162,36 +165,27 @@ public class BondsReportService(
             
         int outputWindowInDays = configuration
             .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
-        
-        var bondCoupons = await bondCouponRepository
-            .GetAsync(
-                DateOnly.FromDateTime(DateTime.Today), 
-                DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays));
+
+        var instrumentIds = bonds
+            .Select(x => x.InstrumentId)
+            .ToList();
+
+        var startDate = DateOnly.FromDateTime(DateTime.Today);
+        var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays);
+
+        var bondCoupons = (await bondCouponRepository
+            .GetByInstrumentIdsAsync(instrumentIds))
+            .Where(x =>
+                x.CouponDate >= startDate &&
+                x.CouponDate <= endDate)
+            .ToList();
             
-        var dates = reportHelper.GetDates(
-            DateOnly.FromDateTime(DateTime.Today), 
-            DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays));
+        var dates = reportHelper.GetDates(startDate, endDate);
             
         reportData.Header.AddRange(dates);
-
-        var filter = await resourceStoreService.GetFilterBondsResourceAsync();
-        
+            
         foreach (var bond in bonds)
         {
-            // Вычисляем полную доходность облигации
-            var nextCoupon = bondCoupons
-                .FirstOrDefault(x => x.Ticker == bond.Ticker);
-                
-            double profitPrc = 0.0;
-                
-            if (nextCoupon is not null)
-                profitPrc = (bond.LastPrice / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
-            
-            // Добавляем облигации с подходящей доходностью
-            if (profitPrc < filter!.Yield.Min || 
-                profitPrc > filter.Yield.Max)
-                continue;
-            
             List<ReportParameter> data =
             [
                 new (KnownDisplayTypes.Ticker, 
@@ -205,12 +199,17 @@ public class BondsReportService(
                 new (KnownDisplayTypes.Number, 
                     (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString())
             ];
-            
-            string color = (await resourceStoreService.GetColorPaletteYieldCouponAsync())
-                .FirstOrDefault(x => 
-                    profitPrc >= x.LowLevel && 
-                    profitPrc >= x.HighLevel)!
-                .ColorCode;
+                
+            // Вычисляем полную доходность облигации
+            var nextCoupon = bondCoupons
+                .FirstOrDefault(x => x.Ticker == bond.Ticker);
+                
+            double profitPrc = 0.0;
+                
+            if (nextCoupon is not null)
+                profitPrc = ((bond.LastPrice * 10.0) / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+
+            string color = await reportHelper.GetColorYieldCoupon(profitPrc);
             
             data.Add(new ReportParameter(
                 KnownDisplayTypes.Percent, 
@@ -221,7 +220,7 @@ public class BondsReportService(
             {
                 var bondCoupon = bondCoupons
                     .FirstOrDefault(x => 
-                        x.Ticker == bond.Ticker &&
+                        x.InstrumentId == bond.InstrumentId &&
                         x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                 data.Add(bondCoupon is not null 
