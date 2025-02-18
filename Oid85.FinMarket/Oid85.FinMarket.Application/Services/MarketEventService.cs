@@ -512,8 +512,15 @@ public class MarketEventService(
         return marketEvent;
     }
 
-    private Task SaveMarketEventAsync(MarketEvent marketEvent) =>
-        marketEvent.IsActive
-            ? marketEventRepository.ActivateAsync(marketEvent)
-            : marketEventRepository.DeactivateAsync(marketEvent);
+    private async Task SaveMarketEventAsync(MarketEvent marketEvent)
+    {
+        if (marketEvent.IsActive)
+            await marketEventRepository.ActivateAsync(marketEvent);
+
+        else
+        {
+            await marketEventRepository.DeactivateAsync(marketEvent);
+            await marketEventRepository.MarkAsNoSentAsync(marketEvent);
+        }
+    }
 }

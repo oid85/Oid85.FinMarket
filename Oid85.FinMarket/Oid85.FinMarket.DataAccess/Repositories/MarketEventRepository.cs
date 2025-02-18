@@ -33,6 +33,9 @@ public class MarketEventRepository(
     public Task MarkAsSentAsync(MarketEvent marketEvent) =>
         SetSentNotificationFlagAsync(marketEvent, true);
     
+    public Task MarkAsNoSentAsync(MarketEvent marketEvent) =>
+        SetSentNotificationFlagAsync(marketEvent, false);
+    
     public async Task<List<MarketEvent>> GetActivatedAsync() =>
         (await context.MarketEventEntities
             .Where(x => x.IsActive)

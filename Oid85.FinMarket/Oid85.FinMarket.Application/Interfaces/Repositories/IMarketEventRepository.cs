@@ -8,5 +8,6 @@ public interface IMarketEventRepository
     Task DeactivateAsync(MarketEvent marketEvent);
     Task ActivateAsync(MarketEvent marketEvent);
     Task MarkAsSentAsync(MarketEvent marketEvent);
+    Task MarkAsNoSentAsync(MarketEvent marketEvent);
     Task<List<MarketEvent>> GetActivatedAsync();
 }
