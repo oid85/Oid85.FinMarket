@@ -92,11 +92,7 @@ public class SharesReportService(
             
         foreach (var dividendInfo in dividendInfos)
         {
-            string color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
-                .FirstOrDefault(x => 
-                    dividendInfo.DividendPrc >= x.LowLevel &&
-                    dividendInfo.DividendPrc >= x.HighLevel)!
-                .ColorCode;
+            string color = await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc);
             
             reportData.Data.Add(
             [

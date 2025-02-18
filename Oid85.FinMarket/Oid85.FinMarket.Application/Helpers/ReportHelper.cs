@@ -102,6 +102,23 @@ public class ReportHelper(
         return resource.ColorCode;
     }
     
+    public async Task<string> GetColorYieldDividend(double value)
+    {
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteYieldDividendAsync();
+
+        var resource = colorPalette
+            .FirstOrDefault(
+                x => 
+                    value >= x.LowLevel && 
+                    value <= x.HighLevel);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
+    }
+    
     public async Task<string> GetColorRsi(string value)
     {
         var colorPalette = await resourceStoreService
