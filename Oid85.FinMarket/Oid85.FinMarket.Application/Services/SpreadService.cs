@@ -54,9 +54,6 @@ public class SpreadService(
 
             foreach (var spread in spreads)
             {
-                spread.FirstInstrumentPrice = await GetInstrumentPriceAsync(spread.FirstInstrumentId);
-                spread.SecondInstrumentPrice = await GetInstrumentPriceAsync(spread.SecondInstrumentId);
-
                 if (spread is not
                     {
                         FirstInstrumentPrice: > 0.0,
@@ -225,24 +222,4 @@ public class SpreadService(
             "USD/RUB" => KnownInstrumentIds.UsdRub,
             _ => Guid.Empty
         };
-
-    private async ValueTask<double> GetInstrumentPriceAsync(Guid instrumentId)
-    {
-        var share = await shareRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (share is not null)
-            return share.LastPrice;
-        
-        var future = await futureRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (future is not null)
-            return future.LastPrice;
-        
-        var currency = await currencyRepository.GetByInstrumentIdAsync(instrumentId);
-
-        if (currency is not null)
-            return currency.LastPrice;
-
-        return 0.0;
-    }
 }

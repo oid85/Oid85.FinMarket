@@ -60,6 +60,37 @@ public class SpreadRepository(
         }
     }
 
+    public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.SpreadEntities
+                .Where(x => 
+                    x.FirstInstrumentId == instrumentId)
+                .ExecuteUpdateAsync(
+                    s => s
+                        .SetProperty(u => u.FirstInstrumentPrice, lastPrice));
+            
+            await context.SpreadEntities
+                .Where(x => 
+                    x.SecondInstrumentId == instrumentId)
+                .ExecuteUpdateAsync(
+                    s => s
+                        .SetProperty(u => u.SecondInstrumentPrice, lastPrice));            
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            logger.Error(exception);
+        }
+    }
+
     public Task SetAsDeletedAsync(Spread spread) =>
         context.SpreadEntities
             .Where(x => 

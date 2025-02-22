@@ -82,6 +82,21 @@ public class FuturesController(
             });
     
     /// <summary>
+    /// Загрузить последние цены фьючерсов
+    /// </summary>
+    [HttpGet("load-spread-last-prices")]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadSpreadLastPricesAsync() =>
+        GetResponseAsync(
+            loadService.LoadSpreadLastPricesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });    
+    
+    /// <summary>
     /// Расчитать спреды
     /// </summary>
     [HttpGet("spreads")]

@@ -8,7 +8,6 @@ namespace Oid85.FinMarket.External.ResourceStore;
 
 /// <inheritdoc />
 public class ResourceStoreService(
-    ILogger logger,
     IConfiguration configuration) 
     : IResourceStoreService
 {

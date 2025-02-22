@@ -54,6 +54,7 @@ public class JobService(
         await loadService.LoadFutureLastPricesAsync();
         await loadService.LoadCurrencyLastPricesAsync();
         await loadService.LoadIndexLastPricesAsync();
+        await loadService.LoadSpreadLastPricesAsync();
     }
 
     private async Task LoadBondCouponsAsync()

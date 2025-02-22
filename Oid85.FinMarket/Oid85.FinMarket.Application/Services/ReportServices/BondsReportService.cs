@@ -17,8 +17,7 @@ public class BondsReportService(
     IAnalyseResultRepository analyseResultRepository,
     IBondCouponRepository bondCouponRepository,
     ReportHelper reportHelper,
-    IInstrumentService instrumentService,
-    IResourceStoreService resourceStoreService) 
+    IInstrumentService instrumentService) 
     : IBondsReportService
 {
     /// <inheritdoc />

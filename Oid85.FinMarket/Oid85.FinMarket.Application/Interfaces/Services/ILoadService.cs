@@ -15,6 +15,8 @@ public interface ILoadService
     Task<bool> LoadFutureLastPricesAsync();
     Task<bool> LoadFutureDailyCandlesAsync();
     
+    Task<bool> LoadSpreadLastPricesAsync();
+    
     Task<bool> LoadBondsAsync();
     Task<bool> LoadBondCouponsAsync();
     Task<bool> LoadBondLastPricesAsync();
