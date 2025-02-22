@@ -43,12 +43,12 @@ public class ForecastTargetRepository(
                     x.RecommendationDate == forecastTarget.RecommendationDate)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.RecommendationString, forecastTarget.RecommendationString)
-                        .SetProperty(u => u.RecommendationNumber, forecastTarget.RecommendationNumber)
-                        .SetProperty(u => u.CurrentPrice, forecastTarget.CurrentPrice)
-                        .SetProperty(u => u.TargetPrice, forecastTarget.TargetPrice)
-                        .SetProperty(u => u.PriceChange, forecastTarget.PriceChange)
-                        .SetProperty(u => u.PriceChangeRel, forecastTarget.PriceChangeRel));
+                        .SetProperty(entity => entity.RecommendationString, forecastTarget.RecommendationString)
+                        .SetProperty(entity => entity.RecommendationNumber, forecastTarget.RecommendationNumber)
+                        .SetProperty(entity => entity.CurrentPrice, forecastTarget.CurrentPrice)
+                        .SetProperty(entity => entity.TargetPrice, forecastTarget.TargetPrice)
+                        .SetProperty(entity => entity.PriceChange, forecastTarget.PriceChange)
+                        .SetProperty(entity => entity.PriceChangeRel, forecastTarget.PriceChangeRel));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();

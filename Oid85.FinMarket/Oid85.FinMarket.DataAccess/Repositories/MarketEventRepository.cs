@@ -55,7 +55,7 @@ public class MarketEventRepository(
                 .Where(x => x.Id == marketEvent.Id)
                 .ExecuteUpdateAsync(
                     s => s.SetProperty(
-                        u => u.SentNotification, value));
+                        entity => entity.SentNotification, value));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -81,7 +81,7 @@ public class MarketEventRepository(
                     x.MarketEventText == marketEvent.MarketEventText)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.IsActive, value));
+                        .SetProperty(entity => entity.IsActive, value));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();

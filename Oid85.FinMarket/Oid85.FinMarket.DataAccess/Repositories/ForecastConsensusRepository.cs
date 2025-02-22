@@ -39,14 +39,14 @@ public class ForecastConsensusRepository(
                     x.InstrumentId == forecastConsensus.InstrumentId)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.RecommendationString, forecastConsensus.RecommendationString)
-                        .SetProperty(u => u.RecommendationNumber, forecastConsensus.RecommendationNumber)
-                        .SetProperty(u => u.CurrentPrice, forecastConsensus.CurrentPrice)
-                        .SetProperty(u => u.ConsensusPrice, forecastConsensus.ConsensusPrice)
-                        .SetProperty(u => u.MinTarget, forecastConsensus.MinTarget)
-                        .SetProperty(u => u.MaxTarget, forecastConsensus.MaxTarget)
-                        .SetProperty(u => u.PriceChange, forecastConsensus.PriceChange)
-                        .SetProperty(u => u.PriceChangeRel, forecastConsensus.PriceChangeRel));
+                        .SetProperty(entity => entity.RecommendationString, forecastConsensus.RecommendationString)
+                        .SetProperty(entity => entity.RecommendationNumber, forecastConsensus.RecommendationNumber)
+                        .SetProperty(entity => entity.CurrentPrice, forecastConsensus.CurrentPrice)
+                        .SetProperty(entity => entity.ConsensusPrice, forecastConsensus.ConsensusPrice)
+                        .SetProperty(entity => entity.MinTarget, forecastConsensus.MinTarget)
+                        .SetProperty(entity => entity.MaxTarget, forecastConsensus.MaxTarget)
+                        .SetProperty(entity => entity.PriceChange, forecastConsensus.PriceChange)
+                        .SetProperty(entity => entity.PriceChangeRel, forecastConsensus.PriceChangeRel));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();

@@ -18,5 +18,7 @@ public class TelegramService(
             configuration.GetValue<string>(KnownSettingsKeys.TelegramChatId)!);
         
         await botClient.SendMessage(chatId, message);
+
+        await Task.Delay(TimeSpan.FromSeconds(3));
     }
 }

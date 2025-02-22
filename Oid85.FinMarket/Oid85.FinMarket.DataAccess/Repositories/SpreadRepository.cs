@@ -41,13 +41,13 @@ public class SpreadRepository(
                     x.SecondInstrumentId == spread.SecondInstrumentId)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.DateTime, spread.DateTime)
-                        .SetProperty(u => u.FirstInstrumentPrice, spread.FirstInstrumentPrice)
-                        .SetProperty(u => u.SecondInstrumentPrice, spread.SecondInstrumentPrice)
-                        .SetProperty(u => u.PriceDifference, spread.PriceDifference)
-                        .SetProperty(u => u.PriceDifferencePrc, spread.PriceDifferencePrc)
-                        .SetProperty(u => u.Funding, spread.Funding)
-                        .SetProperty(u => u.SpreadPricePosition, spread.SpreadPricePosition));
+                        .SetProperty(entity => entity.DateTime, spread.DateTime)
+                        .SetProperty(entity => entity.FirstInstrumentPrice, spread.FirstInstrumentPrice)
+                        .SetProperty(entity => entity.SecondInstrumentPrice, spread.SecondInstrumentPrice)
+                        .SetProperty(entity => entity.PriceDifference, spread.PriceDifference)
+                        .SetProperty(entity => entity.PriceDifferencePrc, spread.PriceDifferencePrc)
+                        .SetProperty(entity => entity.Funding, spread.Funding)
+                        .SetProperty(entity => entity.SpreadPricePosition, spread.SpreadPricePosition));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -71,14 +71,14 @@ public class SpreadRepository(
                     x.FirstInstrumentId == instrumentId)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.FirstInstrumentPrice, lastPrice));
+                        .SetProperty(entity => entity.FirstInstrumentPrice, lastPrice));
             
             await context.SpreadEntities
                 .Where(x => 
                     x.SecondInstrumentId == instrumentId)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.SecondInstrumentPrice, lastPrice));            
+                        .SetProperty(entity => entity.SecondInstrumentPrice, lastPrice));            
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -98,8 +98,8 @@ public class SpreadRepository(
                 x.SecondInstrumentId == spread.SecondInstrumentId)
             .ExecuteUpdateAsync(
                 s => s
-                    .SetProperty(u => u.IsDeleted, true)
-                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow));
+                    .SetProperty(entity => entity.IsDeleted, true)
+                    .SetProperty(entity => entity.DeletedAt, DateTime.UtcNow));
 
     public async Task<List<Spread>> GetAllAsync() =>
         (await context.SpreadEntities

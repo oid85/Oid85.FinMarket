@@ -43,24 +43,24 @@ public class MultiplicatorRepository(
                     x.TickerAp == multiplicator.TickerAp)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.TotalSharesAo, multiplicator.TotalSharesAo)
-                        .SetProperty(u => u.TotalSharesAp, multiplicator.TotalSharesAp)
-                        .SetProperty(u => u.Beta, multiplicator.Beta)
-                        .SetProperty(u => u.Revenue, multiplicator.Revenue)
-                        .SetProperty(u => u.OperatingIncome, multiplicator.OperatingIncome)
-                        .SetProperty(u => u.Pe, multiplicator.Pe)
-                        .SetProperty(u => u.Pb, multiplicator.Pb)
-                        .SetProperty(u => u.Pbv, multiplicator.Pbv)
-                        .SetProperty(u => u.Ev, multiplicator.Ev)
-                        .SetProperty(u => u.Roe, multiplicator.Roe)
-                        .SetProperty(u => u.Roa, multiplicator.Roa)
-                        .SetProperty(u => u.NetInterestMargin, multiplicator.NetInterestMargin)
-                        .SetProperty(u => u.TotalDebt, multiplicator.TotalDebt)
-                        .SetProperty(u => u.NetDebt, multiplicator.NetDebt)
-                        .SetProperty(u => u.NetIncome, multiplicator.NetIncome)
-                        .SetProperty(u => u.Ebitda, multiplicator.Ebitda)
-                        .SetProperty(u => u.Eps, multiplicator.Eps)
-                        .SetProperty(u => u.FreeCashFlow, multiplicator.FreeCashFlow));
+                        .SetProperty(entity => entity.TotalSharesAo, multiplicator.TotalSharesAo)
+                        .SetProperty(entity => entity.TotalSharesAp, multiplicator.TotalSharesAp)
+                        .SetProperty(entity => entity.Beta, multiplicator.Beta)
+                        .SetProperty(entity => entity.Revenue, multiplicator.Revenue)
+                        .SetProperty(entity => entity.OperatingIncome, multiplicator.OperatingIncome)
+                        .SetProperty(entity => entity.Pe, multiplicator.Pe)
+                        .SetProperty(entity => entity.Pb, multiplicator.Pb)
+                        .SetProperty(entity => entity.Pbv, multiplicator.Pbv)
+                        .SetProperty(entity => entity.Ev, multiplicator.Ev)
+                        .SetProperty(entity => entity.Roe, multiplicator.Roe)
+                        .SetProperty(entity => entity.Roa, multiplicator.Roa)
+                        .SetProperty(entity => entity.NetInterestMargin, multiplicator.NetInterestMargin)
+                        .SetProperty(entity => entity.TotalDebt, multiplicator.TotalDebt)
+                        .SetProperty(entity => entity.NetDebt, multiplicator.NetDebt)
+                        .SetProperty(entity => entity.NetIncome, multiplicator.NetIncome)
+                        .SetProperty(entity => entity.Ebitda, multiplicator.Ebitda)
+                        .SetProperty(entity => entity.Eps, multiplicator.Eps)
+                        .SetProperty(entity => entity.FreeCashFlow, multiplicator.FreeCashFlow));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -85,10 +85,10 @@ public class MultiplicatorRepository(
                     x.TickerAp == multiplicator.TickerAp)
                 .ExecuteUpdateAsync(
                     s => s
-                        .SetProperty(u => u.MarketCapitalization, multiplicator.MarketCapitalization)
-                        .SetProperty(u => u.EvToEbitda, multiplicator.EvToEbitda)
-                        .SetProperty(u => u.TotalDebtToEbitda, multiplicator.TotalDebtToEbitda)
-                        .SetProperty(u => u.NetDebtToEbitda, multiplicator.NetDebtToEbitda));
+                        .SetProperty(entity => entity.MarketCapitalization, multiplicator.MarketCapitalization)
+                        .SetProperty(entity => entity.EvToEbitda, multiplicator.EvToEbitda)
+                        .SetProperty(entity => entity.TotalDebtToEbitda, multiplicator.TotalDebtToEbitda)
+                        .SetProperty(entity => entity.NetDebtToEbitda, multiplicator.NetDebtToEbitda));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();

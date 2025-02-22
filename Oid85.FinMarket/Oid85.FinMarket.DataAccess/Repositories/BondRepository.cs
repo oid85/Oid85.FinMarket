@@ -36,7 +36,7 @@ public class BondRepository(
                 .Where(x => x.InstrumentId == instrumentId)
                 .ExecuteUpdateAsync(
                     s => s.SetProperty(
-                        u => u.LastPrice, lastPrice));
+                        entity => entity.LastPrice, lastPrice));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();

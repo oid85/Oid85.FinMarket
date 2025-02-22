@@ -2,6 +2,7 @@
 using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Telegram;
 
 namespace Oid85.FinMarket.Application.Services;
@@ -42,14 +43,23 @@ public class SendService(
 
             if (marketEvents is [])
                 return true;
-            
-            foreach (var marketEvent in marketEvents) 
-                await marketEventRepository.MarkAsSentAsync(marketEvent);
 
-            string message = telegramMessageFactory.CreateTelegramMessage(marketEvents);
-        
-            await telegramService.SendMessageAsync(message);
-        
+            var marketEventsForSend = new List<MarketEvent>();
+            
+            foreach (var marketEvent in marketEvents)
+            {
+                marketEventsForSend.Add(marketEvent);
+                await marketEventRepository.MarkAsSentAsync(marketEvent);
+                
+                // Отправляем по 5 событий за раз
+                if (marketEventsForSend.Count >= 5)
+                {
+                    string message = telegramMessageFactory.CreateTelegramMessage(marketEventsForSend);
+                    await telegramService.SendMessageAsync(message);
+                    marketEventsForSend.Clear();
+                }
+            }
+            
             return true;
         }
         
