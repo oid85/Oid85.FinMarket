@@ -160,6 +160,14 @@ public class ResourceStoreService(
                 "limits",
                 "yieldLtmLimits.json")) ?? [];
 
+    /// <inheritdoc />
+    public async Task<List<RangeColorResource>> GetColorPaletteDrawdownFromMaximumAsync() =>
+        await ReadAsync<List<RangeColorResource>>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "colorPalettes",
+                "limits",
+                "drawdownFromMaximumLimits.json")) ?? [];
+
     public async Task<List<RangeColorResource>> GetColorPalettePeAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,

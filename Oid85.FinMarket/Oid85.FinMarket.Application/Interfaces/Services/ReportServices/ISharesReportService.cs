@@ -45,6 +45,12 @@ public interface ISharesReportService
         GetAnalyseRequest request);
     
     /// <summary>
+    /// Отчет Максимальная просадка от максимума
+    /// </summary>
+    Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(
+        GetAnalyseRequest request);    
+    
+    /// <summary>
     /// Отчет Дивиденды
     /// </summary>
     Task<ReportData> GetDividendAnalyseAsync();

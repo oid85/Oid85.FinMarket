@@ -37,4 +37,10 @@ public interface IIndexesReportService
     /// </summary>
     Task<ReportData> GetYieldLtmAnalyseAsync(
         GetAnalyseRequest request);
+    
+    /// <summary>
+    /// Отчет Максимальная просадка от максимума
+    /// </summary>
+    Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(
+        GetAnalyseRequest request);  
 }

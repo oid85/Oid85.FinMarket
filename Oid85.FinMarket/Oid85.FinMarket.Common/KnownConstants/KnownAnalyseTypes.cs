@@ -7,5 +7,6 @@ public static class KnownAnalyseTypes
     public const string CandleVolume = "CandleVolume";
     public const string Rsi = "Rsi";
     public const string YieldLtm = "YieldLtm";
+    public const string DrawdownFromMaximum = "DrawdownFromMaximum";
     public const string Aggregated = "Aggregated";
 }
