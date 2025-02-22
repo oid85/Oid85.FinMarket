@@ -37,6 +37,7 @@ public class AnalyseService(
                 await CandleVolumeAnalyseAsync(instruments[i].InstrumentId);
                 await RsiAnalyseAsync(instruments[i].InstrumentId);
                 await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+                await DrawdownFromMaximumAnalyseAsync(instruments[i].InstrumentId);
 
                 double percent = ((i + 1) / (double) instruments.Count) * 100;
 
@@ -108,6 +109,7 @@ public class AnalyseService(
                 await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
                 await RsiAnalyseAsync(instruments[i].InstrumentId);
                 await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+                await DrawdownFromMaximumAnalyseAsync(instruments[i].InstrumentId);
             
                 double percent = ((i + 1) / (double) instruments.Count) * 100;
 
@@ -181,6 +183,7 @@ public class AnalyseService(
                 await CandleSequenceAnalyseAsync(instruments[i].InstrumentId);
                 await RsiAnalyseAsync(instruments[i].InstrumentId);
                 await YieldLtmAnalyseAsync(instruments[i].InstrumentId);
+                await DrawdownFromMaximumAnalyseAsync(instruments[i].InstrumentId);
 
                 double percent = ((i + 1) / (double) instruments.Count) * 100;
 
@@ -565,6 +568,70 @@ public class AnalyseService(
             double yieldPrc = yield * 100.0;
             
             return (yieldPrc.ToString("N2"), yieldPrc);
+        }
+    }
+    
+        private async Task DrawdownFromMaximumAnalyseAsync(Guid instrumentId)
+    {
+        try
+        {
+            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
+                .Where(x => x.IsComplete)
+                .ToList();
+
+            if (candles is [])
+            {
+                logger.Warn($"По инструменту '{instrumentId}' нет ни одной свечи");
+                return;
+            }
+            
+            var results = new List<AnalyseResult>();
+            
+            foreach (var candle in candles)
+            {
+                var yearAgoCandleDate = candle.Date.AddYears(-1);
+                var currentCandleDate = candle.Date;
+                
+                var candlesForAnalyse = candles
+                    .Where(x => 
+                        x.Date >= yearAgoCandleDate && 
+                        x.Date <= currentCandleDate)
+                    .OrderBy(x => x.Date)
+                    .ToList();
+                
+                var (resultString, resultNumber) = GetResult(candlesForAnalyse);
+                
+                results.Add(new AnalyseResult
+                {
+                    Date = currentCandleDate,
+                    InstrumentId = instrumentId,
+                    ResultString = resultString,
+                    ResultNumber = resultNumber,
+                    AnalyseType = KnownAnalyseTypes.DrawdownFromMaximum
+                });
+            }
+
+            await analyseResultRepository.AddAsync(results);
+            
+            logger.Trace($"Анализ 'DrawdownFromMaximum' выполнен. InstrumentId = '{instrumentId}'");
+        }
+
+        catch (Exception exception)
+        {
+            logger.Error($"Не удалось прочитать данные из БД finmarket. {exception}");
+        }
+
+        return;
+
+        (string, double) GetResult(List<Candle> candles)
+        {
+            double maxPrice = candles.Max(x => x.High);
+            double lastPrice = candles.Last().Close;
+            double difference = maxPrice - lastPrice;
+            double drawdown = difference / maxPrice;
+            double drawdownPrc = drawdown * 100.0;
+            
+            return (drawdownPrc.ToString("N2"), drawdownPrc);
         }
     }
 }
