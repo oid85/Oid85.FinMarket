@@ -289,7 +289,7 @@ public class AnalyseService(
             {
                 var result = new AnalyseResult();
 
-                if (i < 2)
+                if (i < 3)
                 {
                     result.Date = candles[i].Date;
                     result.InstrumentId = instrumentId;
@@ -302,6 +302,7 @@ public class AnalyseService(
                 {
                     var candlesForAnalyse = new List<Candle>()
                     {
+                        candles[i - 2],
                         candles[i - 1],
                         candles[i]
                     };
