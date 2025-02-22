@@ -466,7 +466,7 @@ public class MarketEventService(
                 var marketEvent = await CreateMarketEvent(
                     spread.FirstInstrumentId, 
                     KnownMarketEventTypes.SpreadGreaterPercent3,
-                    $"Спред '{spread.FirstInstrumentTicker}/{spread.SecondInstrumentTicker}' превышает 3 %");
+                    $"Спред '{spread.FirstInstrumentTicker}' / '{spread.SecondInstrumentTicker}' превышает 3 %");
                 
                 if (spread is
                     {
