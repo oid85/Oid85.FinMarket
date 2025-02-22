@@ -201,7 +201,7 @@ public class AnalyseService(
     {
         try
         {
-            var candles = (await candleRepository.GetAsync(instrumentId))
+            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -273,7 +273,7 @@ public class AnalyseService(
     {
         try
         {
-            var candles = (await candleRepository.GetAsync(instrumentId))
+            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -349,7 +349,7 @@ public class AnalyseService(
     {
         try
         {
-            var candles = (await candleRepository.GetAsync(instrumentId))
+            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -433,7 +433,7 @@ public class AnalyseService(
     {
         try
         {
-            var candles = (await candleRepository.GetAsync(instrumentId))
+            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -508,7 +508,7 @@ public class AnalyseService(
     {
         try
         {
-            var candles = (await candleRepository.GetAsync(instrumentId))
+            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 

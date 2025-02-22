@@ -11,9 +11,7 @@ public class SpreadService(
     ILogger logger,
     IInstrumentRepository instrumentRepository,
     ISpreadRepository spreadRepository,
-    IShareRepository shareRepository,
     IFutureRepository futureRepository,
-    ICurrencyRepository currencyRepository,
     IResourceStoreService resourceStoreService) 
     : ISpreadService
 {

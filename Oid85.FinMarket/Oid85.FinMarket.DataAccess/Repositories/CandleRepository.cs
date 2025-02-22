@@ -111,7 +111,7 @@ public class CandleRepository(
             .AsNoTracking()
             .ToListAsync();
 
-        if (entities.Count < 2)
+        if (entities.Count == 0)
             return [];
         
         var models = entities
