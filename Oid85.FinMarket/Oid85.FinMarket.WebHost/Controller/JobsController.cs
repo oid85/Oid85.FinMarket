@@ -12,30 +12,15 @@ public class JobsController(
     : FinMarketBaseController
 {
     /// <summary>
-    /// Загрузка данных
+    /// Загрузка данных и расчет
     /// </summary>
-    [HttpGet("run/load")]
+    [HttpGet("run/load-and-calculate")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> LoadInstrumentsAsync() =>
         GetResponseAsync(
-            jobService.LoadAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Расчеты
-    /// </summary>
-    [HttpGet("run/calculate")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadLastPricesAsync() =>
-        GetResponseAsync(
-            jobService.CalculateAsync,
+            jobService.LoadAndCalculate,
             result => new BaseResponse<bool>
             {
                 Result = result

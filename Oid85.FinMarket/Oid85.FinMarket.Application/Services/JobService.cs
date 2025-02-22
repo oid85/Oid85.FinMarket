@@ -12,7 +12,7 @@ public class JobService(
     : IJobService
 {
     /// <inheritdoc />
-    public async Task<bool> LoadAsync()
+    public async Task<bool> LoadAndCalculate()
     {
         await LoadInstrumentsAsync();
         await LoadLastPricesAsync();
@@ -22,13 +22,6 @@ public class JobService(
         await LoadDailyCandlesAsync();
         await LoadFiveMinuteCandlesAsync();
         await LoadForecastsAsync();
-        
-        return true;
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> CalculateAsync()
-    {
         await AnalyseAsync();
         await CalculateSpreadsAsync();
         await CalculateMultiplicatorsAsync();

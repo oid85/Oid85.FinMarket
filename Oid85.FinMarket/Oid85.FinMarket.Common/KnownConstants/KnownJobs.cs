@@ -2,6 +2,5 @@
 
 public static class KnownJobs
 {
-    public const string Load = "Load";
-    public const string Calculate = "Calculate";
+    public const string LoadAndCalculate = "LoadAndCalculate";
 }

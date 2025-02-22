@@ -6,12 +6,7 @@
 public interface IJobService
 {
     /// <summary>
-    /// Загрузка данных
+    /// Загрузка данных и расчет
     /// </summary>
-    Task<bool> LoadAsync();
-    
-    /// <summary>
-    /// Расчеты
-    /// </summary>
-    Task<bool> CalculateAsync();
+    Task<bool> LoadAndCalculate();
 }

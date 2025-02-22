@@ -46,8 +46,7 @@ public static class ServiceCollectionExtensions
         await using var scope = scopeFactory.CreateAsyncScope();
         var jobService = scope.ServiceProvider.GetRequiredService<IJobService>();
         
-        RegisterJob(KnownJobs.Load, () => jobService.LoadAsync());
-        RegisterJob(KnownJobs.Calculate, () => jobService.CalculateAsync());
+        RegisterJob(KnownJobs.LoadAndCalculate, () => jobService.LoadAndCalculate());
 
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)
         {
