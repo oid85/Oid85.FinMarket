@@ -45,6 +45,9 @@ public class ReportHelper(
             case KnownAnalyseTypes.YieldLtm:
                 return await GetColorYieldLtm(analyseResult.ResultNumber);
             
+            case KnownAnalyseTypes.DrawdownFromMaximum:
+                return await GetColorDrawdownFromMaximum(analyseResult.ResultNumber);            
+            
             case KnownAnalyseTypes.Aggregated:
                 return await GetColorAggregated((int) analyseResult.ResultNumber);
             
@@ -85,6 +88,23 @@ public class ReportHelper(
         return resource.ColorCode;
     }
 
+    public async Task<string> GetColorDrawdownFromMaximum(double value)
+    {
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteDrawdownFromMaximumAsync();
+
+        var resource = colorPalette
+            .FirstOrDefault(
+                x => 
+                    value >= x.LowLevel && 
+                    value <= x.HighLevel);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
+    }    
+    
     public async Task<string> GetColorYieldCoupon(double value)
     {
         var colorPalette = await resourceStoreService

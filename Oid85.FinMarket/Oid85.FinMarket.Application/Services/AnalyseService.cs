@@ -627,6 +627,10 @@ public class AnalyseService(
         {
             double maxPrice = candles.Max(x => x.High);
             double lastPrice = candles.Last().Close;
+            
+            if (lastPrice > maxPrice)
+                return ("0.0", 0.0);
+            
             double difference = maxPrice - lastPrice;
             double drawdown = difference / maxPrice;
             double drawdownPrc = drawdown * 100.0;

@@ -54,6 +54,13 @@ public class CurrenciesReportService(
             request.From, 
             request.To);
     
+    /// <inheritdoc />
+    public async Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(GetAnalyseRequest request) =>
+        await GetReportDataDrawdownFromMaximumAnalyse(
+            await instrumentService.GetCurrenciesInWatchlist(), 
+            request.From, 
+            request.To);
+    
     private async Task<ReportData> GetReportDataByAnalyseType(
         List<Currency> currencies,
         DateOnly from,
@@ -235,6 +242,68 @@ public class CurrenciesReportService(
                         analyseResult.ResultString,
                         await reportHelper.GetColor(
                             KnownAnalyseTypes.YieldLtm, 
+                            analyseResult))
+                    : new ReportParameter(
+                        KnownDisplayTypes.Percent,
+                        string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+    
+    private async Task<ReportData> GetReportDataDrawdownFromMaximumAnalyse(
+        List<Currency> instruments, 
+        DateOnly from, 
+        DateOnly to)
+    {
+        var instrumentIds = instruments
+            .Select(x => x.InstrumentId)
+            .ToList();        
+        
+        var analyseResults = (await analyseResultRepository
+                .GetAsync(instrumentIds, from, to))
+            .Where(x => x.AnalyseType == KnownAnalyseTypes.DrawdownFromMaximum)
+            .ToList();
+        
+        var dates = reportHelper.GetDates(from, to);
+            
+        var reportData = new ReportData
+        {
+            Title = $"Анализ {KnownAnalyseTypes.DrawdownFromMaximum} " +
+                    $"с {from.ToString(KnownDateTimeFormats.DateISO)} " +
+                    $"по {to.ToString(KnownDateTimeFormats.DateISO)}",
+                
+            Header = 
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+            ]
+        };
+
+        reportData.Header.AddRange(dates);
+
+        foreach (var instrument in instruments)
+        {
+            var data = new List<ReportParameter>
+            {
+                new (KnownDisplayTypes.Ticker, instrument.Ticker)
+            };
+
+            foreach (var date in dates)
+            {
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x =>
+                        x.InstrumentId == instrument.InstrumentId &&
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(analyseResult is not null
+                    ? new ReportParameter(
+                        KnownDisplayTypes.Percent,
+                        analyseResult.ResultString,
+                        await reportHelper.GetColor(
+                            KnownAnalyseTypes.DrawdownFromMaximum, 
                             analyseResult))
                     : new ReportParameter(
                         KnownDisplayTypes.Percent,

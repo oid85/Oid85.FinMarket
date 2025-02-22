@@ -173,4 +173,20 @@ public class CurrenciesController(
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Отчет Максимальная просадка от максимума
+    /// </summary>
+    [HttpPost("report/drawdown-from-maximum-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetDrawdownFromMaximumAnalyseAsync(
+        [FromBody] GetAnalyseRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetDrawdownFromMaximumAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });     
 }

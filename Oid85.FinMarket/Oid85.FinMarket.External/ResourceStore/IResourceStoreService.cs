@@ -103,6 +103,11 @@ public interface IResourceStoreService
     Task<List<RangeColorResource>> GetColorPaletteYieldLtmAsync();
     
     /// <summary>
+    /// Получить цветовую палитру для DrawdownFromMaximum
+    /// </summary>
+    Task<List<RangeColorResource>> GetColorPaletteDrawdownFromMaximumAsync();
+    
+    /// <summary>
     /// Получить цветовую палитру для PE
     /// </summary>
     Task<List<RangeColorResource>> GetColorPalettePeAsync();
