@@ -23,6 +23,11 @@ public class MarketEvent
     public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
+    /// Наименование инструмента
+    /// </summary>
+    public string InstrumentName { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
     public Guid InstrumentId { get; set; }

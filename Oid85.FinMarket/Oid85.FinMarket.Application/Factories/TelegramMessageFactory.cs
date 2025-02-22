@@ -14,6 +14,7 @@ public class TelegramMessageFactory
         foreach (var marketEvent in marketEvents)
             message.AppendLine(
                 $"{marketEvent.Ticker} " +
+                $"{marketEvent.InstrumentName} " +
                 $"{marketEvent.MarketEventText}");
         
         return message.ToString();

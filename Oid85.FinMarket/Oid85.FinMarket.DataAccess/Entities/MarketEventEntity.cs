@@ -25,6 +25,12 @@ public class MarketEventEntity : AuditableEntity
     public string Ticker { get; set; } = string.Empty;
     
     /// <summary>
+    /// Наименование инструмента
+    /// </summary>
+    [Column("instrument_name"), MaxLength(200)]
+    public string InstrumentName { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Уникальный идентификатор инструмента
     /// </summary>
     [Column("instrument_id")]

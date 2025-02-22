@@ -500,6 +500,7 @@ public class MarketEventService(
         {
             InstrumentId = instrumentId,
             Ticker = instrument?.Ticker ?? string.Empty,
+            InstrumentName = instrument?.Name ?? string.Empty,
             Date = DateOnly.FromDateTime(DateTime.UtcNow),
             Time = TimeOnly.FromDateTime(DateTime.UtcNow),
             MarketEventType = marketEventType,
