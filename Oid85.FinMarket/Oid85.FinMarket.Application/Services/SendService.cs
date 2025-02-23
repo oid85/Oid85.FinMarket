@@ -60,6 +60,14 @@ public class SendService(
                 }
             }
             
+            // Отправляем остаток
+            if (marketEventsForSend.Count > 0)
+            {
+                string message = telegramMessageFactory.CreateTelegramMessage(marketEventsForSend);
+                await telegramService.SendMessageAsync(message);
+                marketEventsForSend.Clear();
+            }
+            
             return true;
         }
         

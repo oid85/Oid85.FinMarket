@@ -582,12 +582,30 @@ public class LoadService(
                     instrumentIds.Add(share.InstrumentId);
             }
 
-            var assetFundamentals = await tinkoffService
-                .GetAssetFundamentalsAsync(instrumentIds);
-        
-            await assetFundamentalRepository.AddAsync(assetFundamentals);
+            // Читаем по 10 инструментов
+            var instrumentIdsForRequest = new List<Guid>();
+
+            foreach (var instrumentId in instrumentIds)
+            {
+                instrumentIdsForRequest.Add(instrumentId);
+
+                if (instrumentIdsForRequest.Count >= 10)
+                {
+                    var assetFundamentals = await tinkoffService.GetAssetFundamentalsAsync(instrumentIdsForRequest);
+                    await assetFundamentalRepository.AddAsync(assetFundamentals);
+                    instrumentIdsForRequest.Clear();
+                }
+            }
             
-            logger.Trace($"Загружены фундаментальные данные. {assetFundamentals.Count} шт.");
+            // Догружаем остаток
+            if (instrumentIdsForRequest.Count > 0)
+            {
+                var assetFundamentals = await tinkoffService.GetAssetFundamentalsAsync(instrumentIdsForRequest);
+                await assetFundamentalRepository.AddAsync(assetFundamentals);
+                instrumentIdsForRequest.Clear();
+            }
+            
+            logger.Trace("Загружены фундаментальные данные");
         
             return true;
         }

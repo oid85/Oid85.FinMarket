@@ -598,7 +598,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception);
+            logger.Error(exception, "Ошибка получения данных. {instrumentIds}", instrumentIds);
             return [];
         }
     }
@@ -705,7 +705,7 @@ public class TinkoffService(
         
         catch (Exception exception)
         {
-            logger.Error(exception);
+            logger.Error(exception, "Ошибка получения данных. {instrumentId}", instrumentId);
             return ([], new());
         }
     }
