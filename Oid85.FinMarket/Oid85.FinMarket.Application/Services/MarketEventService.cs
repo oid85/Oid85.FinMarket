@@ -31,6 +31,9 @@ public class MarketEventService(
                 var analyseResults = await analyseResultRepository
                     .GetTwoLastAsync(instrumentId, KnownAnalyseTypes.Supertrend);
             
+                if (analyseResults is [])
+                    continue;
+                
                 var marketEvent = await CreateMarketEvent(
                     instrumentId, 
                     KnownMarketEventTypes.SupertrendUp,
