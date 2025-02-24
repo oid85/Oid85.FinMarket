@@ -428,11 +428,11 @@ public class TinkoffService(
 
             foreach (var share in shares)
             {
+                await Task.Delay(DelayInMilliseconds);
+                
                 var request = new GetDividendsRequest
                 {
-                    InstrumentId = share.InstrumentId.ToString(),
-                    From = Timestamp.FromDateTime(from),
-                    To = Timestamp.FromDateTime(to)
+                    InstrumentId = share.InstrumentId.ToString()
                 };
 
                 var response = await client
@@ -493,11 +493,11 @@ public class TinkoffService(
 
             for (var i = 0; i < bonds.Count; i++)
             {
+                await Task.Delay(DelayInMilliseconds);
+                
                 var request = new GetBondCouponsRequest
                 {
-                    InstrumentId = bonds[i].InstrumentId.ToString(),
-                    From = Timestamp.FromDateTime(from),
-                    To = Timestamp.FromDateTime(to)
+                    InstrumentId = bonds[i].InstrumentId.ToString()
                 };
 
                 var response = await client.Instruments.GetBondCouponsAsync(request);
