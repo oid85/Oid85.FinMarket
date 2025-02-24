@@ -22,6 +22,8 @@ public class TinkoffService(
     InvestApiClient client)
     : ITinkoffService
 {
+    private const int DelayInMilliseconds = 50;
+    
     // <inheritdoc />
     public async Task<List<Candle>> GetCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to)
@@ -65,6 +67,8 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             var request = new GetCandlesRequest
             {
                 InstrumentId = instrumentId.ToString(),
@@ -92,7 +96,7 @@ public class TinkoffService(
 
         catch (Exception exception)
         {
-            logger.Error(exception);
+            logger.Error(exception, "Ошибка получения данных. {instrumentId}", instrumentId);
             return [];
         }
     }
@@ -100,59 +104,81 @@ public class TinkoffService(
     /// <inheritdoc />
     public async Task<List<double>> GetPricesAsync(List<Guid> instrumentIds)
     {
-        try
+        const int chunkSize = 50;
+        var chunks = instrumentIds.Chunk(chunkSize);
+
+        var result = new List<double>();
+        
+        foreach (var chunk in chunks)
         {
-            var request = new GetLastPricesRequest();
-
-            foreach (var instrumentId in instrumentIds)
-                request.InstrumentId.Add(instrumentId.ToString());
-
-            request.LastPriceType = LastPriceType.LastPriceExchange;
+            try
+            {
+                await Task.Delay(DelayInMilliseconds);
                 
-            var response = await client.MarketData.GetLastPricesAsync(request);
-                
-            if (response is null)
-                return [];
-                
-            var result = response.LastPrices
-                .Select(x => ConvertHelper.QuotationToDouble(x.Price))
-                .ToList();
+                var request = new GetLastPricesRequest();
 
-            return result;
+                foreach (var instrumentId in chunk)
+                    request.InstrumentId.Add(instrumentId.ToString());
+
+                request.LastPriceType = LastPriceType.LastPriceExchange;
+                
+                var response = await client.MarketData.GetLastPricesAsync(request);
+                
+                if (response is null)
+                    continue;
+                
+                var chunkResult = response.LastPrices
+                    .Select(x => ConvertHelper.QuotationToDouble(x.Price))
+                    .ToList();
+
+                result.AddRange(chunkResult);
+            }
+
+            catch (Exception exception)
+            {
+                logger.Error(exception);
+            }
         }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
+        
+        return result;
     }
 
     private async Task<List<Candle>> GetCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
     {
-        var request = new GetCandlesRequest
+        try
         {
-            InstrumentId = instrumentId.ToString(),
-            From = from,
-            To = to,
-            Interval = CandleInterval.Day
-        };
-
-        var response = await client.MarketData.GetCandlesAsync(request);
-
-        return response.Candles.Select(historicCandle => new Candle
+            await Task.Delay(DelayInMilliseconds);
+        
+            var request = new GetCandlesRequest
             {
-                InstrumentId = instrumentId,
-                Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-                Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-                High = ConvertHelper.QuotationToDouble(historicCandle.High),
-                Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-                Volume = historicCandle.Volume,
-                Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-                IsComplete = historicCandle.IsComplete
-            })
-            .ToList();
+                InstrumentId = instrumentId.ToString(),
+                From = from,
+                To = to,
+                Interval = CandleInterval.Day
+            };
+
+            var response = await client.MarketData.GetCandlesAsync(request);
+
+            return response.Candles.Select(historicCandle => new Candle
+                {
+                    InstrumentId = instrumentId,
+                    Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
+                    Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
+                    High = ConvertHelper.QuotationToDouble(historicCandle.High),
+                    Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
+                    Volume = historicCandle.Volume,
+                    Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
+                    IsComplete = historicCandle.IsComplete
+                })
+                .ToList();
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Error(exception, "Ошибка получения данных. {instrumentId}", instrumentId);
+            return [];
+        }
     }
 
     /// <inheritdoc />
@@ -160,6 +186,8 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             List<TinkoffShare> shares = (await client.Instruments
                     .SharesAsync()).Instruments
                 .Where(x => x.CountryOfRisk.ToLower() == "ru")
@@ -200,6 +228,8 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             List<TinkoffFuture> futures = (await client.Instruments
                     .FuturesAsync()).Instruments
                 .Where(x => x.CountryOfRisk.ToLower() == "ru")
@@ -250,9 +280,10 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             List<TinkoffBond> bonds = (await client.Instruments.BondsAsync())
                 .Instruments
-                //.Where(x => x.CountryOfRisk.ToLower() == "ru")
                 .ToList();
 
             var result = new List<Bond>();
@@ -299,6 +330,8 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             var request = new IndicativesRequest();
                 
             var indicatives = (await client.Instruments
@@ -340,6 +373,8 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             var request = new InstrumentsRequest();
                 
             var currencies = (await client.Instruments
@@ -381,6 +416,8 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             var dividendInfos = new List<DividendInfo>();
             
             var from = DateTime.SpecifyKind(
@@ -444,6 +481,8 @@ public class TinkoffService(
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             var bondCoupons = new List<BondCoupon>();
             
             var from = DateTime.SpecifyKind(
@@ -506,108 +545,12 @@ public class TinkoffService(
     }
 
     /// <inheritdoc />
-    public async Task<List<AssetFundamental>> GetAssetFundamentalsAsync(List<Guid> instrumentIds)
-    {
-        try
-        {
-            if (instrumentIds is [])
-                return [];
-            
-            var request = new GetAssetFundamentalsRequest();
-
-            foreach (var instrumentId in instrumentIds) 
-                request.Assets.Add(instrumentId.ToString());
-            
-            var response = await client
-                .Instruments
-                .GetAssetFundamentalsAsync(request);
-
-            if (response is null)
-                return [];
-            
-            var result = new List<AssetFundamental>();
-
-            foreach (var item in response.Fundamentals)
-            {
-                var assetFundamental = new AssetFundamental
-                {
-                    Date = DateOnly.FromDateTime(DateTime.Today),
-                    InstrumentId = Guid.Parse(item.AssetUid),
-                    Currency = item.Currency,
-                    MarketCapitalization = item.MarketCapitalization,
-                    HighPriceLast52Weeks = item.HighPriceLast52Weeks,
-                    LowPriceLast52Weeks = item.LowPriceLast52Weeks,
-                    AverageDailyVolumeLast10Days = item.AverageDailyVolumeLast10Days,
-                    AverageDailyVolumeLast4Weeks = item.AverageDailyVolumeLast4Weeks,
-                    Beta = item.Beta,
-                    FreeFloat = item.FreeFloat,
-                    ForwardAnnualDividendYield = item.ForwardAnnualDividendYield,
-                    SharesOutstanding = item.SharesOutstanding,
-                    RevenueTtm = item.RevenueTtm,
-                    EbitdaTtm = item.EbitdaTtm,
-                    NetIncomeTtm = item.NetIncomeTtm,
-                    EpsTtm = item.EpsTtm,
-                    DilutedEpsTtm = item.DilutedEpsTtm,
-                    FreeCashFlowTtm = item.FreeCashFlowTtm,
-                    FiveYearAnnualRevenueGrowthRate = item.FiveYearAnnualRevenueGrowthRate,
-                    ThreeYearAnnualRevenueGrowthRate = item.ThreeYearAnnualRevenueGrowthRate,
-                    PeRatioTtm = item.PeRatioTtm,
-                    PriceToSalesTtm = item.PriceToSalesTtm,
-                    PriceToBookTtm = item.PriceToBookTtm,
-                    PriceToFreeCashFlowTtm = item.PriceToFreeCashFlowTtm,
-                    TotalEnterpriseValueMrq = item.TotalEnterpriseValueMrq,
-                    EvToEbitdaMrq = item.EvToEbitdaMrq,
-                    NetMarginMrq = item.NetMarginMrq,
-                    NetInterestMarginMrq = item.NetInterestMarginMrq,
-                    Roe = item.Roe,
-                    Roa = item.Roa,
-                    Roic = item.Roic,
-                    TotalDebtMrq = item.TotalDebtMrq,
-                    TotalDebtToEquityMrq = item.TotalDebtToEquityMrq,
-                    TotalDebtToEbitdaMrq = item.TotalDebtToEbitdaMrq,
-                    FreeCashFlowToPrice = item.FreeCashFlowToPrice,
-                    NetDebtToEbitda = item.NetDebtToEbitda,
-                    CurrentRatioMrq = item.CurrentRatioMrq,
-                    FixedChargeCoverageRatioFy = item.FixedChargeCoverageRatioFy,
-                    DividendYieldDailyTtm = item.DividendYieldDailyTtm,
-                    DividendRateTtm = item.DividendRateTtm,
-                    DividendsPerShare = item.DividendsPerShare,
-                    FiveYearsAverageDividendYield = item.FiveYearsAverageDividendYield,
-                    FiveYearAnnualDividendGrowthRate = item.FiveYearAnnualDividendGrowthRate,
-                    DividendPayoutRatioFy = item.DividendPayoutRatioFy,
-                    BuyBackTtm = item.BuyBackTtm,
-                    OneYearAnnualRevenueGrowthRate = item.OneYearAnnualRevenueGrowthRate,
-                    DomicileIndicatorCode = item.DomicileIndicatorCode,
-                    AdrToCommonShareRatio = item.AdrToCommonShareRatio,
-                    NumberOfEmployees = item.NumberOfEmployees,
-                    ExDividendDate = ConvertHelper.TimestampToDateOnly(item.ExDividendDate),
-                    FiscalPeriodStartDate = ConvertHelper.TimestampToDateOnly(item.FiscalPeriodStartDate),
-                    FiscalPeriodEndDate = ConvertHelper.TimestampToDateOnly(item.FiscalPeriodEndDate),
-                    RevenueChangeFiveYears = item.RevenueChangeFiveYears,
-                    EpsChangeFiveYears = item.EpsChangeFiveYears,
-                    EbitdaChangeFiveYears = item.EbitdaChangeFiveYears,
-                    TotalDebtChangeFiveYears = item.TotalDebtChangeFiveYears,
-                    EvToSales = item.EvToSales
-                };
-
-                result.Add(assetFundamental);
-            }
-
-            return result;
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception, "Ошибка получения данных. {instrumentIds}", instrumentIds);
-            return [];
-        }
-    }
-
-    /// <inheritdoc />
     public async Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId)
     {
         try
         {
+            await Task.Delay(DelayInMilliseconds);
+            
             var request = new GetForecastRequest
             {
                 InstrumentId = instrumentId.ToString()

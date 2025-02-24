@@ -56,11 +56,6 @@ public interface ISharesReportService
     Task<ReportData> GetDividendAnalyseAsync();
     
     /// <summary>
-    /// Отчет Фундаментальные данные
-    /// </summary>
-    Task<ReportData> GetAssetFundamentalAnalyseAsync();
-
-    /// <summary>
     /// Отчет Мультипликаторы
     /// </summary>
     Task<ReportData> GetMultiplicatorAnalyseAsync();

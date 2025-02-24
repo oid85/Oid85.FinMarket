@@ -21,7 +21,6 @@ public class LoadService(
     IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
-    IAssetFundamentalRepository assetFundamentalRepository,
     IInstrumentRepository instrumentRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository)
@@ -559,65 +558,6 @@ public class LoadService(
         }
     }
 
-    
-    public async Task<bool> LoadAssetFundamentalsAsync()
-    {
-        try
-        {
-            var shares = await instrumentService.GetSharesInWatchlist();
-
-            var instrumentIds = new List<Guid>();
-
-            // Загружаем данные, которых нет
-            foreach (var share in shares)
-            {
-                var assetFundamental = await assetFundamentalRepository
-                    .GetLastAsync(share.InstrumentId);
-            
-                if (assetFundamental is null)
-                    instrumentIds.Add(share.InstrumentId);
-            
-                else
-                if (assetFundamental.Date < DateOnly.FromDateTime(DateTime.Today))
-                    instrumentIds.Add(share.InstrumentId);
-            }
-
-            // Читаем по 10 инструментов
-            var instrumentIdsForRequest = new List<Guid>();
-
-            foreach (var instrumentId in instrumentIds)
-            {
-                instrumentIdsForRequest.Add(instrumentId);
-
-                if (instrumentIdsForRequest.Count >= 10)
-                {
-                    var assetFundamentals = await tinkoffService.GetAssetFundamentalsAsync(instrumentIdsForRequest);
-                    await assetFundamentalRepository.AddAsync(assetFundamentals);
-                    instrumentIdsForRequest.Clear();
-                }
-            }
-            
-            // Догружаем остаток
-            if (instrumentIdsForRequest.Count > 0)
-            {
-                var assetFundamentals = await tinkoffService.GetAssetFundamentalsAsync(instrumentIdsForRequest);
-                await assetFundamentalRepository.AddAsync(assetFundamentals);
-                instrumentIdsForRequest.Clear();
-            }
-            
-            logger.Trace("Загружены фундаментальные данные");
-        
-            return true;
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return false;
-        }
-    }
-
-    
     public async Task<bool> LoadDividendInfosAsync()
     {
         try
