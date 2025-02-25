@@ -18,7 +18,6 @@ public class JobService(
         await LoadLastPricesAsync();
         await LoadBondCouponsAsync();
         await LoadDividendInfosAsync();
-        await LoadAssetFundamentalsAsync();
         await LoadDailyCandlesAsync();
         await LoadFiveMinuteCandlesAsync();
         await LoadForecastsAsync();
@@ -59,12 +58,7 @@ public class JobService(
     {
         await loadService.LoadDividendInfosAsync();
     }
-
-    private async Task LoadAssetFundamentalsAsync()
-    {
-        await loadService.LoadAssetFundamentalsAsync();
-    }
-
+    
     private async Task LoadDailyCandlesAsync()
     {
         await loadService.LoadShareDailyCandlesAsync();

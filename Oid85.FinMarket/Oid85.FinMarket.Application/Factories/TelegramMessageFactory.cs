@@ -7,7 +7,7 @@ namespace Oid85.FinMarket.Application.Factories;
 public class TelegramMessageFactory 
     : ITelegramMessageFactory
 {
-    public string CreateTelegramMessage(List<MarketEvent> marketEvents)
+    public string CreateTelegramMessage(IEnumerable<MarketEvent> marketEvents)
     {
         var message = new StringBuilder();
 

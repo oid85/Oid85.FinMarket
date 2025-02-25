@@ -21,7 +21,6 @@ public class LoadService(
     IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
-    IAssetFundamentalRepository assetFundamentalRepository,
     IInstrumentRepository instrumentRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository)
@@ -559,47 +558,6 @@ public class LoadService(
         }
     }
 
-    
-    public async Task<bool> LoadAssetFundamentalsAsync()
-    {
-        try
-        {
-            var shares = await instrumentService.GetSharesInWatchlist();
-
-            var instrumentIds = new List<Guid>();
-
-            // Загружаем данные, которых нет
-            foreach (var share in shares)
-            {
-                var assetFundamental = await assetFundamentalRepository
-                    .GetLastAsync(share.InstrumentId);
-            
-                if (assetFundamental is null)
-                    instrumentIds.Add(share.InstrumentId);
-            
-                else
-                if (assetFundamental.Date < DateOnly.FromDateTime(DateTime.Today))
-                    instrumentIds.Add(share.InstrumentId);
-            }
-
-            var assetFundamentals = await tinkoffService
-                .GetAssetFundamentalsAsync(instrumentIds);
-        
-            await assetFundamentalRepository.AddAsync(assetFundamentals);
-            
-            logger.Trace($"Загружены фундаментальные данные. {assetFundamentals.Count} шт.");
-        
-            return true;
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return false;
-        }
-    }
-
-    
     public async Task<bool> LoadDividendInfosAsync()
     {
         try

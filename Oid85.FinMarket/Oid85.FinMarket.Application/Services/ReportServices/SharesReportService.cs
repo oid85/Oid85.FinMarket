@@ -16,7 +16,6 @@ public class SharesReportService(
     IConfiguration configuration,
     IAnalyseResultRepository analyseResultRepository,
     IDividendInfoRepository dividendInfoRepository,
-    IAssetFundamentalRepository assetFundamentalRepository,
     IMultiplicatorRepository multiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
@@ -128,63 +127,7 @@ public class SharesReportService(
             
         return reportData;
     }
-
-    /// <inheritdoc />
-    public async Task<ReportData> GetAssetFundamentalAnalyseAsync()
-    {
-        var shares = await instrumentService.GetSharesInWatchlist();
-            
-        var reportData = new ReportData
-        {
-            Title = "Фундаментальный анализ",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
-                new ReportParameter(KnownDisplayTypes.String, "Рыночная капитализация"),
-                new ReportParameter(KnownDisplayTypes.String, "Минимум за год"),
-                new ReportParameter(KnownDisplayTypes.String, "Максимум за год"),
-                new ReportParameter(KnownDisplayTypes.String, "Бета-коэффициент"),
-                new ReportParameter(KnownDisplayTypes.String, "Чистая прибыль"),
-                new ReportParameter(KnownDisplayTypes.String, "EBITDA"),
-                new ReportParameter(KnownDisplayTypes.String, "EPS"),
-                new ReportParameter(KnownDisplayTypes.String, "Свободный денежный поток"),
-                new ReportParameter(KnownDisplayTypes.String, "EV/EBITDA"),
-                new ReportParameter(KnownDisplayTypes.String, "Total Debt/EBITDA"),
-                new ReportParameter(KnownDisplayTypes.String, "Net Debt/EBITDA")
-            ]
-        };
-
-        foreach (var share in shares)
-        {
-            var assetFundamental = await assetFundamentalRepository.GetLastAsync(share.InstrumentId);
-            
-            if (assetFundamental is null)
-                continue;
-            
-            List<ReportParameter> data =
-            [
-                new (KnownDisplayTypes.Ticker, share.Ticker),
-                new (KnownDisplayTypes.Sector, share.Sector),
-                new (KnownDisplayTypes.Number, assetFundamental.MarketCapitalization.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.LowPriceLast52Weeks.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.HighPriceLast52Weeks.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.Beta.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.NetIncomeTtm.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.EbitdaTtm.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.EpsTtm.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.FreeCashFlowTtm.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.EvToEbitdaMrq.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.TotalDebtToEbitdaMrq.ToString("N2")),
-                new (KnownDisplayTypes.Number, assetFundamental.NetDebtToEbitda.ToString("N2"))
-            ];
-            
-            reportData.Data.Add(data);
-        }
-        
-        return reportData;
-    }
-
+    
     /// <inheritdoc />
     public async Task<ReportData> GetMultiplicatorAnalyseAsync()
     {

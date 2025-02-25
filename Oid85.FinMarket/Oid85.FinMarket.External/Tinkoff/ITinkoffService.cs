@@ -65,11 +65,6 @@ public interface ITinkoffService
     public Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds);
     
     /// <summary>
-    /// Получить фундаментальные данные
-    /// </summary>
-    public Task<List<AssetFundamental>> GetAssetFundamentalsAsync(List<Guid> instrumentIds);
-
-    /// <summary>
     /// Получение прогнозов по инструменту
     /// </summary>
     Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId);

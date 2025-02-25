@@ -44,20 +44,17 @@ public class SendService(
             if (marketEvents is [])
                 return true;
 
-            var marketEventsForSend = new List<MarketEvent>();
-            
-            foreach (var marketEvent in marketEvents)
+            const int maxEventInMessage = 5;
+
+            var chunks = marketEvents.Chunk(maxEventInMessage);
+
+            foreach (var chunk in chunks)
             {
-                marketEventsForSend.Add(marketEvent);
-                await marketEventRepository.MarkAsSentAsync(marketEvent);
+                foreach (var marketEvent in chunk)
+                    await marketEventRepository.MarkAsSentAsync(marketEvent);
                 
-                // Отправляем по 5 событий за раз
-                if (marketEventsForSend.Count >= 5)
-                {
-                    string message = telegramMessageFactory.CreateTelegramMessage(marketEventsForSend);
-                    await telegramService.SendMessageAsync(message);
-                    marketEventsForSend.Clear();
-                }
+                string message = telegramMessageFactory.CreateTelegramMessage(chunk);
+                await telegramService.SendMessageAsync(message);
             }
             
             return true;
@@ -68,25 +65,5 @@ public class SendService(
             logger.Error(exception);
             return false;
         }
-    }
-    
-    private async Task SendActiveMarketEvents()
-    {
-        try
-        {
-            var marketEvents = (await marketEventRepository.GetActivatedAsync()).ToList();
-
-            foreach (var marketEvent in marketEvents) 
-                await marketEventRepository.MarkAsSentAsync(marketEvent);
-
-            string message = telegramMessageFactory.CreateTelegramMessage(marketEvents);
-        
-            await telegramService.SendMessageAsync(message);
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-        }
-    }
+    }    
 }

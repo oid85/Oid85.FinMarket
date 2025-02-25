@@ -108,22 +108,7 @@ public class SharesController(
             {
                 Result = result
             });
-
-    /// <summary>
-    /// Загрузить фундаментальные данные по акциям
-    /// </summary>
-    [HttpGet("load-asset-fundamentals")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadAssetFundamentalsAsync() =>
-        GetResponseAsync(
-            loadService.LoadAssetFundamentalsAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-
+    
     /// <summary>
     /// Загрузить последние цены акций
     /// </summary>
@@ -276,21 +261,6 @@ public class SharesController(
     public Task<IActionResult> GetDividendAnalyseAsync() =>
         GetResponseAsync(
             reportService.GetDividendAnalyseAsync,
-            result => new BaseResponse<ReportData>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Отчет Фундаментальные данные
-    /// </summary>
-    [HttpPost("report/asset-fundamental-analyse")]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetAssetFundamentalAnalyseAsync() =>
-        GetResponseAsync(
-            reportService.GetAssetFundamentalAnalyseAsync,
             result => new BaseResponse<ReportData>
             {
                 Result = result

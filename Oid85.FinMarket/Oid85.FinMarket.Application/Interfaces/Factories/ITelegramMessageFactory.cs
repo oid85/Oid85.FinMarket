@@ -4,5 +4,5 @@ namespace Oid85.FinMarket.Application.Interfaces.Factories;
 
 public interface ITelegramMessageFactory
 {
-    string CreateTelegramMessage(List<MarketEvent> marketEvents);
+    string CreateTelegramMessage(IEnumerable<MarketEvent> marketEvents);
 }
