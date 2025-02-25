@@ -55,92 +55,7 @@ public class BondsReportService(
     public async Task<ReportData> GetCouponAnalyseAsync()
     {
         var bonds = await instrumentService.GetBondsInWatchlist();
-            
-        var reportData = new ReportData
-        {
-            Title = "Информация по облигациям",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
-                new ReportParameter(KnownDisplayTypes.String, "Плав. купон"),
-                new ReportParameter(KnownDisplayTypes.String, "До погаш., дней"),
-                new ReportParameter(KnownDisplayTypes.String, "Дох-ть., %")
-            ]
-        };
-            
-        int outputWindowInDays = configuration
-            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
-
-        var instrumentIds = bonds
-            .Select(x => x.InstrumentId)
-            .ToList();
-
-        var startDate = DateOnly.FromDateTime(DateTime.Today);
-        var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays);
-
-        var bondCoupons = (await bondCouponRepository
-            .GetByInstrumentIdsAsync(instrumentIds))
-            .Where(x =>
-                x.CouponDate >= startDate &&
-                x.CouponDate <= endDate)
-            .ToList();
-            
-        var dates = reportHelper.GetDates(startDate, endDate);
-            
-        reportData.Header.AddRange(dates);
-            
-        foreach (var bond in bonds)
-        {
-            List<ReportParameter> data =
-            [
-                new (KnownDisplayTypes.Ticker, 
-                    bond.Ticker),
-                    
-                new (KnownDisplayTypes.Sector, bond.Sector),
-                    
-                new (KnownDisplayTypes.String, 
-                    bond.FloatingCouponFlag ? "Да" : string.Empty),
-                    
-                new (KnownDisplayTypes.Number, 
-                    (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString())
-            ];
-                
-            // Вычисляем полную доходность облигации
-            var nextCoupon = bondCoupons
-                .FirstOrDefault(x => x.Ticker == bond.Ticker);
-                
-            double profitPrc = 0.0;
-                
-            if (nextCoupon is not null)
-                profitPrc = ((bond.LastPrice * 10.0) / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
-
-            string color = await reportHelper.GetColorYieldCoupon(profitPrc);
-            
-            data.Add(new ReportParameter(
-                KnownDisplayTypes.Percent, 
-                profitPrc.ToString("N1"),
-                color));
-                
-            foreach (var date in dates)
-            {
-                var bondCoupon = bondCoupons
-                    .FirstOrDefault(x => 
-                        x.InstrumentId == bond.InstrumentId &&
-                        x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
-
-                data.Add(bondCoupon is not null 
-                    ? new ReportParameter(
-                        KnownDisplayTypes.Ruble, 
-                        bondCoupon.PayOneBond.ToString("N1")) 
-                    : new ReportParameter(
-                        KnownDisplayTypes.Ruble, 
-                        string.Empty));
-            }
-                
-            reportData.Data.Add(data);
-        }
-            
+        var reportData = await GetBondCouponReportDataAsync(bonds);
         return reportData;
     }
 
@@ -148,7 +63,12 @@ public class BondsReportService(
     public async Task<ReportData> GetBondSelectionAsync()
     {
         var bonds = await instrumentService.GetBondsByFilter();
-            
+        var reportData = await GetBondCouponReportDataAsync(bonds);
+        return reportData;
+    }
+    
+    private async Task<ReportData> GetBondCouponReportDataAsync(List<Bond> bonds)
+    {
         var reportData = new ReportData
         {
             Title = "Информация по облигациям",
@@ -178,12 +98,33 @@ public class BondsReportService(
                 x.CouponDate >= startDate &&
                 x.CouponDate <= endDate)
             .ToList();
+
+        var instrumentIdsWithCoupon = bondCoupons
+            .Select(x => x.InstrumentId)
+            .Distinct()
+            .ToList();
+
+        DateOnly GetNearCouponDate(Guid instrumentId)
+        {
+            var coupon = bondCoupons
+                .OrderBy(x => x.CouponDate)
+                .FirstOrDefault(x => x.InstrumentId == instrumentId);
+
+            if (coupon is not null)
+                return coupon.CouponDate;
             
+            return DateOnly.MaxValue;
+        }
+        
+        var selectedBonds = bonds
+            .Where(x => instrumentIdsWithCoupon.Contains(x.InstrumentId))
+            .OrderBy(x => GetNearCouponDate(x.InstrumentId));
+        
         var dates = reportHelper.GetDates(startDate, endDate);
             
         reportData.Header.AddRange(dates);
             
-        foreach (var bond in bonds)
+        foreach (var bond in selectedBonds)
         {
             List<ReportParameter> data =
             [
@@ -201,12 +142,21 @@ public class BondsReportService(
                 
             // Вычисляем полную доходность облигации
             var nextCoupon = bondCoupons
-                .FirstOrDefault(x => x.Ticker == bond.Ticker);
+                .OrderBy(x => x.CouponDate)
+                .FirstOrDefault(x => x.InstrumentId == bond.InstrumentId);
                 
             double profitPrc = 0.0;
-                
-            if (nextCoupon is not null)
-                profitPrc = ((bond.LastPrice * 10.0) / (365.0 / nextCoupon.CouponPeriod) * nextCoupon.PayOneBond) / 100.0;
+
+            if (nextCoupon is not null &&
+                bond.LastPrice == 0.0 &&
+                nextCoupon.CouponPeriod == 0.0)
+            {
+                double priceInRubles = bond.LastPrice * 10.0;
+                double payDay = nextCoupon.PayOneBond / nextCoupon.CouponPeriod;
+                double payYear = payDay * 365;
+                double profit = payYear / priceInRubles;
+                profitPrc = profit / 100.0;   
+            }
 
             string color = await reportHelper.GetColorYieldCoupon(profitPrc);
             
