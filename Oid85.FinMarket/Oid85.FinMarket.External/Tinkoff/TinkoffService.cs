@@ -3,6 +3,7 @@ using NLog;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.Tinkoff.Helpers;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -19,7 +20,8 @@ namespace Oid85.FinMarket.External.Tinkoff;
 /// <inheritdoc />
 public class TinkoffService(
     ILogger logger,
-    InvestApiClient client)
+    InvestApiClient client,
+    GetPricesHelper getPricesHelper)
     : ITinkoffService
 {
     private const int DelayInMilliseconds = 50;
@@ -102,46 +104,8 @@ public class TinkoffService(
     }
 
     /// <inheritdoc />
-    public async Task<List<double>> GetPricesAsync(List<Guid> instrumentIds)
-    {
-        const int chunkSize = 50;
-        var chunks = instrumentIds.Chunk(chunkSize);
-
-        var result = new List<double>();
-        
-        foreach (var chunk in chunks)
-        {
-            try
-            {
-                await Task.Delay(DelayInMilliseconds);
-                
-                var request = new GetLastPricesRequest();
-
-                foreach (var instrumentId in chunk)
-                    request.InstrumentId.Add(instrumentId.ToString());
-
-                request.LastPriceType = LastPriceType.LastPriceExchange;
-                
-                var response = await client.MarketData.GetLastPricesAsync(request);
-                
-                if (response is null)
-                    continue;
-                
-                var chunkResult = response.LastPrices
-                    .Select(x => ConvertHelper.QuotationToDouble(x.Price))
-                    .ToList();
-
-                result.AddRange(chunkResult);
-            }
-
-            catch (Exception exception)
-            {
-                logger.Error(exception);
-            }
-        }
-        
-        return result;
-    }
+    public Task<List<double>> GetPricesAsync(List<Guid> instrumentIds) =>
+        getPricesHelper.GetPricesAsync(instrumentIds);
 
     private async Task<List<Candle>> GetCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
