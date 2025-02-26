@@ -102,7 +102,7 @@ public class GetCandlesService(
         }
     }
 
-    private GetCandlesRequest CreateGetCandlesRequest(
+    private static GetCandlesRequest CreateGetCandlesRequest(
         Guid instrumentId, Timestamp from, Timestamp to, CandleInterval interval)
     {
         var request = new GetCandlesRequest

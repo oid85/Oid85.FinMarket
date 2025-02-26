@@ -31,11 +31,8 @@ public class GetDividendInfoService(
             foreach (var share in shares)
             {
                 await Task.Delay(DelayInMilliseconds);
-                
-                var request = new GetDividendsRequest
-                {
-                    InstrumentId = share.InstrumentId.ToString()
-                };
+
+                var request = CreateGetDividendsRequest(share.InstrumentId);
 
                 var response = await client
                     .Instruments
@@ -76,5 +73,15 @@ public class GetDividendInfoService(
             logger.Error(exception);
             return [];
         }
+    }
+
+    private static GetDividendsRequest CreateGetDividendsRequest(Guid instrumentId)
+    {
+        var request = new GetDividendsRequest
+        {
+            InstrumentId = instrumentId.ToString()
+        };
+
+        return request;
     }
 }
