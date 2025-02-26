@@ -39,7 +39,7 @@ public class GetCandlesService(
     {
         await Task.Delay(DelayInMilliseconds);
         
-        var response = await SendCandlesRequest(
+        var response = await SendGetCandlesRequest(
             instrumentId, from, to, CandleInterval.Day);
 
         if (response is null)
@@ -64,7 +64,7 @@ public class GetCandlesService(
     {
         await Task.Delay(DelayInMilliseconds);
         
-        var response = await SendCandlesRequest(
+        var response = await SendGetCandlesRequest(
             instrumentId, from, to, CandleInterval._5Min);
 
         if (response is null)
@@ -85,30 +85,25 @@ public class GetCandlesService(
             .ToList();
     }
 
-    private async Task<GetCandlesResponse?> SendCandlesRequest(
+    private async Task<GetCandlesResponse?> SendGetCandlesRequest(
         Guid instrumentId, Timestamp from, Timestamp to, CandleInterval interval)
     {
+        var request = new GetCandlesRequest
+        {
+            InstrumentId = instrumentId.ToString(),
+            From = from,
+            To = to,
+            Interval = interval
+        };
+        
         try
         {
-            var request = new GetCandlesRequest
-            {
-                InstrumentId = instrumentId.ToString(),
-                From = from,
-                To = to,
-                Interval = interval
-            };
-
-            var response = await client.MarketData.GetCandlesAsync(request);
-
-            return response;
+            return await client.MarketData.GetCandlesAsync(request);
         }
         
         catch (Exception exception)
         {
-            logger.Error(
-                exception, 
-                "Ошибка получения данных. {instrumentId}, {from}, {to}, {interval}", 
-                instrumentId, from, to, interval);
+            logger.Error(exception, "Ошибка получения данных. {request}", request);
             return null;
         }
     }

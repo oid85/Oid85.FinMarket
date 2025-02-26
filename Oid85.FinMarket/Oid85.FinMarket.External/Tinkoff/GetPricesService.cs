@@ -32,12 +32,8 @@ public class GetPricesService(
         try
         {
             await Task.Delay(DelayInMilliseconds);
-                
-            var request = new GetLastPricesRequest();
-            request.InstrumentId.AddRange(chunkInstrumentIds.Select(x => x.ToString()));
-            request.LastPriceType = LastPriceType.LastPriceExchange;
-                
-            var response = await client.MarketData.GetLastPricesAsync(request);
+            
+            var response = await SendGetLastPricesRequest(chunkInstrumentIds);
                 
             if (response is null)
                 return [];
@@ -54,5 +50,23 @@ public class GetPricesService(
             logger.Error(exception);
             return [];
         }        
+    }
+    
+    private async Task<GetLastPricesResponse?> SendGetLastPricesRequest(List<Guid> instrumentIds)
+    {
+        var request = new GetLastPricesRequest();
+        request.InstrumentId.AddRange(instrumentIds.Select(x => x.ToString()));
+        request.LastPriceType = LastPriceType.LastPriceExchange;
+        
+        try
+        {
+            return await client.MarketData.GetLastPricesAsync(request);
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Error(exception, "Ошибка получения данных. {request}", request);
+            return null;
+        }
     }
 }
