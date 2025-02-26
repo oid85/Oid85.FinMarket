@@ -54,9 +54,7 @@ public class GetPricesService(
     
     private async Task<GetLastPricesResponse?> SendGetLastPricesRequest(List<Guid> instrumentIds)
     {
-        var request = new GetLastPricesRequest();
-        request.InstrumentId.AddRange(instrumentIds.Select(x => x.ToString()));
-        request.LastPriceType = LastPriceType.LastPriceExchange;
+        var request = CreateGetLastPricesRequest(instrumentIds);
         
         try
         {
@@ -68,5 +66,14 @@ public class GetPricesService(
             logger.Error(exception, "Ошибка получения данных. {request}", request);
             return null;
         }
+    }
+    
+    private static GetLastPricesRequest CreateGetLastPricesRequest(List<Guid> instrumentIds)
+    {
+        var request = new GetLastPricesRequest();
+        request.InstrumentId.AddRange(instrumentIds.Select(x => x.ToString()));
+        request.LastPriceType = LastPriceType.LastPriceExchange;
+
+        return request;
     }
 }

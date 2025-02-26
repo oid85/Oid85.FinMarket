@@ -88,13 +88,7 @@ public class GetCandlesService(
     private async Task<GetCandlesResponse?> SendGetCandlesRequest(
         Guid instrumentId, Timestamp from, Timestamp to, CandleInterval interval)
     {
-        var request = new GetCandlesRequest
-        {
-            InstrumentId = instrumentId.ToString(),
-            From = from,
-            To = to,
-            Interval = interval
-        };
+        var request = CreateGetCandlesRequest(instrumentId, from, to, interval);
         
         try
         {
@@ -106,5 +100,19 @@ public class GetCandlesService(
             logger.Error(exception, "Ошибка получения данных. {request}", request);
             return null;
         }
+    }
+
+    private GetCandlesRequest CreateGetCandlesRequest(
+        Guid instrumentId, Timestamp from, Timestamp to, CandleInterval interval)
+    {
+        var request = new GetCandlesRequest
+        {
+            InstrumentId = instrumentId.ToString(),
+            From = from,
+            To = to,
+            Interval = interval
+        };
+
+        return request;
     }
 }
