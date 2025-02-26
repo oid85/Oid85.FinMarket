@@ -3,9 +3,9 @@ using Oid85.FinMarket.Common.Helpers;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 
-namespace Oid85.FinMarket.External.Tinkoff.Helpers;
+namespace Oid85.FinMarket.External.Tinkoff;
 
-public class GetPricesHelper(
+public class GetPricesService(
     ILogger logger,
     InvestApiClient client)
 {

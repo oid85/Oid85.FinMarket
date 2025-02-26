@@ -3,7 +3,6 @@ using NLog;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.Tinkoff.Helpers;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -21,7 +20,8 @@ namespace Oid85.FinMarket.External.Tinkoff;
 public class TinkoffService(
     ILogger logger,
     InvestApiClient client,
-    GetPricesHelper getPricesHelper)
+    GetPricesService getPricesService,
+    GetInstrumentsService getInstrumentsService)
     : ITinkoffService
 {
     private const int DelayInMilliseconds = 50;
@@ -105,7 +105,7 @@ public class TinkoffService(
 
     /// <inheritdoc />
     public Task<List<double>> GetPricesAsync(List<Guid> instrumentIds) =>
-        getPricesHelper.GetPricesAsync(instrumentIds);
+        getPricesService.GetPricesAsync(instrumentIds);
 
     private async Task<List<Candle>> GetCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
@@ -146,233 +146,24 @@ public class TinkoffService(
     }
 
     /// <inheritdoc />
-    public async Task<List<Share>> GetSharesAsync()
-    {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
-            
-            List<TinkoffShare> shares = (await client.Instruments
-                    .SharesAsync()).Instruments
-                .Where(x => x.CountryOfRisk.ToLower() == "ru")
-                .ToList(); 
-
-            var result = new List<Share>();
-
-            foreach (var share in shares)
-            {
-                if (share.Ticker.Contains("@"))
-                    continue;
-                    
-                if (share.Ticker.Contains("-"))
-                    continue;
-                    
-                result.Add(new Share
-                {
-                    Ticker = share.Ticker,
-                    Figi = share.Figi,
-                    InstrumentId = Guid.Parse(share.Uid),
-                    Isin = share.Isin,
-                    Name = share.Name,
-                    Sector = share.Sector
-                });
-            }
-
-            return result;
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
-    }
+    public Task<List<Share>> GetSharesAsync() =>
+        getInstrumentsService.GetSharesAsync();
+    
     /// <inheritdoc />
-    public async Task<List<Future>> GetFuturesAsync()
-    {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
-            
-            List<TinkoffFuture> futures = (await client.Instruments
-                    .FuturesAsync()).Instruments
-                .Where(x => x.CountryOfRisk.ToLower() == "ru")
-                .ToList(); 
-
-            var result = new List<Future>();
-
-            foreach (var future in futures)
-            {
-                if (future.Ticker.Contains("@"))
-                    continue;
-                    
-                if (future.Ticker.Contains("-"))
-                    continue;
-                    
-                result.Add(new Future
-                {
-                    Ticker = future.Ticker,
-                    Figi = future.Figi,
-                    Name = future.Name,
-                    InstrumentId = Guid.Parse(future.Uid),
-                    ExpirationDate = ConvertHelper.TimestampToDateOnly(future.ExpirationDate),
-                    Lot = future.Lot,
-                    FirstTradeDate = ConvertHelper.TimestampToDateOnly(future.FirstTradeDate),
-                    LastTradeDate = ConvertHelper.TimestampToDateOnly(future.LastTradeDate),
-                    FutureType = future.FuturesType,
-                    AssetType = future.AssetType,
-                    BasicAsset = future.BasicAsset,
-                    BasicAssetSize = ConvertHelper.QuotationToDouble(future.BasicAssetSize),
-                    InitialMarginOnBuy = ConvertHelper.MoneyValueToDouble(future.InitialMarginOnBuy),
-                    InitialMarginOnSell = ConvertHelper.MoneyValueToDouble(future.InitialMarginOnSell),
-                    MinPriceIncrementAmount = ConvertHelper.QuotationToDouble(future.MinPriceIncrementAmount)
-                });
-            }
-
-            return result;
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
-    }
-        
+    public Task<List<Future>> GetFuturesAsync() =>
+        getInstrumentsService.GetFuturesAsync();
+    
     /// <inheritdoc />
-    public async Task<List<Bond>> GetBondsAsync()
-    {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
-            
-            List<TinkoffBond> bonds = (await client.Instruments.BondsAsync())
-                .Instruments
-                .ToList();
-
-            var result = new List<Bond>();
-
-            foreach (var bond in bonds)
-            {
-                var instrument = new Bond
-                {
-                    Ticker = bond.Ticker,
-                    Figi = bond.Figi,
-                    Isin = bond.Isin,
-                    Name = bond.Name,
-                    InstrumentId = Guid.Parse(bond.Uid),
-                    Sector = bond.Sector,
-                    Currency = bond.Currency,
-                    Nkd = ConvertHelper.MoneyValueToDouble(bond.AciValue),
-                    MaturityDate = ConvertHelper.TimestampToDateOnly(bond.MaturityDate),
-                    FloatingCouponFlag = bond.FloatingCouponFlag,
-                    RiskLevel = bond.RiskLevel switch
-                    {
-                        RiskLevel.Low => 1,
-                        RiskLevel.Moderate => 2,
-                        RiskLevel.High => 3,
-                        RiskLevel.Unspecified => 0,
-                        _ => 0
-                    }
-                };
-
-                result.Add(instrument);
-            }
-
-            return result;
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
-    }
-        
-    /// <inheritdoc />
-    public async Task<List<FinIndex>> GetIndexesAsync()
-    {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
-            
-            var request = new IndicativesRequest();
-                
-            var indicatives = (await client.Instruments
-                    .IndicativesAsync(request))
-                .Instruments
-                .ToList();
-
-            var result = new List<FinIndex>();
-
-            foreach (var indicative in indicatives)
-            {
-                var instrument = new FinIndex
-                {
-                    Figi = indicative.Figi,
-                    Ticker = indicative.Ticker,
-                    ClassCode = indicative.ClassCode,
-                    Currency = indicative.Currency,
-                    InstrumentKind = indicative.InstrumentKind.ToString(),
-                    Name = indicative.Name,
-                    Exchange = indicative.Exchange,
-                    InstrumentId = Guid.Parse(indicative.Uid)
-                };
-
-                result.Add(instrument);
-            }
-
-            return result;
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
-    }
+    public Task<List<Bond>> GetBondsAsync() =>
+        getInstrumentsService.GetBondsAsync();
 
     /// <inheritdoc />
-    public async Task<List<Currency>> GetCurrenciesAsync()
-    {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
-            
-            var request = new InstrumentsRequest();
-                
-            var currencies = (await client.Instruments
-                    .CurrenciesAsync(request))
-                .Instruments
-                .ToList();
+    public Task<List<FinIndex>> GetIndexesAsync() =>
+        getInstrumentsService.GetIndexesAsync();
 
-            var result = new List<Currency>();
-
-            foreach (var currency in currencies)
-            {
-                var instrument = new Currency
-                {
-                    Ticker = currency.Ticker,
-                    Isin = currency.Isin,
-                    Figi = currency.Figi,
-                    ClassCode = currency.ClassCode,
-                    Name = currency.Name,
-                    IsoCurrencyName = currency.IsoCurrencyName,
-                    InstrumentId = Guid.Parse(currency.Uid)
-                };
-
-                result.Add(instrument);
-            }
-
-            return result;
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
-    }
+    /// <inheritdoc />
+    public Task<List<Currency>> GetCurrenciesAsync() =>
+        getInstrumentsService.GetCurrenciesAsync();
 
     /// <inheritdoc />
     public async Task<List<DividendInfo>> GetDividendInfoAsync(

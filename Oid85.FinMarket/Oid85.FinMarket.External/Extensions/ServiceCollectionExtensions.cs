@@ -5,7 +5,6 @@ using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.Telegram;
 using Oid85.FinMarket.External.Tinkoff;
-using Oid85.FinMarket.External.Tinkoff.Helpers;
 using Telegram.Bot;
 
 namespace Oid85.FinMarket.External.Extensions;
@@ -17,7 +16,8 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddTransient<ITinkoffService, TinkoffService>();
-        services.AddTransient<GetPricesHelper>();
+        services.AddTransient<GetPricesService>();
+        services.AddTransient<GetInstrumentsService>();
         services.AddTransient<ITelegramService, TelegramService>();
         services.AddTransient<IResourceStoreService, ResourceStoreService>();
         
