@@ -21,130 +21,30 @@ public class TinkoffService(
     ILogger logger,
     InvestApiClient client,
     GetPricesService getPricesService,
-    GetInstrumentsService getInstrumentsService)
+    GetInstrumentsService getInstrumentsService,
+    GetCandlesService getCandlesService)
     : ITinkoffService
 {
     private const int DelayInMilliseconds = 50;
     
     // <inheritdoc />
-    public async Task<List<Candle>> GetCandlesAsync(
-        Guid instrumentId, DateOnly from, DateOnly to)
-    {
-        try
-        {
-            return await GetCandlesAsync(
-                instrumentId, 
-                Timestamp.FromDateTime(from.ToDateTime(TimeOnly.MinValue).ToUniversalTime()), 
-                Timestamp.FromDateTime(to.ToDateTime(TimeOnly.MinValue).ToUniversalTime()));
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
-    }
+    public Task<List<Candle>> GetDailyCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to) =>
+        getCandlesService.GetDailyCandlesAsync(instrumentId, from, to);
 
     /// <inheritdoc />
-    public async Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year)
-    {
-        try
-        {
-            return await GetCandlesAsync(
-                instrumentId, 
-                Timestamp.FromDateTime(new DateTime(year, 1, 1).ToUniversalTime()), 
-                Timestamp.FromDateTime(new DateTime(year, 12, 31).ToUniversalTime()));
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
-    }
+    public Task<List<Candle>> GetDailyCandlesAsync(Guid instrumentId, int year) =>
+        getCandlesService.GetDailyCandlesAsync(instrumentId, year);
 
     /// <inheritdoc />
-    public async Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
-        Guid instrumentId, DateTime from, DateTime to)
-    {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
-            
-            var request = new GetCandlesRequest
-            {
-                InstrumentId = instrumentId.ToString(),
-                From = Timestamp.FromDateTime(from.ToUniversalTime()),
-                To = Timestamp.FromDateTime(to.ToUniversalTime()),
-                Interval = CandleInterval._5Min
-            };
-
-            var response = await client.MarketData.GetCandlesAsync(request);
-
-            return response.Candles.Select(historicCandle => new FiveMinuteCandle
-                {
-                    InstrumentId = instrumentId,
-                    Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-                    Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-                    High = ConvertHelper.QuotationToDouble(historicCandle.High),
-                    Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-                    Volume = historicCandle.Volume,
-                    Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-                    Time = ConvertHelper.TimestampToTimeOnly(historicCandle.Time),
-                    IsComplete = historicCandle.IsComplete
-                })
-                .ToList();
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception, "Ошибка получения данных. {instrumentId}", instrumentId);
-            return [];
-        }
-    }
+    public Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
+        Guid instrumentId, DateTime from, DateTime to) =>
+        getCandlesService.GetFiveMinuteCandlesAsync(instrumentId, from, to);
 
     /// <inheritdoc />
     public Task<List<double>> GetPricesAsync(List<Guid> instrumentIds) =>
         getPricesService.GetPricesAsync(instrumentIds);
-
-    private async Task<List<Candle>> GetCandlesAsync(
-        Guid instrumentId, Timestamp from, Timestamp to)
-    {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
-        
-            var request = new GetCandlesRequest
-            {
-                InstrumentId = instrumentId.ToString(),
-                From = from,
-                To = to,
-                Interval = CandleInterval.Day
-            };
-
-            var response = await client.MarketData.GetCandlesAsync(request);
-
-            return response.Candles.Select(historicCandle => new Candle
-                {
-                    InstrumentId = instrumentId,
-                    Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-                    Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-                    High = ConvertHelper.QuotationToDouble(historicCandle.High),
-                    Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-                    Volume = historicCandle.Volume,
-                    Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-                    IsComplete = historicCandle.IsComplete
-                })
-                .ToList();
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception, "Ошибка получения данных. {instrumentId}", instrumentId);
-            return [];
-        }
-    }
-
+    
     /// <inheritdoc />
     public Task<List<Share>> GetSharesAsync() =>
         getInstrumentsService.GetSharesAsync();

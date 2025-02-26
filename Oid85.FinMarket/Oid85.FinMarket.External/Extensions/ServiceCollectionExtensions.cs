@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITinkoffService, TinkoffService>();
         services.AddTransient<GetPricesService>();
         services.AddTransient<GetInstrumentsService>();
+        services.AddTransient<GetCandlesService>();
         services.AddTransient<ITelegramService, TelegramService>();
         services.AddTransient<IResourceStoreService, ResourceStoreService>();
         

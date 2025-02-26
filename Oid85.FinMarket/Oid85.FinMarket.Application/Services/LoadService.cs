@@ -99,7 +99,7 @@ public class LoadService(
 
                     for (int year = currentYear - historyInYears; year <= currentYear; year++)
                     {
-                        var candles = await tinkoffService.GetCandlesAsync(
+                        var candles = await tinkoffService.GetDailyCandlesAsync(
                             instrument.InstrumentId, year);
                     
                         await candleRepository.AddOrUpdateAsync(candles);
@@ -108,7 +108,7 @@ public class LoadService(
 
                 else
                 {
-                    var candles = await tinkoffService.GetCandlesAsync(
+                    var candles = await tinkoffService.GetDailyCandlesAsync(
                         instrument.InstrumentId,
                         lastCandle.Date,
                         DateOnly.FromDateTime(DateTime.Today));
@@ -275,7 +275,7 @@ public class LoadService(
 
                     for (int year = currentYear - historyInYears; year <= currentYear; year++)
                     {
-                        var candles = await tinkoffService.GetCandlesAsync(
+                        var candles = await tinkoffService.GetDailyCandlesAsync(
                             instrument.InstrumentId, year);
                     
                         await candleRepository.AddOrUpdateAsync(candles);
@@ -284,7 +284,7 @@ public class LoadService(
 
                 else
                 {
-                    var candles = await tinkoffService.GetCandlesAsync(
+                    var candles = await tinkoffService.GetDailyCandlesAsync(
                         instrument.InstrumentId,
                         lastCandle.Date,
                         DateOnly.FromDateTime(DateTime.Today));
@@ -421,7 +421,7 @@ public class LoadService(
 
                     for (int year = currentYear - historyInYears; year <= currentYear; year++)
                     {
-                        var candles = await tinkoffService.GetCandlesAsync(
+                        var candles = await tinkoffService.GetDailyCandlesAsync(
                             instrument.InstrumentId, year);
                     
                         await candleRepository.AddOrUpdateAsync(candles);
@@ -430,7 +430,7 @@ public class LoadService(
 
                 else
                 {
-                    var candles = await tinkoffService.GetCandlesAsync(
+                    var candles = await tinkoffService.GetDailyCandlesAsync(
                         instrument.InstrumentId,
                         lastCandle.Date,
                         DateOnly.FromDateTime(DateTime.Today));
@@ -528,7 +528,7 @@ public class LoadService(
 
                     for (int year = currentYear - historyInYears; year <= currentYear; year++)
                     {
-                        var candles = await tinkoffService.GetCandlesAsync(
+                        var candles = await tinkoffService.GetDailyCandlesAsync(
                             instrument.InstrumentId, year);
                     
                         await candleRepository.AddOrUpdateAsync(candles);
@@ -537,7 +537,7 @@ public class LoadService(
 
                 else
                 {
-                    var candles = await tinkoffService.GetCandlesAsync(
+                    var candles = await tinkoffService.GetDailyCandlesAsync(
                         instrument.InstrumentId,
                         lastCandle.Date,
                         DateOnly.FromDateTime(DateTime.Today));
@@ -654,7 +654,7 @@ public class LoadService(
 
                     for (int year = currentYear - historyInYears; year <= currentYear; year++)
                     {
-                        var candles = await tinkoffService.GetCandlesAsync(
+                        var candles = await tinkoffService.GetDailyCandlesAsync(
                             instrument.InstrumentId, year);
                     
                         await candleRepository.AddOrUpdateAsync(candles);
@@ -663,7 +663,7 @@ public class LoadService(
 
                 else
                 {
-                    var candles = await tinkoffService.GetCandlesAsync(
+                    var candles = await tinkoffService.GetDailyCandlesAsync(
                         instrument.InstrumentId,
                         lastCandle.Date,
                         DateOnly.FromDateTime(DateTime.Today));
