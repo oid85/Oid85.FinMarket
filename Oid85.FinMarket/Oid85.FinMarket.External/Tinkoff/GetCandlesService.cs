@@ -39,57 +39,60 @@ public class GetCandlesService(
     {
         await Task.Delay(DelayInMilliseconds);
         
-        var response = await SendGetCandlesRequest(
-            instrumentId, from, to, CandleInterval.Day);
+        var request = CreateGetCandlesRequest(instrumentId, from, to, CandleInterval.Day);
+        var response = await SendGetCandlesRequest(request);
 
         if (response is null)
             return [];
 
-        return response.Candles.Select(historicCandle => new Candle
-            {
-                InstrumentId = instrumentId,
-                Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-                Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-                High = ConvertHelper.QuotationToDouble(historicCandle.High),
-                Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-                Volume = historicCandle.Volume,
-                Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-                IsComplete = historicCandle.IsComplete
-            })
-            .ToList();
+        var candles = response.Candles.Select(MapCandle).ToList();
+        candles.ForEach(x => x.InstrumentId = instrumentId);
+        return candles;
     }
-    
+
+    private static Candle MapCandle(HistoricCandle historicCandle) =>
+        new()
+        {
+            Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
+            Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
+            High = ConvertHelper.QuotationToDouble(historicCandle.High),
+            Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
+            Volume = historicCandle.Volume,
+            Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
+            IsComplete = historicCandle.IsComplete
+        };
+
     private async Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
     {
         await Task.Delay(DelayInMilliseconds);
         
-        var response = await SendGetCandlesRequest(
-            instrumentId, from, to, CandleInterval._5Min);
+        var request = CreateGetCandlesRequest(instrumentId, from, to, CandleInterval._5Min);
+        var response = await SendGetCandlesRequest(request);
 
         if (response is null)
             return [];
         
-        return response.Candles.Select(historicCandle => new FiveMinuteCandle
-            {
-                InstrumentId = instrumentId,
-                Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-                Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-                High = ConvertHelper.QuotationToDouble(historicCandle.High),
-                Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-                Volume = historicCandle.Volume,
-                Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-                Time = ConvertHelper.TimestampToTimeOnly(historicCandle.Time),
-                IsComplete = historicCandle.IsComplete
-            })
-            .ToList();
+        var candles = response.Candles.Select(MapFiveMinuteCandle).ToList();
+        candles.ForEach(x => x.InstrumentId = instrumentId);
+        return candles;
     }
 
-    private async Task<GetCandlesResponse?> SendGetCandlesRequest(
-        Guid instrumentId, Timestamp from, Timestamp to, CandleInterval interval)
+    private static FiveMinuteCandle MapFiveMinuteCandle(HistoricCandle historicCandle) =>
+        new()
+        {
+            Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
+            Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
+            High = ConvertHelper.QuotationToDouble(historicCandle.High),
+            Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
+            Volume = historicCandle.Volume,
+            Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
+            Time = ConvertHelper.TimestampToTimeOnly(historicCandle.Time),
+            IsComplete = historicCandle.IsComplete
+        };
+    
+    private async Task<GetCandlesResponse?> SendGetCandlesRequest(GetCandlesRequest request)
     {
-        var request = CreateGetCandlesRequest(instrumentId, from, to, interval);
-        
         try
         {
             return await client.MarketData.GetCandlesAsync(request);
@@ -103,16 +106,12 @@ public class GetCandlesService(
     }
 
     private static GetCandlesRequest CreateGetCandlesRequest(
-        Guid instrumentId, Timestamp from, Timestamp to, CandleInterval interval)
-    {
-        var request = new GetCandlesRequest
+        Guid instrumentId, Timestamp from, Timestamp to, CandleInterval interval) =>
+        new()
         {
             InstrumentId = instrumentId.ToString(),
             From = from,
             To = to,
             Interval = interval
         };
-
-        return request;
-    }
 }

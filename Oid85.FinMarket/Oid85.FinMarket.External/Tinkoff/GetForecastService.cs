@@ -15,109 +15,104 @@ public class GetForecastService(
     
         public async Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId)
     {
-        try
-        {
             await Task.Delay(DelayInMilliseconds);
-            
-            var request = new GetForecastRequest
-            {
-                InstrumentId = instrumentId.ToString()
-            };
-            
-            var response = await client.Instruments.GetForecastByAsync(request);
 
+            var request = CreateGetForecastRequest(instrumentId);
+            var response = await SendGetForecastRequest(request);
+            
             if (response is null)
                 return ([], new());
 
             var targets = new List<ForecastTarget>();
-            
-            foreach (var targetItem in response.Targets)
-            {
-                var target = new ForecastTarget
-                {
-                    InstrumentId = Guid.Parse(targetItem.Uid),
-                    Ticker = targetItem.Ticker,
-                    Company = targetItem.Company
-                };
 
-                switch (targetItem.Recommendation)
-                {
-                    case Recommendation.Unspecified:
-                        target.RecommendationString = KnownForecastRecommendations.Unknown;
-                        target.RecommendationNumber = 0;
-                        break;
-                    
-                    case Recommendation.Buy:
-                        target.RecommendationString = KnownForecastRecommendations.Buy;
-                        target.RecommendationNumber = 1;
-                        break;
-                    
-                    case Recommendation.Hold:
-                        target.RecommendationString = KnownForecastRecommendations.Hold;
-                        target.RecommendationNumber = 2;
-                        break;
-                    
-                    case Recommendation.Sell:
-                        target.RecommendationString = KnownForecastRecommendations.Sell;
-                        target.RecommendationNumber = 3;
-                        break;
-                }
-                
-                target.RecommendationDate = ConvertHelper.TimestampToDateOnly(targetItem.RecommendationDate);
-                target.Currency = targetItem.Currency;
-                target.CurrentPrice = ConvertHelper.QuotationToDouble(targetItem.CurrentPrice);
-                target.TargetPrice = ConvertHelper.QuotationToDouble(targetItem.TargetPrice);
-                target.PriceChange = ConvertHelper.QuotationToDouble(targetItem.PriceChange);
-                target.PriceChangeRel = ConvertHelper.QuotationToDouble(targetItem.PriceChangeRel);
-                target.ShowName = targetItem.ShowName;
-                
-                targets.Add(target);
-            }
-            
-            var consensus = new ForecastConsensus
-            {
-                InstrumentId = Guid.Parse(response.Consensus.Uid),
-                Ticker = response.Consensus.Ticker
-            };
+            if (response.Targets is not null)
+                foreach (var targetItem in response.Targets)
+                    if (targetItem is not null)
+                    {
+                        var target = Map(targetItem);
+                        targets.Add(target);   
+                    }
 
-            switch (response.Consensus.Recommendation)
-            {
-                case Recommendation.Unspecified:
-                    consensus.RecommendationString = KnownForecastRecommendations.Unknown;
-                    consensus.RecommendationNumber = 0;
-                    break;
-                    
-                case Recommendation.Buy:
-                    consensus.RecommendationString = KnownForecastRecommendations.Buy;
-                    consensus.RecommendationNumber = 1;
-                    break;
-                    
-                case Recommendation.Hold:
-                    consensus.RecommendationString = KnownForecastRecommendations.Hold;
-                    consensus.RecommendationNumber = 2;
-                    break;
-                    
-                case Recommendation.Sell:
-                    consensus.RecommendationString = KnownForecastRecommendations.Sell;
-                    consensus.RecommendationNumber = 3;
-                    break;
-            }
-            
-            consensus.Currency = response.Consensus.Currency;
-            consensus.CurrentPrice = ConvertHelper.QuotationToDouble(response.Consensus.CurrentPrice);
-            consensus.ConsensusPrice = ConvertHelper.QuotationToDouble(response.Consensus.Consensus);
-            consensus.MinTarget = ConvertHelper.QuotationToDouble(response.Consensus.MinTarget);
-            consensus.MaxTarget = ConvertHelper.QuotationToDouble(response.Consensus.MaxTarget);
-            consensus.PriceChange = ConvertHelper.QuotationToDouble(response.Consensus.PriceChange);
-            consensus.PriceChangeRel = ConvertHelper.QuotationToDouble(response.Consensus.PriceChangeRel);
+            var consensus = response.Consensus is null 
+                ? new() 
+                : Map(response.Consensus);
             
             return (targets, consensus);
+    }
+        
+    private static ForecastTarget Map(GetForecastResponse.Types.TargetItem targetItem) =>
+        new()
+        {
+            InstrumentId = Guid.Parse(targetItem.Uid),
+            Ticker = targetItem.Ticker,
+            Company = targetItem.Company,
+            RecommendationDate = ConvertHelper.TimestampToDateOnly(targetItem.RecommendationDate),
+            Currency = targetItem.Currency,
+            CurrentPrice = ConvertHelper.QuotationToDouble(targetItem.CurrentPrice),
+            TargetPrice = ConvertHelper.QuotationToDouble(targetItem.TargetPrice),
+            PriceChange = ConvertHelper.QuotationToDouble(targetItem.PriceChange),
+            PriceChangeRel = ConvertHelper.QuotationToDouble(targetItem.PriceChangeRel),
+            ShowName = targetItem.ShowName,
+            RecommendationNumber = targetItem.Recommendation switch
+            {
+                Recommendation.Buy => 1,
+                Recommendation.Hold => 2,
+                Recommendation.Sell => 3,
+                _ => 0
+            },
+            RecommendationString = targetItem.Recommendation switch
+            {
+                Recommendation.Buy => KnownForecastRecommendations.Buy,
+                Recommendation.Hold => KnownForecastRecommendations.Hold,
+                Recommendation.Sell => KnownForecastRecommendations.Sell,
+                _ => string.Empty
+            }
+        };
+    
+    private static ForecastConsensus Map(GetForecastResponse.Types.ConsensusItem consensusItem) =>
+        new()
+        {
+            InstrumentId = Guid.Parse(consensusItem.Uid),
+            Ticker = consensusItem.Ticker,
+            Currency = consensusItem.Currency,
+            CurrentPrice = ConvertHelper.QuotationToDouble(consensusItem.CurrentPrice),
+            MinTarget = ConvertHelper.QuotationToDouble(consensusItem.MinTarget),
+            MaxTarget = ConvertHelper.QuotationToDouble(consensusItem.MaxTarget),
+            PriceChange = ConvertHelper.QuotationToDouble(consensusItem.PriceChange),
+            PriceChangeRel = ConvertHelper.QuotationToDouble(consensusItem.PriceChangeRel),
+            RecommendationNumber = consensusItem.Recommendation switch
+            {
+                Recommendation.Buy => 1,
+                Recommendation.Hold => 2,
+                Recommendation.Sell => 3,
+                _ => 0
+            },
+            RecommendationString = consensusItem.Recommendation switch
+            {
+                Recommendation.Buy => KnownForecastRecommendations.Buy,
+                Recommendation.Hold => KnownForecastRecommendations.Hold,
+                Recommendation.Sell => KnownForecastRecommendations.Sell,
+                _ => string.Empty
+            }
+        };
+    
+    private static GetForecastRequest CreateGetForecastRequest(Guid instrumentId) =>
+        new()
+        {
+            InstrumentId = instrumentId.ToString()
+        };
+    
+    private async Task<GetForecastResponse?> SendGetForecastRequest(GetForecastRequest request)
+    {
+        try
+        {
+            return await client.Instruments.GetForecastByAsync(request);
         }
         
         catch (Exception exception)
         {
-            logger.Error(exception, "Ошибка получения данных. {instrumentId}", instrumentId);
-            return ([], new());
+            logger.Error(exception, "Ошибка получения данных. {request}", request);
+            return null;
         }
     }
 }

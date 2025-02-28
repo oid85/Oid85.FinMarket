@@ -29,33 +29,23 @@ public class GetPricesService(
 
     private async Task<List<double>> GetPricesByChunkAsync(List<Guid> chunkInstrumentIds)
     {
-        try
-        {
-            await Task.Delay(DelayInMilliseconds);
+        await Task.Delay(DelayInMilliseconds);
             
-            var response = await SendGetLastPricesRequest(chunkInstrumentIds);
+        var request = CreateGetLastPricesRequest(chunkInstrumentIds);
+        var response = await SendGetLastPricesRequest(request);
                 
-            if (response is null)
-                return [];
-                
-            var result = response.LastPrices
-                .Select(x => ConvertHelper.QuotationToDouble(x.Price))
-                .ToList();
-
-            return result;
-        }
-
-        catch (Exception exception)
-        {
-            logger.Error(exception);
+        if (response is null)
             return [];
-        }        
+                
+        var result = response.LastPrices
+            .Select(x => ConvertHelper.QuotationToDouble(x.Price))
+            .ToList();
+
+        return result;      
     }
     
-    private async Task<GetLastPricesResponse?> SendGetLastPricesRequest(List<Guid> instrumentIds)
+    private async Task<GetLastPricesResponse?> SendGetLastPricesRequest(GetLastPricesRequest request)
     {
-        var request = CreateGetLastPricesRequest(instrumentIds);
-        
         try
         {
             return await client.MarketData.GetLastPricesAsync(request);

@@ -16,72 +16,60 @@ public class GetDividendInfoService(
     public async Task<List<DividendInfo>> GetDividendInfoAsync(
     List<Share> shares)
     {
-        try
+        await Task.Delay(DelayInMilliseconds);
+        
+        var dividendInfos = new List<DividendInfo>();
+
+        foreach (var share in shares)
         {
             await Task.Delay(DelayInMilliseconds);
-            
-            var dividendInfos = new List<DividendInfo>();
-            
-            var from = DateTime.SpecifyKind(
-                new DateTime(DateTime.UtcNow.Year, 1, 1), 
-                DateTimeKind.Utc);
-            
-            var to = from.AddYears(2);
 
-            foreach (var share in shares)
-            {
-                await Task.Delay(DelayInMilliseconds);
+            var request = CreateGetDividendsRequest(share.InstrumentId);
+            var response = await SendGetDividendsRequest(request);
 
-                var request = CreateGetDividendsRequest(share.InstrumentId);
+            if (response is null)
+                continue;
 
-                var response = await client
-                    .Instruments
-                    .GetDividendsAsync(request);
-
-                if (response is null)
-                    continue;
-
-                var dividends = response.Dividends.ToList();
-
-                if (dividends.Any())
-                {
-                    foreach (var dividend in dividends)
+            if (response.Dividends is not null)
+                foreach (var dividend in response.Dividends)
+                    if (dividend is not null)
                     {
-                        if (dividend is null)
-                            continue;
-
-                        var dividendInfo = new DividendInfo
-                        {
-                            Ticker = share.Ticker,
-                            InstrumentId = share.InstrumentId,
-                            DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
-                            RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
-                            Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
-                            DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
-                        };
-
-                        dividendInfos.Add(dividendInfo);
-                    }                    
-                }
-            }
-
-            return dividendInfos;
+                        var dividendInfo = Map(dividend, share);
+                        dividendInfos.Add(dividendInfo);   
+                    }
         }
-            
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
+
+        return dividendInfos;
     }
 
-    private static GetDividendsRequest CreateGetDividendsRequest(Guid instrumentId)
-    {
-        var request = new GetDividendsRequest
+    private static DividendInfo Map(Dividend dividend, Share share) =>
+        new()
+        {
+            Ticker = share.Ticker,
+            InstrumentId = share.InstrumentId,
+            DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
+            RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
+            Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
+            DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
+        };
+    
+    private static GetDividendsRequest CreateGetDividendsRequest(Guid instrumentId) =>
+        new()
         {
             InstrumentId = instrumentId.ToString()
         };
-
-        return request;
+    
+    private async Task<GetDividendsResponse?> SendGetDividendsRequest(GetDividendsRequest request)
+    {
+        try
+        {
+            return await client.Instruments.GetDividendsAsync(request);
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Error(exception, "Ошибка получения данных. {request}", request);
+            return null;
+        }
     }
 }
