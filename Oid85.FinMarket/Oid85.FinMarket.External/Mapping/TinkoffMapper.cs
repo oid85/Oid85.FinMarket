@@ -14,14 +14,13 @@ using TinkoffCurrency = Tinkoff.InvestApi.V1.Currency;
 
 namespace Oid85.FinMarket.External.Mapping;
 
-public static class TinkoffMap
+public static class TinkoffMapper
 {
     private static readonly List<string> BadTickerSymbols = [ "@", "-" ]; 
     
     public static Share? Map(TinkoffShare tinkoffShare)
     {
-        bool containsBadSymbol = BadTickerSymbols
-            .Any(x => tinkoffShare.Ticker.Contains(x));
+        bool containsBadSymbol = BadTickerSymbols.Any(x => tinkoffShare.Ticker.Contains(x));
         
         if (containsBadSymbol)
             return null;
@@ -39,8 +38,7 @@ public static class TinkoffMap
 
     public static Future? Map(TinkoffFuture tinkoffFuture)
     {
-        bool containsBadSymbol = BadTickerSymbols
-            .Any(x => tinkoffFuture.Ticker.Contains(x));
+        bool containsBadSymbol = BadTickerSymbols.Any(x => tinkoffFuture.Ticker.Contains(x));
         
         if (containsBadSymbol)
             return null;
@@ -67,8 +65,7 @@ public static class TinkoffMap
 
     public static Bond? Map(TinkoffBond tinkoffBond)
     {
-        bool containsBadSymbol = BadTickerSymbols
-            .Any(x => tinkoffBond.Ticker.Contains(x));
+        bool containsBadSymbol = BadTickerSymbols.Any(x => tinkoffBond.Ticker.Contains(x));
         
         if (containsBadSymbol)
             return null;
@@ -98,8 +95,7 @@ public static class TinkoffMap
 
     public static FinIndex? Map(IndicativeResponse indicativeResponse)
     {
-        bool containsBadSymbol = BadTickerSymbols
-            .Any(x => indicativeResponse.Ticker.Contains(x));
+        bool containsBadSymbol = BadTickerSymbols.Any(x => indicativeResponse.Ticker.Contains(x));
         
         if (containsBadSymbol)
             return null;
@@ -119,8 +115,7 @@ public static class TinkoffMap
 
     public static Currency? Map(TinkoffCurrency tinkoffCurrency)
     {
-        bool containsBadSymbol = BadTickerSymbols
-            .Any(x => tinkoffCurrency.Ticker.Contains(x));
+        bool containsBadSymbol = BadTickerSymbols.Any(x => tinkoffCurrency.Ticker.Contains(x));
 
         if (containsBadSymbol)
             return null;

@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -23,7 +24,7 @@ public class SpreadRepository(
                     .AnyAsync(x => 
                         x.FirstInstrumentId == spread.FirstInstrumentId &&
                         x.SecondInstrumentId == spread.SecondInstrumentId))
-                entities.Add(GetEntity(spread));
+                entities.Add(DataAccessMapper.Map(spread));
 
         await context.SpreadEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -107,7 +108,7 @@ public class SpreadRepository(
             .OrderBy(x => x.FirstInstrumentTicker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<Spread?> GetByTickerAsync(string firstInstrumentTicker)
@@ -117,59 +118,6 @@ public class SpreadRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.FirstInstrumentTicker == firstInstrumentTicker);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-    
-    private SpreadEntity GetEntity(Spread model)
-    {
-        var entity = new SpreadEntity
-        {
-            DateTime = model.DateTime,
-            FirstInstrumentId = model.FirstInstrumentId,
-            FirstInstrumentTicker = model.FirstInstrumentTicker,
-            FirstInstrumentRole = model.FirstInstrumentRole,
-            FirstInstrumentPrice = model.FirstInstrumentPrice,
-            SecondInstrumentId = model.SecondInstrumentId,
-            SecondInstrumentTicker = model.SecondInstrumentTicker,
-            SecondInstrumentRole = model.SecondInstrumentRole,
-            SecondInstrumentPrice = model.SecondInstrumentPrice,
-            Multiplier = model.Multiplier,
-            PriceDifference = model.PriceDifference,
-            PriceDifferencePrc = model.PriceDifferencePrc,
-            PriceDifferenceAverage = model.PriceDifferenceAverage,
-            PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc,
-            Funding = model.Funding,
-            SpreadPricePosition = model.SpreadPricePosition
-        };
-
-        return entity;
-    }
-    
-    private Spread GetModel(SpreadEntity entity)
-    {
-        var model = new Spread
-        {
-            Id = entity.Id,
-            DateTime = entity.DateTime,
-            FirstInstrumentId = entity.FirstInstrumentId,
-            FirstInstrumentTicker = entity.FirstInstrumentTicker,
-            FirstInstrumentRole = entity.FirstInstrumentRole,
-            FirstInstrumentPrice = entity.FirstInstrumentPrice,
-            SecondInstrumentId = entity.SecondInstrumentId,
-            SecondInstrumentTicker = entity.SecondInstrumentTicker,
-            SecondInstrumentRole = entity.SecondInstrumentRole,
-            SecondInstrumentPrice = entity.SecondInstrumentPrice,
-            Multiplier = entity.Multiplier,
-            PriceDifference = entity.PriceDifference,
-            PriceDifferencePrc = entity.PriceDifferencePrc,
-            PriceDifferenceAverage = entity.PriceDifferenceAverage,
-            PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc,
-            Funding = entity.Funding,
-            SpreadPricePosition = entity.SpreadPricePosition
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

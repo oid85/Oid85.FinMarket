@@ -1,5 +1,4 @@
 ﻿using NLog;
-using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
@@ -34,7 +33,7 @@ public class GetBondCouponsService(
                 foreach (var coupon in response.Events)
                     if (coupon is not null)
                     {
-                        var bondCoupon = TinkoffMap.Map(coupon, bond);
+                        var bondCoupon = TinkoffMapper.Map(coupon, bond);
                         bondCoupons.Add(bondCoupon);   
                     }
         }

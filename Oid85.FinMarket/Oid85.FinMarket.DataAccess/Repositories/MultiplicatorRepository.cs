@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -23,7 +24,7 @@ public class MultiplicatorRepository(
                     .AnyAsync(x => 
                         x.TickerAo == multiplicator.TickerAo ||
                         x.TickerAp == multiplicator.TickerAp))
-                entities.Add(GetEntity(multiplicator));
+                entities.Add(DataAccessMapper.Map(multiplicator));
             else
                 await UpdateStaticFieldsAsync(multiplicator);
 
@@ -107,7 +108,7 @@ public class MultiplicatorRepository(
             .OrderBy(x => x.TickerAo)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<Multiplicator?> GetAsync(string ticker)
@@ -119,75 +120,6 @@ public class MultiplicatorRepository(
                 x.TickerAo == ticker ||
                 x.TickerAp == ticker);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-    
-    private MultiplicatorEntity GetEntity(Multiplicator model)
-    {
-        var entity = new MultiplicatorEntity
-        {
-            TickerAo = model.TickerAo,
-            TickerAp = model.TickerAp,
-            TotalSharesAo = model.TotalSharesAo,
-            TotalSharesAp = model.TotalSharesAp,
-            Beta = model.Beta,
-            Revenue = model.Revenue,
-            OperatingIncome = model.OperatingIncome,
-            Pe = model.Pe,
-            Pb = model.Pb,
-            Pbv = model.Pbv,
-            Ev = model.Ev,
-            Roe = model.Roe,
-            Roa = model.Roa,
-            NetInterestMargin = model.NetInterestMargin,
-            TotalDebt = model.TotalDebt,
-            NetDebt = model.NetDebt,
-            MarketCapitalization = model.MarketCapitalization,
-            NetIncome = model.NetIncome,
-            Ebitda = model.Ebitda,
-            Eps = model.Eps,
-            FreeCashFlow = model.FreeCashFlow,
-            EvToEbitda = model.EvToEbitda,
-            TotalDebtToEbitda = model.TotalDebtToEbitda,
-            NetDebtToEbitda = model.NetDebtToEbitda
-        };
-
-        return entity;
-    }
-    
-    private Multiplicator GetModel(MultiplicatorEntity entity)
-    {
-        var model = new Multiplicator
-        {
-            Id = entity.Id,
-            TickerAo = entity.TickerAo,
-            TickerAp = entity.TickerAp,
-            TotalSharesAo = entity.TotalSharesAo,
-            TotalSharesAp = entity.TotalSharesAp,
-            Beta = entity.Beta,
-            Revenue = entity.Revenue,
-            OperatingIncome = entity.OperatingIncome,
-            Pe = entity.Pe,
-            Pb = entity.Pb,
-            Pbv = entity.Pbv,
-            Ev = entity.Ev,
-            Roe = entity.Roe,
-            Roa = entity.Roa,
-            NetInterestMargin = entity.NetInterestMargin,
-            TotalDebt = entity.TotalDebt,
-            NetDebt = entity.NetDebt,
-            MarketCapitalization = entity.MarketCapitalization,
-            NetIncome = entity.NetIncome,
-            Ebitda = entity.Ebitda,
-            Eps = entity.Eps,
-            FreeCashFlow = entity.FreeCashFlow,
-            EvToEbitda = entity.EvToEbitda,
-            TotalDebtToEbitda = entity.TotalDebtToEbitda,
-            NetDebtToEbitda = entity.NetDebtToEbitda
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

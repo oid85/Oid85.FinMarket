@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -22,7 +23,7 @@ public class InstrumentRepository(
 
             if (entity is null)
             {
-                SetEntity(ref entity, ticker);
+                DataAccessMapper.Map(ref entity, ticker);
                 
                 if (entity is not null)
                     await context.InstrumentEntities.AddAsync(entity);
@@ -30,7 +31,7 @@ public class InstrumentRepository(
 
             else
             {
-                SetEntity(ref entity, ticker);
+                DataAccessMapper.Map(ref entity, ticker);
             }
         }
 
@@ -42,7 +43,7 @@ public class InstrumentRepository(
             .OrderBy(x => x.Name)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
     
     public async Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -50,9 +51,7 @@ public class InstrumentRepository(
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
     
     public async Task<Instrument?> GetByNameAsync(string name)
@@ -60,9 +59,7 @@ public class InstrumentRepository(
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Name == name);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
     
     public async Task<Instrument?> GetByTickerAsync(string ticker)
@@ -70,32 +67,6 @@ public class InstrumentRepository(
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-    
-    private void SetEntity(ref InstrumentEntity? entity, Instrument model)
-    {
-        entity ??= new InstrumentEntity();
-        
-        entity.InstrumentId = model.InstrumentId;
-        entity.Ticker = model.Ticker;
-        entity.Name = model.Name;
-        entity.Type = model.Type;
-    }
-    
-    private Instrument GetModel(InstrumentEntity entity)
-    {
-        var model = new Instrument
-        {
-            Id = entity.Id,
-            InstrumentId = entity.InstrumentId,
-            Ticker = entity.Ticker,
-            Name = entity.Name,
-            Type = entity.Type
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

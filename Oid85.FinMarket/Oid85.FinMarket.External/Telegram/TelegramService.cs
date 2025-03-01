@@ -18,7 +18,8 @@ public class TelegramService(
     {
         try
         {
-            string chatId = ConvertHelper.Base64Decode(configuration.GetValue<string>(KnownSettingsKeys.TelegramChatId)!);
+            string chatIdBase64 = configuration.GetValue<string>(KnownSettingsKeys.TelegramChatId)!;
+            string chatId = ConvertHelper.Base64Decode(chatIdBase64);
             await botClient.SendMessage(chatId, message);
             await Task.Delay(TimeSpan.FromSeconds(3));
         }

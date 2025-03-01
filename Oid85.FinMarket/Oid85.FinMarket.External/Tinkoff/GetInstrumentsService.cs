@@ -34,7 +34,7 @@ public class GetInstrumentsService(
 
             foreach (var tinkoffShare in tinkoffShares)
             {
-                var share = TinkoffMap.Map(tinkoffShare);
+                var share = TinkoffMapper.Map(tinkoffShare);
                     
                 if (share is not null)
                     result.Add(share);
@@ -65,7 +65,7 @@ public class GetInstrumentsService(
 
             foreach (var tinkoffFuture in tinkoffFutures)
             {
-                var future = TinkoffMap.Map(tinkoffFuture);
+                var future = TinkoffMapper.Map(tinkoffFuture);
                     
                 if (future is not null)
                     result.Add(future);
@@ -95,7 +95,7 @@ public class GetInstrumentsService(
 
             foreach (var tinkoffBond in tinkoffBonds)
             {
-                var bond = TinkoffMap.Map(tinkoffBond);
+                var bond = TinkoffMapper.Map(tinkoffBond);
 
                 if (bond is not null)
                     result.Add(bond);
@@ -128,7 +128,7 @@ public class GetInstrumentsService(
 
             foreach (var indicative in indicatives)
             {
-                var finIndex = TinkoffMap.Map(indicative);
+                var finIndex = TinkoffMapper.Map(indicative);
 
                 if (finIndex is not null)
                     result.Add(finIndex);
@@ -161,7 +161,7 @@ public class GetInstrumentsService(
 
             foreach (var tinkoffCurrency in tinkoffCurrencies)
             {
-                var currency = TinkoffMap.Map(tinkoffCurrency);
+                var currency = TinkoffMapper.Map(tinkoffCurrency);
 
                 if (currency is not null)
                     result.Add(currency);

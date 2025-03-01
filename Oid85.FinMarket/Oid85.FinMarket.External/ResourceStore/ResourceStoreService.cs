@@ -14,51 +14,44 @@ public class ResourceStoreService(
     public async Task<List<string>> GetSharesWatchlistAsync() =>
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "watchLists",
-            "shares.json")) ?? [];
+            "watchLists", "shares.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<string>> GetBondsWatchlistAsync() =>
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "watchLists",
-            "bonds.json")) ?? [];
+            "watchLists", "bonds.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<string>> GetFuturesWatchlistAsync() =>
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "watchLists",
-            "futures.json")) ?? [];
+            "watchLists", "futures.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<string>> GetCurrenciesWatchlistAsync() =>
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "watchLists",
-            "currencies.json")) ?? [];
+            "watchLists", "currencies.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<string>> GetIndexesWatchlistAsync() =>
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "watchLists",
-            "indexes.json")) ?? [];
+            "watchLists", "indexes.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<string>> GetIMoexTickersAsync() =>
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "tickerLists",
-            "imoex.json")) ?? [];
+            "tickerLists", "imoex.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<MultiplicatorResource>> GetMultiplicatorsLtmAsync()
     {
         string directoryPath = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "multiplicators",
-            "ltm");
+            "multiplicators", "ltm");
 
         var filePathes = Directory.GetFiles(directoryPath);
 
@@ -79,8 +72,7 @@ public class ResourceStoreService(
     public async Task<List<PriceLevelResource>> GetPriceLevelsAsync(string ticker) =>
         await ReadAsync<List<PriceLevelResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "priceLevels",
-            $"{ticker.ToLower()}.json")) ?? [];
+            "priceLevels", $"{ticker.ToLower()}.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<FutureCodeResource>> GetFutureCodesAsync() =>
@@ -104,109 +96,87 @@ public class ResourceStoreService(
     public async Task<List<ValueColorResource<int>>> GetColorPaletteAggregatedAnalyseAsync() =>
         await ReadAsync<List<ValueColorResource<int>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "aggregatedAnalyse.json")) ?? [];
+                "colorPalettes", "aggregatedAnalyse.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteCandleSequenceAsync() =>
         await ReadAsync<List<ValueColorResource<string>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "candleSequence.json")) ?? [];
+                "colorPalettes", "candleSequence.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteRsiInterpretationAsync() =>
         await ReadAsync<List<ValueColorResource<string>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "rsiInterpretation.json")) ?? [];
+                "colorPalettes", "rsiInterpretation.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteTrendDirectionAsync() =>
         await ReadAsync<List<ValueColorResource<string>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "trendDirection.json")) ?? [];
+                "colorPalettes", "trendDirection.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteVolumeDirectionAsync() =>
         await ReadAsync<List<ValueColorResource<string>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "volumeDirection.json")) ?? [];
+                "colorPalettes", "volumeDirection.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPaletteYieldDividendAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "limits",
-                "yieldDividendLimits.json")) ?? [];
+                "colorPalettes", "limits", "yieldDividendLimits.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPaletteYieldCouponAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "limits",
-                "yieldCouponLimits.json")) ?? [];
+                "colorPalettes", "limits", "yieldCouponLimits.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPaletteYieldLtmAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "limits",
-                "yieldLtmLimits.json")) ?? [];
+                "colorPalettes", "limits", "yieldLtmLimits.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPaletteDrawdownFromMaximumAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "limits",
-                "drawdownFromMaximumLimits.json")) ?? [];
+                "colorPalettes", "limits", "drawdownFromMaximumLimits.json")) ?? [];
 
     public async Task<List<RangeColorResource>> GetColorPalettePeAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "limits",
-                "peLimits.json")) ?? [];
+                "colorPalettes", "limits", "peLimits.json")) ?? [];
 
     public async Task<List<RangeColorResource>> GetColorPaletteEvToEbitdaAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "limits",
-                "evEbitdaLimits.json")) ?? [];
+                "colorPalettes", "limits", "evEbitdaLimits.json")) ?? [];
 
     public async Task<List<RangeColorResource>> GetColorPaletteNetDebtToEbitdaAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "limits",
-                "netDebtEbitdaLimits.json")) ?? [];
+                "colorPalettes", "limits", "netDebtEbitdaLimits.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteSpreadPricePositionAsync() =>
         await ReadAsync<List<ValueColorResource<string>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "colorPalettes",
-                "spreadPricePosition.json")) ?? [];
+                "colorPalettes", "spreadPricePosition.json")) ?? [];
 
     /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteForecastRecommendationAsync() =>
         await ReadAsync<List<ValueColorResource<string>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "colorPalettes",
-            "forecastRecommendation.json")) ?? [];
+            "colorPalettes", "forecastRecommendation.json")) ?? [];
 
     public async Task<FilterBondsResource?> GetFilterBondsResourceAsync() =>
         await ReadAsync<FilterBondsResource>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "filters",
-            "filterBonds.json"));
+            "filters", "filterBonds.json"));
 
     private async Task<T?> ReadAsync<T>(string path)
     {

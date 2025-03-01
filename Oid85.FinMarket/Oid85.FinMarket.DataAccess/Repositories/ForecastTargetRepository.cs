@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -24,7 +25,7 @@ public class ForecastTargetRepository(
                         x.InstrumentId == forecastTarget.InstrumentId && 
                         x.Company == forecastTarget.Company && 
                         x.RecommendationDate == forecastTarget.RecommendationDate))
-                entities.Add(GetEntity(forecastTarget));
+                entities.Add(DataAccessMapper.Map(forecastTarget));
 
         await context.ForecastTargetEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -67,7 +68,7 @@ public class ForecastTargetRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<List<ForecastTarget>> GetByTickerAsync(string ticker)
@@ -78,9 +79,7 @@ public class ForecastTargetRepository(
             .AsNoTracking()
             .ToListAsync();
         
-        var models = entities
-            .Select(GetModel)
-            .ToList();
+        var models = entities.Select(DataAccessMapper.Map).ToList();
         
         return models;
     }
@@ -93,53 +92,8 @@ public class ForecastTargetRepository(
             .AsNoTracking()
             .ToListAsync();
         
-        var models = entities
-            .Select(GetModel)
-            .ToList();
+        var models = entities.Select(DataAccessMapper.Map).ToList();
         
         return models;
-    }
-    
-    private ForecastTargetEntity GetEntity(ForecastTarget model)
-    {
-        var entity = new ForecastTargetEntity
-        {
-            Ticker = model.Ticker,
-            InstrumentId = model.InstrumentId,
-            Company = model.Company,
-            RecommendationString = model.RecommendationString,
-            RecommendationNumber = model.RecommendationNumber,
-            RecommendationDate = model.RecommendationDate,
-            Currency = model.Currency,
-            CurrentPrice = model.CurrentPrice,
-            TargetPrice = model.TargetPrice,
-            PriceChange = model.PriceChange,
-            PriceChangeRel = model.PriceChangeRel,
-            ShowName = model.ShowName
-        };
-
-        return entity;
-    }
-    
-    private ForecastTarget GetModel(ForecastTargetEntity entity)
-    {
-        var model = new ForecastTarget
-        {
-            Id = entity.Id,
-            Ticker = entity.Ticker,
-            InstrumentId = entity.InstrumentId,
-            Company = entity.Company,
-            RecommendationString = entity.RecommendationString,
-            RecommendationNumber = entity.RecommendationNumber,
-            RecommendationDate = entity.RecommendationDate,
-            Currency = entity.Currency,
-            CurrentPrice = entity.CurrentPrice,
-            TargetPrice = entity.TargetPrice,
-            PriceChange = entity.PriceChange,
-            PriceChangeRel = entity.PriceChangeRel,
-            ShowName = entity.ShowName
-        };
-
-        return model;
     }
 }

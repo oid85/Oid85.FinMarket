@@ -46,7 +46,7 @@ public class GetCandlesService(
         if (response is null)
             return [];
 
-        var candles = response.Candles.Select(TinkoffMap.MapCandle).ToList();
+        var candles = response.Candles.Select(TinkoffMapper.MapCandle).ToList();
         candles.ForEach(x => x.InstrumentId = instrumentId);
         return candles;
     }
@@ -62,7 +62,7 @@ public class GetCandlesService(
         if (response is null)
             return [];
         
-        var candles = response.Candles.Select(TinkoffMap.MapFiveMinuteCandle).ToList();
+        var candles = response.Candles.Select(TinkoffMapper.MapFiveMinuteCandle).ToList();
         candles.ForEach(x => x.InstrumentId = instrumentId);
         return candles;
     }

@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
@@ -20,7 +21,7 @@ public class BondRepository(
         foreach (var bond in bonds)
             if (!await context.BondEntities
                     .AnyAsync(x => x.InstrumentId == bond.InstrumentId))
-                entities.Add(GetEntity(bond));
+                entities.Add(DataAccessMapper.Map(bond));
 
         await context.BondEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -55,7 +56,7 @@ public class BondRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<List<Bond>> GetByTickersAsync(List<string> tickers) =>
@@ -65,7 +66,7 @@ public class BondRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<Bond?> GetByTickerAsync(string ticker)
@@ -75,9 +76,7 @@ public class BondRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
     public async Task<Bond?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -87,51 +86,6 @@ public class BondRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-
-    private BondEntity GetEntity(Bond model)
-    {
-        var entity = new BondEntity
-        {
-            Ticker = model.Ticker,
-            LastPrice = model.LastPrice,
-            Isin = model.Isin,
-            Figi = model.Figi,
-            InstrumentId = model.InstrumentId,
-            Name = model.Name,
-            Sector = model.Sector,
-            Currency = model.Currency,
-            Nkd = model.Nkd,
-            MaturityDate = model.MaturityDate,
-            FloatingCouponFlag = model.FloatingCouponFlag,
-            RiskLevel = model.RiskLevel
-        };
-
-        return entity;
-    }
-    
-    private Bond GetModel(BondEntity entity)
-    {
-        var model = new Bond
-        {
-            Id = entity.Id,
-            Ticker = entity.Ticker,
-            LastPrice = entity.LastPrice,
-            Isin = entity.Isin,
-            Figi = entity.Figi,
-            InstrumentId = entity.InstrumentId,
-            Name = entity.Name,
-            Sector = entity.Sector,
-            Currency = entity.Currency,
-            Nkd = entity.Nkd,
-            MaturityDate = entity.MaturityDate,
-            FloatingCouponFlag = entity.FloatingCouponFlag,
-            RiskLevel = entity.RiskLevel
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

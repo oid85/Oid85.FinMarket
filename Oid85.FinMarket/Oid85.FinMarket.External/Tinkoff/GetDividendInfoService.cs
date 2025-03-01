@@ -1,5 +1,4 @@
 ﻿using NLog;
-using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
@@ -35,7 +34,7 @@ public class GetDividendInfoService(
                 foreach (var dividend in response.Dividends)
                     if (dividend is not null)
                     {
-                        var dividendInfo = TinkoffMap.Map(dividend, share);
+                        var dividendInfo = TinkoffMapper.Map(dividend, share);
                         dividendInfos.Add(dividendInfo);   
                     }
         }

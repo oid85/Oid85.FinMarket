@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -18,9 +18,7 @@ public class CandleRepository(
 
         if (lastCandle is null)
         {
-            var entities = candles
-                .Select(GetEntity);
-            
+            var entities = candles.Select(DataAccessMapper.Map);
             await context.CandleEntities.AddRangeAsync(entities);
         }
         
@@ -37,12 +35,12 @@ public class CandleRepository(
                             x.Date == candle.Date &&
                             x.InstrumentId == candle.InstrumentId);
 
-                    SetEntity(ref entity, candle);
+                    DataAccessMapper.Map(ref entity, candle);
                 }
             }
 
             var entities = candles
-                .Select(GetEntity)
+                .Select(DataAccessMapper.Map)
                 .Where(x => x.Date > lastCandle.Date);
                 
             await context.CandleEntities.AddRangeAsync(entities);  
@@ -57,7 +55,7 @@ public class CandleRepository(
             .OrderBy(x => x.Date)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<Candle?> GetLastAsync(Guid instrumentId)
@@ -72,7 +70,7 @@ public class CandleRepository(
         if (entity is null)
             return null;
         
-        var model = GetModel(entity);
+        var model = DataAccessMapper.Map(entity);
         
         return model;
     }
@@ -90,9 +88,7 @@ public class CandleRepository(
         if (entities.Count < 2)
             return [];
         
-        var models = entities
-            .Select(GetModel)
-            .ToList();
+        var models = entities.Select(DataAccessMapper.Map).ToList();
         
         return models;
     }
@@ -114,59 +110,8 @@ public class CandleRepository(
         if (entities.Count == 0)
             return [];
         
-        var models = entities
-            .Select(GetModel)
-            .ToList();
+        var models = entities.Select(DataAccessMapper.Map).ToList();
         
         return models;
-    }
-
-    private void SetEntity(ref CandleEntity? entity, Candle model)
-    {
-        entity ??= new CandleEntity();
-        
-        entity.InstrumentId = model.InstrumentId;
-        entity.Open = model.Open;
-        entity.Close = model.Close;
-        entity.High = model.High;
-        entity.Low = model.Low;
-        entity.Volume = model.Volume;
-        entity.Date = model.Date;
-        entity.IsComplete = model.IsComplete;
-    }
-    
-    private CandleEntity GetEntity(Candle model)
-    {
-        var entity = new CandleEntity
-        {
-            InstrumentId = model.InstrumentId,
-            Open = model.Open,
-            Close = model.Close,
-            High = model.High,
-            Low = model.Low,
-            Volume = model.Volume,
-            Date = model.Date,
-            IsComplete = model.IsComplete
-        };
-
-        return entity;
-    }
-    
-    private Candle GetModel(CandleEntity entity)
-    {
-        var model = new Candle
-        {
-            Id = entity.Id,
-            InstrumentId = entity.InstrumentId,
-            Open = entity.Open,
-            Close = entity.Close,
-            High = entity.High,
-            Low = entity.Low,
-            Volume = entity.Volume,
-            Date = entity.Date,
-            IsComplete = entity.IsComplete
-        };
-
-        return model;
     }
 }

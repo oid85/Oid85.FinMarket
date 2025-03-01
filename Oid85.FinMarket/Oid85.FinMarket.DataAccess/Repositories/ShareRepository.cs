@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -21,7 +22,7 @@ public class ShareRepository(
         foreach (var share in shares)
             if (!await context.ShareEntities
                     .AnyAsync(x => x.InstrumentId == share.InstrumentId))
-                entities.Add(GetEntity(share));
+                entities.Add(DataAccessMapper.Map(share));
 
         await context.ShareEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -56,7 +57,7 @@ public class ShareRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<List<Share>> GetByTickersAsync(List<string> tickers) =>
@@ -66,7 +67,7 @@ public class ShareRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<Share?> GetByTickerAsync(string ticker)
@@ -76,9 +77,7 @@ public class ShareRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
     
     public async Task<Share?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -88,41 +87,6 @@ public class ShareRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-
-    private ShareEntity GetEntity(Share model)
-    {
-        var entity = new ShareEntity
-        {
-            Ticker = model.Ticker,
-            LastPrice = model.LastPrice,
-            Isin = model.Isin,
-            Figi = model.Figi,
-            InstrumentId = model.InstrumentId,
-            Name = model.Name,
-            Sector = model.Sector
-        };
-
-        return entity;
-    }
-    
-    private Share GetModel(ShareEntity entity)
-    {
-        var model = new Share
-        {
-            Id = entity.Id,
-            Ticker = entity.Ticker,
-            LastPrice = entity.LastPrice,
-            Isin = entity.Isin,
-            Figi = entity.Figi,
-            InstrumentId = entity.InstrumentId,
-            Name = entity.Name,
-            Sector = entity.Sector
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

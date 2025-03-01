@@ -1,6 +1,4 @@
 ﻿using NLog;
-using Oid85.FinMarket.Common.Helpers;
-using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
@@ -30,13 +28,13 @@ public class GetForecastService(
             foreach (var targetItem in response.Targets)
                 if (targetItem is not null)
                 {
-                    var target = TinkoffMap.Map(targetItem);
+                    var target = TinkoffMapper.Map(targetItem);
                     targets.Add(target);   
                 }
 
         var consensus = response.Consensus is null 
             ? new() 
-            : TinkoffMap.Map(response.Consensus);
+            : TinkoffMapper.Map(response.Consensus);
         
         return (targets, consensus);
     }
