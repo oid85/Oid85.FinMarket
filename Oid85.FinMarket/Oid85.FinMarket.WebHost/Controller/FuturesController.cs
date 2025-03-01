@@ -103,9 +103,9 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<List<Spread>>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> CalculateSpreadsAsync() =>
+    public Task<IActionResult> ProcessSpreadPairsAsync() =>
         GetResponseAsync(
-            spreadService.CalculateSpreadsAsync,
+            spreadService.ProcessSpreadPairsAsync,
             result => new BaseResponse<List<Spread>>
             {
                 Result = result

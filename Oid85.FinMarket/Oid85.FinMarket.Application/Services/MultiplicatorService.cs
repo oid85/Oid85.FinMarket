@@ -7,62 +7,57 @@ using Oid85.FinMarket.External.ResourceStore;
 namespace Oid85.FinMarket.Application.Services;
 
 public class MultiplicatorService(
-    ILogger logger,
     IShareRepository shareRepository,
     IMultiplicatorRepository multiplicatorRepository,
     IResourceStoreService resourceStoreService) 
     : IMultiplicatorService
 {
-    public async Task FillingMultiplicatorInstrumentsAsync()
+    public async Task<List<Multiplicator>> ProcessMultiplicatorsAsync()
     {
-        try
-        {
-            var multiplicators = new List<Multiplicator>();
-
-            var multiplicatorResources = await resourceStoreService
-                .GetMultiplicatorsLtmAsync();
-        
-            foreach (var multiplicatorResource in multiplicatorResources)
-            {
-                var multiplicator = new Multiplicator
-                {
-                    TickerAo = multiplicatorResource.TickerAo.Value ?? string.Empty,
-                    TickerAp = multiplicatorResource.TickerAp.Value ?? string.Empty,
-                    TotalSharesAo = multiplicatorResource.TotalSharesAo.Value,
-                    TotalSharesAp = multiplicatorResource.TotalSharesAp.Value,
-                    Beta = multiplicatorResource.Beta.Value,
-                    Revenue = multiplicatorResource.Revenue.Value,
-                    NetIncome = multiplicatorResource.NetIncome.Value,
-                    OperatingIncome = multiplicatorResource.OperatingIncome.Value,
-                    Ebitda = multiplicatorResource.Ebitda.Value,
-                    Pe = multiplicatorResource.Pe.Value,
-                    Pb = multiplicatorResource.Pb.Value,
-                    Pbv = multiplicatorResource.Pbv.Value,
-                    Ev = multiplicatorResource.Ev.Value,
-                    Roe = multiplicatorResource.Roe.Value,
-                    Roa = multiplicatorResource.Roa.Value,
-                    Eps = multiplicatorResource.Eps.Value,
-                    NetInterestMargin = multiplicatorResource.NetInterestMargin.Value,
-                    TotalDebt = multiplicatorResource.TotalDebt.Value,
-                    NetDebt = multiplicatorResource.NetDebt.Value
-                };
-
-                multiplicators.Add(multiplicator);
-            }
-
-            await multiplicatorRepository.AddOrUpdateAsync(multiplicators);
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-        }
+        await FillingMultiplicatorInstrumentsAsync();
+        return await CalculateMultiplicatorsAsync();
     }
     
-    public async Task<List<Multiplicator>> CalculateMultiplicatorsAsync()
+    private async Task FillingMultiplicatorInstrumentsAsync()
     {
-        try
+        var multiplicators = new List<Multiplicator>();
+
+        var multiplicatorResources = await resourceStoreService
+            .GetMultiplicatorsLtmAsync();
+        
+        foreach (var multiplicatorResource in multiplicatorResources)
         {
+            var multiplicator = new Multiplicator
+            {
+                TickerAo = multiplicatorResource.TickerAo.Value ?? string.Empty,
+                TickerAp = multiplicatorResource.TickerAp.Value ?? string.Empty,
+                TotalSharesAo = multiplicatorResource.TotalSharesAo.Value,
+                TotalSharesAp = multiplicatorResource.TotalSharesAp.Value,
+                Beta = multiplicatorResource.Beta.Value,
+                Revenue = multiplicatorResource.Revenue.Value,
+                NetIncome = multiplicatorResource.NetIncome.Value,
+                OperatingIncome = multiplicatorResource.OperatingIncome.Value,
+                Ebitda = multiplicatorResource.Ebitda.Value,
+                Pe = multiplicatorResource.Pe.Value,
+                Pb = multiplicatorResource.Pb.Value,
+                Pbv = multiplicatorResource.Pbv.Value,
+                Ev = multiplicatorResource.Ev.Value,
+                Roe = multiplicatorResource.Roe.Value,
+                Roa = multiplicatorResource.Roa.Value,
+                Eps = multiplicatorResource.Eps.Value,
+                NetInterestMargin = multiplicatorResource.NetInterestMargin.Value,
+                TotalDebt = multiplicatorResource.TotalDebt.Value,
+                NetDebt = multiplicatorResource.NetDebt.Value
+            };
+
+            multiplicators.Add(multiplicator);
+        }
+
+        await multiplicatorRepository.AddOrUpdateAsync(multiplicators);
+    }
+    
+    private async Task<List<Multiplicator>> CalculateMultiplicatorsAsync()
+    {
             var multiplicators = await multiplicatorRepository.GetAllAsync();
 
             foreach (var multiplicator in multiplicators)
@@ -130,12 +125,5 @@ public class MultiplicatorService(
             
                 return multiplicator.NetDebtToEbitda = multiplicator.NetDebt / multiplicator.Ebitda;
             }
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
     }
 }

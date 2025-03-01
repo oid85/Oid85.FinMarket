@@ -9,6 +9,7 @@ using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Services;
+using Oid85.FinMarket.Application.Services.AnalyseServices;
 using Oid85.FinMarket.Application.Services.ReportServices;
 using Oid85.FinMarket.Common.KnownConstants;
 
@@ -21,6 +22,12 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<ILoadService, LoadService>();
         services.AddTransient<IAnalyseService, AnalyseService>();
+        services.AddTransient<CandleSequenceAnalyseService>();
+        services.AddTransient<CandleVolumeAnalyseService>();
+        services.AddTransient<DrawdownFromMaximumAnalyseService>();
+        services.AddTransient<RsiAnalyseService>();
+        services.AddTransient<SupertrendAnalyseService>();
+        services.AddTransient<YieldLtmAnalyseService>();
         services.AddTransient<ISharesReportService, SharesReportService>();
         services.AddTransient<IIndexesReportService, IndexesReportService>();
         services.AddTransient<IFuturesReportService, FuturesReportService>();

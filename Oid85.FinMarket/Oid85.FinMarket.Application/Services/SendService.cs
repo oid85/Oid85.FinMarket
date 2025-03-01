@@ -2,7 +2,6 @@
 using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Telegram;
 
 namespace Oid85.FinMarket.Application.Services;

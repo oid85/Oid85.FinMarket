@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
-using NLog;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.ResourceStore.Models;
 
