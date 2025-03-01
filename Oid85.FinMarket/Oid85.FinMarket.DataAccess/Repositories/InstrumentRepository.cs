@@ -30,9 +30,7 @@ public class InstrumentRepository(
             }
 
             else
-            {
                 DataAccessMapper.Map(ref entity, ticker);
-            }
         }
 
         await context.SaveChangesAsync();
@@ -50,7 +48,6 @@ public class InstrumentRepository(
     {
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
-        
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
     
@@ -58,7 +55,6 @@ public class InstrumentRepository(
     {
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Name == name);
-        
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
     
@@ -66,7 +62,6 @@ public class InstrumentRepository(
     {
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
-        
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

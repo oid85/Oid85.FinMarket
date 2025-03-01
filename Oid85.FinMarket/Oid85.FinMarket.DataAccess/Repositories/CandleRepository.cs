@@ -67,12 +67,7 @@ public class CandleRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
-        if (entity is null)
-            return null;
-        
-        var model = DataAccessMapper.Map(entity);
-        
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
     public async Task<List<Candle>> GetTwoLastAsync(Guid instrumentId)
@@ -85,12 +80,7 @@ public class CandleRepository(
             .AsNoTracking()
             .ToListAsync();
 
-        if (entities.Count < 2)
-            return [];
-        
-        var models = entities.Select(DataAccessMapper.Map).ToList();
-        
-        return models;
+        return entities.Count < 2 ? [] : entities.Select(DataAccessMapper.Map).ToList();
     }
 
     public async Task<List<Candle>> GetLastYearAsync(Guid instrumentId)
@@ -107,11 +97,6 @@ public class CandleRepository(
             .AsNoTracking()
             .ToListAsync();
 
-        if (entities.Count == 0)
-            return [];
-        
-        var models = entities.Select(DataAccessMapper.Map).ToList();
-        
-        return models;
+        return entities.Count == 0 ? [] : entities.Select(DataAccessMapper.Map).ToList();
     }
 }

@@ -36,9 +36,8 @@ public class FutureRepository(
         {
             await context.FutureEntities
                 .Where(x => x.InstrumentId == instrumentId)
-                .ExecuteUpdateAsync(
-                    s => s.SetProperty(
-                        entity => entity.LastPrice, lastPrice));
+                .ExecuteUpdateAsync(x => x
+                        .SetProperty(entity => entity.LastPrice, lastPrice));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();

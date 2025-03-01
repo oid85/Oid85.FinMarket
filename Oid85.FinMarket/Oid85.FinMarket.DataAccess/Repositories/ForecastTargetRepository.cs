@@ -42,8 +42,7 @@ public class ForecastTargetRepository(
                     x.InstrumentId == forecastTarget.InstrumentId && 
                     x.Company == forecastTarget.Company && 
                     x.RecommendationDate == forecastTarget.RecommendationDate)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.RecommendationString, forecastTarget.RecommendationString)
                         .SetProperty(entity => entity.RecommendationNumber, forecastTarget.RecommendationNumber)
                         .SetProperty(entity => entity.CurrentPrice, forecastTarget.CurrentPrice)
@@ -71,29 +70,19 @@ public class ForecastTargetRepository(
         .Select(DataAccessMapper.Map)
         .ToList();
 
-    public async Task<List<ForecastTarget>> GetByTickerAsync(string ticker)
-    {
-        var entities = await context.ForecastTargetEntities
+    public async Task<List<ForecastTarget>> GetByTickerAsync(string ticker) =>
+        (await context.ForecastTargetEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.Ticker == ticker)
             .AsNoTracking()
-            .ToListAsync();
-        
-        var models = entities.Select(DataAccessMapper.Map).ToList();
-        
-        return models;
-    }
+            .ToListAsync())
+        .Select(DataAccessMapper.Map)
+        .ToList();
 
-    public async Task<List<ForecastTarget>> GetByInstrumentIdAsync(Guid instrumentId)
-    {
-        var entities = await context.ForecastTargetEntities
+    public async Task<List<ForecastTarget>> GetByInstrumentIdAsync(Guid instrumentId) =>
+        (await context.ForecastTargetEntities
             .Where(x => !x.IsDeleted)
             .Where(x => x.InstrumentId == instrumentId)
             .AsNoTracking()
-            .ToListAsync();
-        
-        var models = entities.Select(DataAccessMapper.Map).ToList();
-        
-        return models;
-    }
+            .ToListAsync()).Select(DataAccessMapper.Map).ToList();
 }

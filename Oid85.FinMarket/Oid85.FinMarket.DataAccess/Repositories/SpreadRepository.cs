@@ -40,8 +40,7 @@ public class SpreadRepository(
                 .Where(x => 
                     x.FirstInstrumentId == spread.FirstInstrumentId && 
                     x.SecondInstrumentId == spread.SecondInstrumentId)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.DateTime, spread.DateTime)
                         .SetProperty(entity => entity.FirstInstrumentPrice, spread.FirstInstrumentPrice)
                         .SetProperty(entity => entity.SecondInstrumentPrice, spread.SecondInstrumentPrice)
@@ -70,15 +69,13 @@ public class SpreadRepository(
             await context.SpreadEntities
                 .Where(x => 
                     x.FirstInstrumentId == instrumentId)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.FirstInstrumentPrice, lastPrice));
             
             await context.SpreadEntities
                 .Where(x => 
                     x.SecondInstrumentId == instrumentId)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.SecondInstrumentPrice, lastPrice));            
             
             await context.SaveChangesAsync();
@@ -97,8 +94,7 @@ public class SpreadRepository(
             .Where(x => 
                 x.FirstInstrumentId == spread.FirstInstrumentId && 
                 x.SecondInstrumentId == spread.SecondInstrumentId)
-            .ExecuteUpdateAsync(
-                s => s
+            .ExecuteUpdateAsync(x => x
                     .SetProperty(entity => entity.IsDeleted, true)
                     .SetProperty(entity => entity.DeletedAt, DateTime.UtcNow));
 
@@ -116,7 +112,8 @@ public class SpreadRepository(
         var entity = await context.SpreadEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.FirstInstrumentTicker == firstInstrumentTicker);
+            .FirstOrDefaultAsync(x => 
+                x.FirstInstrumentTicker == firstInstrumentTicker);
         
         return entity is null ? null : DataAccessMapper.Map(entity);
     }

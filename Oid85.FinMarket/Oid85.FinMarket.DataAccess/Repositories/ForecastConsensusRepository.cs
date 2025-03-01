@@ -38,8 +38,7 @@ public class ForecastConsensusRepository(
             await context.ForecastConsensusEntities
                 .Where(x => 
                     x.InstrumentId == forecastConsensus.InstrumentId)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.RecommendationString, forecastConsensus.RecommendationString)
                         .SetProperty(entity => entity.RecommendationNumber, forecastConsensus.RecommendationNumber)
                         .SetProperty(entity => entity.CurrentPrice, forecastConsensus.CurrentPrice)

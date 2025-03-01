@@ -19,9 +19,7 @@ public class FiveMinuteCandleRepository(
 
         if (lastCandle is null)
         {
-            var entities = candles
-                .Select(DataAccessMapper.Map);
-            
+            var entities = candles.Select(DataAccessMapper.Map);
             await context.FiveMinuteCandleEntities.AddRangeAsync(entities);
         }
         
@@ -70,13 +68,11 @@ public class FiveMinuteCandleRepository(
     {
         var candles = await GetAsync(instrumentId);
         
-        var result = candles
+        return candles
             .Where(x => 
                 x.Date.ToDateTime(x.Time) >= from && 
                 x.Date.ToDateTime(x.Time) <= to)
             .ToList();
-
-        return result;
     }
 
     public async Task<FiveMinuteCandle?> GetLastAsync(Guid instrumentId)
@@ -100,12 +96,8 @@ public class FiveMinuteCandleRepository(
             .AsNoTracking()
             .ToListAsync();
 
-        var lastCandleEntity = entitiesByMaxDate
-            .OrderBy(x => x.Time)
-            .Last();
+        var lastCandleEntity = entitiesByMaxDate.OrderBy(x => x.Time).Last();
         
-        var candle = DataAccessMapper.Map(lastCandleEntity);
-        
-        return candle;
+        return DataAccessMapper.Map(lastCandleEntity);
     }
 }

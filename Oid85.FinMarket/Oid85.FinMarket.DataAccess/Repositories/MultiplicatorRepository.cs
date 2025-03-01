@@ -42,8 +42,7 @@ public class MultiplicatorRepository(
                 .Where(x => 
                     x.TickerAo == multiplicator.TickerAo ||
                     x.TickerAp == multiplicator.TickerAp)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.TotalSharesAo, multiplicator.TotalSharesAo)
                         .SetProperty(entity => entity.TotalSharesAp, multiplicator.TotalSharesAp)
                         .SetProperty(entity => entity.Beta, multiplicator.Beta)
@@ -84,8 +83,7 @@ public class MultiplicatorRepository(
                 .Where(x => 
                     x.TickerAo == multiplicator.TickerAo ||
                     x.TickerAp == multiplicator.TickerAp)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.MarketCapitalization, multiplicator.MarketCapitalization)
                         .SetProperty(entity => entity.EvToEbitda, multiplicator.EvToEbitda)
                         .SetProperty(entity => entity.TotalDebtToEbitda, multiplicator.TotalDebtToEbitda)
@@ -117,7 +115,7 @@ public class MultiplicatorRepository(
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => 
-                x.TickerAo == ticker ||
+                x.TickerAo == ticker || 
                 x.TickerAp == ticker);
         
         return entity is null ? null : DataAccessMapper.Map(entity);

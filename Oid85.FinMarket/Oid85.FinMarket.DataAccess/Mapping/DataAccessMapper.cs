@@ -5,9 +5,8 @@ namespace Oid85.FinMarket.DataAccess.Mapping;
 
 public static class DataAccessMapper
 {
-    public static AnalyseResultEntity Map(AnalyseResult model)
-    {
-        var entity = new AnalyseResultEntity
+    public static AnalyseResultEntity Map(AnalyseResult model) =>
+        new()
         {
             Date = model.Date,
             InstrumentId = model.InstrumentId,
@@ -15,13 +14,9 @@ public static class DataAccessMapper
             ResultString = model.ResultString,
             ResultNumber = model.ResultNumber
         };
-
-        return entity;
-    }
     
-    public static AnalyseResult Map(AnalyseResultEntity entity)
-    {
-        var model = new AnalyseResult
+    public static AnalyseResult Map(AnalyseResultEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Date = entity.Date,
@@ -30,13 +25,9 @@ public static class DataAccessMapper
             ResultString = entity.ResultString,
             ResultNumber = entity.ResultNumber
         };
-
-        return model;
-    }
     
-    public static BondCouponEntity Map(BondCoupon model)
-    {
-        var entity = new BondCouponEntity
+    public static BondCouponEntity Map(BondCoupon model) =>
+        new()
         {
             InstrumentId = model.InstrumentId,
             Ticker = model.Ticker,
@@ -47,13 +38,9 @@ public static class DataAccessMapper
             CouponEndDate = model.CouponEndDate,
             PayOneBond = model.PayOneBond
         };
-
-        return entity;
-    }
     
-    public static BondCoupon Map(BondCouponEntity entity)
-    {
-        var model = new BondCoupon
+    public static BondCoupon Map(BondCouponEntity entity) =>
+        new()
         {
             Id = entity.Id,
             InstrumentId = entity.InstrumentId,
@@ -65,13 +52,9 @@ public static class DataAccessMapper
             CouponEndDate = entity.CouponEndDate,
             PayOneBond = entity.PayOneBond
         };
-
-        return model;
-    }
     
-    public static BondEntity Map(Bond model)
-    {
-        var entity = new BondEntity
+    public static BondEntity Map(Bond model) =>
+        new()
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
@@ -86,13 +69,9 @@ public static class DataAccessMapper
             FloatingCouponFlag = model.FloatingCouponFlag,
             RiskLevel = model.RiskLevel
         };
-
-        return entity;
-    }
     
-    public static Bond Map(BondEntity entity)
-    {
-        var model = new Bond
+    public static Bond Map(BondEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Ticker = entity.Ticker,
@@ -108,13 +87,9 @@ public static class DataAccessMapper
             FloatingCouponFlag = entity.FloatingCouponFlag,
             RiskLevel = entity.RiskLevel
         };
-
-        return model;
-    }
     
-    public static  CandleEntity Map(Candle model)
-    {
-        var entity = new CandleEntity
+    public static CandleEntity Map(Candle model) =>
+        new()
         {
             InstrumentId = model.InstrumentId,
             Open = model.Open,
@@ -125,13 +100,9 @@ public static class DataAccessMapper
             Date = model.Date,
             IsComplete = model.IsComplete
         };
-
-        return entity;
-    }
     
-    public static  Candle Map(CandleEntity entity)
-    {
-        var model = new Candle
+    public static Candle Map(CandleEntity entity) =>
+        new()
         {
             Id = entity.Id,
             InstrumentId = entity.InstrumentId,
@@ -143,9 +114,6 @@ public static class DataAccessMapper
             Date = entity.Date,
             IsComplete = entity.IsComplete
         };
-
-        return model;
-    }
     
     public static void Map(ref CandleEntity? entity, Candle model)
     {
@@ -161,9 +129,8 @@ public static class DataAccessMapper
         entity.IsComplete = model.IsComplete;
     }
     
-    public static  CurrencyEntity Map(Currency model)
-    {
-        var entity = new CurrencyEntity
+    public static CurrencyEntity Map(Currency model) =>
+        new()
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
@@ -174,13 +141,9 @@ public static class DataAccessMapper
             IsoCurrencyName = model.IsoCurrencyName,
             InstrumentId = model.InstrumentId
         };
-
-        return entity;
-    }
     
-    public static  Currency Map(CurrencyEntity entity)
-    {
-        var model = new Currency
+    public static Currency Map(CurrencyEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Ticker = entity.Ticker,
@@ -192,11 +155,8 @@ public static class DataAccessMapper
             IsoCurrencyName = entity.IsoCurrencyName,
             InstrumentId = entity.InstrumentId
         };
-
-        return model;
-    }
     
-    public static  DividendInfoEntity Map(DividendInfo model)
+    public static DividendInfoEntity Map(DividendInfo model)
     {
         var entity = new DividendInfoEntity
         {
@@ -211,9 +171,8 @@ public static class DataAccessMapper
         return entity;
     }
     
-    public static  DividendInfo Map(DividendInfoEntity entity)
-    {
-        var model = new DividendInfo
+    public static DividendInfo Map(DividendInfoEntity entity) =>
+        new()
         {
             Id = entity.Id,
             InstrumentId = entity.InstrumentId,
@@ -223,9 +182,6 @@ public static class DataAccessMapper
             Dividend = entity.Dividend,
             DividendPrc = entity.DividendPrc
         };
-
-        return model;
-    }
     
     public static void Map(ref FiveMinuteCandleEntity? entity, FiveMinuteCandle model)
     {
@@ -242,9 +198,8 @@ public static class DataAccessMapper
         entity.IsComplete = model.IsComplete;
     }
     
-    public static FiveMinuteCandleEntity Map(FiveMinuteCandle model)
-    {
-        var entity = new FiveMinuteCandleEntity
+    public static FiveMinuteCandleEntity Map(FiveMinuteCandle model) =>
+        new()
         {
             InstrumentId = model.InstrumentId,
             Open = model.Open,
@@ -256,13 +211,9 @@ public static class DataAccessMapper
             Time = model.Time,
             IsComplete = model.IsComplete
         };
-
-        return entity;
-    }
     
-    public static FiveMinuteCandle Map(FiveMinuteCandleEntity entity)
-    {
-        var model = new FiveMinuteCandle
+    public static FiveMinuteCandle Map(FiveMinuteCandleEntity entity) =>
+        new()
         {
             Id = entity.Id,
             InstrumentId = entity.InstrumentId,
@@ -275,13 +226,9 @@ public static class DataAccessMapper
             Time = entity.Time,
             IsComplete = entity.IsComplete
         };
-
-        return model;
-    }
     
-    public static ForecastConsensusEntity Map(ForecastConsensus model)
-    {
-        var entity = new ForecastConsensusEntity
+    public static ForecastConsensusEntity Map(ForecastConsensus model) =>
+        new()
         {
             Ticker = model.Ticker,
             InstrumentId = model.InstrumentId,
@@ -295,13 +242,9 @@ public static class DataAccessMapper
             PriceChange = model.PriceChange,
             PriceChangeRel = model.PriceChangeRel
         };
-
-        return entity;
-    }
     
-    public static ForecastConsensus Map(ForecastConsensusEntity entity)
-    {
-        var model = new ForecastConsensus
+    public static ForecastConsensus Map(ForecastConsensusEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Ticker = entity.Ticker,
@@ -316,13 +259,9 @@ public static class DataAccessMapper
             PriceChange = entity.PriceChange,
             PriceChangeRel = entity.PriceChangeRel
         };
-
-        return model;
-    }
     
-    public static ForecastTargetEntity Map(ForecastTarget model)
-    {
-        var entity = new ForecastTargetEntity
+    public static ForecastTargetEntity Map(ForecastTarget model) =>
+        new()
         {
             Ticker = model.Ticker,
             InstrumentId = model.InstrumentId,
@@ -337,13 +276,9 @@ public static class DataAccessMapper
             PriceChangeRel = model.PriceChangeRel,
             ShowName = model.ShowName
         };
-
-        return entity;
-    }
     
-    public static ForecastTarget Map(ForecastTargetEntity entity)
-    {
-        var model = new ForecastTarget
+    public static ForecastTarget Map(ForecastTargetEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Ticker = entity.Ticker,
@@ -359,13 +294,9 @@ public static class DataAccessMapper
             PriceChangeRel = entity.PriceChangeRel,
             ShowName = entity.ShowName
         };
-
-        return model;
-    }
     
-    public static FutureEntity Map(Future model)
-    {
-        var entity = new FutureEntity
+    public static FutureEntity Map(Future model) =>
+        new()
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
@@ -384,13 +315,9 @@ public static class DataAccessMapper
             InitialMarginOnSell = model.InitialMarginOnSell,
             MinPriceIncrementAmount = model.MinPriceIncrementAmount
         };
-
-        return entity;
-    }
     
-    public static Future Map(FutureEntity entity)
-    {
-        var model = new Future
+    public static Future Map(FutureEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Ticker = entity.Ticker,
@@ -410,13 +337,9 @@ public static class DataAccessMapper
             InitialMarginOnSell = entity.InitialMarginOnSell,
             MinPriceIncrementAmount = entity.MinPriceIncrementAmount
         };
-
-        return model;
-    }
     
-    public static FinIndexEntity Map(FinIndex model)
-    {
-        var entity = new FinIndexEntity
+    public static FinIndexEntity Map(FinIndex model) =>
+        new()
         {
             Figi = model.Figi,
             InstrumentId = model.InstrumentId,
@@ -428,13 +351,9 @@ public static class DataAccessMapper
             Name = model.Name,
             Exchange = model.Exchange
         };
-
-        return entity;
-    }
     
-    public static FinIndex Map(FinIndexEntity entity)
-    {
-        var model = new FinIndex
+    public static FinIndex Map(FinIndexEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Figi = entity.Figi,
@@ -447,9 +366,6 @@ public static class DataAccessMapper
             Name = entity.Name,
             Exchange = entity.Exchange
         };
-
-        return model;
-    }
     
     public static void Map(ref InstrumentEntity? entity, Instrument model)
     {
@@ -461,9 +377,8 @@ public static class DataAccessMapper
         entity.Type = model.Type;
     }
     
-    public static Instrument Map(InstrumentEntity entity)
-    {
-        var model = new Instrument
+    public static Instrument Map(InstrumentEntity entity) =>
+        new()
         {
             Id = entity.Id,
             InstrumentId = entity.InstrumentId,
@@ -471,13 +386,9 @@ public static class DataAccessMapper
             Name = entity.Name,
             Type = entity.Type
         };
-
-        return model;
-    }
     
-    public static MarketEventEntity Map(MarketEvent model)
-    {
-        var entity = new MarketEventEntity
+    public static MarketEventEntity Map(MarketEvent model) =>
+        new()
         {
             Date = model.Date,
             Time = model.Time,
@@ -489,13 +400,9 @@ public static class DataAccessMapper
             IsActive = model.IsActive,
             SentNotification = model.SentNotification
         };
-
-        return entity;
-    }
     
-    public static MarketEvent Map(MarketEventEntity entity)
-    {
-        var model = new MarketEvent
+    public static MarketEvent Map(MarketEventEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Date = entity.Date,
@@ -508,13 +415,9 @@ public static class DataAccessMapper
             IsActive = entity.IsActive,
             SentNotification = entity.SentNotification
         };
-
-        return model;
-    }
     
-        public static MultiplicatorEntity Map(Multiplicator model)
-    {
-        var entity = new MultiplicatorEntity
+    public static MultiplicatorEntity Map(Multiplicator model) =>
+        new()
         {
             TickerAo = model.TickerAo,
             TickerAp = model.TickerAp,
@@ -541,13 +444,9 @@ public static class DataAccessMapper
             TotalDebtToEbitda = model.TotalDebtToEbitda,
             NetDebtToEbitda = model.NetDebtToEbitda
         };
-
-        return entity;
-    }
     
-    public static Multiplicator Map(MultiplicatorEntity entity)
-    {
-        var model = new Multiplicator
+    public static Multiplicator Map(MultiplicatorEntity entity) =>
+        new()
         {
             Id = entity.Id,
             TickerAo = entity.TickerAo,
@@ -575,13 +474,9 @@ public static class DataAccessMapper
             TotalDebtToEbitda = entity.TotalDebtToEbitda,
             NetDebtToEbitda = entity.NetDebtToEbitda
         };
-
-        return model;
-    }
     
-    public static ShareEntity Map(Share model)
-    {
-        var entity = new ShareEntity
+    public static ShareEntity Map(Share model) =>
+        new()
         {
             Ticker = model.Ticker,
             LastPrice = model.LastPrice,
@@ -591,13 +486,9 @@ public static class DataAccessMapper
             Name = model.Name,
             Sector = model.Sector
         };
-
-        return entity;
-    }
     
-    public static Share Map(ShareEntity entity)
-    {
-        var model = new Share
+    public static Share Map(ShareEntity entity) =>
+        new()
         {
             Id = entity.Id,
             Ticker = entity.Ticker,
@@ -608,13 +499,9 @@ public static class DataAccessMapper
             Name = entity.Name,
             Sector = entity.Sector
         };
-
-        return model;
-    }
     
-        public static SpreadEntity Map(Spread model)
-    {
-        var entity = new SpreadEntity
+    public static SpreadEntity Map(Spread model) =>
+        new()
         {
             DateTime = model.DateTime,
             FirstInstrumentId = model.FirstInstrumentId,
@@ -633,13 +520,9 @@ public static class DataAccessMapper
             Funding = model.Funding,
             SpreadPricePosition = model.SpreadPricePosition
         };
-
-        return entity;
-    }
     
-    public static Spread Map(SpreadEntity entity)
-    {
-        var model = new Spread
+    public static Spread Map(SpreadEntity entity) =>
+        new()
         {
             Id = entity.Id,
             DateTime = entity.DateTime,
@@ -659,7 +542,4 @@ public static class DataAccessMapper
             Funding = entity.Funding,
             SpreadPricePosition = entity.SpreadPricePosition
         };
-
-        return model;
-    }
 }

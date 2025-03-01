@@ -63,12 +63,7 @@ public class AnalyseResultRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync();
 
-        if (entity is null)
-            return null;
-        
-        var model = DataAccessMapper.Map(entity);
-        
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
     public async Task<List<AnalyseResult>> GetTwoLastAsync(Guid instrumentId, string analyseType)
@@ -83,11 +78,6 @@ public class AnalyseResultRepository(
             .AsNoTracking()
             .ToListAsync();
 
-        if (entities.Count < 2)
-            return [];
-        
-        var models = entities.Select(DataAccessMapper.Map).ToList();
-        
-        return models;
+        return entities.Count < 2 ? [] : entities.Select(DataAccessMapper.Map).ToList();
     }
 }

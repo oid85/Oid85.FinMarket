@@ -21,7 +21,8 @@ public class IndexRepository(
         
         foreach (var indicative in indicatives)
             if (!await context.IndicativeEntities
-                    .AnyAsync(x => x.InstrumentId == indicative.InstrumentId))
+                    .AnyAsync(x => 
+                        x.InstrumentId == indicative.InstrumentId))
                 entities.Add(DataAccessMapper.Map(indicative));
 
         await context.IndicativeEntities.AddRangeAsync(entities);
@@ -36,9 +37,8 @@ public class IndexRepository(
         {
             await context.IndicativeEntities
                 .Where(x => x.InstrumentId == instrumentId)
-                .ExecuteUpdateAsync(
-                    s => s.SetProperty(
-                        entity => entity.LastPrice, lastPrice));
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(entity => entity.LastPrice, lastPrice));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
