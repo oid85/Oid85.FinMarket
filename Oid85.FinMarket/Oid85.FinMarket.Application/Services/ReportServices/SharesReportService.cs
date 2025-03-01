@@ -80,8 +80,7 @@ public class SharesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetDividendAnalyseAsync()
     {
-        var dividendInfos = await dividendInfoRepository
-            .GetAllAsync();
+        var dividendInfos = await dividendInfoRepository.GetAllAsync();
             
         var reportData = new ReportData
         {
@@ -131,7 +130,8 @@ public class SharesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetMultiplicatorAnalyseAsync()
     {
-        var shares = await instrumentService.GetSharesInWatchlist();
+        var shares = (await instrumentService.GetSharesInWatchlist())
+            .OrderBy(x => x.Sector);
             
         var reportData = new ReportData
         {
@@ -321,6 +321,7 @@ public class SharesReportService(
         string analyseType)
     {
         var instrumentIds = instruments
+            .OrderBy(x => x.Sector)
             .Select(x => x.InstrumentId)
             .ToList();        
         
@@ -422,6 +423,7 @@ public class SharesReportService(
         DateOnly to)
     {
         var instrumentIds = instruments
+            .OrderBy(x => x.Sector)
             .Select(x => x.InstrumentId)
             .ToList();
 
@@ -532,6 +534,7 @@ public class SharesReportService(
         DateOnly to)
     {
         var instrumentIds = instruments
+            .OrderBy(x => x.Sector)
             .Select(x => x.InstrumentId)
             .ToList();        
         
@@ -635,6 +638,7 @@ public class SharesReportService(
         DateOnly to)
     {
         var instrumentIds = instruments
+            .OrderBy(x => x.Sector)
             .Select(x => x.InstrumentId)
             .ToList();        
         
