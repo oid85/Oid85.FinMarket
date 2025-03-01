@@ -1,5 +1,4 @@
-﻿using NLog;
-using Oid85.FinMarket.Application.Interfaces.Services;
+﻿using Oid85.FinMarket.Application.Interfaces.Services;
 
 namespace Oid85.FinMarket.Application.Services.AnalyseServices;
 

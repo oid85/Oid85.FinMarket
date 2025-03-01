@@ -1,6 +1,7 @@
 ﻿using NLog;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Bond = Oid85.FinMarket.Domain.Models.Bond;
@@ -15,53 +16,31 @@ public class GetBondCouponsService(
     
     public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
     {
-        try
+        await Task.Delay(DelayInMilliseconds);
+            
+        var bondCoupons = new List<BondCoupon>();
+            
+        foreach (var bond in bonds)
         {
             await Task.Delay(DelayInMilliseconds);
-            
-            var bondCoupons = new List<BondCoupon>();
-            
-            foreach (var bond in bonds)
-            {
-                await Task.Delay(DelayInMilliseconds);
 
-                var request = CreateGetBondCouponsRequest(bond.InstrumentId);
-                var response = await SendGetDividendsRequest(request);
+            var request = CreateGetBondCouponsRequest(bond.InstrumentId);
+            var response = await SendGetDividendsRequest(request);
 
-                if (response is null)
-                    continue;
+            if (response is null)
+                continue;
 
-                if (response.Events is not null)
-                    foreach (var coupon in response.Events)
-                        if (coupon is not null)
-                        {
-                            var bondCoupon = Map(coupon, bond);
-                            bondCoupons.Add(bondCoupon);   
-                        }
-            }
-
-            return bondCoupons;
+            if (response.Events is not null)
+                foreach (var coupon in response.Events)
+                    if (coupon is not null)
+                    {
+                        var bondCoupon = TinkoffMap.Map(coupon, bond);
+                        bondCoupons.Add(bondCoupon);   
+                    }
         }
-            
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-            return [];
-        }
+
+        return bondCoupons;
     }
-    
-    private static BondCoupon Map(Coupon coupon, Bond bond) =>
-        new()
-        {
-            InstrumentId = bond.InstrumentId,
-            Ticker = bond.Ticker,
-            CouponNumber = coupon.CouponNumber,
-            CouponPeriod = coupon.CouponPeriod,
-            CouponDate = ConvertHelper.TimestampToDateOnly(coupon.CouponDate),
-            CouponStartDate = ConvertHelper.TimestampToDateOnly(coupon.CouponStartDate),
-            CouponEndDate = ConvertHelper.TimestampToDateOnly(coupon.CouponEndDate),
-            PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
-        };
     
     private static GetBondCouponsRequest CreateGetBondCouponsRequest(Guid instrumentId) =>
         new()

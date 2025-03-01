@@ -1,6 +1,7 @@
 ﻿using NLog;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Share = Oid85.FinMarket.Domain.Models.Share;
@@ -34,24 +35,13 @@ public class GetDividendInfoService(
                 foreach (var dividend in response.Dividends)
                     if (dividend is not null)
                     {
-                        var dividendInfo = Map(dividend, share);
+                        var dividendInfo = TinkoffMap.Map(dividend, share);
                         dividendInfos.Add(dividendInfo);   
                     }
         }
 
         return dividendInfos;
     }
-
-    private static DividendInfo Map(Dividend dividend, Share share) =>
-        new()
-        {
-            Ticker = share.Ticker,
-            InstrumentId = share.InstrumentId,
-            DeclaredDate = ConvertHelper.TimestampToDateOnly(dividend.DeclaredDate),
-            RecordDate = ConvertHelper.TimestampToDateOnly(dividend.RecordDate),
-            Dividend = Math.Round(ConvertHelper.MoneyValueToDouble(dividend.DividendNet), 2),
-            DividendPrc = Math.Round(ConvertHelper.QuotationToDouble(dividend.YieldValue), 2)
-        };
     
     private static GetDividendsRequest CreateGetDividendsRequest(Guid instrumentId) =>
         new()

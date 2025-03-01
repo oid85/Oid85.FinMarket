@@ -1,6 +1,5 @@
 ﻿using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 

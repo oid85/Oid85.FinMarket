@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Candle;
@@ -45,22 +46,10 @@ public class GetCandlesService(
         if (response is null)
             return [];
 
-        var candles = response.Candles.Select(MapCandle).ToList();
+        var candles = response.Candles.Select(TinkoffMap.MapCandle).ToList();
         candles.ForEach(x => x.InstrumentId = instrumentId);
         return candles;
     }
-
-    private static Candle MapCandle(HistoricCandle historicCandle) =>
-        new()
-        {
-            Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-            Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-            High = ConvertHelper.QuotationToDouble(historicCandle.High),
-            Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-            Volume = historicCandle.Volume,
-            Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-            IsComplete = historicCandle.IsComplete
-        };
 
     private async Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
@@ -73,23 +62,10 @@ public class GetCandlesService(
         if (response is null)
             return [];
         
-        var candles = response.Candles.Select(MapFiveMinuteCandle).ToList();
+        var candles = response.Candles.Select(TinkoffMap.MapFiveMinuteCandle).ToList();
         candles.ForEach(x => x.InstrumentId = instrumentId);
         return candles;
     }
-
-    private static FiveMinuteCandle MapFiveMinuteCandle(HistoricCandle historicCandle) =>
-        new()
-        {
-            Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-            Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-            High = ConvertHelper.QuotationToDouble(historicCandle.High),
-            Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-            Volume = historicCandle.Volume,
-            Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-            Time = ConvertHelper.TimestampToTimeOnly(historicCandle.Time),
-            IsComplete = historicCandle.IsComplete
-        };
     
     private async Task<GetCandlesResponse?> SendGetCandlesRequest(GetCandlesRequest request)
     {
