@@ -10,13 +10,13 @@ public interface ITinkoffService
     /// <summary>
     /// Получить дневные свечи
     /// </summary>
-    public Task<List<Candle>> GetCandlesAsync(
+    public Task<List<Candle>> GetDailyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to);
     
     /// <summary>
     /// Получить дневные свечи за конкретный год
     /// </summary>
-    public Task<List<Candle>> GetCandlesAsync(Guid instrumentId, int year);
+    public Task<List<Candle>> GetDailyCandlesAsync(Guid instrumentId, int year);
         
     /// <summary>
     /// Получить 5-минутные свечи за период

@@ -7,6 +7,5 @@ namespace Oid85.FinMarket.Application.Interfaces.Services;
 /// </summary>
 public interface ISpreadService
 {
-    Task<List<Spread>> FillingSpreadPairsAsync();
-    Task<List<Spread>> CalculateSpreadsAsync();
+    Task<List<Spread>> ProcessSpreadPairsAsync();
 }

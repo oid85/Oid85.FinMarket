@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -22,7 +23,7 @@ public class ForecastConsensusRepository(
             if (!await context.ForecastConsensusEntities
                     .AnyAsync(x => 
                         x.InstrumentId == forecastConsensuse.InstrumentId))
-                entities.Add(GetEntity(forecastConsensuse));
+                entities.Add(DataAccessMapper.Map(forecastConsensuse));
 
         await context.ForecastConsensusEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -37,8 +38,7 @@ public class ForecastConsensusRepository(
             await context.ForecastConsensusEntities
                 .Where(x => 
                     x.InstrumentId == forecastConsensus.InstrumentId)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.RecommendationString, forecastConsensus.RecommendationString)
                         .SetProperty(entity => entity.RecommendationNumber, forecastConsensus.RecommendationNumber)
                         .SetProperty(entity => entity.CurrentPrice, forecastConsensus.CurrentPrice)
@@ -65,7 +65,7 @@ public class ForecastConsensusRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<ForecastConsensus?> GetByTickerAsync(string ticker)
@@ -75,9 +75,7 @@ public class ForecastConsensusRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
     public async Task<ForecastConsensus?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -87,49 +85,6 @@ public class ForecastConsensusRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-    
-    private ForecastConsensusEntity GetEntity(ForecastConsensus model)
-    {
-        var entity = new ForecastConsensusEntity
-        {
-            Ticker = model.Ticker,
-            InstrumentId = model.InstrumentId,
-            RecommendationString = model.RecommendationString,
-            RecommendationNumber = model.RecommendationNumber,
-            Currency = model.Currency,
-            CurrentPrice = model.CurrentPrice,
-            ConsensusPrice = model.ConsensusPrice,
-            MinTarget = model.MinTarget,
-            MaxTarget = model.MaxTarget,
-            PriceChange = model.PriceChange,
-            PriceChangeRel = model.PriceChangeRel
-        };
-
-        return entity;
-    }
-    
-    private ForecastConsensus GetModel(ForecastConsensusEntity entity)
-    {
-        var model = new ForecastConsensus
-        {
-            Id = entity.Id,
-            Ticker = entity.Ticker,
-            InstrumentId = entity.InstrumentId,
-            RecommendationString = entity.RecommendationString,
-            RecommendationNumber = entity.RecommendationNumber,
-            Currency = entity.Currency,
-            CurrentPrice = entity.CurrentPrice,
-            ConsensusPrice = entity.ConsensusPrice,
-            MinTarget = entity.MinTarget,
-            MaxTarget = entity.MaxTarget,
-            PriceChange = entity.PriceChange,
-            PriceChangeRel = entity.PriceChangeRel
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

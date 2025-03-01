@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -21,7 +22,7 @@ public class CurrencyRepository(
         foreach (var currency in currencies)
             if (!await context.CurrencyEntities
                     .AnyAsync(x => x.InstrumentId == currency.InstrumentId))
-                entities.Add(GetEntity(currency));
+                entities.Add(DataAccessMapper.Map(currency));
 
         await context.CurrencyEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -35,9 +36,8 @@ public class CurrencyRepository(
         {
             await context.CurrencyEntities
                 .Where(x => x.InstrumentId == instrumentId)
-                .ExecuteUpdateAsync(
-                    s => s.SetProperty(
-                        entity => entity.LastPrice, lastPrice));
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(entity => entity.LastPrice, lastPrice));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -56,7 +56,7 @@ public class CurrencyRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<List<Currency>> GetByTickersAsync(List<string> tickers) =>
@@ -66,7 +66,7 @@ public class CurrencyRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<Currency?> GetByTickerAsync(string ticker)
@@ -76,9 +76,7 @@ public class CurrencyRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 
-        return entity is null 
-            ? null 
-            : GetModel(entity);
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
     public async Task<Currency?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -88,43 +86,6 @@ public class CurrencyRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-    
-    private CurrencyEntity GetEntity(Currency model)
-    {
-        var entity = new CurrencyEntity
-        {
-            Ticker = model.Ticker,
-            LastPrice = model.LastPrice,
-            Isin = model.Isin,
-            Figi = model.Figi,
-            ClassCode = model.ClassCode,
-            Name = model.Name,
-            IsoCurrencyName = model.IsoCurrencyName,
-            InstrumentId = model.InstrumentId
-        };
-
-        return entity;
-    }
-    
-    private Currency GetModel(CurrencyEntity entity)
-    {
-        var model = new Currency
-        {
-            Id = entity.Id,
-            Ticker = entity.Ticker,
-            LastPrice = entity.LastPrice,
-            Isin = entity.Isin,
-            Figi = entity.Figi,
-            ClassCode = entity.ClassCode,
-            Name = entity.Name,
-            IsoCurrencyName = entity.IsoCurrencyName,
-            InstrumentId = entity.InstrumentId
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

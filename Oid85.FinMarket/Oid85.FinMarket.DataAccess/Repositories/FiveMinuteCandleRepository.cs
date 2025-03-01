@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -18,9 +19,7 @@ public class FiveMinuteCandleRepository(
 
         if (lastCandle is null)
         {
-            var entities = candles
-                .Select(GetEntity);
-            
+            var entities = candles.Select(DataAccessMapper.Map);
             await context.FiveMinuteCandleEntities.AddRangeAsync(entities);
         }
         
@@ -40,12 +39,12 @@ public class FiveMinuteCandleRepository(
                             x.Time == lastCandle.Time &&
                             x.InstrumentId == candle.InstrumentId);
 
-                    SetEntity(ref entity, candle);
+                    DataAccessMapper.Map(ref entity, candle);
                 }
             }
 
             var entities = candles
-                .Select(GetEntity)
+                .Select(DataAccessMapper.Map)
                 .Where(x => 
                     x.Date.ToDateTime(x.Time) > lastCandle.Date.ToDateTime(x.Time));
                 
@@ -60,7 +59,7 @@ public class FiveMinuteCandleRepository(
             .Where(x => x.InstrumentId == instrumentId)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .OrderBy(x => x.Date.ToDateTime(x.Time))
         .ToList();
 
@@ -69,13 +68,11 @@ public class FiveMinuteCandleRepository(
     {
         var candles = await GetAsync(instrumentId);
         
-        var result = candles
+        return candles
             .Where(x => 
                 x.Date.ToDateTime(x.Time) >= from && 
                 x.Date.ToDateTime(x.Time) <= to)
             .ToList();
-
-        return result;
     }
 
     public async Task<FiveMinuteCandle?> GetLastAsync(Guid instrumentId)
@@ -99,64 +96,8 @@ public class FiveMinuteCandleRepository(
             .AsNoTracking()
             .ToListAsync();
 
-        var lastCandleEntity = entitiesByMaxDate
-            .OrderBy(x => x.Time)
-            .Last();
+        var lastCandleEntity = entitiesByMaxDate.OrderBy(x => x.Time).Last();
         
-        var candle = GetModel(lastCandleEntity);
-        
-        return candle;
-    }
-    
-    private void SetEntity(ref FiveMinuteCandleEntity? entity, FiveMinuteCandle model)
-    {
-        entity ??= new FiveMinuteCandleEntity();
-        
-        entity.InstrumentId = model.InstrumentId;
-        entity.Open = model.Open;
-        entity.Close = model.Close;
-        entity.High = model.High;
-        entity.Low = model.Low;
-        entity.Volume = model.Volume;
-        entity.Date = model.Date;
-        entity.Time = model.Time;
-        entity.IsComplete = model.IsComplete;
-    }
-    
-    private FiveMinuteCandleEntity GetEntity(FiveMinuteCandle model)
-    {
-        var entity = new FiveMinuteCandleEntity
-        {
-            InstrumentId = model.InstrumentId,
-            Open = model.Open,
-            Close = model.Close,
-            High = model.High,
-            Low = model.Low,
-            Volume = model.Volume,
-            Date = model.Date,
-            Time = model.Time,
-            IsComplete = model.IsComplete
-        };
-
-        return entity;
-    }
-    
-    private FiveMinuteCandle GetModel(FiveMinuteCandleEntity entity)
-    {
-        var model = new FiveMinuteCandle
-        {
-            Id = entity.Id,
-            InstrumentId = entity.InstrumentId,
-            Open = entity.Open,
-            Close = entity.Close,
-            High = entity.High,
-            Low = entity.Low,
-            Volume = entity.Volume,
-            Date = entity.Date,
-            Time = entity.Time,
-            IsComplete = entity.IsComplete
-        };
-
-        return model;
+        return DataAccessMapper.Map(lastCandleEntity);
     }
 }

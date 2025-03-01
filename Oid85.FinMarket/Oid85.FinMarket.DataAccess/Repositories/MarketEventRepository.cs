@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -20,7 +21,7 @@ public class MarketEventRepository(
                     x.MarketEventText == marketEvent.MarketEventText)) 
             return;
         
-        await context.AddAsync(GetEntity(marketEvent));
+        await context.AddAsync(DataAccessMapper.Map(marketEvent));
         await context.SaveChangesAsync();
     }
 
@@ -42,7 +43,7 @@ public class MarketEventRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     private async Task SetSentNotificationFlagAsync(MarketEvent marketEvent, bool value)
@@ -53,9 +54,8 @@ public class MarketEventRepository(
         {
             await context.MarketEventEntities
                 .Where(x => x.Id == marketEvent.Id)
-                .ExecuteUpdateAsync(
-                    s => s.SetProperty(
-                        entity => entity.SentNotification, value));
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(entity => entity.SentNotification, value));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -79,8 +79,7 @@ public class MarketEventRepository(
                     x.InstrumentId == marketEvent.InstrumentId &&
                     x.MarketEventType == marketEvent.MarketEventType &&
                     x.MarketEventText == marketEvent.MarketEventText)
-                .ExecuteUpdateAsync(
-                    s => s
+                .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.IsActive, value));
             
             await context.SaveChangesAsync();
@@ -92,42 +91,5 @@ public class MarketEventRepository(
             await transaction.RollbackAsync();
             logger.Error(exception);
         }
-    }
-    
-    private MarketEventEntity GetEntity(MarketEvent model)
-    {
-        var entity = new MarketEventEntity
-        {
-            Date = model.Date,
-            Time = model.Time,
-            InstrumentId = model.InstrumentId,
-            Ticker = model.Ticker,
-            InstrumentName = model.InstrumentName,
-            MarketEventType = model.MarketEventType,
-            MarketEventText = model.MarketEventText,
-            IsActive = model.IsActive,
-            SentNotification = model.SentNotification
-        };
-
-        return entity;
-    }
-    
-    private MarketEvent GetModel(MarketEventEntity entity)
-    {
-        var model = new MarketEvent
-        {
-            Id = entity.Id,
-            Date = entity.Date,
-            Time = entity.Time,
-            InstrumentId = entity.InstrumentId,
-            Ticker = entity.Ticker,
-            InstrumentName = entity.InstrumentName,
-            MarketEventType = entity.MarketEventType,
-            MarketEventText = entity.MarketEventText,
-            IsActive = entity.IsActive,
-            SentNotification = entity.SentNotification
-        };
-
-        return model;
     }
 }

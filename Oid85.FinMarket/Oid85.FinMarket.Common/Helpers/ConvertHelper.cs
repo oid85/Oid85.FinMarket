@@ -23,6 +23,12 @@ public static class ConvertHelper
         return moneyValue.Units + moneyValue.Nano / 1_000_000_000.0;
     }
 
+    public static Timestamp DateOnlyToTimestamp(DateOnly dateOnly) => 
+        Timestamp.FromDateTime(dateOnly.ToDateTime(TimeOnly.MinValue).ToUniversalTime());
+
+    public static Timestamp DateTimeToTimestamp(DateTime dateOnly) => 
+        Timestamp.FromDateTime(dateOnly.ToUniversalTime());
+    
     public static DateOnly TimestampToDateOnly(Timestamp timestamp)
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract

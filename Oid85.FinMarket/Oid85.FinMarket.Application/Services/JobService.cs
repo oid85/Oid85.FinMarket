@@ -22,8 +22,8 @@ public class JobService(
         await LoadFiveMinuteCandlesAsync();
         await LoadForecastsAsync();
         await AnalyseAsync();
-        await CalculateSpreadsAsync();
-        await CalculateMultiplicatorsAsync();
+        await ProcessSpreadPairsAsync();
+        await ProcessMultiplicatorsAsync();
         await CheckMarketEventsAsync();
         await SendNotificationsAsync();
         
@@ -87,16 +87,14 @@ public class JobService(
         await analyseService.AnalyseIndexesAsync();
     }
 
-    private async Task CalculateSpreadsAsync()
+    private async Task ProcessSpreadPairsAsync()
     {
-        await spreadService.FillingSpreadPairsAsync();
-        await spreadService.CalculateSpreadsAsync();
+        await spreadService.ProcessSpreadPairsAsync();
     }
 
-    private async Task CalculateMultiplicatorsAsync()
+    private async Task ProcessMultiplicatorsAsync()
     {
-        await multiplicatorService.FillingMultiplicatorInstrumentsAsync();
-        await multiplicatorService.CalculateMultiplicatorsAsync();
+        await multiplicatorService.ProcessMultiplicatorsAsync();
     }
 
     private async Task CheckMarketEventsAsync()

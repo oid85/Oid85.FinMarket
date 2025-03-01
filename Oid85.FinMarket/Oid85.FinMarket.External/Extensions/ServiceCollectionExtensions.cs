@@ -16,6 +16,12 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddTransient<ITinkoffService, TinkoffService>();
+        services.AddTransient<GetPricesService>();
+        services.AddTransient<GetInstrumentsService>();
+        services.AddTransient<GetCandlesService>();
+        services.AddTransient<GetDividendInfoService>();
+        services.AddTransient<GetBondCouponsService>();
+        services.AddTransient<GetForecastService>();
         services.AddTransient<ITelegramService, TelegramService>();
         services.AddTransient<IResourceStoreService, ResourceStoreService>();
         

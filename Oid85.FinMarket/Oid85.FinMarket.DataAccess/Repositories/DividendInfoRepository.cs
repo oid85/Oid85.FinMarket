@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -22,7 +23,7 @@ public class DividendInfoRepository(
                         x.InstrumentId == dividendInfo.InstrumentId &&
                         x.RecordDate == dividendInfo.RecordDate &&
                         x.DeclaredDate == dividendInfo.DeclaredDate))
-                entities.Add(GetEntity(dividendInfo));
+                entities.Add(DataAccessMapper.Map(dividendInfo));
 
         await context.DividendInfoEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -33,7 +34,7 @@ public class DividendInfoRepository(
             .OrderBy(x => x.DividendPrc)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
     
     public async Task<List<DividendInfo>> GetAsync(
@@ -46,37 +47,6 @@ public class DividendInfoRepository(
             .OrderBy(x => x.DividendPrc)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
-    
-    private DividendInfoEntity GetEntity(DividendInfo model)
-    {
-        var entity = new DividendInfoEntity
-        {
-            InstrumentId = model.InstrumentId,
-            Ticker = model.Ticker,
-            RecordDate = model.RecordDate,
-            DeclaredDate = model.DeclaredDate,
-            Dividend = model.Dividend,
-            DividendPrc = model.DividendPrc
-        };
-
-        return entity;
-    }
-    
-    private DividendInfo GetModel(DividendInfoEntity entity)
-    {
-        var model = new DividendInfo
-        {
-            Id = entity.Id,
-            InstrumentId = entity.InstrumentId,
-            Ticker = entity.Ticker,
-            RecordDate = entity.RecordDate,
-            DeclaredDate = entity.DeclaredDate,
-            Dividend = entity.Dividend,
-            DividendPrc = entity.DividendPrc
-        };
-
-        return model;
-    }
 }

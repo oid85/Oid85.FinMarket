@@ -2,6 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
+using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
@@ -20,8 +21,9 @@ public class IndexRepository(
         
         foreach (var indicative in indicatives)
             if (!await context.IndicativeEntities
-                    .AnyAsync(x => x.InstrumentId == indicative.InstrumentId))
-                entities.Add(GetEntity(indicative));
+                    .AnyAsync(x => 
+                        x.InstrumentId == indicative.InstrumentId))
+                entities.Add(DataAccessMapper.Map(indicative));
 
         await context.IndicativeEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -35,9 +37,8 @@ public class IndexRepository(
         {
             await context.IndicativeEntities
                 .Where(x => x.InstrumentId == instrumentId)
-                .ExecuteUpdateAsync(
-                    s => s.SetProperty(
-                        entity => entity.LastPrice, lastPrice));
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(entity => entity.LastPrice, lastPrice));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -56,7 +57,7 @@ public class IndexRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<List<FinIndex>> GetByTickersAsync(List<string> tickers) =>
@@ -66,7 +67,7 @@ public class IndexRepository(
             .OrderBy(x => x.Ticker)
             .AsNoTracking()
             .ToListAsync())
-        .Select(GetModel)
+        .Select(DataAccessMapper.Map)
         .ToList();
 
     public async Task<FinIndex?> GetByTickerAsync(string ticker)
@@ -76,9 +77,7 @@ public class IndexRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 
-        return entity is null 
-            ? null 
-            : GetModel(entity);
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
     public async Task<FinIndex?> GetByInstrumentIdAsync(Guid instrumentId)
@@ -88,45 +87,6 @@ public class IndexRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
 
-        return entity is null 
-            ? null 
-            : GetModel(entity);
-    }
-
-    private FinIndexEntity GetEntity(FinIndex model)
-    {
-        var entity = new FinIndexEntity
-        {
-            Figi = model.Figi,
-            InstrumentId = model.InstrumentId,
-            Ticker = model.Ticker,
-            LastPrice = model.LastPrice,
-            ClassCode = model.ClassCode,
-            Currency = model.Currency,
-            InstrumentKind = model.InstrumentKind,
-            Name = model.Name,
-            Exchange = model.Exchange
-        };
-
-        return entity;
-    }
-    
-    private FinIndex GetModel(FinIndexEntity entity)
-    {
-        var model = new FinIndex
-        {
-            Id = entity.Id,
-            Figi = entity.Figi,
-            InstrumentId = entity.InstrumentId,
-            Ticker = entity.Ticker,
-            LastPrice = entity.LastPrice,
-            ClassCode = entity.ClassCode,
-            Currency = entity.Currency,
-            InstrumentKind = entity.InstrumentKind,
-            Name = entity.Name,
-            Exchange = entity.Exchange
-        };
-
-        return model;
+        return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }
