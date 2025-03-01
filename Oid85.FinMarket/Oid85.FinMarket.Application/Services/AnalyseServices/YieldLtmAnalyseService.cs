@@ -67,6 +67,6 @@ public class YieldLtmAnalyseService(
         double yield = difference / firstPrice;
         double yieldPrc = yield * 100.0;
             
-        return (yieldPrc.ToString("N2"), yieldPrc);
+        return (yieldPrc.ToString("N1"), yieldPrc);
     }
 }

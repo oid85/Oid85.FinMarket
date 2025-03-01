@@ -71,6 +71,6 @@ public class DrawdownFromMaximumAnalyseService(
         double drawdown = difference / maxPrice;
         double drawdownPrc = drawdown * 100.0;
             
-        return (drawdownPrc.ToString("N2"), drawdownPrc);
+        return (drawdownPrc.ToString("N1"), drawdownPrc);
     }
 }

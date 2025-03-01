@@ -375,9 +375,7 @@ public class SharesReportService(
                         ? new ReportParameter(
                             $"AnalyseResult{analyseType}",
                             analyseResult.ResultString,
-                            await reportHelper.GetColor(
-                                analyseType, 
-                                analyseResult)) 
+                            await reportHelper.GetColor(analyseType, analyseResult)) 
                         : new ReportParameter(
                             $"AnalyseResult{analyseType}",
                             string.Empty));

@@ -74,6 +74,7 @@ public class BondsReportService(
             Header =
             [
                 new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Наименование"),
                 new ReportParameter(KnownDisplayTypes.String, "Сектор"),
                 new ReportParameter(KnownDisplayTypes.String, "Плав. купон"),
                 new ReportParameter(KnownDisplayTypes.String, "До погаш., дней"),
@@ -127,9 +128,8 @@ public class BondsReportService(
         {
             List<ReportParameter> data =
             [
-                new (KnownDisplayTypes.Ticker, 
-                    bond.Ticker),
-                    
+                new (KnownDisplayTypes.Ticker, bond.Ticker),
+                new (KnownDisplayTypes.String, bond.Name),                
                 new (KnownDisplayTypes.Sector, bond.Sector),
                     
                 new (KnownDisplayTypes.String, 
@@ -211,7 +211,9 @@ public class BondsReportService(
                 
             Header = 
             [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Наименование"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор")
             ]
         };
 
@@ -221,7 +223,9 @@ public class BondsReportService(
         {
             var data = new List<ReportParameter>
             {
-                new (KnownDisplayTypes.Ticker, bond.Ticker)
+                new (KnownDisplayTypes.Ticker, bond.Ticker),
+                new (KnownDisplayTypes.String, bond.Name),                
+                new (KnownDisplayTypes.Sector, bond.Sector)
             };
 
             foreach (var date in dates)
@@ -235,9 +239,7 @@ public class BondsReportService(
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         analyseResult.ResultString,
-                        await reportHelper.GetColor(
-                            analyseType, 
-                            analyseResult)) 
+                        await reportHelper.GetColor(analyseType, analyseResult)) 
                     : new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         string.Empty));
@@ -280,7 +282,9 @@ public class BondsReportService(
                 
             Header = 
             [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер")
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Наименование"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор")
             ]
         };
 
@@ -290,7 +294,9 @@ public class BondsReportService(
         {
             var data = new List<ReportParameter>
             {
-                new (KnownDisplayTypes.Ticker, instrument.Ticker)
+                new (KnownDisplayTypes.Ticker, instrument.Ticker),
+                new (KnownDisplayTypes.String, instrument.Name),                
+                new (KnownDisplayTypes.Sector, instrument.Sector)
             };
 
             foreach (var date in dates)
