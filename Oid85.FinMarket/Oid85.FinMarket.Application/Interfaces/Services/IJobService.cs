@@ -6,7 +6,14 @@
 public interface IJobService
 {
     /// <summary>
-    /// Загрузка данных и расчет
+    /// В начале дня
     /// </summary>
-    Task<bool> LoadAndCalculate();
+    /// <returns></returns>
+    Task EarlyInTheDay();
+    
+    /// <summary>
+    /// Каждые 15 минут
+    /// </summary>
+    /// <returns></returns>
+    Task Every15Minutes();
 }
