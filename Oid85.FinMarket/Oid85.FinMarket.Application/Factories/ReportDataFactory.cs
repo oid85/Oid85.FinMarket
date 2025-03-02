@@ -6,6 +6,7 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Factories;
 
@@ -14,11 +15,15 @@ public class ReportDataFactory(
     IInstrumentRepository instrumentRepository,
     IAnalyseResultRepository analyseResultRepository,
     IDividendInfoRepository dividendInfoRepository,
+    IBondCouponRepository bondCouponRepository,
+    IBondRepository bondRepository,
     IMultiplicatorRepository multiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
     ReportHelper reportHelper,
-    IInstrumentService instrumentService) 
+    IInstrumentService instrumentService,
+    ISpreadRepository spreadRepository,
+    IResourceStoreService resourceStoreService) 
     : IReportDataFactory
 {
     private async Task<List<AnalyseResult>> GetAnalyseResults(
@@ -337,6 +342,158 @@ public class ReportDataFactory(
                 new (KnownDisplayTypes.Ruble, forecastConsensus.PriceChange.ToString("N2")),
                 new (KnownDisplayTypes.Percent, forecastConsensus.PriceChangeRel.ToString("N2"))
             ];
+            
+            reportData.Data.Add(data);
+        }
+        
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateBondCouponReportDataAsync(List<Guid> instrumentIds)
+    {
+        var reportData = new ReportData
+        {
+            Title = "Информация по облигациям",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Наименование"),
+                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
+                new ReportParameter(KnownDisplayTypes.String, "Плав. купон"),
+                new ReportParameter(KnownDisplayTypes.String, "До погаш., дней"),
+                new ReportParameter(KnownDisplayTypes.String, "Дох-ть., %")
+            ]
+        };
+            
+        int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
+        var bonds = await bondRepository.GetAsync(instrumentIds);
+        var startDate = DateOnly.FromDateTime(DateTime.Today);
+        var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(days);
+
+        var bondCoupons = (await bondCouponRepository
+            .GetByInstrumentIdsAsync(instrumentIds))
+            .Where(x =>
+                x.CouponDate >= startDate &&
+                x.CouponDate <= endDate)
+            .ToList();
+
+        var instrumentIdsWithCoupon = bondCoupons.Select(x => x.InstrumentId).Distinct().ToList();
+
+        DateOnly GetNearCouponDate(Guid instrumentId)
+        {
+            var coupon = bondCoupons
+                .OrderBy(x => x.CouponDate)
+                .FirstOrDefault(x => x.InstrumentId == instrumentId);
+
+            if (coupon is not null)
+                return coupon.CouponDate;
+            
+            return DateOnly.MaxValue;
+        }
+        
+        var selectedBonds = bonds
+            .Where(x => instrumentIdsWithCoupon.Contains(x.InstrumentId))
+            .OrderBy(x => GetNearCouponDate(x.InstrumentId));
+        
+        var dates = reportHelper.GetDates(startDate, endDate);
+        reportData.Header.AddRange(dates);
+            
+        foreach (var bond in selectedBonds)
+        {
+            int daysToMaturityDate = (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+            
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.Ticker, bond.Ticker),
+                new (KnownDisplayTypes.String, bond.Name),                
+                new (KnownDisplayTypes.Sector, bond.Sector),
+                new (KnownDisplayTypes.String, bond.FloatingCouponFlag ? "Да" : string.Empty),
+                new (KnownDisplayTypes.Number, daysToMaturityDate.ToString())
+            ];
+                
+            // Вычисляем полную доходность облигации
+            var nextCoupon = bondCoupons
+                .OrderBy(x => x.CouponDate)
+                .FirstOrDefault(x => x.InstrumentId == bond.InstrumentId);
+                
+            double profitPrc = 0.0;
+
+            if (nextCoupon is not null &&
+                bond.LastPrice == 0.0 &&
+                nextCoupon.CouponPeriod == 0.0)
+            {
+                double priceInRubles = bond.LastPrice * 10.0;
+                double payDay = nextCoupon.PayOneBond / nextCoupon.CouponPeriod;
+                double payYear = payDay * 365;
+                double profit = payYear / priceInRubles;
+                profitPrc = profit / 100.0;   
+            }
+            
+            data.Add(new ReportParameter(KnownDisplayTypes.Percent, profitPrc.ToString("N1"),
+                await reportHelper.GetColorYieldCoupon(profitPrc)));
+                
+            foreach (var date in dates)
+            {
+                var bondCoupon = bondCoupons
+                    .FirstOrDefault(x => 
+                        x.InstrumentId == bond.InstrumentId &&
+                        x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+
+                data.Add(bondCoupon is not null 
+                    ? new ReportParameter(KnownDisplayTypes.Ruble, bondCoupon.PayOneBond.ToString("N1")) 
+                    : new ReportParameter(KnownDisplayTypes.Ruble, string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateSpreadReportDataAsync()
+    {
+        var spreads = await spreadRepository.GetAllAsync();
+            
+        var reportData = new ReportData
+        {
+            Title = "Спреды",
+            Header =
+            [
+                new ReportParameter(KnownDisplayTypes.String, "Первый"),
+                new ReportParameter(KnownDisplayTypes.String, "Второй"),
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
+                new ReportParameter(KnownDisplayTypes.String, "Цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Цена"),
+                new ReportParameter(KnownDisplayTypes.String, "Спред"),
+                new ReportParameter(KnownDisplayTypes.String, "Спред, %"),
+                new ReportParameter(KnownDisplayTypes.String, "Конт./Бэкв.")
+            ]
+        };
+
+        foreach (var spread in spreads)
+        {
+            List<ReportParameter> data =
+            [
+                new (KnownDisplayTypes.String, spread.FirstInstrumentRole),
+                new (KnownDisplayTypes.String, spread.SecondInstrumentRole),
+                new (KnownDisplayTypes.Ticker, spread.FirstInstrumentTicker),
+                new (KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
+                new (KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N2")),
+                new (KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N2")),
+                new (KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N2"))
+            ];
+            
+            string color = (await resourceStoreService.GetColorPaletteSpreadPricePositionAsync())
+                .FirstOrDefault(x => 
+                    spread.SpreadPricePosition == x.Value)!
+                .ColorCode; 
+            
+            data.Add(new (
+                KnownDisplayTypes.String, 
+                spread.SpreadPricePosition,
+                color));
             
             reportData.Data.Add(data);
         }

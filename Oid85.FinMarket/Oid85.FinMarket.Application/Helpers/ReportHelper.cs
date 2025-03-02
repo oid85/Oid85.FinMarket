@@ -246,4 +246,19 @@ public class ReportHelper(
         
         return resource.ColorCode;
     }
+    
+    public async Task<string> GetColorPaletteSpreadPricePosition(string value)
+    {
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteSpreadPricePositionAsync();
+
+        var resource = colorPalette
+            .FirstOrDefault(
+                x => x.Value == value);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
+    }
 }

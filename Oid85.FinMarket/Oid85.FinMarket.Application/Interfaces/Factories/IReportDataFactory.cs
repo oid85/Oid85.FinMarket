@@ -10,4 +10,6 @@ public interface IReportDataFactory
     Task<ReportData> CreateMultiplicatorReportDataAsync();
     Task<ReportData> CreateForecastTargetReportDataAsync();
     Task<ReportData> CreateForecastConsensusReportDataAsync();
+    Task<ReportData> CreateBondCouponReportDataAsync(List<Guid> instrumentIds);
+    Task<ReportData> CreateSpreadReportDataAsync();
 }
