@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 

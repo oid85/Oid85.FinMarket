@@ -6,7 +6,6 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Factories;
 
@@ -22,8 +21,7 @@ public class ReportDataFactory(
     IForecastConsensusRepository forecastConsensusRepository,
     ReportHelper reportHelper,
     IInstrumentService instrumentService,
-    ISpreadRepository spreadRepository,
-    IResourceStoreService resourceStoreService) 
+    ISpreadRepository spreadRepository) 
     : IReportDataFactory
 {
     private async Task<List<AnalyseResult>> GetAnalyseResults(
@@ -39,7 +37,7 @@ public class ReportDataFactory(
         
         var reportData = new ReportData
         {
-            Title = $"{from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}",
+            Title = $"{analyseType} {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}",
             Header = 
             [
                 new ReportParameter(KnownDisplayTypes.String, "Тикер"),
@@ -92,7 +90,7 @@ public class ReportDataFactory(
             
         var reportData = new ReportData
         {
-            Title = $"{from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}",
+            Title = $"Aggregated {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}",
             Header = 
             [
                 new ReportParameter(KnownDisplayTypes.String, "Тикер"),
