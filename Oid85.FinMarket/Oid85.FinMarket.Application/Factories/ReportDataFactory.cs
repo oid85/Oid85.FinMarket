@@ -475,26 +475,18 @@ public class ReportDataFactory(
         {
             List<ReportParameter> data =
             [
-                new (KnownDisplayTypes.String, spread.FirstInstrumentRole),
-                new (KnownDisplayTypes.String, spread.SecondInstrumentRole),
-                new (KnownDisplayTypes.Ticker, spread.FirstInstrumentTicker),
-                new (KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
-                new (KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N2")),
-                new (KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N2"))
+                new(KnownDisplayTypes.String, spread.FirstInstrumentRole),
+                new(KnownDisplayTypes.String, spread.SecondInstrumentRole),
+                new(KnownDisplayTypes.Ticker, spread.FirstInstrumentTicker),
+                new(KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
+                new(KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N2")),
+                new(KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N2")),
+                new(KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N2")),
+                new(KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N2")),
+                new(KnownDisplayTypes.String, spread.SpreadPricePosition,
+                    await reportHelper.GetColorSpreadPricePosition(spread.SpreadPricePosition))
             ];
-            
-            string color = (await resourceStoreService.GetColorPaletteSpreadPricePositionAsync())
-                .FirstOrDefault(x => 
-                    spread.SpreadPricePosition == x.Value)!
-                .ColorCode; 
-            
-            data.Add(new (
-                KnownDisplayTypes.String, 
-                spread.SpreadPricePosition,
-                color));
-            
+
             reportData.Data.Add(data);
         }
         

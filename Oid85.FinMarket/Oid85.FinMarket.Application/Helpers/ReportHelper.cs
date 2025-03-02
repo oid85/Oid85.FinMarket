@@ -247,7 +247,7 @@ public class ReportHelper(
         return resource.ColorCode;
     }
     
-    public async Task<string> GetColorPaletteSpreadPricePosition(string value)
+    public async Task<string> GetColorSpreadPricePosition(string value)
     {
         var colorPalette = await resourceStoreService
             .GetColorPaletteSpreadPricePositionAsync();

@@ -67,46 +67,6 @@ public class FuturesReportService(
             KnownAnalyseTypes.YieldLtm, 
             request.From, request.To);
 
-    public async Task<ReportData> GetSpreadAnalyseAsync()
-    {
-        var spreads = await spreadRepository.GetAllAsync();
-            
-        var reportData = new ReportData
-        {
-            Title = "Спреды",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Первый"),
-                new ReportParameter(KnownDisplayTypes.String, "Второй"),
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Спред"),
-                new ReportParameter(KnownDisplayTypes.String, "Спред, %"),
-                new ReportParameter(KnownDisplayTypes.String, "Конт./Бэкв.")
-            ]
-        };
-
-        foreach (var spread in spreads)
-        {
-            List<ReportParameter> data =
-            [
-                new(KnownDisplayTypes.String, spread.FirstInstrumentRole),
-                new(KnownDisplayTypes.String, spread.SecondInstrumentRole),
-                new(KnownDisplayTypes.Ticker, spread.FirstInstrumentTicker),
-                new(KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
-                new(KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N2")),
-                new(KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N2")),
-                new(KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N2")),
-                new(KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N2")),
-                new(KnownDisplayTypes.String, spread.SpreadPricePosition,
-                    await reportHelper.GetColorPaletteSpreadPricePosition(spread.SpreadPricePosition))
-            ];
-
-            reportData.Data.Add(data);
-        }
-        
-        return reportData;
-    }
+    public async Task<ReportData> GetSpreadAnalyseAsync() =>
+        await reportDataFactory.CreateSpreadReportDataAsync();
 }
