@@ -20,68 +20,52 @@ public class SharesReportService(
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
     ReportHelper reportHelper,
-    IInstrumentService instrumentService,
-    IResourceStoreService resourceStoreService)
+    IInstrumentService instrumentService)
     : ISharesReportService
 {
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
-        await GetReportDataAggregatedAnalyse(
-            await instrumentService.GetSharesInWatchlist(), 
-            request.From, 
-            request.To);
+        await GetReportDataAggregatedAnalyse(await instrumentService.GetSharesInWatchlist(), request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetSharesInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.Supertrend);
+            await instrumentService.GetSharesInWatchlist(), request.From, request.To, KnownAnalyseTypes.Supertrend);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetSharesInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.CandleSequence);
+            await instrumentService.GetSharesInWatchlist(), request.From, request.To, KnownAnalyseTypes.CandleSequence);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetSharesInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.CandleVolume);
+            await instrumentService.GetSharesInWatchlist(), request.From, request.To, KnownAnalyseTypes.CandleVolume);
 
     /// <inheritdoc />
     public async Task<ReportData> GetRsiAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetSharesInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.Rsi);
+            await instrumentService.GetSharesInWatchlist(), request.From, request.To, KnownAnalyseTypes.Rsi);
 
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataYieldLtmAnalyse(
-            await instrumentService.GetSharesInWatchlist(), 
-            request.From, 
-            request.To);
+            await instrumentService.GetSharesInWatchlist(), request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataDrawdownFromMaximumAnalyse(
-            await instrumentService.GetSharesInWatchlist(), 
-            request.From, 
-            request.To);
+            await instrumentService.GetSharesInWatchlist(), request.From, request.To);
     
     /// <inheritdoc />
     public async Task<ReportData> GetDividendAnalyseAsync()
     {
         var dividendInfos = await dividendInfoRepository.GetAllAsync();
-            
+        int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
+        var from = DateOnly.FromDateTime(DateTime.Today);
+        var to = from.AddDays(days);
+        var dates = reportHelper.GetDates(from, to);
+        
         var reportData = new ReportData
         {
             Title = "Информация по дивидендам",
@@ -94,36 +78,30 @@ public class SharesReportService(
                 new ReportParameter(KnownDisplayTypes.String, "Дох-ть, %")
             ]
         };
-            
+        
+        reportData.Header.AddRange(dates);
+        
         foreach (var dividendInfo in dividendInfos)
         {
-            string color = await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc);
+            var data = new List<ReportParameter>
+            {
+                new(KnownDisplayTypes.Ticker, dividendInfo.Ticker),
+                new(KnownDisplayTypes.Date, dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)),
+                new(KnownDisplayTypes.Date, dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO)),
+                new(KnownDisplayTypes.Ruble, dividendInfo.Dividend.ToString("N1")),
+                new(KnownDisplayTypes.Percent, dividendInfo.DividendPrc.ToString("N1"), 
+                    await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc))
+            };
             
-            reportData.Data.Add(
-            [
-                new ReportParameter(
-                    KnownDisplayTypes.Ticker, 
-                    dividendInfo.Ticker),
-                    
-                new ReportParameter(
-                    KnownDisplayTypes.Date, 
-                    dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)),
-                    
-                new ReportParameter(
-                    KnownDisplayTypes.Date, 
-                    dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO)),
-                    
-                new ReportParameter(
-                    KnownDisplayTypes.Ruble, 
-                    dividendInfo.Dividend.ToString("N1")), 
-                    
-                new ReportParameter(
-                    KnownDisplayTypes.Percent, 
-                    dividendInfo.DividendPrc.ToString("N1"),
-                    color)
-            ]);
+            foreach (var date in dates)
+                data.Add(date.Value == dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)
+                    ? new ReportParameter(KnownDisplayTypes.Percent, dividendInfo.DividendPrc.ToString("N1"), 
+                        await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc))
+                    : new ReportParameter(KnownDisplayTypes.Percent, string.Empty));
+
+            reportData.Data.Add(data);
         }
-            
+        
         return reportData;
     }
     
@@ -169,14 +147,10 @@ public class SharesReportService(
                 new (KnownDisplayTypes.Number, multiplicator.Ebitda.ToString("N2")),
                 new (KnownDisplayTypes.Number, multiplicator.Eps.ToString("N2")),
                 new (KnownDisplayTypes.Number, multiplicator.FreeCashFlow.ToString("N2")),
-                new (
-                    KnownDisplayTypes.Number, 
-                    multiplicator.EvToEbitda.ToString("N2"), 
+                new (KnownDisplayTypes.Number, multiplicator.EvToEbitda.ToString("N2"), 
                     await reportHelper.GetColorEvToEbitda(multiplicator.EvToEbitda)),
                 new (KnownDisplayTypes.Number, multiplicator.TotalDebtToEbitda.ToString("N2")),
-                new (
-                    KnownDisplayTypes.Number, 
-                    multiplicator.NetDebtToEbitda.ToString("N2"), 
+                new (KnownDisplayTypes.Number, multiplicator.NetDebtToEbitda.ToString("N2"), 
                     await reportHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda))
             ];
             
@@ -190,14 +164,8 @@ public class SharesReportService(
     public async Task<ReportData> GetForecastTargetAnalyseAsync()
     {
         var forecastTargets = await forecastTargetRepository.GetAllAsync();
-
-        // Выбираем свежие прогнозы
         var actualForecastTargets = new List<ForecastTarget>();
 
-        // Получение цветовой палитры
-        var colorPalette = await resourceStoreService
-            .GetColorPaletteForecastRecommendationAsync();
-        
         foreach (var forecastTarget in forecastTargets)
         {
             var target = forecastTargets
@@ -243,11 +211,8 @@ public class SharesReportService(
             [
                 new (KnownDisplayTypes.Ticker, forecastTarget.Ticker),
                 new (KnownDisplayTypes.String, forecastTarget.Company),
-                new (KnownDisplayTypes.String, 
-                    forecastTarget.RecommendationString, 
-                    colorPalette
-                        .FirstOrDefault(x => 
-                            x.Value == forecastTarget.RecommendationString)?.ColorCode ?? KnownColors.White),
+                new (KnownDisplayTypes.String, forecastTarget.RecommendationString, 
+                    await reportHelper.GetColorForecastRecommendation(forecastTarget.RecommendationString)),
                 new (KnownDisplayTypes.Date, forecastTarget.RecommendationDate.ToString(KnownDateTimeFormats.DateISO)),
                 new (KnownDisplayTypes.String, forecastTarget.Currency),
                 new (KnownDisplayTypes.Ruble, forecastTarget.CurrentPrice.ToString("N2")),
@@ -267,10 +232,6 @@ public class SharesReportService(
     public async Task<ReportData> GetForecastConsensusAnalyseAsync()
     {
         var forecastConsensuses = await forecastConsensusRepository.GetAllAsync();
-            
-        // Получение цветовой палитры
-        var colorPalette = await resourceStoreService
-            .GetColorPaletteForecastRecommendationAsync();
         
         var reportData = new ReportData
         {
@@ -294,11 +255,8 @@ public class SharesReportService(
             List<ReportParameter> data =
             [
                 new (KnownDisplayTypes.Ticker, forecastConsensus.Ticker),
-                new (KnownDisplayTypes.String, 
-                    forecastConsensus.RecommendationString, 
-                    colorPalette
-                        .FirstOrDefault(x => 
-                            x.Value == forecastConsensus.RecommendationString)?.ColorCode ?? KnownColors.White),
+                new (KnownDisplayTypes.String, forecastConsensus.RecommendationString, 
+                    await reportHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString)),
                 new (KnownDisplayTypes.String, forecastConsensus.Currency),
                 new (KnownDisplayTypes.Ruble, forecastConsensus.CurrentPrice.ToString("N2")),
                 new (KnownDisplayTypes.Ruble, forecastConsensus.ConsensusPrice.ToString("N2")),
@@ -315,28 +273,18 @@ public class SharesReportService(
     }
     
     private async Task<ReportData> GetReportDataByAnalyseType(
-        List<Share> instruments, 
-        DateOnly from, 
-        DateOnly to, 
-        string analyseType)
+        List<Share> instruments, DateOnly from, DateOnly to, string analyseType)
     {
         var instrumentIds = instruments
             .OrderBy(x => x.Sector)
             .Select(x => x.InstrumentId)
             .ToList();        
         
-        var analyseResults = (await analyseResultRepository
-                .GetAsync(instrumentIds, from, to))
+        var analyseResults = (await analyseResultRepository.GetAsync(instrumentIds, from, to))
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
-
-        int outputWindowInDays = configuration
-            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         
-        var dividendInfos = await dividendInfoRepository
-            .GetAsync(instrumentIds, to.AddDays(1), to.AddDays(outputWindowInDays));
-            
-        var dates = reportHelper.GetDates(from, to.AddDays(outputWindowInDays));
+        var dates = reportHelper.GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -363,52 +311,15 @@ public class SharesReportService(
 
             foreach (var date in dates)
             {
-                var currentDate = DateOnly.FromDateTime(Convert.ToDateTime(date.Value));
-                
-                if (currentDate <= to)
-                {
-                    var analyseResult = analyseResults
-                        .FirstOrDefault(x =>
-                            x.InstrumentId == instrument.InstrumentId &&
-                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x =>
+                        x.InstrumentId == instrument.InstrumentId &&
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
-                    data.Add(analyseResult is not null 
-                        ? new ReportParameter(
-                            $"AnalyseResult{analyseType}",
-                            analyseResult.ResultString,
-                            await reportHelper.GetColor(analyseType, analyseResult)) 
-                        : new ReportParameter(
-                            $"AnalyseResult{analyseType}",
-                            string.Empty));
-                }
-
-                else
-                {
-                    var dividendInfo = dividendInfos
-                        .FirstOrDefault(x => 
-                            x.Ticker == instrument.Ticker && 
-                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
-
-                    string color = KnownColors.White;
-                    
-                    if (dividendInfo is not null)
-                    {
-                        color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
-                            .FirstOrDefault(x => 
-                                dividendInfo.DividendPrc >= x.LowLevel &&
-                                dividendInfo.DividendPrc <= x.HighLevel)!
-                            .ColorCode;
-                    }
-                    
-                    data.Add(dividendInfo is not null 
-                        ? new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString("N1"),
-                            color) 
-                        : new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            string.Empty));
-                }
+                data.Add(analyseResult is not null 
+                    ? new ReportParameter($"AnalyseResult{analyseType}", analyseResult.ResultString,
+                        await reportHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
+                    : new ReportParameter($"AnalyseResult{analyseType}", string.Empty));
             }
                 
             reportData.Data.Add(data);
@@ -418,9 +329,7 @@ public class SharesReportService(
     }
     
     private async Task<ReportData> GetReportDataAggregatedAnalyse(
-        List<Share> instruments, 
-        DateOnly from, 
-        DateOnly to)
+        List<Share> instruments, DateOnly from, DateOnly to)
     {
         var instrumentIds = instruments
             .OrderBy(x => x.Sector)
@@ -435,18 +344,11 @@ public class SharesReportService(
             KnownAnalyseTypes.Rsi
         };
         
-        var analyseResults = (await analyseResultRepository
-                .GetAsync(instrumentIds, from, to))
+        var analyseResults = (await analyseResultRepository.GetAsync(instrumentIds, from, to))
             .Where(x => analyseTypes.Contains(x.AnalyseType))
             .ToList();
         
-        int outputWindowInDays = configuration
-            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
-        
-        var dividendInfos = await dividendInfoRepository
-            .GetAsync(instrumentIds, to.AddDays(1), to.AddDays(outputWindowInDays));
-            
-        var dates = reportHelper.GetDates(from, to.AddDays(outputWindowInDays));
+        var dates = reportHelper.GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -473,53 +375,16 @@ public class SharesReportService(
 
             foreach (var date in dates)
             {
-                var currentDate = DateOnly.FromDateTime(Convert.ToDateTime(date.Value));
-                
-                if (currentDate <= to)
-                {
-                    double resultNumber = analyseResults
-                        .Where(x => 
-                            x.InstrumentId == instrument.InstrumentId && 
-                            analyseTypes.Contains(x.AnalyseType) &&
-                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value)
-                        .Select(x => x.ResultNumber)
-                        .Sum();
+                double resultNumber = analyseResults
+                    .Where(x => 
+                        x.InstrumentId == instrument.InstrumentId && 
+                        analyseTypes.Contains(x.AnalyseType) &&
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value)
+                    .Select(x => x.ResultNumber)
+                    .Sum();
                     
-                    data.Add(new ReportParameter(
-                        $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
-                        resultNumber.ToString("N0"),
-                        await reportHelper.GetColor(
-                            KnownAnalyseTypes.Aggregated, 
-                            new AnalyseResult { ResultNumber = resultNumber})));
-                }
-
-                else
-                {
-                    var dividendInfo = dividendInfos
-                        .FirstOrDefault(x => 
-                            x.Ticker == instrument.Ticker && 
-                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
-
-                    string color = KnownColors.White;
-                    
-                    if (dividendInfo is not null)
-                    {
-                        color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
-                            .FirstOrDefault(x => 
-                                dividendInfo.DividendPrc >= x.LowLevel &&
-                                dividendInfo.DividendPrc >= x.HighLevel)!
-                            .ColorCode;
-                    }
-                    
-                    data.Add(dividendInfo is not null 
-                        ? new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString("N1"),
-                            color) 
-                        : new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            string.Empty));
-                }
+                data.Add(new ReportParameter($"AnalyseResult{KnownAnalyseTypes.Aggregated}", resultNumber.ToString("N0"),
+                    await reportHelper.GetColorAggregated((int) resultNumber)));
             }
                 
             reportData.Data.Add(data);
@@ -529,27 +394,18 @@ public class SharesReportService(
     }
 
     private async Task<ReportData> GetReportDataYieldLtmAnalyse(
-        List<Share> instruments, 
-        DateOnly from, 
-        DateOnly to)
+        List<Share> instruments, DateOnly from, DateOnly to)
     {
         var instrumentIds = instruments
             .OrderBy(x => x.Sector)
             .Select(x => x.InstrumentId)
             .ToList();        
         
-        var analyseResults = (await analyseResultRepository
-                .GetAsync(instrumentIds, from, to))
+        var analyseResults = (await analyseResultRepository.GetAsync(instrumentIds, from, to))
             .Where(x => x.AnalyseType == KnownAnalyseTypes.YieldLtm)
             .ToList();
-
-        int outputWindowInDays = configuration
-            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         
-        var dividendInfos = await dividendInfoRepository
-            .GetAsync(instrumentIds, to.AddDays(1), to.AddDays(outputWindowInDays));
-            
-        var dates = reportHelper.GetDates(from, to.AddDays(outputWindowInDays));
+        var dates = reportHelper.GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -576,54 +432,15 @@ public class SharesReportService(
 
             foreach (var date in dates)
             {
-                var currentDate = DateOnly.FromDateTime(Convert.ToDateTime(date.Value));
-                
-                if (currentDate <= to)
-                {
-                    var analyseResult = analyseResults
-                        .FirstOrDefault(x =>
-                            x.InstrumentId == instrument.InstrumentId &&
-                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x =>
+                        x.InstrumentId == instrument.InstrumentId &&
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
-                    data.Add(analyseResult is not null
-                        ? new ReportParameter(
-                            KnownDisplayTypes.Percent,
-                            analyseResult.ResultString,
-                            await reportHelper.GetColor(
-                                KnownAnalyseTypes.YieldLtm, 
-                                analyseResult))
-                        : new ReportParameter(
-                            KnownDisplayTypes.Percent,
-                            string.Empty));
-                }
-
-                else
-                {
-                    var dividendInfo = dividendInfos
-                        .FirstOrDefault(x => 
-                            x.Ticker == instrument.Ticker && 
-                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
-
-                    string color = KnownColors.White;
-                    
-                    if (dividendInfo is not null)
-                    {
-                        color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
-                            .FirstOrDefault(x => 
-                                dividendInfo.DividendPrc >= x.LowLevel &&
-                                dividendInfo.DividendPrc >= x.HighLevel)!
-                            .ColorCode;
-                    }
-                    
-                    data.Add(dividendInfo is not null 
-                        ? new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString("N1"),
-                            color) 
-                        : new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            string.Empty));
-                }
+                data.Add(analyseResult is not null
+                    ? new ReportParameter(KnownDisplayTypes.Percent, analyseResult.ResultString,
+                        await reportHelper.GetColorByAnalyseType(KnownAnalyseTypes.YieldLtm, analyseResult))
+                    : new ReportParameter(KnownDisplayTypes.Percent, string.Empty));
             }
                 
             reportData.Data.Add(data);
@@ -633,27 +450,18 @@ public class SharesReportService(
     }
     
     private async Task<ReportData> GetReportDataDrawdownFromMaximumAnalyse(
-        List<Share> instruments, 
-        DateOnly from, 
-        DateOnly to)
+        List<Share> instruments, DateOnly from, DateOnly to)
     {
         var instrumentIds = instruments
             .OrderBy(x => x.Sector)
             .Select(x => x.InstrumentId)
             .ToList();        
         
-        var analyseResults = (await analyseResultRepository
-                .GetAsync(instrumentIds, from, to))
+        var analyseResults = (await analyseResultRepository.GetAsync(instrumentIds, from, to))
             .Where(x => x.AnalyseType == KnownAnalyseTypes.DrawdownFromMaximum)
             .ToList();
-
-        int outputWindowInDays = configuration
-            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         
-        var dividendInfos = await dividendInfoRepository
-            .GetAsync(instrumentIds, to.AddDays(1), to.AddDays(outputWindowInDays));
-            
-        var dates = reportHelper.GetDates(from, to.AddDays(outputWindowInDays));
+        var dates = reportHelper.GetDates(from, to);
             
         var reportData = new ReportData
         {
@@ -680,54 +488,15 @@ public class SharesReportService(
 
             foreach (var date in dates)
             {
-                var currentDate = DateOnly.FromDateTime(Convert.ToDateTime(date.Value));
-                
-                if (currentDate <= to)
-                {
-                    var analyseResult = analyseResults
-                        .FirstOrDefault(x =>
-                            x.InstrumentId == instrument.InstrumentId &&
-                            x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                var analyseResult = analyseResults
+                    .FirstOrDefault(x =>
+                        x.InstrumentId == instrument.InstrumentId &&
+                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
-                    data.Add(analyseResult is not null
-                        ? new ReportParameter(
-                            KnownDisplayTypes.Percent,
-                            analyseResult.ResultString,
-                            await reportHelper.GetColor(
-                                KnownAnalyseTypes.DrawdownFromMaximum, 
-                                analyseResult))
-                        : new ReportParameter(
-                            KnownDisplayTypes.Percent,
-                            string.Empty));
-                }
-
-                else
-                {
-                    var dividendInfo = dividendInfos
-                        .FirstOrDefault(x => 
-                            x.Ticker == instrument.Ticker && 
-                            x.RecordDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
-
-                    string color = KnownColors.White;
-                    
-                    if (dividendInfo is not null)
-                    {
-                        color = (await resourceStoreService.GetColorPaletteYieldDividendAsync())
-                            .FirstOrDefault(x => 
-                                dividendInfo.DividendPrc >= x.LowLevel &&
-                                dividendInfo.DividendPrc >= x.HighLevel)!
-                            .ColorCode;
-                    }
-                    
-                    data.Add(dividendInfo is not null 
-                        ? new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            dividendInfo.DividendPrc.ToString("N1"),
-                            color) 
-                        : new ReportParameter(
-                            KnownDisplayTypes.Percent, 
-                            string.Empty));
-                }
+                data.Add(analyseResult is not null
+                    ? new ReportParameter(KnownDisplayTypes.Percent, analyseResult.ResultString,
+                        await reportHelper.GetColorByAnalyseType(KnownAnalyseTypes.DrawdownFromMaximum, analyseResult))
+                    : new ReportParameter(KnownDisplayTypes.Percent, string.Empty));
             }
                 
             reportData.Data.Add(data);

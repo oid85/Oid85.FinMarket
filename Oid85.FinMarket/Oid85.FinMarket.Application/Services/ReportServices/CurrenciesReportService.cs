@@ -19,65 +19,43 @@ public class CurrenciesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataAggregatedAnalyse(
-            await instrumentService.GetCurrenciesInWatchlist(), 
-            request.From, 
-            request.To);
+            await instrumentService.GetCurrenciesInWatchlist(), request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetCurrenciesInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.Supertrend);
+            await instrumentService.GetCurrenciesInWatchlist(), request.From, request.To, KnownAnalyseTypes.Supertrend);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetCurrenciesInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.CandleSequence);
+            await instrumentService.GetCurrenciesInWatchlist(), request.From, request.To, KnownAnalyseTypes.CandleSequence);
 
     /// <inheritdoc />
     public async Task<ReportData> GetRsiAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetCurrenciesInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.Rsi);
+            await instrumentService.GetCurrenciesInWatchlist(), request.From, request.To, KnownAnalyseTypes.Rsi);
 
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataYieldLtmAnalyse(
-            await instrumentService.GetCurrenciesInWatchlist(), 
-            request.From, 
-            request.To);
+            await instrumentService.GetCurrenciesInWatchlist(), request.From, request.To);
     
     /// <inheritdoc />
     public async Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataDrawdownFromMaximumAnalyse(
-            await instrumentService.GetCurrenciesInWatchlist(), 
-            request.From, 
-            request.To);
+            await instrumentService.GetCurrenciesInWatchlist(), request.From, request.To);
     
     private async Task<ReportData> GetReportDataByAnalyseType(
-        List<Currency> currencies,
-        DateOnly from,
-        DateOnly to,
-        string analyseType)
+        List<Currency> currencies, DateOnly from, DateOnly to, string analyseType)
     {
-        var instrumentIds = currencies
-            .Select(x => x.InstrumentId)
-            .ToList();        
+        var instrumentIds = currencies.Select(x => x.InstrumentId).ToList();        
         
         var analyseResults = (await analyseResultRepository
                 .GetAsync(instrumentIds, from, to))
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
-            
-        var dates = reportHelper.GetDates(from, to);
-            
+        
         var reportData = new ReportData
         {
             Title = $"Анализ {analyseType} " +
@@ -90,6 +68,7 @@ public class CurrenciesReportService(
             ]
         };
 
+        var dates = reportHelper.GetDates(from, to);
         reportData.Header.AddRange(dates);
 
         foreach (var currency in currencies)
@@ -110,7 +89,7 @@ public class CurrenciesReportService(
                     ? new ReportParameter(
                         $"AnalyseResult{analyseType}",
                         analyseResult.ResultString,
-                        await reportHelper.GetColor(
+                        await reportHelper.GetColorByAnalyseType(
                             analyseType, 
                             analyseResult)) 
                     : new ReportParameter(
@@ -181,7 +160,7 @@ public class CurrenciesReportService(
                 data.Add(new ReportParameter(
                     $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
                     resultNumber.ToString("N0"),
-                    await reportHelper.GetColor(
+                    await reportHelper.GetColorByAnalyseType(
                         KnownAnalyseTypes.Aggregated, 
                         new AnalyseResult { ResultNumber = resultNumber })));
             }
@@ -240,7 +219,7 @@ public class CurrenciesReportService(
                     ? new ReportParameter(
                         KnownDisplayTypes.Percent,
                         analyseResult.ResultString,
-                        await reportHelper.GetColor(
+                        await reportHelper.GetColorByAnalyseType(
                             KnownAnalyseTypes.YieldLtm, 
                             analyseResult))
                     : new ReportParameter(
@@ -302,7 +281,7 @@ public class CurrenciesReportService(
                     ? new ReportParameter(
                         KnownDisplayTypes.Percent,
                         analyseResult.ResultString,
-                        await reportHelper.GetColor(
+                        await reportHelper.GetColorByAnalyseType(
                             KnownAnalyseTypes.DrawdownFromMaximum, 
                             analyseResult))
                     : new ReportParameter(

@@ -21,34 +21,22 @@ public class BondsReportService(
 {
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
-        await GetReportDataAggregatedAnalyse(
-            await instrumentService.GetBondsInWatchlist(), 
-            request.From, 
-            request.To);
+        await GetReportDataAggregatedAnalyse(await instrumentService.GetBondsInWatchlist(), request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetBondsInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.Supertrend);
+            await instrumentService.GetBondsInWatchlist(), request.From, request.To, KnownAnalyseTypes.Supertrend);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetBondsInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.CandleSequence);
+            await instrumentService.GetBondsInWatchlist(), request.From, request.To, KnownAnalyseTypes.CandleSequence);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request) =>
         await GetReportDataByAnalyseType(
-            await instrumentService.GetBondsInWatchlist(), 
-            request.From, 
-            request.To, 
-            KnownAnalyseTypes.CandleVolume);
+            await instrumentService.GetBondsInWatchlist(), request.From, request.To, KnownAnalyseTypes.CandleVolume);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCouponAnalyseAsync()
@@ -82,15 +70,10 @@ public class BondsReportService(
             ]
         };
             
-        int outputWindowInDays = configuration
-            .GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
-
-        var instrumentIds = bonds
-            .Select(x => x.InstrumentId)
-            .ToList();
-
+        int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
+        var instrumentIds = bonds.Select(x => x.InstrumentId).ToList();
         var startDate = DateOnly.FromDateTime(DateTime.Today);
-        var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(outputWindowInDays);
+        var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(days);
 
         var bondCoupons = (await bondCouponRepository
             .GetByInstrumentIdsAsync(instrumentIds))
@@ -126,17 +109,15 @@ public class BondsReportService(
             
         foreach (var bond in selectedBonds)
         {
+            int daysToMaturityDate = (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+            
             List<ReportParameter> data =
             [
                 new (KnownDisplayTypes.Ticker, bond.Ticker),
                 new (KnownDisplayTypes.String, bond.Name),                
                 new (KnownDisplayTypes.Sector, bond.Sector),
-                    
-                new (KnownDisplayTypes.String, 
-                    bond.FloatingCouponFlag ? "Да" : string.Empty),
-                    
-                new (KnownDisplayTypes.Number, 
-                    (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString())
+                new (KnownDisplayTypes.String, bond.FloatingCouponFlag ? "Да" : string.Empty),
+                new (KnownDisplayTypes.Number, daysToMaturityDate.ToString())
             ];
                 
             // Вычисляем полную доходность облигации
@@ -156,13 +137,9 @@ public class BondsReportService(
                 double profit = payYear / priceInRubles;
                 profitPrc = profit / 100.0;   
             }
-
-            string color = await reportHelper.GetColorYieldCoupon(profitPrc);
             
-            data.Add(new ReportParameter(
-                KnownDisplayTypes.Percent, 
-                profitPrc.ToString("N1"),
-                color));
+            data.Add(new ReportParameter(KnownDisplayTypes.Percent, profitPrc.ToString("N1"),
+                await reportHelper.GetColorYieldCoupon(profitPrc)));
                 
             foreach (var date in dates)
             {
@@ -172,12 +149,8 @@ public class BondsReportService(
                         x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                 data.Add(bondCoupon is not null 
-                    ? new ReportParameter(
-                        KnownDisplayTypes.Ruble, 
-                        bondCoupon.PayOneBond.ToString("N1")) 
-                    : new ReportParameter(
-                        KnownDisplayTypes.Ruble, 
-                        string.Empty));
+                    ? new ReportParameter(KnownDisplayTypes.Ruble, bondCoupon.PayOneBond.ToString("N1")) 
+                    : new ReportParameter(KnownDisplayTypes.Ruble, string.Empty));
             }
                 
             reportData.Data.Add(data);
@@ -187,22 +160,15 @@ public class BondsReportService(
     }
 
     private async Task<ReportData> GetReportDataByAnalyseType(
-        List<Bond> bonds,
-        DateOnly from,
-        DateOnly to,
-        string analyseType)
+        List<Bond> bonds, DateOnly from, DateOnly to, string analyseType)
     {
-        var instrumentIds = bonds
-            .Select(x => x.InstrumentId)
-            .ToList();        
+        var instrumentIds = bonds.Select(x => x.InstrumentId).ToList();        
         
         var analyseResults = (await analyseResultRepository
                 .GetAsync(instrumentIds, from, to))
             .Where(x => x.AnalyseType == analyseType)
             .ToList();
-            
-        var dates = reportHelper.GetDates(from, to);
-            
+        
         var reportData = new ReportData
         {
             Title = $"Анализ {analyseType} " +
@@ -216,7 +182,8 @@ public class BondsReportService(
                 new ReportParameter(KnownDisplayTypes.String, "Сектор")
             ]
         };
-
+        
+        var dates = reportHelper.GetDates(from, to);
         reportData.Header.AddRange(dates);
 
         foreach (var bond in bonds)
@@ -236,13 +203,9 @@ public class BondsReportService(
                         x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
 
                 data.Add(analyseResult is not null 
-                    ? new ReportParameter(
-                        $"AnalyseResult{analyseType}",
-                        analyseResult.ResultString,
-                        await reportHelper.GetColor(analyseType, analyseResult)) 
-                    : new ReportParameter(
-                        $"AnalyseResult{analyseType}",
-                        string.Empty));
+                    ? new ReportParameter($"AnalyseResult{analyseType}", analyseResult.ResultString,
+                        await reportHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
+                    : new ReportParameter($"AnalyseResult{analyseType}", string.Empty));
             }
                 
             reportData.Data.Add(data);
@@ -252,15 +215,11 @@ public class BondsReportService(
     }
     
     private async Task<ReportData> GetReportDataAggregatedAnalyse(
-        List<Bond> instruments,
-        DateOnly from,
-        DateOnly to)
+        List<Bond> instruments, DateOnly from, DateOnly to)
     {
-        var instrumentIds = instruments
-            .Select(x => x.InstrumentId)
-            .ToList();        
+        var instrumentIds = instruments.Select(x => x.InstrumentId).ToList();        
         
-        var analyseTypes = new List<string>()
+        var analyseTypes = new List<string>
         {
             KnownAnalyseTypes.Supertrend,
             KnownAnalyseTypes.CandleSequence,
@@ -309,12 +268,8 @@ public class BondsReportService(
                     .Select(x => x.ResultNumber)
                     .Sum();
                 
-                data.Add(new ReportParameter(
-                    $"AnalyseResult{KnownAnalyseTypes.Aggregated}",
-                    resultNumber.ToString("N0"),
-                    await reportHelper.GetColor(
-                        KnownAnalyseTypes.Aggregated, 
-                        new AnalyseResult { ResultNumber = resultNumber})));
+                data.Add(new ReportParameter($"AnalyseResult{KnownAnalyseTypes.Aggregated}", resultNumber.ToString("N0"),
+                    await reportHelper.GetColorAggregated((int) resultNumber)));
             }
                 
             reportData.Data.Add(data);

@@ -25,6 +25,12 @@ public class InstrumentEntity : BaseEntity
     public string Name { get; set; } = string.Empty;
     
     /// <summary>
+    /// Сектор
+    /// </summary>
+    [Column("sector"), MaxLength(200)]
+    public string Sector { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Тип инструмента
     /// </summary>
     [Column("type"), MaxLength(20)]

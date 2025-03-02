@@ -23,6 +23,11 @@ public class Instrument
     public string Name { get; set; } = string.Empty;
     
     /// <summary>
+    /// Сектор
+    /// </summary>
+    public string Sector { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Тип инструмента
     /// </summary>
     public string Type { get; set; } = string.Empty;

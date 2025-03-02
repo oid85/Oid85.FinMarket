@@ -374,6 +374,7 @@ public static class DataAccessMapper
         entity.InstrumentId = model.InstrumentId;
         entity.Ticker = model.Ticker;
         entity.Name = model.Name;
+        entity.Sector = model.Sector;
         entity.Type = model.Type;
     }
     
@@ -384,6 +385,7 @@ public static class DataAccessMapper
             InstrumentId = entity.InstrumentId,
             Ticker = entity.Ticker,
             Name = entity.Name,
+            Sector = entity.Sector,
             Type = entity.Type
         };
     

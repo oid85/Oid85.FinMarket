@@ -9,5 +9,9 @@
   <ItemGroup>
     <PackageReference Include="NLog.Targets.Seq" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Oid85.FinMarket.Common\Oid85.FinMarket.Common.csproj" />
+  </ItemGroup>
   
 </Project>

@@ -8,8 +8,7 @@ namespace Oid85.FinMarket.Application.Helpers;
 public class ReportHelper(
     IResourceStoreService resourceStoreService)
 {
-    public List<ReportParameter> GetDates(
-        DateOnly from, DateOnly to)
+    public List<ReportParameter> GetDates(DateOnly from, DateOnly to)
     {
         var curDate = from;
         var dates = new List<ReportParameter>();
@@ -26,7 +25,7 @@ public class ReportHelper(
         return dates;
     }
     
-    public async Task<string> GetColor(string analyseType, AnalyseResult analyseResult)
+    public async Task<string> GetColorByAnalyseType(string analyseType, AnalyseResult analyseResult)
     {
         switch (analyseType)
         {
@@ -227,6 +226,21 @@ public class ReportHelper(
                     value >= x.LowLevel &&
                     value <= x.HighLevel);
 
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.ColorCode;
+    }
+    
+    public async Task<string> GetColorForecastRecommendation(string value)
+    {
+        var colorPalette = await resourceStoreService
+            .GetColorPaletteForecastRecommendationAsync();
+
+        var resource = colorPalette
+            .FirstOrDefault(
+                x => x.Value == value);
+        
         if (resource is null)
             return KnownColors.White;
         

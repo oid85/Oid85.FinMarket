@@ -43,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IInstrumentService, InstrumentService>();
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
+        services.AddTransient<IReportDataFactory, ReportDataFactory>();
     }
     
     public static async Task RegisterHangfireJobs(
