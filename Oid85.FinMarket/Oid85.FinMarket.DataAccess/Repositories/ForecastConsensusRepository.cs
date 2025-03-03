@@ -8,7 +8,6 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class ForecastConsensusRepository(
-    ILogger logger,
     FinMarketContext context) 
     : IForecastConsensusRepository
 {

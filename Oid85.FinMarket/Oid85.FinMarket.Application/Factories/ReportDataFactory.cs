@@ -34,20 +34,48 @@ public class ReportDataFactory(
         var reportData = new ReportData();
         
         foreach (var header in headers)
-            reportData.Header.Add(new ReportParameter(KnownDisplayTypes.String, header));
+            reportData.Header.Add(GetString(header));
         
         return reportData;
     }
 
-    private static ReportData CreateNewReportDataWithHeaders(List<string> headers, List<string> dates)
+    private static ReportData CreateNewReportDataWithHeaders(List<string> headers, List<DateOnly> dates)
     {
         var reportData = CreateNewReportDataWithHeaders(headers);
         
         foreach (var date in dates)
-            reportData.Header.Add(new ReportParameter(KnownDisplayTypes.Date, date));
+            reportData.Header.Add(GetDate(date));
         
         return reportData;
-    }    
+    }
+
+    private static string CreateTitleWithDates(string title, DateOnly from, DateOnly to)
+    {
+        string fromString = from.ToString(KnownDateTimeFormats.DateISO);
+        string toString = to.ToString(KnownDateTimeFormats.DateISO);
+        return $"{title} с {fromString} по {toString}";
+    }
+
+    private static ReportParameter GetTicker(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.Ticker, value, color);
+    
+    private static ReportParameter GetSector(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.Sector, value, color);
+    
+    private static ReportParameter GetString(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.String, value, color);    
+    
+    private static ReportParameter GetDate(DateOnly value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.Date, value.ToString(KnownDateTimeFormats.DateISO), color);     
+    
+    private static ReportParameter GetRuble(double value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.Ruble, value.ToString("N1"), color);     
+    
+    private static ReportParameter GetPercent(double value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.Percent, value.ToString("N1"), color);     
+    
+    private static ReportParameter GetNumber(double value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.Number, value.ToString("N2"), color);     
     
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
@@ -55,10 +83,56 @@ public class ReportDataFactory(
         var analyseResults = await GetAnalyseResults(
             instrumentIds, [analyseType], from, to);
 
-        var dates = reportHelper.GetDates(from, to);
+        var dates = ReportHelper.GetDates(from, to);
         var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"], dates);
-        reportData.Title = $"{analyseType} {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}";
+        reportData.Title = CreateTitleWithDates(analyseType, from, to);
         
+        foreach (var instrumentId in instrumentIds)
+        {
+            var instrumentAnalyseResults = analyseResults
+                .Where(x => x.InstrumentId == instrumentId).ToList();
+            
+            if (instrumentAnalyseResults is [])
+                continue;
+            
+            var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+            
+            if (instrument is null)
+                continue;
+            
+            var data = new List<ReportParameter>
+            {
+                GetTicker(instrument.Ticker), 
+                GetSector(instrument.Sector),
+                GetString(instrument.Name)
+            };
+
+            foreach (var date in dates)
+            {
+                var analyseResult = instrumentAnalyseResults
+                    .FirstOrDefault(x => x.Date == date);
+
+                data.Add(analyseResult is not null 
+                    ? GetString(analyseResult.ResultString, 
+                        await reportHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
+                    : GetString(string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateAggregatedReportDataAsync(
+        List<Guid> instrumentIds, List<string> analyseTypes, DateOnly from, DateOnly to)
+    {
+        var analyseResults = await GetAnalyseResults(
+            instrumentIds, analyseTypes, from, to);
+            
+        var dates = ReportHelper.GetDates(from, to);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"]);
+        reportData.Title = reportData.Title = CreateTitleWithDates("Aggregated", from, to);
 
         foreach (var instrumentId in instrumentIds)
         {
@@ -75,68 +149,19 @@ public class ReportDataFactory(
             
             var data = new List<ReportParameter>
             {
-                new (KnownDisplayTypes.Ticker, instrument.Ticker), 
-                new (KnownDisplayTypes.Sector, instrument.Sector),
-                new (KnownDisplayTypes.String, instrument.Name)
-            };
-
-            foreach (var date in dates)
-            {
-                var analyseResult = instrumentAnalyseResults
-                    .FirstOrDefault(x => x.Date.ToString(KnownDateTimeFormats.DateISO) == date);
-
-                data.Add(analyseResult is not null 
-                    ? new ReportParameter(KnownDisplayTypes.String, analyseResult.ResultString,
-                        await reportHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
-                    : new ReportParameter(KnownDisplayTypes.String, string.Empty));
-            }
-                
-            reportData.Data.Add(data);
-        }
-            
-        return reportData;
-    }
-
-    public async Task<ReportData> CreateAggregatedReportDataAsync(
-        List<Guid> instrumentIds, List<string> analyseTypes, DateOnly from, DateOnly to)
-    {
-        var analyseResults = await GetAnalyseResults(
-            instrumentIds, analyseTypes, from, to);
-            
-        var dates = reportHelper.GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"]);
-        reportData.Title = $"Aggregated {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}";
-
-        foreach (var instrumentId in instrumentIds)
-        {
-            var instrumentAnalyseResults = analyseResults
-                .Where(x => x.InstrumentId == instrumentId)
-                .ToList();
-            
-            if (instrumentAnalyseResults is [])
-                continue;
-            
-            var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
-            
-            if (instrument is null)
-                continue;
-            
-            var data = new List<ReportParameter>
-            {
-                new (KnownDisplayTypes.Ticker, instrument.Ticker), 
-                new (KnownDisplayTypes.Sector, instrument.Sector),
-                new (KnownDisplayTypes.String, instrument.Name)
+                GetTicker(instrument.Ticker), 
+                GetSector(instrument.Sector),
+                GetString(instrument.Name)
             };
 
             foreach (var date in dates)
             {
                 var resultNumbers = instrumentAnalyseResults
-                    .Where(x => x.Date.ToString(KnownDateTimeFormats.DateISO) == date)
+                    .Where(x => x.Date == date)
                     .Select(x => x.ResultNumber).ToList();
                     
                 double resultNumber = resultNumbers is [] ? 0 : resultNumbers.Sum();
-                
-                data.Add(new ReportParameter(KnownDisplayTypes.String, resultNumber.ToString("N0"),
+                data.Add(GetString(resultNumber.ToString("N0"), 
                     await reportHelper.GetColorAggregated((int) resultNumber)));
             }
                 
@@ -152,7 +177,7 @@ public class ReportDataFactory(
         int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         var from = DateOnly.FromDateTime(DateTime.Today);
         var to = from.AddDays(days);
-        var dates = reportHelper.GetDates(from, to);
+        var dates = ReportHelper.GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
             ["Тикер", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %"], dates);
@@ -161,19 +186,19 @@ public class ReportDataFactory(
         {
             var data = new List<ReportParameter>
             {
-                new(KnownDisplayTypes.Ticker, dividendInfo.Ticker),
-                new(KnownDisplayTypes.Date, dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)),
-                new(KnownDisplayTypes.Date, dividendInfo.DeclaredDate.ToString(KnownDateTimeFormats.DateISO)),
-                new(KnownDisplayTypes.Ruble, dividendInfo.Dividend.ToString("N1")),
-                new(KnownDisplayTypes.Percent, dividendInfo.DividendPrc.ToString("N1"), 
+                GetTicker(dividendInfo.Ticker),
+                GetDate(dividendInfo.RecordDate),
+                GetDate(dividendInfo.DeclaredDate),
+                GetRuble(dividendInfo.Dividend),
+                GetPercent(dividendInfo.DividendPrc, 
                     await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc))
             };
             
             foreach (var date in dates)
-                data.Add(date == dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)
-                    ? new ReportParameter(KnownDisplayTypes.Percent, dividendInfo.DividendPrc.ToString("N1"), 
+                data.Add(dividendInfo.RecordDate == date
+                    ? GetPercent(dividendInfo.DividendPrc, 
                         await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc))
-                    : new ReportParameter(KnownDisplayTypes.Percent, string.Empty));
+                    : GetString(string.Empty));
 
             reportData.Data.Add(data);
         }
@@ -203,18 +228,18 @@ public class ReportDataFactory(
             
             List<ReportParameter> data =
             [
-                new (KnownDisplayTypes.Ticker, share.Ticker),
-                new (KnownDisplayTypes.Sector, share.Sector),
-                new (KnownDisplayTypes.Number, multiplicator.MarketCapitalization.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.Beta.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.NetIncome.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.Ebitda.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.Eps.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.FreeCashFlow.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.EvToEbitda.ToString("N2"), 
+                GetTicker(share.Ticker),
+                GetSector(share.Sector),
+                GetNumber(multiplicator.MarketCapitalization),
+                GetNumber(multiplicator.Beta),
+                GetNumber(multiplicator.NetIncome),
+                GetNumber(multiplicator.Ebitda),
+                GetNumber(multiplicator.Eps),
+                GetNumber(multiplicator.FreeCashFlow),
+                GetNumber(multiplicator.EvToEbitda, 
                     await reportHelper.GetColorEvToEbitda(multiplicator.EvToEbitda)),
-                new (KnownDisplayTypes.Number, multiplicator.TotalDebtToEbitda.ToString("N2")),
-                new (KnownDisplayTypes.Number, multiplicator.NetDebtToEbitda.ToString("N2"), 
+                GetNumber(multiplicator.TotalDebtToEbitda),
+                GetNumber(multiplicator.NetDebtToEbitda, 
                     await reportHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda))
             ];
             
@@ -259,24 +284,20 @@ public class ReportDataFactory(
         reportData.Title = "Прогнозы";
 
         foreach (var forecastTarget in actualForecastTargets)
-        {
-            List<ReportParameter> data =
+            reportData.Data.Add(
             [
-                new (KnownDisplayTypes.Ticker, forecastTarget.Ticker),
-                new (KnownDisplayTypes.String, forecastTarget.Company),
-                new (KnownDisplayTypes.String, forecastTarget.RecommendationString, 
+                GetTicker(forecastTarget.Ticker),
+                GetString(forecastTarget.Company),
+                GetString(forecastTarget.RecommendationString, 
                     await reportHelper.GetColorForecastRecommendation(forecastTarget.RecommendationString)),
-                new (KnownDisplayTypes.Date, forecastTarget.RecommendationDate.ToString(KnownDateTimeFormats.DateISO)),
-                new (KnownDisplayTypes.String, forecastTarget.Currency),
-                new (KnownDisplayTypes.Ruble, forecastTarget.CurrentPrice.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, forecastTarget.TargetPrice.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, forecastTarget.PriceChange.ToString("N2")),
-                new (KnownDisplayTypes.Percent, forecastTarget.PriceChangeRel.ToString("N2")),
-                new (KnownDisplayTypes.String, forecastTarget.ShowName)
-            ];
-            
-            reportData.Data.Add(data);
-        }
+                GetDate(forecastTarget.RecommendationDate),
+                GetString(forecastTarget.Currency),
+                GetRuble(forecastTarget.CurrentPrice),
+                GetRuble(forecastTarget.TargetPrice),
+                GetRuble(forecastTarget.PriceChange),
+                GetPercent(forecastTarget.PriceChangeRel),
+                GetString(forecastTarget.ShowName)
+            ]);
         
         return reportData;
     }
@@ -294,23 +315,19 @@ public class ReportDataFactory(
         reportData.Title = "Консенсус-прогнозы";
 
         foreach (var forecastConsensus in forecastConsensuses)
-        {
-            List<ReportParameter> data =
+            reportData.Data.Add(
             [
-                new (KnownDisplayTypes.Ticker, forecastConsensus.Ticker),
-                new (KnownDisplayTypes.String, forecastConsensus.RecommendationString, 
+                GetTicker(forecastConsensus.Ticker),
+                GetString(forecastConsensus.RecommendationString, 
                     await reportHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString)),
-                new (KnownDisplayTypes.String, forecastConsensus.Currency),
-                new (KnownDisplayTypes.Ruble, forecastConsensus.CurrentPrice.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, forecastConsensus.ConsensusPrice.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, forecastConsensus.MinTarget.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, forecastConsensus.MaxTarget.ToString("N2")),
-                new (KnownDisplayTypes.Ruble, forecastConsensus.PriceChange.ToString("N2")),
-                new (KnownDisplayTypes.Percent, forecastConsensus.PriceChangeRel.ToString("N2"))
-            ];
-            
-            reportData.Data.Add(data);
-        }
+                GetString(forecastConsensus.Currency),
+                GetRuble(forecastConsensus.CurrentPrice),
+                GetRuble(forecastConsensus.ConsensusPrice),
+                GetRuble(forecastConsensus.MinTarget),
+                GetRuble(forecastConsensus.MaxTarget),
+                GetRuble(forecastConsensus.PriceChange),
+                GetPercent(forecastConsensus.PriceChangeRel)
+            ]);
         
         return reportData;
     }
@@ -321,7 +338,7 @@ public class ReportDataFactory(
         var bonds = await bondRepository.GetAsync(instrumentIds);
         var startDate = DateOnly.FromDateTime(DateTime.Today);
         var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(days);
-        var dates = reportHelper.GetDates(startDate, endDate);
+        var dates = ReportHelper.GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
             ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Дох-ть., %"], dates);
@@ -355,15 +372,15 @@ public class ReportDataFactory(
             
         foreach (var bond in selectedBonds)
         {
-            int daysToMaturityDate = (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+            double daysToMaturityDate = (bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).TotalDays;
             
             List<ReportParameter> data =
             [
-                new (KnownDisplayTypes.Ticker, bond.Ticker),
-                new (KnownDisplayTypes.String, bond.Name),                
-                new (KnownDisplayTypes.Sector, bond.Sector),
-                new (KnownDisplayTypes.String, bond.FloatingCouponFlag ? "Да" : string.Empty),
-                new (KnownDisplayTypes.Number, daysToMaturityDate.ToString())
+                GetTicker(bond.Ticker),
+                GetString(bond.Name),
+                GetSector(bond.Sector),
+                GetString(bond.FloatingCouponFlag ? "Да" : string.Empty),
+                GetNumber(daysToMaturityDate)
             ];
                 
             // Вычисляем полную доходность облигации
@@ -384,8 +401,7 @@ public class ReportDataFactory(
                 profitPrc = profit / 100.0;   
             }
             
-            data.Add(new ReportParameter(KnownDisplayTypes.Percent, profitPrc.ToString("N1"),
-                await reportHelper.GetColorYieldCoupon(profitPrc)));
+            data.Add(GetPercent(profitPrc, await reportHelper.GetColorYieldCoupon(profitPrc)));
                 
             var instrumentBondCoupons = bondCoupons.
                 Where(x => x.InstrumentId == bond.InstrumentId)
@@ -394,11 +410,11 @@ public class ReportDataFactory(
             foreach (var date in dates)
             {
                 var bondCoupon = instrumentBondCoupons
-                    .FirstOrDefault(x => x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date);
+                    .FirstOrDefault(x => x.CouponDate == date);
 
                 data.Add(bondCoupon is not null 
-                    ? new ReportParameter(KnownDisplayTypes.Ruble, bondCoupon.PayOneBond.ToString("N1")) 
-                    : new ReportParameter(KnownDisplayTypes.Ruble, string.Empty));
+                    ? GetRuble(bondCoupon.PayOneBond)
+                    : GetString(string.Empty));
             }
                 
             reportData.Data.Add(data);
@@ -417,23 +433,19 @@ public class ReportDataFactory(
         reportData.Title = "Спреды";
 
         foreach (var spread in spreads)
-        {
-            List<ReportParameter> data =
+            reportData.Data.Add(
             [
-                new(KnownDisplayTypes.String, spread.FirstInstrumentRole),
-                new(KnownDisplayTypes.String, spread.SecondInstrumentRole),
-                new(KnownDisplayTypes.Ticker, spread.FirstInstrumentTicker),
-                new(KnownDisplayTypes.Ticker, spread.SecondInstrumentTicker),
-                new(KnownDisplayTypes.Ruble, spread.FirstInstrumentPrice.ToString("N2")),
-                new(KnownDisplayTypes.Ruble, spread.SecondInstrumentPrice.ToString("N2")),
-                new(KnownDisplayTypes.Ruble, spread.PriceDifference.ToString("N2")),
-                new(KnownDisplayTypes.Percent, spread.PriceDifferencePrc.ToString("N2")),
-                new(KnownDisplayTypes.String, spread.SpreadPricePosition,
+                GetString(spread.FirstInstrumentRole),
+                GetString(spread.SecondInstrumentRole),
+                GetTicker(spread.FirstInstrumentTicker),
+                GetTicker(spread.SecondInstrumentTicker),
+                GetRuble(spread.FirstInstrumentPrice),
+                GetRuble(spread.SecondInstrumentPrice),
+                GetRuble(spread.PriceDifference),
+                GetPercent(spread.PriceDifferencePrc),
+                GetString(spread.SpreadPricePosition, 
                     await reportHelper.GetColorSpreadPricePosition(spread.SpreadPricePosition))
-            ];
-
-            reportData.Data.Add(data);
-        }
+            ]);
         
         return reportData;
     }

@@ -12,10 +12,7 @@ public class TelegramMessageFactory
         var message = new StringBuilder();
 
         foreach (var marketEvent in marketEvents)
-            message.AppendLine(
-                $"{marketEvent.Ticker} " +
-                $"{marketEvent.InstrumentName} " +
-                $"{marketEvent.MarketEventText}");
+            message.AppendLine($"{marketEvent.Ticker} {marketEvent.InstrumentName} {marketEvent.MarketEventText}");
         
         return message.ToString();
     }

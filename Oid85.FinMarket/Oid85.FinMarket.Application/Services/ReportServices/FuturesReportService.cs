@@ -11,8 +11,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class FuturesReportService(
-    ISpreadRepository spreadRepository,
-    ReportHelper reportHelper,
     IInstrumentService instrumentService,
     IReportDataFactory reportDataFactory)
     : IFuturesReportService

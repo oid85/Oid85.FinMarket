@@ -11,8 +11,6 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class IndexesReportService(
-    IAnalyseResultRepository analyseResultRepository,
-    ReportHelper reportHelper,
     IInstrumentService instrumentService,
     IReportDataFactory reportDataFactory) 
     : IIndexesReportService
