@@ -28,29 +28,46 @@ public class ReportDataFactory(
         List<Guid> instrumentIds, List<string> analyseTypes, DateOnly from, DateOnly to) =>
         (await analyseResultRepository.GetAsync(instrumentIds, from, to))
         .Where(x => analyseTypes.Contains(x.AnalyseType)).ToList();
+
+    private static ReportData CreateNewReportDataWithHeaders(List<string> headers)
+    {
+        var reportData = new ReportData();
+        
+        foreach (var header in headers)
+            reportData.Header.Add(new ReportParameter(KnownDisplayTypes.String, header));
+        
+        return reportData;
+    }
+
+    private static ReportData CreateNewReportDataWithHeaders(List<string> headers, List<string> dates)
+    {
+        var reportData = CreateNewReportDataWithHeaders(headers);
+        
+        foreach (var date in dates)
+            reportData.Header.Add(new ReportParameter(KnownDisplayTypes.Date, date));
+        
+        return reportData;
+    }    
     
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
     {
         var analyseResults = await GetAnalyseResults(
             instrumentIds, [analyseType], from, to);
-        
-        var reportData = new ReportData
-        {
-            Title = $"{analyseType} {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}",
-            Header = 
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
-                new ReportParameter(KnownDisplayTypes.String, "Наименование")
-            ]
-        };
-        
+
         var dates = reportHelper.GetDates(from, to);
-        reportData.Header.AddRange(dates);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"], dates);
+        reportData.Title = $"{analyseType} {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}";
+        
 
         foreach (var instrumentId in instrumentIds)
         {
+            var instrumentAnalyseResults = analyseResults
+                .Where(x => x.InstrumentId == instrumentId).ToList();
+            
+            if (instrumentAnalyseResults is [])
+                continue;
+            
             var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
             
             if (instrument is null)
@@ -65,10 +82,8 @@ public class ReportDataFactory(
 
             foreach (var date in dates)
             {
-                var analyseResult = analyseResults
-                    .FirstOrDefault(x =>
-                        x.InstrumentId == instrument.InstrumentId &&
-                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                var analyseResult = instrumentAnalyseResults
+                    .FirstOrDefault(x => x.Date.ToString(KnownDateTimeFormats.DateISO) == date);
 
                 data.Add(analyseResult is not null 
                     ? new ReportParameter(KnownDisplayTypes.String, analyseResult.ResultString,
@@ -88,22 +103,19 @@ public class ReportDataFactory(
         var analyseResults = await GetAnalyseResults(
             instrumentIds, analyseTypes, from, to);
             
-        var reportData = new ReportData
-        {
-            Title = $"Aggregated {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}",
-            Header = 
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
-                new ReportParameter(KnownDisplayTypes.String, "Наименование")
-            ]
-        };
-
         var dates = reportHelper.GetDates(from, to);
-        reportData.Header.AddRange(dates);
-        
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"]);
+        reportData.Title = $"Aggregated {from.ToString(KnownDateTimeFormats.DateISO)} - {to.ToString(KnownDateTimeFormats.DateISO)}";
+
         foreach (var instrumentId in instrumentIds)
         {
+            var instrumentAnalyseResults = analyseResults
+                .Where(x => x.InstrumentId == instrumentId)
+                .ToList();
+            
+            if (instrumentAnalyseResults is [])
+                continue;
+            
             var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
             
             if (instrument is null)
@@ -118,11 +130,8 @@ public class ReportDataFactory(
 
             foreach (var date in dates)
             {
-                double resultNumber = analyseResults
-                    .Where(x => 
-                        x.InstrumentId == instrument.InstrumentId && 
-                        analyseTypes.Contains(x.AnalyseType) &&
-                        x.Date.ToString(KnownDateTimeFormats.DateISO) == date.Value)
+                double resultNumber = instrumentAnalyseResults
+                    .Where(x => x.Date.ToString(KnownDateTimeFormats.DateISO) == date)
                     .Select(x => x.ResultNumber)
                     .Sum();
                     
@@ -144,20 +153,8 @@ public class ReportDataFactory(
         var to = from.AddDays(days);
         var dates = reportHelper.GetDates(from, to);
         
-        var reportData = new ReportData
-        {
-            Title = "Информация по дивидендам",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Фикс. р."),
-                new ReportParameter(KnownDisplayTypes.String, "Объяв."),
-                new ReportParameter(KnownDisplayTypes.String, "Размер, руб"),
-                new ReportParameter(KnownDisplayTypes.String, "Дох-ть, %")
-            ]
-        };
-        
-        reportData.Header.AddRange(dates);
+        var reportData = CreateNewReportDataWithHeaders(
+            ["Тикер", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %"], dates);
         
         foreach (var dividendInfo in dividendInfos)
         {
@@ -172,7 +169,7 @@ public class ReportDataFactory(
             };
             
             foreach (var date in dates)
-                data.Add(date.Value == dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)
+                data.Add(date == dividendInfo.RecordDate.ToString(KnownDateTimeFormats.DateISO)
                     ? new ReportParameter(KnownDisplayTypes.Percent, dividendInfo.DividendPrc.ToString("N1"), 
                         await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc))
                     : new ReportParameter(KnownDisplayTypes.Percent, string.Empty));
@@ -187,25 +184,14 @@ public class ReportDataFactory(
     {
         var shares = (await instrumentService.GetSharesInWatchlist())
             .OrderBy(x => x.Sector);
-            
-        var reportData = new ReportData
-        {
-            Title = "Мультипликаторы",
-            Header =
+
+        var reportData = CreateNewReportDataWithHeaders(
             [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
-                new ReportParameter(KnownDisplayTypes.String, "Рыночная капитализация"),
-                new ReportParameter(KnownDisplayTypes.String, "Бета-коэффициент"),
-                new ReportParameter(KnownDisplayTypes.String, "Чистая прибыль"),
-                new ReportParameter(KnownDisplayTypes.String, "EBITDA"),
-                new ReportParameter(KnownDisplayTypes.String, "EPS"),
-                new ReportParameter(KnownDisplayTypes.String, "Свободный денежный поток"),
-                new ReportParameter(KnownDisplayTypes.String, "EV/EBITDA"),
-                new ReportParameter(KnownDisplayTypes.String, "Total Debt/EBITDA"),
-                new ReportParameter(KnownDisplayTypes.String, "Net Debt/EBITDA")
-            ]
-        };
+                "Тикер", "Сектор", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", "EBITDA", "EPS", 
+                "Своб. ден. поток", "EV/EBITDA", "Total Debt/EBITDA", "Net Debt/EBITDA"
+            ]);
+
+        reportData.Title = "Мультипликаторы";
         
         foreach (var share in shares)
         {
@@ -263,23 +249,13 @@ public class ReportDataFactory(
             }
         }
         
-        var reportData = new ReportData
-        {
-            Title = "Прогнозы",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Прогноз от компании"),
-                new ReportParameter(KnownDisplayTypes.String, "Прогноз"),
-                new ReportParameter(KnownDisplayTypes.String, "Дата прогноза"),
-                new ReportParameter(KnownDisplayTypes.String, "Валюта"),
-                new ReportParameter(KnownDisplayTypes.String, "Текущая цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Прогнозируемая цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Изменение цены"),
-                new ReportParameter(KnownDisplayTypes.String, "Относительное изменение цены"),
-                new ReportParameter(KnownDisplayTypes.String, "Наименование инструмента")
-            ]
-        };
+        var reportData = CreateNewReportDataWithHeaders(
+        [
+            "Тикер", "Компания", "Прогноз", "Дата прогноза", "Валюта", "Тек. цена", "Прогноз. цена",
+            "Изм. цены", "Отн. изм. цены", "Инструмент"
+        ]);
+
+        reportData.Title = "Прогнозы";
 
         foreach (var forecastTarget in actualForecastTargets)
         {
@@ -308,22 +284,13 @@ public class ReportDataFactory(
     {
         var forecastConsensuses = await forecastConsensusRepository.GetAllAsync();
         
-        var reportData = new ReportData
-        {
-            Title = "Консенсус-прогнозы",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Прогноз"),
-                new ReportParameter(KnownDisplayTypes.String, "Валюта"),
-                new ReportParameter(KnownDisplayTypes.String, "Текущая цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Прогнозируемая цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Минимальная цена прогноза"),
-                new ReportParameter(KnownDisplayTypes.String, "Максимальная цена прогноза"),
-                new ReportParameter(KnownDisplayTypes.String, "Изменение цены"),
-                new ReportParameter(KnownDisplayTypes.String, "Относительное изменение цены")
-            ]
-        };
+        var reportData = CreateNewReportDataWithHeaders(
+        [
+            "Тикер", "Прогноз", "Валюта", "Тек. цена", "Прогноз. цена",
+            "Мин. цена прогноза", "Макс. цена прогноза", "Изм. цены", "Отн. изм. цены"
+        ]);
+
+        reportData.Title = "Консенсус-прогнозы";
 
         foreach (var forecastConsensus in forecastConsensuses)
         {
@@ -349,25 +316,17 @@ public class ReportDataFactory(
 
     public async Task<ReportData> CreateBondCouponReportDataAsync(List<Guid> instrumentIds)
     {
-        var reportData = new ReportData
-        {
-            Title = "Информация по облигациям",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Наименование"),
-                new ReportParameter(KnownDisplayTypes.String, "Сектор"),
-                new ReportParameter(KnownDisplayTypes.String, "Плав. купон"),
-                new ReportParameter(KnownDisplayTypes.String, "До погаш., дней"),
-                new ReportParameter(KnownDisplayTypes.String, "Дох-ть., %")
-            ]
-        };
-            
         int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         var bonds = await bondRepository.GetAsync(instrumentIds);
         var startDate = DateOnly.FromDateTime(DateTime.Today);
         var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(days);
-
+        var dates = reportHelper.GetDates(startDate, endDate);
+        
+        var reportData = CreateNewReportDataWithHeaders(
+            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Дох-ть., %"], dates);
+        
+        reportData.Title = "Купоны";
+        
         var bondCoupons = (await bondCouponRepository
             .GetByInstrumentIdsAsync(instrumentIds))
             .Where(x =>
@@ -392,9 +351,6 @@ public class ReportDataFactory(
         var selectedBonds = bonds
             .Where(x => instrumentIdsWithCoupon.Contains(x.InstrumentId))
             .OrderBy(x => GetNearCouponDate(x.InstrumentId));
-        
-        var dates = reportHelper.GetDates(startDate, endDate);
-        reportData.Header.AddRange(dates);
             
         foreach (var bond in selectedBonds)
         {
@@ -430,12 +386,14 @@ public class ReportDataFactory(
             data.Add(new ReportParameter(KnownDisplayTypes.Percent, profitPrc.ToString("N1"),
                 await reportHelper.GetColorYieldCoupon(profitPrc)));
                 
+            var instrumentBondCoupons = bondCoupons.
+                Where(x => x.InstrumentId == bond.InstrumentId)
+                .ToList();
+            
             foreach (var date in dates)
             {
-                var bondCoupon = bondCoupons
-                    .FirstOrDefault(x => 
-                        x.InstrumentId == bond.InstrumentId &&
-                        x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date.Value);
+                var bondCoupon = instrumentBondCoupons
+                    .FirstOrDefault(x => x.CouponDate.ToString(KnownDateTimeFormats.DateISO) == date);
 
                 data.Add(bondCoupon is not null 
                     ? new ReportParameter(KnownDisplayTypes.Ruble, bondCoupon.PayOneBond.ToString("N1")) 
@@ -452,22 +410,10 @@ public class ReportDataFactory(
     {
         var spreads = await spreadRepository.GetAllAsync();
             
-        var reportData = new ReportData
-        {
-            Title = "Спреды",
-            Header =
-            [
-                new ReportParameter(KnownDisplayTypes.String, "Первый"),
-                new ReportParameter(KnownDisplayTypes.String, "Второй"),
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Тикер"),
-                new ReportParameter(KnownDisplayTypes.String, "Цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Цена"),
-                new ReportParameter(KnownDisplayTypes.String, "Спред"),
-                new ReportParameter(KnownDisplayTypes.String, "Спред, %"),
-                new ReportParameter(KnownDisplayTypes.String, "Конт./Бэкв.")
-            ]
-        };
+        var reportData = CreateNewReportDataWithHeaders(
+            ["Первый", "Второй", "Тикер", "Тикер", "Цена", "Цена", "Спред", "Спред, %", "Конт./Бэкв."]);
+        
+        reportData.Title = "Спреды";
 
         foreach (var spread in spreads)
         {

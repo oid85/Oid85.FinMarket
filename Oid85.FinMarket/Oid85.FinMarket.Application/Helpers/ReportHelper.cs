@@ -8,17 +8,14 @@ namespace Oid85.FinMarket.Application.Helpers;
 public class ReportHelper(
     IResourceStoreService resourceStoreService)
 {
-    public List<ReportParameter> GetDates(DateOnly from, DateOnly to)
+    public List<string> GetDates(DateOnly from, DateOnly to)
     {
         var curDate = from;
-        var dates = new List<ReportParameter>();
+        var dates = new List<string>();
 
         while (curDate <= to)
         {
-            dates.Add(new ReportParameter(
-                KnownDisplayTypes.Date,
-                curDate.ToString(KnownDateTimeFormats.DateISO)));
-
+            dates.Add(curDate.ToString(KnownDateTimeFormats.DateISO));
             curDate = curDate.AddDays(1);
         }
 
