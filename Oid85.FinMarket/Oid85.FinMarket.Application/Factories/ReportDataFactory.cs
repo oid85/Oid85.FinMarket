@@ -130,12 +130,13 @@ public class ReportDataFactory(
 
             foreach (var date in dates)
             {
-                double resultNumber = instrumentAnalyseResults
+                var resultNumbers = instrumentAnalyseResults
                     .Where(x => x.Date.ToString(KnownDateTimeFormats.DateISO) == date)
-                    .Select(x => x.ResultNumber)
-                    .Sum();
+                    .Select(x => x.ResultNumber).ToList();
                     
-                data.Add(new ReportParameter($"AnalyseResult{KnownAnalyseTypes.Aggregated}", resultNumber.ToString("N0"),
+                double resultNumber = resultNumbers is [] ? 0 : resultNumbers.Sum();
+                
+                data.Add(new ReportParameter(KnownDisplayTypes.String, resultNumber.ToString("N0"),
                     await reportHelper.GetColorAggregated((int) resultNumber)));
             }
                 
