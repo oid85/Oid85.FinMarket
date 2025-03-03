@@ -78,14 +78,4 @@ public class FutureRepository(
 
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
-    
-    public async Task<Future?> GetByInstrumentIdAsync(Guid instrumentId)
-    {
-        var entity = await context.FutureEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
-
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
 }

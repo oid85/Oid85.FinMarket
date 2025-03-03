@@ -52,28 +52,7 @@ public class FiveMinuteCandleRepository(
 
         await context.SaveChangesAsync();
     }
-
-    public async Task<List<FiveMinuteCandle>> GetAsync(Guid instrumentId) =>
-        (await context.FiveMinuteCandleEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .OrderBy(x => x.Date.ToDateTime(x.Time))
-        .ToList();
-
-    public async Task<List<FiveMinuteCandle>> GetAsync(
-        Guid instrumentId, DateTime from, DateTime to)
-    {
-        var candles = await GetAsync(instrumentId);
-        
-        return candles
-            .Where(x => 
-                x.Date.ToDateTime(x.Time) >= from && 
-                x.Date.ToDateTime(x.Time) <= to)
-            .ToList();
-    }
-
+    
     public async Task<FiveMinuteCandle?> GetLastAsync(Guid instrumentId)
     {
         bool exists = await context.FiveMinuteCandleEntities

@@ -28,37 +28,7 @@ public class ForecastConsensusRepository(
         await context.ForecastConsensusEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
-
-    public async Task UpdateForecastTargetAsync(Guid instrumentId, ForecastConsensus forecastConsensus)
-    {
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        
-        try
-        {
-            await context.ForecastConsensusEntities
-                .Where(x => 
-                    x.InstrumentId == forecastConsensus.InstrumentId)
-                .ExecuteUpdateAsync(x => x
-                        .SetProperty(entity => entity.RecommendationString, forecastConsensus.RecommendationString)
-                        .SetProperty(entity => entity.RecommendationNumber, forecastConsensus.RecommendationNumber)
-                        .SetProperty(entity => entity.CurrentPrice, forecastConsensus.CurrentPrice)
-                        .SetProperty(entity => entity.ConsensusPrice, forecastConsensus.ConsensusPrice)
-                        .SetProperty(entity => entity.MinTarget, forecastConsensus.MinTarget)
-                        .SetProperty(entity => entity.MaxTarget, forecastConsensus.MaxTarget)
-                        .SetProperty(entity => entity.PriceChange, forecastConsensus.PriceChange)
-                        .SetProperty(entity => entity.PriceChangeRel, forecastConsensus.PriceChangeRel));
-            
-            await context.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-            
-        catch (Exception exception)
-        {
-            await transaction.RollbackAsync();
-            logger.Error(exception);
-        }
-    }
-
+    
     public async Task<List<ForecastConsensus>> GetAllAsync() =>
         (await context.ForecastConsensusEntities
             .Where(x => !x.IsDeleted)
@@ -67,24 +37,4 @@ public class ForecastConsensusRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
-
-    public async Task<ForecastConsensus?> GetByTickerAsync(string ticker)
-    {
-        var entity = await context.ForecastConsensusEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Ticker == ticker);
-        
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
-
-    public async Task<ForecastConsensus?> GetByInstrumentIdAsync(Guid instrumentId)
-    {
-        var entity = await context.ForecastConsensusEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
-        
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
 }

@@ -49,16 +49,7 @@ public class ShareRepository(
             logger.Error(exception);
         }
     }
-
-    public async Task<List<Share>> GetAllAsync() =>
-        (await context.ShareEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-
+    
     public async Task<List<Share>> GetByTickersAsync(List<string> tickers) =>
         (await context.ShareEntities
             .Where(x => !x.IsDeleted)
@@ -76,16 +67,6 @@ public class ShareRepository(
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
         
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
-    
-    public async Task<Share?> GetByInstrumentIdAsync(Guid instrumentId)
-    {
-        var entity = await context.ShareEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
-
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

@@ -34,26 +34,11 @@ public class InstrumentRepository(
 
         await context.SaveChangesAsync();
     }
-
-    public async Task<List<Instrument>> GetAllAsync() =>
-        (await context.InstrumentEntities
-            .OrderBy(x => x.Name)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
     
     public async Task<Instrument?> GetByInstrumentIdAsync(Guid instrumentId)
     {
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
-    
-    public async Task<Instrument?> GetByNameAsync(string name)
-    {
-        var entity = await context.InstrumentEntities
-            .FirstOrDefaultAsync(x => x.Name == name);
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
     

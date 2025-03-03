@@ -50,15 +50,6 @@ public class CurrencyRepository(
         }
     }
     
-    public async Task<List<Currency>> GetAllAsync() =>
-        (await context.CurrencyEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-
     public async Task<List<Currency>> GetByTickersAsync(List<string> tickers) =>
         (await context.CurrencyEntities
             .Where(x => !x.IsDeleted)

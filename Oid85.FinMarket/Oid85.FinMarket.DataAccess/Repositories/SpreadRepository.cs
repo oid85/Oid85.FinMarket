@@ -106,15 +106,4 @@ public class SpreadRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
-
-    public async Task<Spread?> GetByTickerAsync(string firstInstrumentTicker)
-    {
-        var entity = await context.SpreadEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => 
-                x.FirstInstrumentTicker == firstInstrumentTicker);
-        
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
 }

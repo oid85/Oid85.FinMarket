@@ -9,5 +9,4 @@ public interface ISpreadRepository
     Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
     Task SetAsDeletedAsync(Spread spread);
     Task<List<Spread>> GetAllAsync();
-    Task<Spread?> GetByTickerAsync(string firstInstrumentTicker);
 }

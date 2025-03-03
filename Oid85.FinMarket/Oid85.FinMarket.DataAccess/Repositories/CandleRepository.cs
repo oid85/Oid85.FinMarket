@@ -48,16 +48,7 @@ public class CandleRepository(
 
         await context.SaveChangesAsync();
     }
-
-    public async Task<List<Candle>> GetAsync(Guid instrumentId) =>
-        (await context.CandleEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .OrderBy(x => x.Date)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-
+    
     public async Task<Candle?> GetLastAsync(Guid instrumentId)
     {
         var entity = await context.CandleEntities
@@ -68,19 +59,6 @@ public class CandleRepository(
             .FirstOrDefaultAsync();
 
         return entity is null ? null : DataAccessMapper.Map(entity);
-    }
-
-    public async Task<List<Candle>> GetTwoLastAsync(Guid instrumentId)
-    {
-        var entities = await context.CandleEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .OrderByDescending(x => x.Date)
-            .Take(2)
-            .OrderBy(x => x.Date)
-            .AsNoTracking()
-            .ToListAsync();
-
-        return entities.Count < 2 ? [] : entities.Select(DataAccessMapper.Map).ToList();
     }
 
     public async Task<List<Candle>> GetLastYearAsync(Guid instrumentId)

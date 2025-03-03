@@ -28,17 +28,6 @@ public class AnalyseResultRepository(
         await context.AnalyseResultEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
-
-    public async Task<List<AnalyseResult>> GetAsync(
-        Guid instrumentId, DateOnly from, DateOnly to) =>
-        (await context.AnalyseResultEntities
-            .Where(x => x.InstrumentId == instrumentId)
-            .Where(x => x.Date >= from && x.Date <= to)
-            .OrderBy(x => x.Date)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
     
     public async Task<List<AnalyseResult>> GetAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to) =>
@@ -50,21 +39,6 @@ public class AnalyseResultRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
-
-    public async Task<AnalyseResult?> GetLastAsync(
-        Guid instrumentId, string analyseType)
-    {
-        var entity = await context.AnalyseResultEntities
-            .Where(x => 
-                x.InstrumentId == instrumentId
-                && x.AnalyseType == analyseType)
-            .OrderByDescending(x => x.Date)
-            .Take(1)
-            .AsNoTracking()
-            .FirstOrDefaultAsync();
-
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
 
     public async Task<List<AnalyseResult>> GetTwoLastAsync(Guid instrumentId, string analyseType)
     {

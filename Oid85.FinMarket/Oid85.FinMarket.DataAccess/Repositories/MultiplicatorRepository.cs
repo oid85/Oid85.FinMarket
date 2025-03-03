@@ -32,7 +32,7 @@ public class MultiplicatorRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateStaticFieldsAsync(Multiplicator multiplicator)
+    private async Task UpdateStaticFieldsAsync(Multiplicator multiplicator)
     {
         await using var transaction = await context.Database.BeginTransactionAsync();
         

@@ -9,5 +9,4 @@ public interface IFutureRepository
     Task<List<Future>> GetAllAsync();
     Task<List<Future>> GetByTickersAsync(List<string> tickers);
     Task<Future?> GetByTickerAsync(string ticker);
-    Task<Future?> GetByInstrumentIdAsync(Guid instrumentId);
 }

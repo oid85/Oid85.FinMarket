@@ -12,18 +12,18 @@ public class IndexRepository(
     FinMarketContext context) 
     : IIndexRepository
 {
-    public async Task AddAsync(List<FinIndex> indicatives)
+    public async Task AddAsync(List<FinIndex> indexes)
     {
-        if (indicatives is [])
+        if (indexes is [])
             return;
 
         var entities = new List<FinIndexEntity>();
         
-        foreach (var indicative in indicatives)
+        foreach (var index in indexes)
             if (!await context.IndicativeEntities
                     .AnyAsync(x => 
-                        x.InstrumentId == indicative.InstrumentId))
-                entities.Add(DataAccessMapper.Map(indicative));
+                        x.InstrumentId == index.InstrumentId))
+                entities.Add(DataAccessMapper.Map(index));
 
         await context.IndicativeEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
@@ -51,15 +51,6 @@ public class IndexRepository(
         }
     }
     
-    public async Task<List<FinIndex>> GetAllAsync() =>
-        (await context.IndicativeEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-
     public async Task<List<FinIndex>> GetByTickersAsync(List<string> tickers) =>
         (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
@@ -69,24 +60,4 @@ public class IndexRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
-
-    public async Task<FinIndex?> GetByTickerAsync(string ticker)
-    {
-        var entity = await context.IndicativeEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Ticker == ticker);
-
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
-
-    public async Task<FinIndex?> GetByInstrumentIdAsync(Guid instrumentId)
-    {
-        var entity = await context.IndicativeEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
-
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
 }

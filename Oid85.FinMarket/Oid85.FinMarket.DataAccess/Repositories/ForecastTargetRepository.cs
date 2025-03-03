@@ -30,37 +30,7 @@ public class ForecastTargetRepository(
         await context.ForecastTargetEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
-
-    public async Task UpdateForecastTargetAsync(Guid instrumentId, ForecastTarget forecastTarget)
-    {
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        
-        try
-        {
-            await context.ForecastTargetEntities
-                .Where(x => 
-                    x.InstrumentId == forecastTarget.InstrumentId && 
-                    x.Company == forecastTarget.Company && 
-                    x.RecommendationDate == forecastTarget.RecommendationDate)
-                .ExecuteUpdateAsync(x => x
-                        .SetProperty(entity => entity.RecommendationString, forecastTarget.RecommendationString)
-                        .SetProperty(entity => entity.RecommendationNumber, forecastTarget.RecommendationNumber)
-                        .SetProperty(entity => entity.CurrentPrice, forecastTarget.CurrentPrice)
-                        .SetProperty(entity => entity.TargetPrice, forecastTarget.TargetPrice)
-                        .SetProperty(entity => entity.PriceChange, forecastTarget.PriceChange)
-                        .SetProperty(entity => entity.PriceChangeRel, forecastTarget.PriceChangeRel));
-            
-            await context.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-            
-        catch (Exception exception)
-        {
-            await transaction.RollbackAsync();
-            logger.Error(exception);
-        }
-    }
-
+    
     public async Task<List<ForecastTarget>> GetAllAsync() =>
         (await context.ForecastTargetEntities
             .Where(x => !x.IsDeleted)
@@ -69,20 +39,4 @@ public class ForecastTargetRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
-
-    public async Task<List<ForecastTarget>> GetByTickerAsync(string ticker) =>
-        (await context.ForecastTargetEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.Ticker == ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-
-    public async Task<List<ForecastTarget>> GetByInstrumentIdAsync(Guid instrumentId) =>
-        (await context.ForecastTargetEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => x.InstrumentId == instrumentId)
-            .AsNoTracking()
-            .ToListAsync()).Select(DataAccessMapper.Map).ToList();
 }

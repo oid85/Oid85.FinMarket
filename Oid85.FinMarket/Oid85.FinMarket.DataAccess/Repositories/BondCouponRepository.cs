@@ -28,24 +28,6 @@ public class BondCouponRepository(
         await context.SaveChangesAsync();
     }
     
-    public async Task<List<BondCoupon>> GetAllAsync() =>
-        (await context.BondCouponEntities
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList(); 
-    
-    public async Task<List<BondCoupon>> GetAsync(
-        DateOnly from, DateOnly to) =>
-        (await context.BondCouponEntities
-            .Where(x => 
-                x.CouponDate >= from && 
-                x.CouponDate <= to)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-    
     public async Task<List<BondCoupon>> GetByInstrumentIdsAsync(List<Guid> instrumentIds) =>
         (await context.BondCouponEntities
             .Where(x => 
