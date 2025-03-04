@@ -116,10 +116,17 @@ public class ReportDataFactory(
                 var analyseResult = instrumentAnalyseResults
                     .FirstOrDefault(x => x.Date == date);
 
-                data.Add(analyseResult is not null 
-                    ? GetAnalyseResult(analyseResult.ResultString, 
-                        await reportHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
-                    : GetString(string.Empty));
+                if (analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum)
+                    data.Add(analyseResult is not null
+                        ? GetPercent(analyseResult.ResultNumber,
+                            await reportHelper.GetColorByAnalyseType(analyseType, analyseResult))
+                        : GetString(string.Empty));
+
+                else
+                    data.Add(analyseResult is not null 
+                        ? GetAnalyseResult(analyseResult.ResultString, 
+                            await reportHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
+                        : GetString(string.Empty));
             }
                 
             reportData.Data.Add(data);
