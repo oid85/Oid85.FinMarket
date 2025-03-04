@@ -21,7 +21,8 @@ public class ReportDataFactory(
     IForecastConsensusRepository forecastConsensusRepository,
     ReportHelper reportHelper,
     IInstrumentService instrumentService,
-    ISpreadRepository spreadRepository) 
+    ISpreadRepository spreadRepository,
+    IMarketEventRepository marketEventRepository) 
     : IReportDataFactory
 {
     private async Task<List<AnalyseResult>> GetAnalyseResults(
@@ -75,7 +76,13 @@ public class ReportDataFactory(
         new (KnownDisplayTypes.Percent, value.ToString("N1"), color);     
     
     private static ReportParameter GetNumber(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Number, value.ToString("N2"), color);     
+        new (KnownDisplayTypes.Number, value.ToString("N2"), color);
+    
+    private static ReportParameter GetAnalyseResult(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.AnalyseResult, value, color);    
+    
+    private static ReportParameter GetCheckBox(bool value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.CheckBox, value.ToString(), color);      
     
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
@@ -113,7 +120,7 @@ public class ReportDataFactory(
                     .FirstOrDefault(x => x.Date == date);
 
                 data.Add(analyseResult is not null 
-                    ? GetString(analyseResult.ResultString, 
+                    ? GetAnalyseResult(analyseResult.ResultString, 
                         await reportHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
                     : GetString(string.Empty));
             }
@@ -131,7 +138,7 @@ public class ReportDataFactory(
             instrumentIds, analyseTypes, from, to);
             
         var dates = ReportHelper.GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"]);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"], dates);
         reportData.Title = reportData.Title = CreateTitleWithDates("Aggregated", from, to);
 
         foreach (var instrumentId in instrumentIds)
@@ -161,7 +168,7 @@ public class ReportDataFactory(
                     .Select(x => x.ResultNumber).ToList();
                     
                 double resultNumber = resultNumbers is [] ? 0 : resultNumbers.Sum();
-                data.Add(GetString(resultNumber.ToString("N0"), 
+                data.Add(GetAnalyseResult(resultNumber.ToString("N0"), 
                     await reportHelper.GetColorAggregated((int) resultNumber)));
             }
                 
@@ -251,7 +258,8 @@ public class ReportDataFactory(
 
     public async Task<ReportData> CreateForecastTargetReportDataAsync()
     {
-        var forecastTargets = await forecastTargetRepository.GetAllAsync();
+        var forecastTargets = (await forecastTargetRepository.GetAllAsync())
+            .Where(x => string.IsNullOrEmpty(x.Ticker)).ToList();
         var actualForecastTargets = new List<ForecastTarget>();
 
         foreach (var forecastTarget in forecastTargets)
@@ -445,6 +453,25 @@ public class ReportDataFactory(
                 GetPercent(spread.PriceDifferencePrc),
                 GetString(spread.SpreadPricePosition, 
                     await reportHelper.GetColorSpreadPricePosition(spread.SpreadPricePosition))
+            ]);
+        
+        return reportData;
+    }
+    
+    public async Task<ReportData> CreateActiveMarketEventsReportDataAsync()
+    {
+        var marketEvents = await marketEventRepository.GetActivatedAsync();
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Дата", "Время", "Событие", "Текст"]);
+        reportData.Title = "Активные рыночные события";
+        
+        foreach (var marketEvent in marketEvents)
+            reportData.Data.Add(
+            [
+                GetTicker(marketEvent.Ticker),
+                GetString(marketEvent.Date.ToString(KnownDateTimeFormats.DateISO)),
+                GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO)),
+                GetString(marketEvent.MarketEventType),
+                GetString(marketEvent.MarketEventText)
             ]);
         
         return reportData;
