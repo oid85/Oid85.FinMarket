@@ -256,7 +256,7 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateForecastTargetReportDataAsync()
     {
         var forecastTargets = (await forecastTargetRepository.GetAllAsync())
-            .Where(x => string.IsNullOrEmpty(x.Ticker)).ToList();
+            .Where(x => !string.IsNullOrEmpty(x.Ticker)).ToList();
         var actualForecastTargets = new List<ForecastTarget>();
 
         foreach (var forecastTarget in forecastTargets)
@@ -309,7 +309,8 @@ public class ReportDataFactory(
 
     public async Task<ReportData> CreateForecastConsensusReportDataAsync()
     {
-        var forecastConsensuses = await forecastConsensusRepository.GetAllAsync();
+        var forecastConsensuses = (await forecastConsensusRepository.GetAllAsync())
+            .Where(x => !string.IsNullOrEmpty(x.Ticker)).ToList();
         
         var reportData = CreateNewReportDataWithHeaders(
         [
@@ -457,7 +458,7 @@ public class ReportDataFactory(
     
     public async Task<ReportData> CreateActiveMarketEventsReportDataAsync()
     {
-        var marketEvents = await marketEventRepository.GetActivatedAsync();
+        var marketEvents = (await marketEventRepository.GetActivatedAsync());
         var reportData = CreateNewReportDataWithHeaders(["Тикер", "Дата", "Время", "Событие", "Текст"]);
         reportData.Title = "Активные рыночные события";
         
