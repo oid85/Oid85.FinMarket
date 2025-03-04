@@ -24,8 +24,7 @@ public class SharesReportService(
             [
                 KnownAnalyseTypes.Supertrend,
                 KnownAnalyseTypes.CandleSequence,
-                KnownAnalyseTypes.CandleVolume,
-                KnownAnalyseTypes.Rsi
+                KnownAnalyseTypes.CandleVolume
             ], 
             request.From, request.To);
 

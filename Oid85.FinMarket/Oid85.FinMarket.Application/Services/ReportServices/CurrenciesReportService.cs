@@ -22,8 +22,7 @@ public class CurrenciesReportService(
             await GetInstrumentIds(), 
             [
                 KnownAnalyseTypes.Supertrend,
-                KnownAnalyseTypes.CandleSequence,
-                KnownAnalyseTypes.Rsi
+                KnownAnalyseTypes.CandleSequence
             ], 
             request.From, request.To);
 

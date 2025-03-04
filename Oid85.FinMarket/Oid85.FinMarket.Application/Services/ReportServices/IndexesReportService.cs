@@ -1,6 +1,4 @@
-﻿using Oid85.FinMarket.Application.Helpers;
-using Oid85.FinMarket.Application.Interfaces.Factories;
-using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
@@ -16,7 +14,7 @@ public class IndexesReportService(
     : IIndexesReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await instrumentService.GetFuturesInWatchlist()).Select(x => x.InstrumentId).ToList();
+        (await instrumentService.GetFinIndexesInWatchlist()).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
@@ -25,8 +23,7 @@ public class IndexesReportService(
             [
                 KnownAnalyseTypes.Supertrend,
                 KnownAnalyseTypes.CandleSequence,
-                KnownAnalyseTypes.CandleVolume,
-                KnownAnalyseTypes.Rsi
+                KnownAnalyseTypes.CandleVolume
             ], 
             request.From, request.To);
 
