@@ -1,4 +1,4 @@
-﻿using Oid85.FinMarket.Application.Factories;
+﻿using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 
@@ -6,7 +6,7 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class MarketEventsReportService(
-    ReportDataFactory reportDataFactory) 
+    IReportDataFactory reportDataFactory) 
     : IMarketEventsReportService
 {
     /// <inheritdoc />

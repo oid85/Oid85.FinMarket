@@ -76,7 +76,7 @@ public class ReportDataFactory(
         new (KnownDisplayTypes.Percent, value.ToString("N1"), color);     
     
     private static ReportParameter GetNumber(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Number, value.ToString("N2"), color);
+        new (KnownDisplayTypes.Number, value.ToString("N1"), color);
     
     private static ReportParameter GetAnalyseResult(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.AnalyseResult, value, color);    
@@ -113,8 +113,7 @@ public class ReportDataFactory(
 
             foreach (var date in dates)
             {
-                var analyseResult = instrumentAnalyseResults
-                    .FirstOrDefault(x => x.Date == date);
+                var analyseResult = instrumentAnalyseResults.FirstOrDefault(x => x.Date == date);
 
                 if (analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum)
                     data.Add(analyseResult is not null
@@ -354,7 +353,7 @@ public class ReportDataFactory(
         var dates = ReportHelper.GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Дох-ть., %"], dates);
+            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Цена", "Дох-ть., %"], dates);
         
         reportData.Title = "Купоны";
         
@@ -393,7 +392,8 @@ public class ReportDataFactory(
                 GetString(bond.Name),
                 GetSector(bond.Sector),
                 GetString(bond.FloatingCouponFlag ? "Да" : string.Empty),
-                GetNumber(daysToMaturityDate)
+                GetNumber(daysToMaturityDate),
+                GetNumber(bond.LastPrice * 10.0)
             ];
                 
             // Вычисляем полную доходность облигации
@@ -404,8 +404,8 @@ public class ReportDataFactory(
             double profitPrc = 0.0;
 
             if (nextCoupon is not null &&
-                bond.LastPrice == 0.0 &&
-                nextCoupon.CouponPeriod == 0.0)
+                bond.LastPrice > 0.0 &&
+                nextCoupon.CouponPeriod > 0)
             {
                 double priceInRubles = bond.LastPrice * 10.0;
                 double payDay = nextCoupon.PayOneBond / nextCoupon.CouponPeriod;
