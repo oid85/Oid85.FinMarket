@@ -81,9 +81,6 @@ public class ReportDataFactory(
     private static ReportParameter GetAnalyseResult(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.AnalyseResult, value, color);    
     
-    private static ReportParameter GetCheckBox(bool value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.CheckBox, value.ToString(), color);      
-    
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
     {
