@@ -1,4 +1,5 @@
 ﻿using NLog;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
@@ -45,7 +46,9 @@ public class GetDividendInfoService(
     private static GetDividendsRequest CreateGetDividendsRequest(Guid instrumentId) =>
         new()
         {
-            InstrumentId = instrumentId.ToString()
+            InstrumentId = instrumentId.ToString(),
+            From = ConvertHelper.DateTimeToTimestamp(DateTime.Today),
+            To = ConvertHelper.DateTimeToTimestamp(DateTime.Today.AddYears(1))
         };
     
     private async Task<GetDividendsResponse?> SendGetDividendsRequest(GetDividendsRequest request)

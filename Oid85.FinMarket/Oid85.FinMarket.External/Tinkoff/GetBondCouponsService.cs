@@ -1,4 +1,5 @@
 ﻿using NLog;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
@@ -24,7 +25,7 @@ public class GetBondCouponsService(
             await Task.Delay(DelayInMilliseconds);
 
             var request = CreateGetBondCouponsRequest(bond.InstrumentId);
-            var response = await SendGetDividendsRequest(request);
+            var response = await SendGetBondCouponsRequest(request);
 
             if (response is null)
                 continue;
@@ -44,10 +45,12 @@ public class GetBondCouponsService(
     private static GetBondCouponsRequest CreateGetBondCouponsRequest(Guid instrumentId) =>
         new()
         {
-            InstrumentId = instrumentId.ToString()
+            InstrumentId = instrumentId.ToString(),
+            From = ConvertHelper.DateTimeToTimestamp(DateTime.Today),
+            To = ConvertHelper.DateTimeToTimestamp(DateTime.Today.AddYears(1))
         };
     
-    private async Task<GetBondCouponsResponse?> SendGetDividendsRequest(GetBondCouponsRequest request)
+    private async Task<GetBondCouponsResponse?> SendGetBondCouponsRequest(GetBondCouponsRequest request)
     {
         try
         {

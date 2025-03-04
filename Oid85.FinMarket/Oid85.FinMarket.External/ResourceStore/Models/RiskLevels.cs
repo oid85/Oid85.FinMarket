@@ -12,4 +12,7 @@ public class RiskLevels
     
     [JsonPropertyName("high")]
     public bool High { get; set; }
+    
+    [JsonPropertyName("veryHigh")]
+    public bool VeryHigh { get; set; }
 }

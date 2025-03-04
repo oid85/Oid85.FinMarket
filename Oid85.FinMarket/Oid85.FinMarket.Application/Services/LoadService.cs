@@ -361,6 +361,14 @@ public class LoadService(
     public async Task<bool> LoadBondCouponsAsync()
     {
         var bonds = await instrumentService.GetBondsByFilter();
+        var watchlistBonds = await instrumentService.GetBondsInWatchlist();
+
+        var bondInstrumentIds = bonds.Select(x => x.InstrumentId).ToList();
+        
+        foreach (var watchlistBond in watchlistBonds)
+            if (!bondInstrumentIds.Contains(watchlistBond.InstrumentId))
+                bonds.Add(watchlistBond);
+        
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
         await bondCouponRepository.AddAsync(bondCoupons);
             

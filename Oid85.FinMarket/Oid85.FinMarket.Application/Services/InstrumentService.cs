@@ -64,9 +64,10 @@ public class InstrumentService(
                 x.MaturityDate >= from && 
                 x.MaturityDate <= to)
             .Where(x => 
-                (x.RiskLevel == 1 && filter.RiskLevels.Low) || 
-                (x.RiskLevel == 2 && filter.RiskLevels.Middle) || 
-                (x.RiskLevel == 3 && filter.RiskLevels.High))
+                (x.RiskLevel == 0 && filter.RiskLevels.Low) || 
+                (x.RiskLevel == 1 && filter.RiskLevels.Middle) || 
+                (x.RiskLevel == 2 && filter.RiskLevels.High) || 
+                (x.RiskLevel == 3 && filter.RiskLevels.VeryHigh))
             .Where(x => 
                 x.LastPrice >= filter.Price.Min && 
                 x.LastPrice <= filter.Price.Max)

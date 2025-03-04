@@ -12,7 +12,7 @@ public class GetForecastService(
 {
     private const int DelayInMilliseconds = 50;
     
-        public async Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId)
+    public async Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId)
     {
         await Task.Delay(DelayInMilliseconds);
 
