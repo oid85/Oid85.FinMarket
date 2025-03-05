@@ -130,7 +130,7 @@ public class ReportDataFactory(
             instrumentIds, [analyseType], from, to);
 
         var dates = GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"], dates);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
         reportData.Title = CreateTitleWithDates(analyseType, from, to);
         
         foreach (var instrumentId in instrumentIds)
@@ -183,7 +183,7 @@ public class ReportDataFactory(
             instrumentIds, analyseTypes, from, to);
             
         var dates = GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"], dates);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
         reportData.Title = reportData.Title = CreateTitleWithDates("Aggregated", from, to);
 
         foreach (var instrumentId in instrumentIds)
@@ -232,15 +232,17 @@ public class ReportDataFactory(
         var dates = GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
+            ["Тикер", "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
         
         foreach (var dividendInfo in dividendInfos)
         {
+            var instrument = await instrumentRepository.GetByInstrumentIdAsync(dividendInfo.InstrumentId);
             var profitPrc = await CalculateDividendProfitPercentAsync(dividendInfo);
             
             var data = new List<ReportParameter>
             {
                 GetTicker(dividendInfo.Ticker),
+                GetString(instrument?.Name ?? string.Empty),
                 GetDate(dividendInfo.RecordDate),
                 GetDate(dividendInfo.DeclaredDate),
                 GetRuble(dividendInfo.Dividend),
@@ -267,7 +269,7 @@ public class ReportDataFactory(
 
         var reportData = CreateNewReportDataWithHeaders(
             [
-                "Тикер", "Сектор", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", "EBITDA", "EPS", 
+                "Тикер", "Сектор", "Эмитент", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", "EBITDA", "EPS", 
                 "Своб. ден. поток", "EV/EBITDA", "Total Debt/EBITDA", "Net Debt/EBITDA"
             ]);
 
@@ -284,6 +286,7 @@ public class ReportDataFactory(
             [
                 GetTicker(share.Ticker),
                 GetSector(share.Sector),
+                GetSector(share.Name),
                 GetNumber(multiplicator.MarketCapitalization),
                 GetNumber(multiplicator.Beta),
                 GetNumber(multiplicator.NetIncome),
@@ -496,13 +499,14 @@ public class ReportDataFactory(
     {
         var marketEvents = (await marketEventRepository.GetActivatedAsync())
             .OrderBy(x => x.Ticker);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Дата", "Время", "Событие", "Текст"]);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Наименование", "Дата", "Время", "Событие", "Текст"]);
         reportData.Title = "Активные рыночные события";
         
         foreach (var marketEvent in marketEvents)
             reportData.Data.Add(
             [
                 GetTicker(marketEvent.Ticker),
+                GetTicker(marketEvent.InstrumentName),
                 GetString(marketEvent.Date.ToString(KnownDateTimeFormats.DateISO)),
                 GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO)),
                 GetString(marketEvent.MarketEventType),
