@@ -35,12 +35,13 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IBondsReportService, BondsReportService>();
         services.AddTransient<IMarketEventsReportService, MarketEventsReportService>();
         services.AddTransient<ISendService, SendService>();
-        services.AddTransient<ReportHelper>();
+        services.AddTransient<ColorHelper>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
         services.AddTransient<IMultiplicatorService, MultiplicatorService>();
         services.AddTransient<IMarketEventService, MarketEventService>();
         services.AddTransient<IInstrumentService, InstrumentService>();
+        services.AddTransient<INormalizeService, NormalizeService>();
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();

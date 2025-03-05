@@ -1,11 +1,10 @@
-﻿using Oid85.FinMarket.Application.Models.Reports;
-using Oid85.FinMarket.Common.KnownConstants;
+﻿using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Helpers;
 
-public class ReportHelper(
+public class ColorHelper(
     IResourceStoreService resourceStoreService)
 {
     public async Task<string> GetColorByAnalyseType(string analyseType, AnalyseResult analyseResult)
