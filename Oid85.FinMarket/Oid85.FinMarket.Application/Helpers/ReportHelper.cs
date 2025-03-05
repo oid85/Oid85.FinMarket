@@ -8,20 +8,6 @@ namespace Oid85.FinMarket.Application.Helpers;
 public class ReportHelper(
     IResourceStoreService resourceStoreService)
 {
-    public static List<DateOnly> GetDates(DateOnly from, DateOnly to)
-    {
-        var curDate = from;
-        var dates = new List<DateOnly>();
-
-        while (curDate <= to)
-        {
-            dates.Add(curDate);
-            curDate = curDate.AddDays(1);
-        }
-
-        return dates;
-    }
-    
     public async Task<string> GetColorByAnalyseType(string analyseType, AnalyseResult analyseResult)
     {
         switch (analyseType)

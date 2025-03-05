@@ -16,6 +16,7 @@ public class ReportDataFactory(
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
     IBondRepository bondRepository,
+    IShareRepository shareRepository,
     IMultiplicatorRepository multiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
@@ -57,6 +58,53 @@ public class ReportDataFactory(
         return $"{title} с {fromString} по {toString}";
     }
 
+    private static List<DateOnly> GetDates(DateOnly from, DateOnly to)
+    {
+        var curDate = from;
+        var dates = new List<DateOnly>();
+
+        while (curDate <= to)
+        {
+            dates.Add(curDate);
+            curDate = curDate.AddDays(1);
+        }
+
+        return dates;
+    }
+
+    private static double CalculateBondCouponProfitPercent(Bond bond, BondCoupon? coupon)
+    {
+        if (coupon is null)
+            return 0.0;
+
+        if (bond.LastPrice == 0.0)
+            return 0.0;
+        
+        if (coupon.CouponPeriod == 0)
+            return 0.0;
+        
+        double priceInRubles = bond.LastPrice * 10.0 + bond.Nkd;
+        double payDay = coupon.PayOneBond / coupon.CouponPeriod;
+        double payYear = payDay * 365;
+        double profit = payYear / priceInRubles;
+        double profitPrc = profit / 100.0;   
+        
+        return profitPrc;
+    }
+    
+    private async ValueTask<double> CalculateDividendProfitPercentAsync(DividendInfo dividendInfo)
+    {
+        var share = await shareRepository.GetByInstrumentIdAsync(dividendInfo.InstrumentId);
+
+        if (share is null)
+            return 0.0;
+
+        if (share.LastPrice == 0.0)
+            return 0.0;
+        
+        return dividendInfo.Dividend / share.LastPrice * 100.0;
+    }
+    
     private static ReportParameter GetTicker(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.Ticker, value, color);
     
@@ -87,7 +135,7 @@ public class ReportDataFactory(
         var analyseResults = await GetAnalyseResults(
             instrumentIds, [analyseType], from, to);
 
-        var dates = ReportHelper.GetDates(from, to);
+        var dates = GetDates(from, to);
         var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"], dates);
         reportData.Title = CreateTitleWithDates(analyseType, from, to);
         
@@ -140,7 +188,7 @@ public class ReportDataFactory(
         var analyseResults = await GetAnalyseResults(
             instrumentIds, analyseTypes, from, to);
             
-        var dates = ReportHelper.GetDates(from, to);
+        var dates = GetDates(from, to);
         var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Наименование"], dates);
         reportData.Title = reportData.Title = CreateTitleWithDates("Aggregated", from, to);
 
@@ -187,21 +235,23 @@ public class ReportDataFactory(
         int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         var from = DateOnly.FromDateTime(DateTime.Today);
         var to = from.AddDays(days);
-        var dates = ReportHelper.GetDates(from, to);
+        var dates = GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %"], dates);
+            ["Тикер", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
         
         foreach (var dividendInfo in dividendInfos)
         {
+            var profitPrc = await CalculateDividendProfitPercentAsync(dividendInfo);
+            
             var data = new List<ReportParameter>
             {
                 GetTicker(dividendInfo.Ticker),
                 GetDate(dividendInfo.RecordDate),
                 GetDate(dividendInfo.DeclaredDate),
                 GetRuble(dividendInfo.Dividend),
-                GetPercent(dividendInfo.DividendPrc, 
-                    await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc))
+                GetPercent(dividendInfo.DividendPrc, await reportHelper.GetColorYieldDividend(dividendInfo.DividendPrc)),
+                GetPercent(profitPrc, await reportHelper.GetColorYieldDividend(profitPrc))
             };
             
             foreach (var date in dates)
@@ -350,7 +400,7 @@ public class ReportDataFactory(
         var bonds = await bondRepository.GetAsync(instrumentIds);
         var startDate = DateOnly.FromDateTime(DateTime.Today);
         var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(days);
-        var dates = ReportHelper.GetDates(startDate, endDate);
+        var dates = GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
             ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Цена", "Дох-ть., %"], dates);
@@ -400,21 +450,8 @@ public class ReportDataFactory(
                 .Where(x => x.InstrumentId == bond.InstrumentId)
                 .OrderBy(x => x.CouponDate)
                 .ToList();
-
-            var nextCoupon = bondCouponsByInstrument.FirstOrDefault();
-                
-            double profitPrc = 0.0;
-
-            if (nextCoupon is not null &&
-                bond.LastPrice > 0.0 &&
-                nextCoupon.CouponPeriod > 0)
-            {
-                double priceInRubles = bond.LastPrice * 10.0 + bond.Nkd;
-                double payDay = nextCoupon.PayOneBond / nextCoupon.CouponPeriod;
-                double payYear = payDay * 365;
-                double profit = payYear / priceInRubles;
-                profitPrc = profit / 100.0;   
-            }
+            
+            var profitPrc = CalculateBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
             
             data.Add(GetPercent(profitPrc, await reportHelper.GetColorYieldCoupon(profitPrc)));         
             

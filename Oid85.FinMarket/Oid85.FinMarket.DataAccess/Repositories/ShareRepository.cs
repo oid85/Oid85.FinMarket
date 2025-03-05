@@ -69,4 +69,14 @@ public class ShareRepository(
         
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
+
+    public async Task<Share?> GetByInstrumentIdAsync(Guid instrumentId)
+    {
+        var entity = await context.ShareEntities
+            .Where(x => !x.IsDeleted)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
+        
+        return entity is null ? null : DataAccessMapper.Map(entity);
+    }
 }
