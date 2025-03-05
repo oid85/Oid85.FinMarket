@@ -83,7 +83,10 @@ public class ReportDataFactory(
         if (coupon.CouponPeriod == 0)
             return 0.0;
 
-        return coupon.PayOneBond / (bond.LastPrice * 10.0 + bond.Nkd) * 100.0;
+        double numberCouponsByYear = 365.0 / coupon.CouponPeriod;
+        double yieldOfOneCoupon = coupon.PayOneBond / (bond.LastPrice * 10.0 + bond.Nkd);
+        
+        return numberCouponsByYear * yieldOfOneCoupon * 100.0;
     }
     
     private async ValueTask<double> CalculateDividendProfitPercentAsync(DividendInfo dividendInfo)
