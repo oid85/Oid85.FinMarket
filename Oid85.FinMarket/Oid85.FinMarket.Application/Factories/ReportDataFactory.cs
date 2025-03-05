@@ -443,10 +443,12 @@ public class ReportDataFactory(
             
             var profitPrc = CalculateBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
 
+            /*
             var resource = await resourceStoreService.GetFilterBondsResourceAsync();
             
             if (profitPrc < resource!.Yield.Min)
                 continue;
+            */
             
             var riskLevel = bond.RiskLevel switch
             {
