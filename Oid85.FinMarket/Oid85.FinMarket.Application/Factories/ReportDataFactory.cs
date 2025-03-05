@@ -6,6 +6,7 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Factories;
 
@@ -23,7 +24,8 @@ public class ReportDataFactory(
     ReportHelper reportHelper,
     IInstrumentService instrumentService,
     ISpreadRepository spreadRepository,
-    IMarketEventRepository marketEventRepository) 
+    IMarketEventRepository marketEventRepository,
+    IResourceStoreService resourceStoreService) 
     : IReportDataFactory
 {
     private async Task<List<AnalyseResult>> GetAnalyseResults(
@@ -435,6 +437,17 @@ public class ReportDataFactory(
             
         foreach (var bond in bondsWithCoupons)
         {
+            var bondCouponsByInstrument = bondCoupons
+                .Where(x => x.InstrumentId == bond.InstrumentId)
+                .OrderBy(x => x.CouponDate).ToList();
+            
+            var profitPrc = CalculateBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
+
+            var resource = await resourceStoreService.GetFilterBondsResourceAsync();
+            
+            if (profitPrc < resource!.Yield.Min)
+                continue;
+            
             var riskLevel = bond.RiskLevel switch
             {
                 0 => KnownRiskLevels.Low,
@@ -457,15 +470,8 @@ public class ReportDataFactory(
                 GetNumber(bond.Nkd)
             ];
             
-            var bondCouponsByInstrument = bondCoupons
-                .Where(x => x.InstrumentId == bond.InstrumentId)
-                .OrderBy(x => x.CouponDate)
-                .ToList();
-            
             string couponPeriod = bondCouponsByInstrument.FirstOrDefault()?.CouponPeriod.ToString() ?? string.Empty;
             data.Add(GetString(couponPeriod));
-            
-            var profitPrc = CalculateBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
             data.Add(GetPercent(profitPrc, await reportHelper.GetColorYieldCoupon(profitPrc)));         
             
             foreach (var date in dates)
