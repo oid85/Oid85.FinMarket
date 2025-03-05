@@ -135,7 +135,7 @@ public class ReportDataFactory(
             instrumentIds, [analyseType], from, to);
 
         var dates = GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
+        var reportData = CreateNewReportDataWithHeaders([string.Empty, string.Empty, "Эмитент"], dates);
         reportData.Title = CreateTitleWithDates(analyseType, from, to);
         
         foreach (var instrumentId in instrumentIds)
@@ -188,7 +188,7 @@ public class ReportDataFactory(
             instrumentIds, analyseTypes, from, to);
             
         var dates = GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
+        var reportData = CreateNewReportDataWithHeaders([string.Empty, string.Empty, "Эмитент"], dates);
         reportData.Title = reportData.Title = CreateTitleWithDates("Aggregated", from, to);
 
         foreach (var instrumentId in instrumentIds)
@@ -237,7 +237,7 @@ public class ReportDataFactory(
         var dates = GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Доходность, %", "Тек. доходность, %"], dates);
+            [string.Empty, "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Доходность, %", "Тек. доходность, %"], dates);
         
         foreach (var dividendInfo in dividendInfos)
         {
@@ -275,7 +275,7 @@ public class ReportDataFactory(
 
         var reportData = CreateNewReportDataWithHeaders(
             [
-                "Тикер", "Сектор", "Эмитент", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", "EBITDA", "EPS", 
+                string.Empty, string.Empty, "Эмитент", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", "EBITDA", "EPS", 
                 "Своб. ден. поток", "EV/EBITDA", "Total Debt/EBITDA", "Net Debt/EBITDA"
             ]);
 
@@ -341,7 +341,7 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            "Тикер", "Инструмент", "Компания", "Прогноз", "Дата прогноза", "Валюта", "Тек. цена", "Прогноз. цена",
+            string.Empty, "Инструмент", "Компания", "Прогноз", "Дата прогноза", "Валюта", "Тек. цена", "Прогноз. цена",
             "Изм. цены", "Отн. изм. цены"
         ]);
 
@@ -373,7 +373,7 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            "Тикер", "Прогноз", "Валюта", "Тек. цена", "Прогноз. цена",
+            string.Empty, "Прогноз", "Валюта", "Тек. цена", "Прогноз. цена",
             "Мин. цена прогноза", "Макс. цена прогноза", "Изм. цены", "Отн. изм. цены"
         ]);
 
@@ -406,7 +406,7 @@ public class ReportDataFactory(
         var dates = GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Сектор", "Уровень риска", "Валюта", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. доходность куп."], dates);
+            [string.Empty, "Наименование", string.Empty, "Уровень риска", "Валюта", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. доходность куп."], dates);
         
         reportData.Title = "Купоны";
         
@@ -516,7 +516,7 @@ public class ReportDataFactory(
     {
         var marketEvents = (await marketEventRepository.GetActivatedAsync())
             .OrderBy(x => x.Ticker);
-        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Наименование", "Дата", "Время", "Событие", "Текст"]);
+        var reportData = CreateNewReportDataWithHeaders([string.Empty, "Наименование", "Дата", "Время", "Событие", "Текст"]);
         reportData.Title = "Активные рыночные события";
         
         foreach (var marketEvent in marketEvents)
