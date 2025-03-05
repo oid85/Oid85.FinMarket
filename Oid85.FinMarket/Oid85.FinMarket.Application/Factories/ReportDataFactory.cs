@@ -235,7 +235,7 @@ public class ReportDataFactory(
         var dates = GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
+            ["Тикер", "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Доходность, %", "Тек. доходность, %"], dates);
         
         foreach (var dividendInfo in dividendInfos)
         {
@@ -403,7 +403,7 @@ public class ReportDataFactory(
         var dates = GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Сектор", "Валюта", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. дох-ть. куп."], dates);
+            ["Тикер", "Наименование", "Сектор", "Валюта", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. доходность куп."], dates);
         
         reportData.Title = "Купоны";
         
