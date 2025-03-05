@@ -83,7 +83,7 @@ public class ReportDataFactory(
         if (coupon.CouponPeriod == 0)
             return 0.0;
 
-        return coupon.PayOneBond / (bond.LastPrice * 10.0 + bond.Nkd);
+        return coupon.PayOneBond / (bond.LastPrice * 10.0 + bond.Nkd) * 100.0;
     }
     
     private async ValueTask<double> CalculateDividendProfitPercentAsync(DividendInfo dividendInfo)
@@ -112,13 +112,13 @@ public class ReportDataFactory(
         new (KnownDisplayTypes.Date, value.ToString(KnownDateTimeFormats.DateISO), color);     
     
     private static ReportParameter GetRuble(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Ruble, value.ToString("N1"), color);     
+        new (KnownDisplayTypes.Ruble, value.ToString("N2"), color);     
     
     private static ReportParameter GetPercent(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Percent, value.ToString("N1"), color);     
+        new (KnownDisplayTypes.Percent, value.ToString("N2"), color);     
     
     private static ReportParameter GetNumber(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Number, value.ToString("N1"), color);
+        new (KnownDisplayTypes.Number, value.ToString("N2"), color);
     
     private static ReportParameter GetAnalyseResult(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.AnalyseResult, value, color);    
@@ -400,7 +400,7 @@ public class ReportDataFactory(
         var dates = GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Цена", "Куп. период", "Тек. дох-ть. куп."], dates);
+            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. дох-ть. куп."], dates);
         
         reportData.Title = "Купоны";
         
@@ -439,7 +439,8 @@ public class ReportDataFactory(
                 GetSector(bond.Sector),
                 GetString(bond.FloatingCouponFlag ? "Да" : string.Empty),
                 GetString((bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString()),
-                GetNumber(bond.LastPrice * 10.0)
+                GetNumber(bond.LastPrice * 10.0),
+                GetNumber(bond.Nkd)
             ];
             
             var bondCouponsByInstrument = bondCoupons
