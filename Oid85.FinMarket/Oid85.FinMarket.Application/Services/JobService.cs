@@ -27,7 +27,7 @@ public class JobService(
         await AnalyseAsync();
         await ProcessSpreadPairsAsync();
         await ProcessMultiplicatorsAsync();
-        // await CheckMarketEventsAsync();
+        await CheckMarketEventsAsync();
         // await SendNotificationsAsync();
     }
 
