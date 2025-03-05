@@ -400,7 +400,7 @@ public class ReportDataFactory(
         var dates = GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. дох-ть. куп."], dates);
+            ["Тикер", "Наименование", "Сектор", "Валюта", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. дох-ть. куп."], dates);
         
         reportData.Title = "Купоны";
         
@@ -437,6 +437,7 @@ public class ReportDataFactory(
                 GetTicker(bond.Ticker),
                 GetString(bond.Name),
                 GetSector(bond.Sector),
+                GetString(bond.Currency),
                 GetString(bond.FloatingCouponFlag ? "Да" : string.Empty),
                 GetString((bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString()),
                 GetNumber(bond.LastPrice * 10.0),
