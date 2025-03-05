@@ -82,14 +82,8 @@ public class ReportDataFactory(
         
         if (coupon.CouponPeriod == 0)
             return 0.0;
-        
-        double priceInRubles = bond.LastPrice * 10.0 + bond.Nkd;
-        double payDay = coupon.PayOneBond / coupon.CouponPeriod;
-        double payYear = payDay * 365;
-        double profit = payYear / priceInRubles;
-        double profitPrc = profit / 100.0;   
-        
-        return profitPrc;
+
+        return coupon.PayOneBond / (bond.LastPrice * 10.0 + bond.Nkd);
     }
     
     private async ValueTask<double> CalculateDividendProfitPercentAsync(DividendInfo dividendInfo)
@@ -403,7 +397,7 @@ public class ReportDataFactory(
         var dates = GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Цена", "Дох-ть., %"], dates);
+            ["Тикер", "Наименование", "Сектор", "Плав. купон", "Дней до погаш.", "Цена", "Куп. период", "Тек. дох-ть. куп."], dates);
         
         reportData.Title = "Купоны";
         
@@ -444,15 +438,16 @@ public class ReportDataFactory(
                 GetString((bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString()),
                 GetNumber(bond.LastPrice * 10.0)
             ];
-                
-            // Вычисляем полную доходность облигации
+            
             var bondCouponsByInstrument = bondCoupons
                 .Where(x => x.InstrumentId == bond.InstrumentId)
                 .OrderBy(x => x.CouponDate)
                 .ToList();
             
-            var profitPrc = CalculateBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
+            string couponPeriod = bondCouponsByInstrument.FirstOrDefault()?.CouponPeriod.ToString() ?? string.Empty;
+            data.Add(GetString(couponPeriod));
             
+            var profitPrc = CalculateBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
             data.Add(GetPercent(profitPrc, await reportHelper.GetColorYieldCoupon(profitPrc)));         
             
             foreach (var date in dates)
