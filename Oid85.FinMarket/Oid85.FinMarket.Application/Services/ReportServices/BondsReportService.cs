@@ -60,4 +60,9 @@ public class BondsReportService(
         await reportDataFactory.CreateBondCouponReportDataAsync(
             (await instrumentService.GetBondsByFilter())
             .Select(x => x.InstrumentId).ToList());
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync() => 
+        await reportDataFactory.CreateActiveMarketEventsReportDataAsync(
+            await GetInstrumentIds());
 }

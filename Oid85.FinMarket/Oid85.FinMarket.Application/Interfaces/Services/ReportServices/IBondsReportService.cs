@@ -11,26 +11,22 @@ public interface IBondsReportService
     /// <summary>
     /// Отчет Аггрегированный анализ
     /// </summary>
-    Task<ReportData> GetAggregatedAnalyseAsync(
-        GetAnalyseRequest request);
+    Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request);
 
     /// <summary>
     /// Отчет Анализ Супертренд
     /// </summary>
-    Task<ReportData> GetSupertrendAnalyseAsync(
-        GetAnalyseRequest request);
+    Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request);
 
     /// <summary>
     /// Отчет Анализ Последовательность свечей одного цвета
     /// </summary>
-    Task<ReportData> GetCandleSequenceAnalyseAsync(
-        GetAnalyseRequest request);
+    Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request);
 
     /// <summary>
     /// Отчет Анализ Растущий объем
     /// </summary>
-    Task<ReportData> GetCandleVolumeAnalyseAsync(
-        GetAnalyseRequest request);
+    Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request);
     
     /// <summary>
     /// Отчет Купоны
@@ -41,4 +37,9 @@ public interface IBondsReportService
     /// Отчет Подборка облигаций
     /// </summary>
     Task<ReportData> GetBondSelectionAsync();
+
+    /// <summary>
+    /// Отчет Рыночные события
+    /// </summary>
+    Task<ReportData> GetActiveMarketEventsAnalyseAsync();
 }

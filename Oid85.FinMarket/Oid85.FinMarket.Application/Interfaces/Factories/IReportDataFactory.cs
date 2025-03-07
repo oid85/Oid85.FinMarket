@@ -12,5 +12,5 @@ public interface IReportDataFactory
     Task<ReportData> CreateForecastConsensusReportDataAsync();
     Task<ReportData> CreateBondCouponReportDataAsync(List<Guid> instrumentIds);
     Task<ReportData> CreateSpreadReportDataAsync();
-    Task<ReportData> CreateActiveMarketEventsReportDataAsync();
+    Task<ReportData> CreateActiveMarketEventsReportDataAsync(List<Guid> instrumentIds);
 }

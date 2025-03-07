@@ -85,4 +85,9 @@ public class SharesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetForecastConsensusAnalyseAsync() =>
         await reportDataFactory.CreateForecastConsensusReportDataAsync();
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync() => 
+        await reportDataFactory.CreateActiveMarketEventsReportDataAsync(
+            await GetInstrumentIds());
 }

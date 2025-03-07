@@ -66,4 +66,9 @@ public class FuturesReportService(
 
     public async Task<ReportData> GetSpreadAnalyseAsync() =>
         await reportDataFactory.CreateSpreadReportDataAsync();
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync() => 
+        await reportDataFactory.CreateActiveMarketEventsReportDataAsync(
+            await GetInstrumentIds());
 }

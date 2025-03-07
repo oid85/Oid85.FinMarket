@@ -188,5 +188,20 @@ public class IndexesController(
             result => new BaseResponse<ReportData>
             {
                 Result = result
-            });     
+            }); 
+    
+    /// <summary>
+    /// Отчет Рыночные события
+    /// </summary>
+    [HttpPost("report/active-market-events-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetActiveMarketEventsAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetActiveMarketEventsAnalyseAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });    
 }

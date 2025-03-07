@@ -522,10 +522,12 @@ public class ReportDataFactory(
         return reportData;
     }
     
-    public async Task<ReportData> CreateActiveMarketEventsReportDataAsync()
+    public async Task<ReportData> CreateActiveMarketEventsReportDataAsync(List<Guid> instrumentIds)
     {
         var marketEvents = (await marketEventRepository.GetActivatedAsync())
+            .Where(x => instrumentIds.Contains(x.InstrumentId))
             .OrderBy(x => x.Ticker);
+        
         var reportData = CreateNewReportDataWithHeaders([string.Empty, "Наименование", "Дата", "Время", "Событие", "Текст"]);
         reportData.Title = "Активные рыночные события";
         

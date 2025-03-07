@@ -60,4 +60,9 @@ public class CurrenciesReportService(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.DrawdownFromMaximum, 
             request.From, request.To);
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync() => 
+        await reportDataFactory.CreateActiveMarketEventsReportDataAsync(
+            await GetInstrumentIds());
 }
