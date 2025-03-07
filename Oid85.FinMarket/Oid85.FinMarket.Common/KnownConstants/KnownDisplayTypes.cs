@@ -9,5 +9,6 @@ public static class KnownDisplayTypes
     public const string Percent = "Percent";
     public const string Ruble = "Ruble";
     public const string Sector = "Sector";
+    public const string Currency = "Currency";
     public const string AnalyseResult = "AnalyseResult";
 }

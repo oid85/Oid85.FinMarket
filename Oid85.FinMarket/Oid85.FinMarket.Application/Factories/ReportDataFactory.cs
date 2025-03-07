@@ -125,6 +125,9 @@ public class ReportDataFactory(
     private static ReportParameter GetNumber(double value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.Number, value.ToString("N2"), color);
     
+    private static ReportParameter GetCurrency(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.Currency, value, color);  
+    
     private static ReportParameter GetAnalyseResult(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.AnalyseResult, value, color);    
     
@@ -244,6 +247,7 @@ public class ReportDataFactory(
             var instrument = await instrumentRepository.GetByInstrumentIdAsync(dividendInfo.InstrumentId);
             var profitPrc = await CalculateDividendProfitPercentAsync(dividendInfo);
             string instrumentName = instrument?.Name ?? string.Empty;
+            string color = await colorHelper.GetColorYieldDividend(profitPrc);
             
             var data = new List<ReportParameter>
             {
@@ -253,13 +257,12 @@ public class ReportDataFactory(
                 GetDate(dividendInfo.DeclaredDate),
                 GetRuble(dividendInfo.Dividend),
                 GetPercent(dividendInfo.DividendPrc, await colorHelper.GetColorYieldDividend(dividendInfo.DividendPrc)),
-                GetPercent(profitPrc, await colorHelper.GetColorYieldDividend(profitPrc))
+                GetPercent(profitPrc, color)
             };
             
             foreach (var date in dates)
                 data.Add(dividendInfo.RecordDate == date
-                    ? GetPercent(dividendInfo.DividendPrc, 
-                        await colorHelper.GetColorYieldDividend(dividendInfo.DividendPrc))
+                    ? GetPercent(profitPrc, color)
                     : GetString(string.Empty));
 
             reportData.Data.Add(data);
@@ -356,7 +359,7 @@ public class ReportDataFactory(
                 GetString(forecastTarget.RecommendationString, 
                     await colorHelper.GetColorForecastRecommendation(forecastTarget.RecommendationString)),
                 GetDate(forecastTarget.RecommendationDate),
-                GetString(forecastTarget.Currency),
+                GetCurrency(forecastTarget.Currency),
                 GetRuble(forecastTarget.CurrentPrice),
                 GetRuble(forecastTarget.TargetPrice),
                 GetRuble(forecastTarget.PriceChange),
@@ -373,19 +376,23 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            string.Empty, "Прогноз", "Валюта", "Тек. цена", "Прогноз. цена",
+            string.Empty, "Эмитент", "Прогноз", "Валюта", "Тек. цена", "Прогноз. цена",
             "Мин. цена прогноза", "Макс. цена прогноза", "Изм. цены", "Отн. изм. цены"
         ]);
 
         reportData.Title = "Консенсус-прогнозы";
 
         foreach (var forecastConsensus in forecastConsensuses)
+        {
+            var instrument = await instrumentRepository.GetByTickerAsync(forecastConsensus.Ticker);
+            
             reportData.Data.Add(
             [
                 GetTicker(forecastConsensus.Ticker),
+                GetString(normalizeService.NormalizeInstrumentName(instrument?.Name ?? string.Empty)),
                 GetString(forecastConsensus.RecommendationString, 
                     await colorHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString)),
-                GetString(forecastConsensus.Currency),
+                GetCurrency(forecastConsensus.Currency),
                 GetRuble(forecastConsensus.CurrentPrice),
                 GetRuble(forecastConsensus.ConsensusPrice),
                 GetRuble(forecastConsensus.MinTarget),
@@ -393,7 +400,8 @@ public class ReportDataFactory(
                 GetRuble(forecastConsensus.PriceChange),
                 GetPercent(forecastConsensus.PriceChangeRel)
             ]);
-        
+        }
+
         return reportData;
     }
 
@@ -459,7 +467,7 @@ public class ReportDataFactory(
                 GetString(normalizeService.NormalizeInstrumentName(bond.Name)),
                 GetSector(bond.Sector),
                 GetString(riskLevel),
-                GetString(bond.Currency),
+                GetCurrency(bond.Currency),
                 GetString(bond.FloatingCouponFlag ? "Да" : string.Empty),
                 GetString((bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString()),
                 GetNumber(bond.LastPrice * 10.0),
@@ -468,14 +476,16 @@ public class ReportDataFactory(
             
             string couponPeriod = bondCouponsByInstrument.FirstOrDefault()?.CouponPeriod.ToString() ?? string.Empty;
             data.Add(GetString(couponPeriod));
-            data.Add(GetPercent(profitPrc, await colorHelper.GetColorYieldCoupon(profitPrc)));         
+            
+            string color = await colorHelper.GetColorYieldCoupon(profitPrc);
+            data.Add(GetPercent(profitPrc, color));         
             
             foreach (var date in dates)
             {
                 var bondCoupon = bondCouponsByInstrument.FirstOrDefault(x => x.CouponDate == date);
 
                 data.Add(bondCoupon is not null 
-                    ? GetRuble(bondCoupon.PayOneBond)
+                    ? GetRuble(bondCoupon.PayOneBond, color)
                     : GetString(string.Empty));
             }
                 
