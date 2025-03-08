@@ -45,7 +45,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
 
     public async Task<string> GetColorYieldLtm(double value)
@@ -56,7 +56,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
 
     public async Task<string> GetColorDrawdownFromMaximum(double value)
@@ -67,7 +67,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }    
     
     public async Task<string> GetColorYieldCoupon(double value)
@@ -78,7 +78,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
     
     public async Task<string> GetColorYieldDividend(double value)
@@ -89,7 +89,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
     
     public async Task<string> GetColorRsi(string value)
@@ -100,7 +100,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
 
     public async Task<string> GetColorCandleVolume(string value)
@@ -111,7 +111,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
 
     public async Task<string> GetColorCandleSequence(string value)
@@ -122,7 +122,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
 
     public async Task<string> GetColorSupertrend(string value)
@@ -133,7 +133,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
     
     public async Task<string> GetColorEvToEbitda(double value)
@@ -144,7 +144,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
     
     public async Task<string> GetColorNetDebtToEbitda(double value)
@@ -155,7 +155,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
     
     public async Task<string> GetColorForecastRecommendation(string value)
@@ -166,7 +166,7 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
     }
     
     public async Task<string> GetColorSpreadPricePosition(string value)
@@ -177,6 +177,17 @@ public class ColorHelper(
         if (resource is null)
             return KnownColors.White;
         
-        return resource.ColorCode;
+        return resource.Color;
+    }
+    
+    public async Task<string> GetColorMarketEvent(string value)
+    {
+        var colorPalette = await resourceStoreService.GetColorPaletteMarketEventAsync();
+        var resource = colorPalette.FirstOrDefault(x => x.Value == value);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.Color;
     }
 }

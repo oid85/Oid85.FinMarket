@@ -133,6 +133,11 @@ public interface IResourceStoreService
     Task<List<ValueColorResource<string>>> GetColorPaletteForecastRecommendationAsync();
     
     /// <summary>
+    /// Получить цветовую палитру для MarketEvent
+    /// </summary>
+    Task<List<ValueColorResource<string>>> GetColorPaletteMarketEventAsync();
+    
+    /// <summary>
     /// Получить фильтр для облигаций
     /// </summary>
     Task<FilterBondsResource?> GetFilterBondsResourceAsync();

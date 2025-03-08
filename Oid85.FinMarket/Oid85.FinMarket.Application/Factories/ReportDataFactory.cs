@@ -165,17 +165,19 @@ public class ReportDataFactory(
             {
                 var analyseResult = instrumentAnalyseResults.FirstOrDefault(x => x.Date == date);
 
-                if (analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum)
-                    data.Add(analyseResult is not null
-                        ? GetPercent(analyseResult.ResultNumber,
-                            await colorHelper.GetColorByAnalyseType(analyseType, analyseResult))
-                        : GetString(string.Empty));
+                if (analyseResult is not null)
+                {
+                    string color = await colorHelper.GetColorByAnalyseType(analyseType, analyseResult);
+
+                    if (analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum)
+                        GetPercent(analyseResult.ResultNumber, color);
+
+                    else
+                        GetAnalyseResult(analyseResult.ResultString, color);
+                }
 
                 else
-                    data.Add(analyseResult is not null 
-                        ? GetAnalyseResult(analyseResult.ResultString, 
-                            await colorHelper.GetColorByAnalyseType(analyseType, analyseResult)) 
-                        : GetString(string.Empty));
+                    data.Add(GetString(string.Empty));
             }
                 
             reportData.Data.Add(data);
@@ -221,8 +223,9 @@ public class ReportDataFactory(
                     .Select(x => x.ResultNumber).ToList();
                     
                 double resultNumber = resultNumbers is [] ? 0 : resultNumbers.Sum();
-                data.Add(GetAnalyseResult(resultNumber.ToString("N0"), 
-                    await colorHelper.GetColorAggregated((int) resultNumber)));
+                string color = await colorHelper.GetColorAggregated((int) resultNumber);
+                
+                data.Add(GetAnalyseResult(resultNumber.ToString("N0"), color));
             }
                 
             reportData.Data.Add(data);
@@ -248,7 +251,7 @@ public class ReportDataFactory(
             var profitPrc = await CalculateDividendProfitPercentAsync(dividendInfo);
             string instrumentName = instrument?.Name ?? string.Empty;
             string color = await colorHelper.GetColorYieldDividend(profitPrc);
-            
+
             var data = new List<ReportParameter>
             {
                 GetTicker(dividendInfo.Ticker),
@@ -256,7 +259,7 @@ public class ReportDataFactory(
                 GetDate(dividendInfo.RecordDate),
                 GetDate(dividendInfo.DeclaredDate),
                 GetRuble(dividendInfo.Dividend),
-                GetPercent(dividendInfo.DividendPrc, await colorHelper.GetColorYieldDividend(dividendInfo.DividendPrc)),
+                GetPercent(dividendInfo.DividendPrc, color),
                 GetPercent(profitPrc, color)
             };
             
@@ -278,8 +281,8 @@ public class ReportDataFactory(
 
         var reportData = CreateNewReportDataWithHeaders(
             [
-                string.Empty, string.Empty, "Эмитент", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", "EBITDA", "EPS", 
-                "Своб. ден. поток", "EV/EBITDA", "Total Debt/EBITDA", "Net Debt/EBITDA"
+                string.Empty, string.Empty, "Эмитент", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", 
+                "EBITDA", "EPS", "Своб. ден. поток", "EV/EBITDA", "Total Debt/EBITDA", "Net Debt/EBITDA"
             ]);
 
         reportData.Title = "Мультипликаторы";
@@ -290,6 +293,9 @@ public class ReportDataFactory(
             
             if (multiplicator is null)
                 continue;
+
+            string colorEvToEbitda = await colorHelper.GetColorEvToEbitda(multiplicator.EvToEbitda);
+            string colorNetDebtToEbitda = await colorHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda);
             
             List<ReportParameter> data =
             [
@@ -302,11 +308,9 @@ public class ReportDataFactory(
                 GetNumber(multiplicator.Ebitda),
                 GetNumber(multiplicator.Eps),
                 GetNumber(multiplicator.FreeCashFlow),
-                GetNumber(multiplicator.EvToEbitda, 
-                    await colorHelper.GetColorEvToEbitda(multiplicator.EvToEbitda)),
+                GetNumber(multiplicator.EvToEbitda, colorEvToEbitda),
                 GetNumber(multiplicator.TotalDebtToEbitda),
-                GetNumber(multiplicator.NetDebtToEbitda, 
-                    await colorHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda))
+                GetNumber(multiplicator.NetDebtToEbitda, colorNetDebtToEbitda)
             ];
             
             reportData.Data.Add(data);
@@ -344,20 +348,22 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            string.Empty, "Инструмент", "Компания", "Прогноз", "Дата прогноза", "Валюта", "Тек. цена", "Прогноз. цена",
-            "Изм. цены", "Отн. изм. цены"
+            string.Empty, "Инструмент", "Компания", "Прогноз", "Дата прогноза", "Валюта", 
+            "Тек. цена", "Прогноз. цена", "Изм. цены", "Отн. изм. цены"
         ]);
 
         reportData.Title = "Прогнозы";
 
         foreach (var forecastTarget in actualForecastTargets)
+        {
+            string color = await colorHelper.GetColorForecastRecommendation(forecastTarget.RecommendationString);
+            
             reportData.Data.Add(
             [
                 GetTicker(forecastTarget.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(forecastTarget.ShowName)),
                 GetString(forecastTarget.Company),
-                GetString(forecastTarget.RecommendationString, 
-                    await colorHelper.GetColorForecastRecommendation(forecastTarget.RecommendationString)),
+                GetString(forecastTarget.RecommendationString, color),
                 GetDate(forecastTarget.RecommendationDate),
                 GetCurrency(forecastTarget.Currency),
                 GetRuble(forecastTarget.CurrentPrice),
@@ -365,6 +371,7 @@ public class ReportDataFactory(
                 GetRuble(forecastTarget.PriceChange),
                 GetPercent(forecastTarget.PriceChangeRel)
             ]);
+        }
         
         return reportData;
     }
@@ -385,13 +392,14 @@ public class ReportDataFactory(
         foreach (var forecastConsensus in forecastConsensuses)
         {
             var instrument = await instrumentRepository.GetByTickerAsync(forecastConsensus.Ticker);
+
+            string color = await colorHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString);
             
             reportData.Data.Add(
             [
                 GetTicker(forecastConsensus.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(instrument?.Name ?? string.Empty)),
-                GetString(forecastConsensus.RecommendationString, 
-                    await colorHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString)),
+                GetString(forecastConsensus.RecommendationString, color),
                 GetCurrency(forecastConsensus.Currency),
                 GetRuble(forecastConsensus.CurrentPrice),
                 GetRuble(forecastConsensus.ConsensusPrice),
@@ -414,7 +422,10 @@ public class ReportDataFactory(
         var dates = GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
-            [string.Empty, "Наименование", string.Empty, "Уровень риска", "Валюта", "Плав. купон", "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. доходность куп."], dates);
+            [
+                string.Empty, "Наименование", string.Empty, "Уровень риска", "Валюта", "Плав. купон", 
+                "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. доходность куп."
+            ], dates);
         
         reportData.Title = "Купоны";
         
@@ -483,9 +494,9 @@ public class ReportDataFactory(
             foreach (var date in dates)
             {
                 var bondCoupon = bondCouponsByInstrument.FirstOrDefault(x => x.CouponDate == date);
-
+                
                 data.Add(bondCoupon is not null 
-                    ? GetRuble(bondCoupon.PayOneBond, color)
+                    ? GetRuble(bondCoupon.PayOneBond, color) 
                     : GetString(string.Empty));
             }
                 
@@ -505,6 +516,9 @@ public class ReportDataFactory(
         reportData.Title = "Спреды";
 
         foreach (var spread in spreads)
+        {
+            string color = await colorHelper.GetColorSpreadPricePosition(spread.SpreadPricePosition);
+            
             reportData.Data.Add(
             [
                 GetString(spread.FirstInstrumentRole),
@@ -515,9 +529,9 @@ public class ReportDataFactory(
                 GetRuble(spread.SecondInstrumentPrice),
                 GetRuble(spread.PriceDifference),
                 GetPercent(spread.PriceDifferencePrc),
-                GetString(spread.SpreadPricePosition, 
-                    await colorHelper.GetColorSpreadPricePosition(spread.SpreadPricePosition))
+                GetString(spread.SpreadPricePosition, color)
             ]);
+        }
         
         return reportData;
     }
@@ -528,19 +542,24 @@ public class ReportDataFactory(
             .Where(x => instrumentIds.Contains(x.InstrumentId))
             .OrderBy(x => x.Ticker);
         
-        var reportData = CreateNewReportDataWithHeaders([string.Empty, "Наименование", "Дата", "Время", "Событие", "Текст"]);
+        var reportData = CreateNewReportDataWithHeaders(
+            [string.Empty, "Наименование", "Дата", "Время", "Событие", "Текст"]);
+        
         reportData.Title = "Активные рыночные события";
         
         foreach (var marketEvent in marketEvents)
+        {
+            string color = await colorHelper.GetColorMarketEvent(marketEvent.MarketEventType);
+            
             reportData.Data.Add(
             [
-                GetTicker(marketEvent.Ticker),
-                GetTicker(normalizeService.NormalizeInstrumentName(marketEvent.InstrumentName)),
-                GetString(marketEvent.Date.ToString(KnownDateTimeFormats.DateISO)),
-                GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO)),
-                GetString(marketEvent.MarketEventType),
-                GetString(marketEvent.MarketEventText)
+                GetTicker(marketEvent.Ticker, color),
+                GetTicker(normalizeService.NormalizeInstrumentName(marketEvent.InstrumentName), color),
+                GetString(marketEvent.Date.ToString(KnownDateTimeFormats.DateISO), color),
+                GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO), color),
+                GetString(marketEvent.MarketEventText, color)
             ]);
+        }
         
         return reportData;
     }

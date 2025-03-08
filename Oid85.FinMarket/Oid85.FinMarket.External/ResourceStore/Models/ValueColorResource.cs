@@ -16,6 +16,6 @@ public class ValueColorResource<T>
     /// <summary>
     /// Код цвета (RGB)
     /// </summary>
-    [JsonPropertyName("colorCode")]
-    public string ColorCode { get; set; } = string.Empty;
+    [JsonPropertyName("color")]
+    public string Color { get; set; } = string.Empty;
 }
