@@ -53,7 +53,7 @@ public class ColorHelper(
     {
         double h = value > 0 ? 128.0 : 0.0;
         double step = 0.006;
-        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 0.8 - Math.Abs(value) * step));
+        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Max(0.2, 0.8 - Math.Abs(value) * step));
         return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }
 
@@ -61,7 +61,7 @@ public class ColorHelper(
     {
         double h = 0.0;
         double step = 0.006;
-        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 0.8 - Math.Abs(value) * step));
+        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Max(0.2, 0.8 - Math.Abs(value) * step));
         return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }    
     
