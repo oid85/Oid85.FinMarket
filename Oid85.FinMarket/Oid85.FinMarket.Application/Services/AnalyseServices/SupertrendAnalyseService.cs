@@ -34,7 +34,7 @@ public class SupertrendAnalyseService(
                     Close = Convert.ToDecimal(x.Close),
                     High = Convert.ToDecimal(x.High),
                     Low = Convert.ToDecimal(x.Low),
-                    Date = x.Date.ToDateTime(TimeOnly.MinValue).ToUniversalTime()
+                    Date = x.Date.ToDateTime(TimeOnly.MinValue)
                 })
                 .ToList();
 
