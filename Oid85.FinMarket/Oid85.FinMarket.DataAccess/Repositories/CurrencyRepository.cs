@@ -59,24 +59,4 @@ public class CurrencyRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
-
-    public async Task<Currency?> GetByTickerAsync(string ticker)
-    {
-        var entity = await context.CurrencyEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Ticker == ticker);
-
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
-
-    public async Task<Currency?> GetByInstrumentIdAsync(Guid instrumentId)
-    {
-        var entity = await context.CurrencyEntities
-            .Where(x => !x.IsDeleted)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
-
-        return entity is null ? null : DataAccessMapper.Map(entity);
-    }
 }

@@ -63,8 +63,8 @@ public class CandleRepository(
 
     public async Task<List<Candle>> GetLastYearAsync(Guid instrumentId)
     {
-        var from = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddYears(-1));
-        var to = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+        var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
+        var to = DateOnly.FromDateTime(DateTime.Today);
         
         var entities = await context.CandleEntities
             .Where(x => x.InstrumentId == instrumentId)
