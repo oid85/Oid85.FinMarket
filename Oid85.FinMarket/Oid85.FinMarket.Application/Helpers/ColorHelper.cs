@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.Common.KnownConstants;
+﻿using Oid85.FinMarket.Common.Helpers;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
 
@@ -24,10 +25,10 @@ public class ColorHelper(
                 return await GetColorRsi(analyseResult.ResultString);
             
             case KnownAnalyseTypes.YieldLtm:
-                return await GetColorYieldLtm(analyseResult.ResultNumber);
+                return GetColorYieldLtm(analyseResult.ResultNumber);
             
             case KnownAnalyseTypes.DrawdownFromMaximum:
-                return await GetColorDrawdownFromMaximum(analyseResult.ResultNumber);            
+                return GetColorDrawdownFromMaximum(analyseResult.ResultNumber);            
             
             case KnownAnalyseTypes.Aggregated:
                 return await GetColorAggregated((int) analyseResult.ResultNumber);
@@ -48,26 +49,20 @@ public class ColorHelper(
         return resource.Color;
     }
 
-    public async Task<string> GetColorYieldLtm(double value)
+    public string GetColorYieldLtm(double value)
     {
-        var colorPalette = await resourceStoreService.GetColorPaletteYieldLtmAsync();
-        var resource = colorPalette.FirstOrDefault(x => value >= x.LowLevel && value <= x.HighLevel);
-        
-        if (resource is null)
-            return KnownColors.White;
-        
-        return resource.Color;
+        double h = value > 0 ? 128.0 : 0.0;
+        double step = 0.008;
+        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 1 - Math.Abs(value) * step));
+        return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }
 
-    public async Task<string> GetColorDrawdownFromMaximum(double value)
+    public string GetColorDrawdownFromMaximum(double value)
     {
-        var colorPalette = await resourceStoreService.GetColorPaletteDrawdownFromMaximumAsync();
-        var resource = colorPalette.FirstOrDefault(x => value >= x.LowLevel && value <= x.HighLevel);
-        
-        if (resource is null)
-            return KnownColors.White;
-        
-        return resource.Color;
+        double h = 0.0;
+        double step = 0.008;
+        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 1 - Math.Abs(value) * step));
+        return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }    
     
     public async Task<string> GetColorYieldCoupon(double value)
