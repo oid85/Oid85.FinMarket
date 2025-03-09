@@ -422,7 +422,7 @@ public class ReportDataFactory(
         var reportData = CreateNewReportDataWithHeaders(
             [
                 string.Empty, "Наименование", string.Empty, "Уровень риска", "Валюта", "Плав. купон", 
-                "Дней до погаш.", "Цена", "НКД", "Куп. период", "Тек. доходность куп."
+                "До погаш.", "Цена", "НКД", "Куп. период", "Дох-ть куп."
             ], dates);
         
         reportData.Title = "Купоны";
@@ -509,7 +509,7 @@ public class ReportDataFactory(
         var spreads = await spreadRepository.GetAllAsync();
             
         var reportData = CreateNewReportDataWithHeaders(
-            ["Первый", "Второй", "Тикер", "Тикер", "Цена", "Цена", "Спред", "Спред, %", "Конт./Бэкв."]);
+            ["(1)", "(2)", "Тикер (1)", "Тикер (2)", "Цена (1)", "Цена (2)", "Спред", "Спред, %", "Конт./Бэкв."]);
         
         reportData.Title = "Спреды";
 
