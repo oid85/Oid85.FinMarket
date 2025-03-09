@@ -52,16 +52,16 @@ public class ColorHelper(
     public string GetColorYieldLtm(double value)
     {
         double h = value > 0 ? 128.0 : 0.0;
-        double step = 0.008;
-        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 1 - Math.Abs(value) * step));
+        double step = 0.006;
+        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 0.8 - Math.Abs(value) * step));
         return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }
 
     public string GetColorDrawdownFromMaximum(double value)
     {
         double h = 0.0;
-        double step = 0.008;
-        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 1 - Math.Abs(value) * step));
+        double step = 0.006;
+        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Min(0.2, 0.8 - Math.Abs(value) * step));
         return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }    
     
