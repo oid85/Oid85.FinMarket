@@ -169,11 +169,9 @@ public class ReportDataFactory(
                 {
                     string color = await colorHelper.GetColorByAnalyseType(analyseType, analyseResult);
 
-                    if (analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum)
-                        GetPercent(analyseResult.ResultNumber, color);
-
-                    else
-                        GetAnalyseResult(analyseResult.ResultString, color);
+                    data.Add(analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum
+                        ? GetPercent(analyseResult.ResultNumber, color)
+                        : GetAnalyseResult(analyseResult.ResultString, color));
                 }
 
                 else
@@ -243,7 +241,7 @@ public class ReportDataFactory(
         var dates = GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
-            [string.Empty, "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Доходность, %", "Тек. доходность, %"], dates);
+            [string.Empty, "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
         
         foreach (var dividendInfo in dividendInfos)
         {
@@ -348,8 +346,8 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            string.Empty, "Инструмент", "Компания", "Прогноз", "Дата прогноза", "Валюта", 
-            "Тек. цена", "Прогноз. цена", "Изм. цены", "Отн. изм. цены"
+            string.Empty, "Эмитент", "Компания", "Прогноз", "Дата прогноза", "Валюта", 
+            "Тек. цена", "Прогноз. цена", "Изм. цены", "Изм. цены, %"
         ]);
 
         reportData.Title = "Прогнозы";
