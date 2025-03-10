@@ -104,6 +104,10 @@ public class ReportDataFactory(
 
         double yieldOfNextCoupon = coupon.PayOneBond / (bond.LastPrice * 10.0 + bond.Nkd) * 100.0;
         int daysToCouponDate = (coupon.CouponDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+        
+        if (daysToCouponDate == 0)
+            return 0.0;
+        
         double yieldOfNextCouponByYear = yieldOfNextCoupon / daysToCouponDate * 365.0;
 
         return yieldOfNextCouponByYear;
