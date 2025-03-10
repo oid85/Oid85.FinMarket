@@ -16,7 +16,8 @@ public class MarketEventService(
     ICandleRepository candleRepository,
     IInstrumentRepository instrumentRepository,
     ISpreadRepository spreadRepository,
-    IResourceStoreService resourceStoreService) 
+    IResourceStoreService resourceStoreService,
+    IForecastConsensusRepository forecastConsensusRepository) 
     : IMarketEventService
 {
     /// <inheritdoc />
@@ -483,6 +484,36 @@ public class MarketEventService(
                     marketEvent.IsActive = false;
             
                 await SaveMarketEventAsync(marketEvent);
+            }
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Error(exception);
+        }
+    }
+
+    public async Task CheckForecastReleasedMarketEventAsync()
+    {
+        try
+        {
+            var shares = await instrumentService.GetSharesInWatchlist();
+            var forecasts = await forecastConsensusRepository.GetAllAsync();
+
+            foreach (var share in shares)
+            {
+                var forecast = forecasts.FirstOrDefault(x => x.InstrumentId == share.InstrumentId);
+
+                if (forecast is not null)
+                {
+                    var marketEvent = await CreateMarketEvent(
+                        share.InstrumentId, 
+                        KnownMarketEventTypes.ForecastReleased,
+                        $"Наступил прогноз по '{share.Ticker}'. Уровень цены {share.LastPrice} в прогнозном диапазоне {forecast.MinTarget} - {forecast.MaxTarget}");
+
+                    marketEvent.IsActive = share.LastPrice >= forecast.MinTarget && share.LastPrice <= forecast.MaxTarget;
+                    await SaveMarketEventAsync(marketEvent);
+                }
             }
         }
         
