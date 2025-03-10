@@ -138,7 +138,7 @@ public class ReportDataFactory(
             instrumentIds, [analyseType], from, to);
 
         var dates = GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders([string.Empty, string.Empty, "Эмитент"], dates);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
         reportData.Title = CreateTitleWithDates(analyseType, from, to);
         
         foreach (var instrumentId in instrumentIds)
@@ -160,7 +160,7 @@ public class ReportDataFactory(
                 GetSector(instrument.Sector),
                 GetString(normalizeService.NormalizeInstrumentName(instrument.Name))
             };
-
+            
             foreach (var date in dates)
             {
                 var analyseResult = instrumentAnalyseResults.FirstOrDefault(x => x.Date == date);
@@ -191,7 +191,7 @@ public class ReportDataFactory(
             instrumentIds, analyseTypes, from, to);
             
         var dates = GetDates(from, to);
-        var reportData = CreateNewReportDataWithHeaders([string.Empty, string.Empty, "Эмитент"], dates);
+        var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
         reportData.Title = reportData.Title = CreateTitleWithDates("Aggregated", from, to);
 
         foreach (var instrumentId in instrumentIds)
@@ -241,7 +241,7 @@ public class ReportDataFactory(
         var dates = GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
-            [string.Empty, "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
+            ["Тикер", "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
         
         foreach (var dividendInfo in dividendInfos)
         {
@@ -279,7 +279,7 @@ public class ReportDataFactory(
 
         var reportData = CreateNewReportDataWithHeaders(
             [
-                string.Empty, string.Empty, "Эмитент", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", 
+                "Тикер", "Сектор", "Эмитент", "Рыноч. кап.", "Бета-коэфф.", "Чист. приб.", 
                 "EBITDA", "EPS", "Своб. ден. поток", "EV/EBITDA", "Total Debt/EBITDA", "Net Debt/EBITDA"
             ]);
 
@@ -346,7 +346,7 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            string.Empty, "Эмитент", "Компания", "Прогноз", "Дата прогноза", "Валюта", 
+            "Тикер", "Эмитент", "Компания", "Прогноз", "Дата прогноза", "Валюта", 
             "Тек. цена", "Прогноз. цена", "Изм. цены", "Изм. цены, %"
         ]);
 
@@ -381,8 +381,8 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            string.Empty, "Эмитент", "Прогноз", "Валюта", "Тек. цена", "Прогноз. цена",
-            "Мин. цена прогноза", "Макс. цена прогноза", "Изм. цены", "Отн. изм. цены"
+            "Тикер", "Эмитент", "Прогноз", "Валюта", "Тек. цена", "Мин. цена прогноза", 
+            "Макс. цена прогноза", "Изм. цены", "Отн. изм. цены"
         ]);
 
         reportData.Title = "Консенсус-прогнозы";
@@ -391,16 +391,18 @@ public class ReportDataFactory(
         {
             var instrument = await instrumentRepository.GetByTickerAsync(forecastConsensus.Ticker);
 
-            string color = await colorHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString);
+            string colorRecommendation = await colorHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString);
+
+            string colorCurrentPrice = colorHelper.GetColorForForecastPrice(
+                forecastConsensus.CurrentPrice, forecastConsensus.MinTarget, forecastConsensus.MaxTarget);
             
             reportData.Data.Add(
             [
                 GetTicker(forecastConsensus.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(instrument?.Name ?? string.Empty)),
-                GetString(forecastConsensus.RecommendationString, color),
+                GetString(forecastConsensus.RecommendationString, colorRecommendation),
                 GetCurrency(forecastConsensus.Currency),
-                GetRuble(forecastConsensus.CurrentPrice),
-                GetRuble(forecastConsensus.ConsensusPrice),
+                GetRuble(forecastConsensus.CurrentPrice, colorCurrentPrice),
                 GetRuble(forecastConsensus.MinTarget),
                 GetRuble(forecastConsensus.MaxTarget),
                 GetRuble(forecastConsensus.PriceChange),
@@ -421,7 +423,7 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
             [
-                string.Empty, "Наименование", string.Empty, "Уровень риска", "Валюта", "Плав. купон", 
+                "Тикер", "Сектор", "Наименование", "Уровень риска", "Валюта", "Плав. купон", 
                 "До погаш.", "Цена", "НКД", "Куп. период", "Дох-ть куп."
             ], dates);
         
@@ -469,13 +471,15 @@ public class ReportDataFactory(
                 3 => KnownRiskLevels.VeryHigh,
                 _ => string.Empty
             };
+
+            string riskLevelColor = await colorHelper.GetColorRiskLevel(riskLevel);
             
             List<ReportParameter> data =
             [
                 GetTicker(bond.Ticker),
-                GetString(normalizeService.NormalizeInstrumentName(bond.Name)),
                 GetSector(bond.Sector),
-                GetString(riskLevel),
+                GetString(normalizeService.NormalizeInstrumentName(bond.Name)),
+                GetString(riskLevel, riskLevelColor),
                 GetCurrency(bond.Currency),
                 GetString(bond.FloatingCouponFlag ? "Да" : string.Empty),
                 GetString((bond.MaturityDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days.ToString()),
@@ -509,7 +513,7 @@ public class ReportDataFactory(
         var spreads = await spreadRepository.GetAllAsync();
             
         var reportData = CreateNewReportDataWithHeaders(
-            ["(1)", "(2)", "Тикер (1)", "Тикер (2)", "Цена (1)", "Цена (2)", "Спред", "Спред, %", "Конт./Бэкв."]);
+            ["1", "2", "Тикер 1", "Тикер 2", "Цена 1", "Цена 2", "Спред", "Спред, %", "Конт./Бэкв."]);
         
         reportData.Title = "Спреды";
 
@@ -541,7 +545,7 @@ public class ReportDataFactory(
             .OrderBy(x => x.Ticker);
         
         var reportData = CreateNewReportDataWithHeaders(
-            [string.Empty, "Наименование", "Дата", "Время", "Событие", "Текст"]);
+            ["Тикер", "Наименование", "Дата", "Время", "Событие", "Текст"]);
         
         reportData.Title = "Активные рыночные события";
         

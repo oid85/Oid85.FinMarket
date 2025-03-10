@@ -166,6 +166,12 @@ public class ResourceStoreService(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "colorPalettes", "marketEvent.json")) ?? [];
 
+    /// <inheritdoc />
+    public async Task<List<ValueColorResource<string>>> GetColorPaletteRiskLevelAsync() =>
+        await ReadAsync<List<ValueColorResource<string>>>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "colorPalettes", "riskLevel.json")) ?? [];
+
     public async Task<FilterBondsResource?> GetFilterBondsResourceAsync() =>
         await ReadAsync<FilterBondsResource>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,

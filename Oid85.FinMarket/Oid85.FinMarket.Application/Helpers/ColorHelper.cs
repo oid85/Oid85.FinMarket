@@ -185,4 +185,23 @@ public class ColorHelper(
         
         return resource.Color;
     }
+    
+    public async Task<string> GetColorRiskLevel(string value)
+    {
+        var colorPalette = await resourceStoreService.GetColorPaletteRiskLevelAsync();
+        var resource = colorPalette.FirstOrDefault(x => x.Value == value);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.Color;
+    }
+
+    public string GetColorForForecastPrice(double price, double minTarget, double maxTarget)
+    {
+        if (price >= minTarget && price <= maxTarget)
+            return KnownColors.Green;
+        
+        return KnownColors.White;
+    }
 }
