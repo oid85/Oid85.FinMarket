@@ -509,7 +509,7 @@ public class MarketEventService(
                     var marketEvent = await CreateMarketEvent(
                         share.InstrumentId, 
                         KnownMarketEventTypes.ForecastReleased,
-                        $"Наступил прогноз по '{share.Ticker}'. Уровень цены {share.LastPrice} в прогнозном диапазоне {forecast.MinTarget} - {forecast.MaxTarget}");
+                        $"Прогноз по '{share.Ticker}'. Уровень цены {share.LastPrice} в прогнозном диапазоне {forecast.MinTarget} - {forecast.MaxTarget}");
 
                     marketEvent.IsActive = share.LastPrice >= forecast.MinTarget && share.LastPrice <= forecast.MaxTarget;
                     await SaveMarketEventAsync(marketEvent);
