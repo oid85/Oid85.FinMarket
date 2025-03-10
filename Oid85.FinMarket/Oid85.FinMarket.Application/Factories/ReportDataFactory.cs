@@ -132,19 +132,22 @@ public class ReportDataFactory(
         if (supertrend is null)
             return 0;
 
-        if (supertrend.ResultNumber > 0.0)
-            return (int) analyseResults
-                .Where(x => x.ResultNumber > 0.0)
-                .Select(x => x.ResultNumber)
-                .Sum();
-
-        if (supertrend.ResultNumber < 0.0)
-            return (int) analyseResults
-                .Where(x => x.ResultNumber < 0.0)
-                .Select(x => x.ResultNumber)
-                .Sum();
-        
-        return 0;
+        return supertrend.ResultNumber switch
+        {
+            > 0.0 => 
+                (int) analyseResults
+                    .Where(x => x.ResultNumber > 0.0)
+                    .Select(x => x.ResultNumber)
+                    .Sum(),
+            
+            < 0.0 => 
+                (int) analyseResults
+                    .Where(x => x.ResultNumber < 0.0)
+                    .Select(x => x.ResultNumber)
+                    .Sum(),
+            
+            _ => 0
+        };
     }
     
     private static ReportParameter GetTicker(string value, string color = KnownColors.White) =>
