@@ -6,7 +6,6 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Factories;
 
@@ -126,6 +125,28 @@ public class ReportDataFactory(
         return dividendInfo.Dividend / share.LastPrice * 100.0;
     }
     
+    private int CalculateAggregateAnalyseResult(List<AnalyseResult> analyseResults)
+    {
+        var supertrend = analyseResults.FirstOrDefault(x => x.AnalyseType == KnownAnalyseTypes.Supertrend);
+
+        if (supertrend is null)
+            return 0;
+
+        if (supertrend.ResultNumber > 0.0)
+            return (int) analyseResults
+                .Where(x => x.ResultNumber > 0.0)
+                .Select(x => x.ResultNumber)
+                .Sum();
+
+        if (supertrend.ResultNumber < 0.0)
+            return (int) analyseResults
+                .Where(x => x.ResultNumber < 0.0)
+                .Select(x => x.ResultNumber)
+                .Sum();
+        
+        return 0;
+    }
+    
     private static ReportParameter GetTicker(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.Ticker, value, color);
     
@@ -238,14 +259,12 @@ public class ReportDataFactory(
 
             foreach (var date in dates)
             {
-                var resultNumbers = instrumentAnalyseResults
-                    .Where(x => x.Date == date)
-                    .Select(x => x.ResultNumber).ToList();
-                    
-                double resultNumber = resultNumbers is [] ? 0 : resultNumbers.Sum();
-                string color = await colorHelper.GetColorAggregated((int) resultNumber);
-                
-                data.Add(GetAnalyseResult(resultNumber.ToString("N0"), color));
+                var instrumentAnalyseResultsByDate = instrumentAnalyseResults
+                    .Where(x => x.Date == date).ToList();
+
+                int resultNumber = CalculateAggregateAnalyseResult(instrumentAnalyseResultsByDate);
+                string color = await colorHelper.GetColorAggregated(resultNumber);
+                data.Add(GetAnalyseResult(resultNumber.ToString(), color));
             }
                 
             reportData.Data.Add(data);
