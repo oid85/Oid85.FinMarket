@@ -91,28 +91,6 @@ public class ReportDataFactory(
         return numberCouponsByYear * yieldOfOneCoupon * 100.0;
     }
     
-    private static double CalculateNextBondCouponProfitPercent(Bond bond, BondCoupon? coupon)
-    {
-        if (coupon is null)
-            return 0.0;
-
-        if (bond.LastPrice == 0.0)
-            return 0.0;
-        
-        if (coupon.CouponPeriod == 0)
-            return 0.0;
-
-        double yieldOfNextCoupon = coupon.PayOneBond / (bond.LastPrice * 10.0 + bond.Nkd) * 100.0;
-        int daysToCouponDate = (coupon.CouponDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
-        
-        if (daysToCouponDate == 0)
-            return 0.0;
-        
-        double yieldOfNextCouponByYear = yieldOfNextCoupon / daysToCouponDate * 365.0;
-
-        return yieldOfNextCouponByYear;
-    }
-    
     private async ValueTask<double> CalculateDividendProfitPercentAsync(DividendInfo dividendInfo)
     {
         var share = await shareRepository.GetByInstrumentIdAsync(dividendInfo.InstrumentId);
@@ -438,6 +416,9 @@ public class ReportDataFactory(
         {
             var instrument = await instrumentRepository.GetByTickerAsync(forecastConsensus.Ticker);
 
+            if (instrument is null)
+                continue;
+            
             string colorRecommendation = await colorHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString);
 
             string colorCurrentPrice = colorHelper.GetColorForForecastPrice(
@@ -445,7 +426,8 @@ public class ReportDataFactory(
             
             reportData.Data.Add(
             [
-                GetTicker(forecastConsensus.Ticker),
+                GetTicker(instrument.Ticker),
+                GetSector(instrument.Sector),
                 GetString(normalizeService.NormalizeInstrumentName(instrument?.Name ?? string.Empty)),
                 GetString(forecastConsensus.RecommendationString, colorRecommendation),
                 GetCurrency(forecastConsensus.Currency),
@@ -471,7 +453,7 @@ public class ReportDataFactory(
         var reportData = CreateNewReportDataWithHeaders(
             [
                 "Тикер", "Сектор", "Наименование", "Уровень риска", "Валюта", "Плав. купон", 
-                "До погаш.", "Цена", "НКД", "Куп. период", "Дох-ть куп.", "Дох-ть след. куп."
+                "До погаш.", "Цена", "НКД", "Куп. период", "Дох-ть куп."
             ], dates);
         
         reportData.Title = "Купоны";
@@ -509,7 +491,6 @@ public class ReportDataFactory(
                 .OrderBy(x => x.CouponDate).ToList();
             
             var profitPrc = CalculateBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
-            var profitPrcNextCoupon = CalculateNextBondCouponProfitPercent(bond, bondCouponsByInstrument.FirstOrDefault());
             
             var riskLevel = bond.RiskLevel switch
             {
@@ -540,10 +521,7 @@ public class ReportDataFactory(
             
             string color = await colorHelper.GetColorYieldCoupon(profitPrc);
             data.Add(GetPercent(profitPrc, color));         
-            
-            string colorNextCoupon = await colorHelper.GetColorYieldCoupon(profitPrcNextCoupon);
-            data.Add(GetPercent(profitPrcNextCoupon, colorNextCoupon));   
-            
+
             foreach (var date in dates)
             {
                 var bondCoupon = bondCouponsByInstrument.FirstOrDefault(x => x.CouponDate == date);

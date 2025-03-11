@@ -3,7 +3,7 @@
 public static class KnownColors
 {
     public const string White = "#FFFFFF";
-    public const string Red = "#FF6633";
-    public const string Yellow = "#FFFF99";
-    public const string Green = "#00CC66";
+    public const string Red = "#ff0000";
+    public const string Yellow = "#eeff00";
+    public const string Green = "#00ff22";
 }
