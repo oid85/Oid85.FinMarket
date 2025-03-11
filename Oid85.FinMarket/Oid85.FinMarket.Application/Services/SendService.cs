@@ -37,7 +37,7 @@ public class SendService(
         if (marketEvents is [])
             return true;
 
-        const int maxEventInMessage = 5;
+        const int maxEventInMessage = 10;
 
         var chunks = marketEvents.Chunk(maxEventInMessage);
 
