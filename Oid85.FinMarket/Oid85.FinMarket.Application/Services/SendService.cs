@@ -1,6 +1,7 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.Telegram;
 
 namespace Oid85.FinMarket.Application.Services;
@@ -9,7 +10,8 @@ namespace Oid85.FinMarket.Application.Services;
 public class SendService(
     IMarketEventRepository marketEventRepository,
     ITelegramService telegramService,
-    ITelegramMessageFactory telegramMessageFactory)
+    ITelegramMessageFactory telegramMessageFactory,
+    IResourceStoreService resourceStoreService)
     : ISendService
 {
     /// <inheritdoc />
@@ -22,9 +24,14 @@ public class SendService(
     /// <inheritdoc />
     public async Task<bool> SendNotificationsAsync()
     {
-        var marketEvents = (await marketEventRepository
-                .GetActivatedAsync())
+        var marketEventTypesForSend = (await resourceStoreService.GetSendFilterAsync())
+            .Where(x => x.Enable)
+            .Select(x => x.Name)
+            .ToList();
+        
+        var marketEvents = (await marketEventRepository.GetActivatedAsync())
             .Where(x => !x.SentNotification)
+            .Where(x => marketEventTypesForSend.Contains(x.MarketEventType))
             .ToList();
 
         if (marketEvents is [])

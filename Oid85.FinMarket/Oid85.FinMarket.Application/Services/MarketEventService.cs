@@ -550,7 +550,7 @@ public class MarketEventService(
                 
                 var marketEvent = await CreateMarketEvent(
                     share.InstrumentId, 
-                    KnownMarketEventTypes.ForecastReleased,
+                    KnownMarketEventTypes.StrikeDay,
                     $"(!) Ударный день '{share.Ticker}'");
 
                 marketEvent.IsActive = result;

@@ -136,4 +136,9 @@ public interface IResourceStoreService
     /// Получить фильтр для облигаций
     /// </summary>
     Task<FilterBondsResource?> GetFilterBondsResourceAsync();
+    
+    /// <summary>
+    /// Получить фильтр отправки рыночных событий в телеграмм
+    /// </summary>
+    Task<List<EnableNameResource>> GetSendFilterAsync();
 }
