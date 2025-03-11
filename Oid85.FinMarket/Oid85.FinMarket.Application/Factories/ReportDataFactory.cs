@@ -218,7 +218,7 @@ public class ReportDataFactory(
 
                     data.Add(analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum
                         ? GetPercent(analyseResult.ResultNumber, color)
-                        : GetAnalyseResult(analyseResult.ResultString, color));
+                        : GetAnalyseResult(string.Empty, color));
                 }
 
                 else
@@ -269,8 +269,8 @@ public class ReportDataFactory(
                 int resultNumber = CalculateAggregateAnalyseResult(instrumentAnalyseResultsByDate);
                 string color = await colorHelper.GetColorAggregated(resultNumber);
                 var candle = await candleRepository.GetAsync(instrumentId, date);
-                double price = candle?.Close ?? 0.0;
-                data.Add(GetAnalyseResult(price.ToString("N2"), color));
+                string price = candle?.Close.ToString("N2") ?? string.Empty;
+                data.Add(GetAnalyseResult(price, color));
             }
                 
             reportData.Data.Add(data);
