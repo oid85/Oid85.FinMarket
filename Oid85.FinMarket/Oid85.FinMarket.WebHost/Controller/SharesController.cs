@@ -127,13 +127,13 @@ public class SharesController(
     /// <summary>
     /// Выполнить анализ акций
     /// </summary>
-    [HttpGet("analyse")]
+    [HttpGet("daily-analyse")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> AnalyseSharesAsync() =>
+    public Task<IActionResult> DailyAnalyseSharesAsync() =>
         GetResponseAsync(
-            analyseService.AnalyseSharesAsync,
+            analyseService.DailyAnalyseSharesAsync,
             result => new BaseResponse<bool>
             {
                 Result = result

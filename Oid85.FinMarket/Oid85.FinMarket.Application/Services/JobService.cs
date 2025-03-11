@@ -27,7 +27,7 @@ public class JobService(
         await AnalyseAsync();
         await ProcessSpreadPairsAsync();
         await ProcessMultiplicatorsAsync();
-        await CheckMarketEventsAsync();
+        await CheckDailyMarketEventsAsync();
     }
 
     /// <inheritdoc />
@@ -36,6 +36,7 @@ public class JobService(
         await LoadLastPricesAsync();
         await LoadFiveMinuteCandlesAsync();
         await ProcessSpreadPairsAsync();
+        await CheckIntradayMarketEventsAsync();
     }
     
     private async Task LoadInstrumentsAsync()
@@ -160,11 +161,11 @@ public class JobService(
     {
         try
         {
-            await analyseService.AnalyseSharesAsync();
-            await analyseService.AnalyseBondsAsync();
-            await analyseService.AnalyseFuturesAsync();
-            await analyseService.AnalyseCurrenciesAsync();
-            await analyseService.AnalyseIndexesAsync();
+            await analyseService.DailyAnalyseSharesAsync();
+            await analyseService.DailyAnalyseBondsAsync();
+            await analyseService.DailyAnalyseFuturesAsync();
+            await analyseService.DailyAnalyseCurrenciesAsync();
+            await analyseService.DailyAnalyseIndexesAsync();
             
             logger.Info("Метод 'AnalyseAsync' выполнен успешно");
         }
@@ -205,7 +206,22 @@ public class JobService(
         }
     }
 
-    private async Task CheckMarketEventsAsync()
+    private async Task CheckIntradayMarketEventsAsync()
+    {
+        try
+        {
+            await marketEventService.CheckStrikeDayMarketEventAsync();
+            
+            logger.Info("Метод 'CheckIntradayMarketEventsAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'CheckIntradayMarketEventsAsync'");
+        }
+    }
+    
+    private async Task CheckDailyMarketEventsAsync()
     {
         try
         {
@@ -222,6 +238,7 @@ public class JobService(
             await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
             await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
             await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
+            await marketEventService.CheckForecastReleasedMarketEventAsync();
             
             logger.Info("Метод 'CheckMarketEventsAsync' выполнен успешно");
         }

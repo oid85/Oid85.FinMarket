@@ -82,13 +82,13 @@ public class IndexesController(
     /// <summary>
     /// Выполнить анализ индексов
     /// </summary>
-    [HttpGet("analyse")]
+    [HttpGet("daily-analyse")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> AnalyseIndexesAsync() =>
+    public Task<IActionResult> DailyAnalyseIndexesAsync() =>
         GetResponseAsync(
-            analyseService.AnalyseIndexesAsync,
+            analyseService.DailyAnalyseIndexesAsync,
             result => new BaseResponse<bool>
             {
                 Result = result

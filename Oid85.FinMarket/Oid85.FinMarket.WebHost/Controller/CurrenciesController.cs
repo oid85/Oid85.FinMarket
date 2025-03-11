@@ -82,13 +82,13 @@ public class CurrenciesController(
     /// <summary>
     /// Выполнить анализ валют
     /// </summary>
-    [HttpGet("analyse")]
+    [HttpGet("daily-analyse")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> AnalyseCurrenciesAsync() =>
+    public Task<IActionResult> DailyAnalyseCurrenciesAsync() =>
         GetResponseAsync(
-            analyseService.AnalyseCurrenciesAsync,
+            analyseService.DailyAnalyseCurrenciesAsync,
             result => new BaseResponse<bool>
             {
                 Result = result

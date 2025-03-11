@@ -14,7 +14,7 @@ public class AnalyseService(
     : IAnalyseService
 {
     /// <inheritdoc />
-    public async Task<bool> AnalyseSharesAsync()
+    public async Task<bool> DailyAnalyseSharesAsync()
     {
         var instruments = await instrumentService.GetSharesInWatchlist();
 
@@ -33,7 +33,7 @@ public class AnalyseService(
     }
 
     /// <inheritdoc />
-    public async Task<bool> AnalyseBondsAsync()
+    public async Task<bool> DailyAnalyseBondsAsync()
     {
         var instruments = await instrumentService.GetBondsInWatchlist();
         
@@ -49,7 +49,7 @@ public class AnalyseService(
     }
 
     /// <inheritdoc />
-    public async Task<bool> AnalyseCurrenciesAsync()
+    public async Task<bool> DailyAnalyseCurrenciesAsync()
     {
         var instruments = await instrumentService.GetCurrenciesInWatchlist();
         
@@ -67,7 +67,7 @@ public class AnalyseService(
     }
 
     /// <inheritdoc />
-    public async Task<bool> AnalyseFuturesAsync()
+    public async Task<bool> DailyAnalyseFuturesAsync()
     {
         var instruments = await instrumentService.GetFuturesInWatchlist();
         
@@ -85,7 +85,7 @@ public class AnalyseService(
     }
 
     /// <inheritdoc />
-    public async Task<bool> AnalyseIndexesAsync()
+    public async Task<bool> DailyAnalyseIndexesAsync()
     {
         var instruments = await instrumentService.GetFinIndexesInWatchlist();
         

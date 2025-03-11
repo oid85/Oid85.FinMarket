@@ -8,25 +8,25 @@ public interface IAnalyseService
     /// <summary>
     /// Анализ акций
     /// </summary>
-    Task<bool> AnalyseSharesAsync();
-
+    Task<bool> DailyAnalyseSharesAsync();
+    
     /// <summary>
     /// Анализ облигаций
     /// </summary>
-    Task<bool> AnalyseBondsAsync();
+    Task<bool> DailyAnalyseBondsAsync();
     
     /// <summary>
     /// Анализ валют
     /// </summary>
-    Task<bool> AnalyseCurrenciesAsync();
+    Task<bool> DailyAnalyseCurrenciesAsync();
     
     /// <summary>
     /// Анализ фьючерсов
     /// </summary>
-    Task<bool> AnalyseFuturesAsync();
+    Task<bool> DailyAnalyseFuturesAsync();
     
     /// <summary>
     /// Анализ индексов
     /// </summary>
-    Task<bool> AnalyseIndexesAsync();
+    Task<bool> DailyAnalyseIndexesAsync();
 }

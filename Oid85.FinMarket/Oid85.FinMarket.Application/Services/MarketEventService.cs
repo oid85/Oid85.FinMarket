@@ -14,6 +14,7 @@ public class MarketEventService(
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
+    IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IInstrumentRepository instrumentRepository,
     ISpreadRepository spreadRepository,
     IResourceStoreService resourceStoreService,
@@ -493,6 +494,7 @@ public class MarketEventService(
         }
     }
 
+    /// <inheritdoc />
     public async Task CheckForecastReleasedMarketEventAsync()
     {
         try
@@ -514,6 +516,45 @@ public class MarketEventService(
                     marketEvent.IsActive = share.LastPrice >= forecast.MinTarget && share.LastPrice <= forecast.MaxTarget;
                     await SaveMarketEventAsync(marketEvent);
                 }
+            }
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Error(exception);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task CheckStrikeDayMarketEventAsync()
+    {
+        try
+        {
+            var shares = await instrumentService.GetSharesInWatchlist();
+
+            foreach (var share in shares)
+            {
+                var candles = await fiveMinuteCandleRepository.GetLastDayAsync(share.InstrumentId);
+
+                // Объем последней свечи больше, чем объем 90% свечей
+                long volume = candles[^1].Volume;
+                int countCandlesLessVolume = candles.Count(x => x.Volume < volume);
+                bool result = (double) countCandlesLessVolume / (double) candles.Count >= 0.9;
+
+                // Объем растет
+                result &= candles[^1].Volume > candles[^2].Volume;
+                
+                // Последние 2 свечи белые
+                result &= candles[^1].Close > candles[^1].Open;
+                result &= candles[^2].Close > candles[^2].Open;
+                
+                var marketEvent = await CreateMarketEvent(
+                    share.InstrumentId, 
+                    KnownMarketEventTypes.ForecastReleased,
+                    $"(!) Ударный день '{share.Ticker}'");
+
+                marketEvent.IsActive = result;
+                await SaveMarketEventAsync(marketEvent);
             }
         }
         

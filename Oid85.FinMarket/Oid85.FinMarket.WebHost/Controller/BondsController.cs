@@ -97,13 +97,13 @@ public class BondsController(
     /// <summary>
     /// Выполнить анализ облигаций
     /// </summary>
-    [HttpGet("analyse")]
+    [HttpGet("daily-analyse")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> AnalyseBondsAsync() =>
+    public Task<IActionResult> DailyAnalyseBondsAsync() =>
         GetResponseAsync(
-            analyseService.AnalyseBondsAsync,
+            analyseService.DailyAnalyseBondsAsync,
             result => new BaseResponse<bool>
             {
                 Result = result

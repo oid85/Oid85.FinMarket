@@ -114,13 +114,13 @@ public class FuturesController(
     /// <summary>
     /// Выполнить анализ фьючерсов
     /// </summary>
-    [HttpGet("analyse")]
+    [HttpGet("daily-analyse")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> AnalyseFuturesAsync() =>
+    public Task<IActionResult> DailyAnalyseFuturesAsync() =>
         GetResponseAsync(
-            analyseService.AnalyseFuturesAsync,
+            analyseService.DailyAnalyseFuturesAsync,
             result => new BaseResponse<bool>
             {
                 Result = result

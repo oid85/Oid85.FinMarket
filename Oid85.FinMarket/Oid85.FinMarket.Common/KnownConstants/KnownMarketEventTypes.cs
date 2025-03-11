@@ -16,4 +16,5 @@ public static class KnownMarketEventTypes
     public const string SpreadGreaterPercent2 = "SpreadGreaterPercent2";
     public const string SpreadGreaterPercent3 = "SpreadGreaterPercent3";
     public const string ForecastReleased = "ForecastReleased";
+    public const string StrikeDay = "StrikeDay";
 }
