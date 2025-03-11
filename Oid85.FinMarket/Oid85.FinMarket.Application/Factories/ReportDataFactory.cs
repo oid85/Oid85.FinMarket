@@ -593,7 +593,7 @@ public class ReportDataFactory(
             .OrderBy(x => x.Ticker);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Дата", "Время", "Событие", "Текст"]);
+            ["Тикер", "Наименование", "Дата", "Время", "Текст"]);
         
         reportData.Title = "Активные рыночные события";
         
