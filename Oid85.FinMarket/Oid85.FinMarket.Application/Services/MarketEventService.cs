@@ -539,21 +539,26 @@ public class MarketEventService(
                 // Объем последней свечи больше, чем объем 90% свечей
                 long volume = candles[^1].Volume;
                 int countCandlesLessVolume = candles.Count(x => x.Volume < volume);
-                bool result = (double) countCandlesLessVolume / (double) candles.Count >= 0.9;
-
+                bool mainCondition = (double) countCandlesLessVolume / (double) candles.Count >= 0.9;
+                
                 // Объем растет
-                result &= candles[^1].Volume > candles[^2].Volume;
+                bool subCondition1 = candles[^1].Volume > candles[^2].Volume;
                 
                 // Последние 2 свечи белые
-                result &= candles[^1].Close > candles[^1].Open;
-                result &= candles[^2].Close > candles[^2].Open;
+                bool subCondition2 = candles[^1].Close > candles[^1].Open;
+                subCondition2 &= candles[^2].Close > candles[^2].Open;
+
+                string prefix = "!";
+                if (subCondition1) prefix += "!";
+                if (subCondition2) prefix += "!";
                 
                 var marketEvent = await CreateMarketEvent(
                     share.InstrumentId, 
                     KnownMarketEventTypes.StrikeDay,
-                    $"(!) Ударный день '{share.Ticker}'");
+                    $"({prefix}) Ударный день '{share.Ticker}'");
 
-                marketEvent.IsActive = result;
+                marketEvent.IsActive = mainCondition;
+                
                 await SaveMarketEventAsync(marketEvent);
             }
         }
