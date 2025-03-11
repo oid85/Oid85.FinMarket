@@ -77,4 +77,15 @@ public class CandleRepository(
 
         return entities.Count == 0 ? [] : entities.Select(DataAccessMapper.Map).ToList();
     }
+
+    public async Task<Candle?> GetAsync(Guid instrumentId, DateOnly date)
+    {
+        var entity = await context.CandleEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .Where(x => x.Date == date)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+
+        return entity is null ? null : DataAccessMapper.Map(entity);
+    }
 }

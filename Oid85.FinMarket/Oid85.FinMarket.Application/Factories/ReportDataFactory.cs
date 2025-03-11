@@ -17,6 +17,7 @@ public class ReportDataFactory(
     IBondCouponRepository bondCouponRepository,
     IBondRepository bondRepository,
     IShareRepository shareRepository,
+    ICandleRepository candleRepository,
     IMultiplicatorRepository multiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
@@ -267,7 +268,9 @@ public class ReportDataFactory(
 
                 int resultNumber = CalculateAggregateAnalyseResult(instrumentAnalyseResultsByDate);
                 string color = await colorHelper.GetColorAggregated(resultNumber);
-                data.Add(GetAnalyseResult(resultNumber.ToString(), color));
+                var candle = await candleRepository.GetAsync(instrumentId, date);
+                double price = candle?.Close ?? 0.0;
+                data.Add(GetAnalyseResult(price.ToString("N2"), color));
             }
                 
             reportData.Data.Add(data);
