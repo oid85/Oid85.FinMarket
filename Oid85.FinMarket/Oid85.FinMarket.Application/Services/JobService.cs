@@ -28,6 +28,7 @@ public class JobService(
         await ProcessSpreadPairsAsync();
         await ProcessMultiplicatorsAsync();
         await CheckDailyMarketEventsAsync();
+        await SendNotificationsAsync();
     }
 
     /// <inheritdoc />
@@ -37,6 +38,7 @@ public class JobService(
         await LoadFiveMinuteCandlesAsync();
         await ProcessSpreadPairsAsync();
         await CheckIntradayMarketEventsAsync();
+        await SendNotificationsAsync();
     }
     
     private async Task LoadInstrumentsAsync()
