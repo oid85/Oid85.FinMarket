@@ -593,17 +593,23 @@ public class ReportDataFactory(
             .OrderBy(x => x.Ticker);
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Наименование", "Дата", "Время", "Текст"]);
+            ["Тикер", "Сектор", "Наименование", "Дата", "Время", "Текст"]);
         
         reportData.Title = "Активные рыночные события";
         
         foreach (var marketEvent in marketEvents)
         {
+            var instrument = await instrumentRepository.GetByInstrumentIdAsync(marketEvent.InstrumentId);
+            
+            if (instrument is null)
+                continue;
+            
             string color = await colorHelper.GetColorMarketEvent(marketEvent.MarketEventType);
             
             reportData.Data.Add(
             [
-                GetTicker(marketEvent.Ticker, color),
+                GetTicker(instrument.Ticker, color),
+                GetSector(instrument.Sector, color),
                 GetTicker(normalizeService.NormalizeInstrumentName(marketEvent.InstrumentName), color),
                 GetString(marketEvent.Date.ToString(KnownDateTimeFormats.DateISO), color),
                 GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO), color),
