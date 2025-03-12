@@ -6,7 +6,12 @@
 public class FiveMinuteCandle : Candle
 {
     /// <summary>
-    /// Дата
+    /// Время
     /// </summary>
     public TimeOnly Time { get; set; }
+    
+    /// <summary>
+    /// Метка времени
+    /// </summary>
+    public DateTime DateTime { get; set; }
 }
