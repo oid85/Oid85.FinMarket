@@ -536,8 +536,6 @@ public class MarketEventService(
             {
                 var candles = await fiveMinuteCandleRepository.GetLastWeekCandlesAsync(share.InstrumentId);
                 
-                logger.Info("Чтение свечей. '{share.Ticker}', {candles[^2]}, {candles[^1]}", share.Ticker, candles[^2], candles[^1]);
-                
                 if (candles.Count < 2)
                     continue;
                 
