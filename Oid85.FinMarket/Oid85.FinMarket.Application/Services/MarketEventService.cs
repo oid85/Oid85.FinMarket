@@ -534,7 +534,9 @@ public class MarketEventService(
 
             foreach (var share in shares)
             {
-                var candles = await fiveMinuteCandleRepository.GetLast200CandlesAsync(share.InstrumentId);
+                var candles = await fiveMinuteCandleRepository.GetLastWeekCandlesAsync(share.InstrumentId);
+                
+                logger.Info("Чтение свечей. '{share.Ticker}', {candles[^2]}, {candles[^1]}", share.Ticker, candles[^2], candles[^1]);
                 
                 if (candles.Count < 2)
                     continue;
@@ -554,7 +556,7 @@ public class MarketEventService(
                 var marketEvent = await CreateMarketEvent(
                     share.InstrumentId, 
                     KnownMarketEventTypes.StrikeDay,
-                    $"(!!!) Ударный день '{share.Ticker}'. Анализ '{candles.Count}' свечей");
+                    $"(!!!) Ударный день '{share.Ticker}'");
 
                 marketEvent.IsActive = condition;
                 
