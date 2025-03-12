@@ -536,31 +536,27 @@ public class MarketEventService(
             {
                 var candles = await fiveMinuteCandleRepository.GetLast200CandlesAsync(share.InstrumentId);
                 
-                if (candles.Count < 10)
+                if (candles.Count < 2)
                     continue;
                 
                 // Объем последней свечи больше, чем объем 90% свечей
                 long volume = candles[^1].Volume;
                 int countCandlesLessVolume = candles.Count(x => x.Volume < volume);
-                bool mainCondition = (double) countCandlesLessVolume / (double) candles.Count >= 0.9;
+                bool condition = (double) countCandlesLessVolume / (double) candles.Count >= 0.9;
                 
-                // Объем растет
-                bool subCondition1 = candles[^1].Volume > candles[^2].Volume;
+                // Объем, в течение 2 свечей растет
+                condition &= candles[^1].Volume > candles[^2].Volume;
                 
                 // Последние 2 свечи белые
-                bool subCondition2 = candles[^1].Close > candles[^1].Open;
-                subCondition2 &= candles[^2].Close > candles[^2].Open;
-
-                string prefix = "!";
-                if (subCondition1) prefix += "!";
-                if (subCondition2) prefix += "!";
+                condition &= candles[^1].Close > candles[^1].Open;
+                condition &= candles[^2].Close > candles[^2].Open;
                 
                 var marketEvent = await CreateMarketEvent(
                     share.InstrumentId, 
                     KnownMarketEventTypes.StrikeDay,
-                    $"({prefix}) Ударный день '{share.Ticker}'");
+                    $"(!!!) Ударный день '{share.Ticker}'. Анализ '{candles.Count}' свечей");
 
-                marketEvent.IsActive = mainCondition;
+                marketEvent.IsActive = condition;
                 
                 await SaveMarketEventAsync(marketEvent);
             }

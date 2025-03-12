@@ -2,7 +2,6 @@ using Hangfire;
 using Oid85.FinMarket.WebHost.Extensions;
 using Oid85.FinMarket.External.Extensions;
 using Oid85.FinMarket.Application.Extensions;
-using Oid85.FinMarket.Common.Extensions;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Extensions;
 
@@ -17,7 +16,6 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddMemoryCache();
         builder.Services.ConfigureLogger();
-        builder.Services.ConfigureFinMarketLogger();
         builder.Services.ConfigureSwagger(builder.Configuration);
         builder.Services.ConfigureCors(builder.Configuration);            
         builder.Services.ConfigureApplicationServices();

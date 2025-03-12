@@ -56,6 +56,8 @@ public static class ServiceCollectionExtensions
         
         RegisterJob(KnownJobs.EarlyInTheDay, () => jobService.EarlyInTheDay());
         RegisterJob(KnownJobs.Every15Minutes, () => jobService.Every15Minutes());
+        RegisterJob(KnownJobs.Every10Minutes, () => jobService.Every10Minutes());
+        RegisterJob(KnownJobs.Every5Minutes, () => jobService.Every5Minutes());
 
         void RegisterJob(string configurationSection, Expression<Func<Task>> methodCall)
         {

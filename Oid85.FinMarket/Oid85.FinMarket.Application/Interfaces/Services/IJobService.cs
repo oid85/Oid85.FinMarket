@@ -16,4 +16,16 @@ public interface IJobService
     /// </summary>
     /// <returns></returns>
     Task Every15Minutes();
+    
+    /// <summary>
+    /// Каждые 10 минут
+    /// </summary>
+    /// <returns></returns>
+    Task Every10Minutes();
+    
+    /// <summary>
+    /// Каждые 5 минут
+    /// </summary>
+    /// <returns></returns>
+    Task Every5Minutes();
 }

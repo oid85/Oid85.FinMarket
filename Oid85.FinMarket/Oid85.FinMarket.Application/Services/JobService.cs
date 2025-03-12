@@ -40,7 +40,19 @@ public class JobService(
         await CheckIntradayMarketEventsAsync();
         await SendNotificationsAsync();
     }
-    
+
+    /// <inheritdoc />
+    public async Task Every10Minutes()
+    {
+
+    }
+
+    /// <inheritdoc />
+    public async Task Every5Minutes()
+    {
+
+    }
+
     private async Task LoadInstrumentsAsync()
     {
         try
