@@ -79,9 +79,9 @@ public class FiveMinuteCandleRepository(
         return DataAccessMapper.Map(lastCandleEntity);
     }
 
-    public async Task<List<FiveMinuteCandle>> GetLastDayAsync(Guid instrumentId)
+    public async Task<List<FiveMinuteCandle>> GetLast200CandlesAsync(Guid instrumentId)
     {
-        var from = DateOnly.FromDateTime(DateTime.Today.AddDays(-1));
+        var from = DateOnly.FromDateTime(DateTime.Today.AddDays(-5));
         var to = DateOnly.FromDateTime(DateTime.Today);
         
         var entities = await context.FiveMinuteCandleEntities
@@ -96,6 +96,7 @@ public class FiveMinuteCandleRepository(
         return entities.Count == 0 ? [] : entities
             .Select(DataAccessMapper.Map)
             .OrderBy(x => new DateTime(x.Date, x.Time))
+            .TakeLast(200)
             .ToList();
     }
 }

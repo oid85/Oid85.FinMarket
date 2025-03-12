@@ -534,8 +534,11 @@ public class MarketEventService(
 
             foreach (var share in shares)
             {
-                var candles = await fiveMinuteCandleRepository.GetLastDayAsync(share.InstrumentId);
-
+                var candles = await fiveMinuteCandleRepository.GetLast200CandlesAsync(share.InstrumentId);
+                
+                if (candles.Count < 10)
+                    continue;
+                
                 // Объем последней свечи больше, чем объем 90% свечей
                 long volume = candles[^1].Volume;
                 int countCandlesLessVolume = candles.Count(x => x.Volume < volume);

@@ -6,5 +6,5 @@ public interface IFiveMinuteCandleRepository
 {
     Task AddOrUpdateAsync(List<FiveMinuteCandle> candles);
     Task<FiveMinuteCandle?> GetLastAsync(Guid instrumentId);
-    Task<List<FiveMinuteCandle>> GetLastDayAsync(Guid instrumentId);
+    Task<List<FiveMinuteCandle>> GetLast200CandlesAsync(Guid instrumentId);
 }
