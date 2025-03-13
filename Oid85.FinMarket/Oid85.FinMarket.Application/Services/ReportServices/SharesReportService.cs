@@ -90,4 +90,9 @@ public class SharesReportService(
     public async Task<ReportData> GetActiveMarketEventsAnalyseAsync() => 
         await reportDataFactory.CreateActiveMarketEventsReportDataAsync(
             await GetInstrumentIds());
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetAssetReportEventsAnalyseAsync() => 
+        await reportDataFactory.CreateAssetReportEventsReportDataAsync(
+            await GetInstrumentIds());
 }

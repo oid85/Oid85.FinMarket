@@ -20,7 +20,8 @@ public class LoadService(
     IBondCouponRepository bondCouponRepository,
     IInstrumentRepository instrumentRepository,
     IForecastTargetRepository forecastTargetRepository,
-    IForecastConsensusRepository forecastConsensusRepository)
+    IForecastConsensusRepository forecastConsensusRepository,
+    IAssetReportEventRepository assetReportEventRepository)
     : ILoadService
 {
     public async Task<bool> LoadSharesAsync()
@@ -113,6 +114,16 @@ public class LoadService(
             await forecastTargetRepository.AddAsync(targets);
             await forecastConsensusRepository.AddAsync([consensus]);
         }
+        
+        return true;
+    }
+
+    public async Task<bool> LoadAssetReportEventsAsync()
+    {
+        var shares = await instrumentService.GetSharesInWatchlist();
+        var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
+        var assetReportEvents = await tinkoffService.GetAssetReportEventsAsync(instrumentIds);
+        await assetReportEventRepository.AddAsync(assetReportEvents);
         
         return true;
     }

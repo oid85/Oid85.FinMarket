@@ -10,6 +10,7 @@ public interface ILoadService
     Task<bool> LoadShareDailyCandlesAsync();
     Task<bool> LoadShareFiveMinuteCandlesAsync();
     Task<bool> LoadForecastsAsync();
+    Task<bool> LoadAssetReportEventsAsync();
     
     Task<bool> LoadFuturesAsync();
     Task<bool> LoadFutureLastPricesAsync();

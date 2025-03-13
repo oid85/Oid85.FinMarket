@@ -68,4 +68,9 @@ public interface ITinkoffService
     /// Получение прогнозов по инструменту
     /// </summary>
     Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId);
+    
+    /// <summary>
+    /// Получить отчеты по эмитентам
+    /// </summary>
+    public Task<List<AssetReportEvent>> GetAssetReportEventsAsync(List<Guid> instrumentIds);
 }

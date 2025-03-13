@@ -545,4 +545,25 @@ public static class DataAccessMapper
             Funding = entity.Funding,
             SpreadPricePosition = entity.SpreadPricePosition
         };
+    
+        public static AssetReportEventEntity Map(AssetReportEvent model) =>
+        new()
+        {
+            InstrumentId = model.InstrumentId,
+            ReportDate = model.ReportDate,
+            PeriodYear = model.PeriodYear,
+            PeriodNum = model.PeriodNum,
+            Type = model.Type
+        };
+    
+    public static AssetReportEvent Map(AssetReportEventEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            InstrumentId = entity.InstrumentId,
+            ReportDate = entity.ReportDate,
+            PeriodYear = entity.PeriodYear,
+            PeriodNum = entity.PeriodNum,
+            Type = entity.Type
+        };
 }

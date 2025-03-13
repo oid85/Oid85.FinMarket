@@ -67,4 +67,9 @@ public interface ISharesReportService
     /// Отчет Рыночные события
     /// </summary>
     Task<ReportData> GetActiveMarketEventsAnalyseAsync();
+
+    /// <summary>
+    /// Отчет Отчеты по эмитентам
+    /// </summary>
+    Task<ReportData> GetAssetReportEventsAnalyseAsync();
 }

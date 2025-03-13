@@ -125,6 +125,21 @@ public class SharesController(
             });
 
     /// <summary>
+    /// Загрузить отчеты по эмитентам
+    /// </summary>
+    [HttpGet("load-asset-report-events")]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadAssetReportEventsAsync() =>
+        GetResponseAsync(
+            loadService.LoadAssetReportEventsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
+    
+    /// <summary>
     /// Выполнить анализ акций
     /// </summary>
     [HttpGet("daily-analyse")]
@@ -324,5 +339,20 @@ public class SharesController(
             result => new BaseResponse<ReportData>
             {
                 Result = result
-            });    
+            });
+    
+    /// <summary>
+    /// Отчет Отчеты по эмитентам
+    /// </summary>
+    [HttpPost("report/asset-report-events")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetAssetReportEventsAnalyseAsync() =>
+        GetResponseAsync(
+            reportService.GetAssetReportEventsAnalyseAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
 }

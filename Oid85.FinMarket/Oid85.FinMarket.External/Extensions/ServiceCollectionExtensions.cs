@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<GetDividendInfoService>();
         services.AddTransient<GetBondCouponsService>();
         services.AddTransient<GetForecastService>();
+        services.AddTransient<GetAssetReportEventsService>();
         services.AddTransient<ITelegramService, TelegramService>();
         services.AddTransient<IResourceStoreService, ResourceStoreService>();
         

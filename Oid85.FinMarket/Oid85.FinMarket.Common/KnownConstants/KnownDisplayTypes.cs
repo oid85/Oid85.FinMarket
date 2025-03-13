@@ -11,4 +11,5 @@ public static class KnownDisplayTypes
     public const string Sector = "Sector";
     public const string Currency = "Currency";
     public const string AnalyseResult = "AnalyseResult";
+    public const string AssetReportEvent = "AssetReportEvent";
 }

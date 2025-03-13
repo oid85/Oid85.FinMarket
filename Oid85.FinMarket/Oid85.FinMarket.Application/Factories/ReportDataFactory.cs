@@ -21,6 +21,7 @@ public class ReportDataFactory(
     IMultiplicatorRepository multiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
+    IAssetReportEventRepository assetReportEventRepository,
     ColorHelper colorHelper,
     IInstrumentService instrumentService,
     ISpreadRepository spreadRepository,
@@ -154,7 +155,10 @@ public class ReportDataFactory(
         new (KnownDisplayTypes.Currency, value, color);  
     
     private static ReportParameter GetAnalyseResult(string value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.AnalyseResult, value, color);    
+        new (KnownDisplayTypes.AnalyseResult, value, color);   
+    
+    private static ReportParameter GetAssetReportEvent(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.AssetReportEvent, value, color);   
     
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
@@ -596,6 +600,42 @@ public class ReportDataFactory(
                 GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO), color),
                 GetString(marketEvent.MarketEventText, color)
             ]);
+        }
+        
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateAssetReportEventsReportDataAsync(List<Guid> instrumentIds)
+    {
+        var assetReportEvents = await assetReportEventRepository.GetAllAsync();
+        int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
+        var from = DateOnly.FromDateTime(DateTime.Today);
+        var to = from.AddDays(days);
+        var dates = GetDates(from, to);
+        
+        var reportData = CreateNewReportDataWithHeaders(
+            ["Тикер", "Сектор", "Наименование"], dates);
+        
+        foreach (var assetReportEvent in assetReportEvents)
+        {
+            var instrument = await instrumentRepository.GetByInstrumentIdAsync(assetReportEvent.InstrumentId);
+            string ticker = instrument?.Ticker ?? string.Empty;
+            string sector = instrument?.Sector ?? string.Empty;
+            string instrumentName = instrument?.Name ?? string.Empty;
+
+            var data = new List<ReportParameter>
+            {
+                GetTicker(ticker),
+                GetSector(sector),
+                GetString(normalizeService.NormalizeInstrumentName(instrumentName))
+            };
+            
+            foreach (var date in dates)
+                data.Add(assetReportEvent.ReportDate == date
+                    ? GetAssetReportEvent(string.Empty, KnownColors.Green)
+                    : GetString(string.Empty));
+
+            reportData.Data.Add(data);
         }
         
         return reportData;

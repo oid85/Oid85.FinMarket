@@ -25,15 +25,6 @@
     <ProjectReference Include="..\Oid85.FinMarket.External\Oid85.FinMarket.External.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="reinstall_service.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="install_service.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="uninstall_service.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="SwaggerTest.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

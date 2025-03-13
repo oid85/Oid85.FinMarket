@@ -14,7 +14,8 @@ public class TinkoffService(
     GetCandlesService getCandlesService,
     GetDividendInfoService getDividendInfoService,
     GetBondCouponsService getBondCouponsService,
-    GetForecastService getForecastService)
+    GetForecastService getForecastService,
+    GetAssetReportEventsService getAssetReportEventsService)
     : ITinkoffService
 {
     // <inheritdoc />
@@ -66,4 +67,8 @@ public class TinkoffService(
     /// <inheritdoc />
     public Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId) =>
         getForecastService.GetForecastAsync(instrumentId);
+
+    /// <inheritdoc />
+    public Task<List<AssetReportEvent>> GetAssetReportEventsAsync(List<Guid> instrumentIds) =>
+        getAssetReportEventsService.GetAssetReportEventsAsync(instrumentIds);
 }

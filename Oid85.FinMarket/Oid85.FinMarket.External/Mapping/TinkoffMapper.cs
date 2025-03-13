@@ -236,4 +236,20 @@ public static class TinkoffMapper
                 _ => string.Empty
             }
         };
+    
+    public static AssetReportEvent Map(GetAssetReportsResponse.Types.GetAssetReportsEvent report) =>
+        new()
+        {
+            InstrumentId = Guid.Parse(report.InstrumentId),
+            ReportDate = ConvertHelper.TimestampToDateOnly(report.ReportDate),
+            PeriodYear = report.PeriodYear,
+            PeriodNum = report.PeriodNum,
+            Type = report.PeriodType switch
+            {
+                GetAssetReportsResponse.Types.AssetReportPeriodType.PeriodTypeQuarter => KnownAssetReportPeriodTypes.PeriodTypeQuarter,
+                GetAssetReportsResponse.Types.AssetReportPeriodType.PeriodTypeSemiannual => KnownAssetReportPeriodTypes.PeriodTypeSemiannual,
+                GetAssetReportsResponse.Types.AssetReportPeriodType.PeriodTypeAnnual => KnownAssetReportPeriodTypes.PeriodTypeAnnual,
+                _ => string.Empty
+            }
+        };   
 }

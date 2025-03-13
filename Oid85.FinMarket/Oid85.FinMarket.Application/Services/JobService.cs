@@ -19,6 +19,7 @@ public class JobService(
     {
         await LoadInstrumentsAsync();
         await LoadLastPricesAsync();
+        await LoadAssetReportEventsAsync();
         await LoadBondCouponsAsync();
         await LoadDividendInfosAsync();
         await LoadDailyCandlesAsync();
@@ -122,6 +123,21 @@ public class JobService(
         }
     }
     
+    private async Task LoadAssetReportEventsAsync()
+        {
+            try
+            {
+                await loadService.LoadAssetReportEventsAsync();
+                
+                logger.Info("Метод 'LoadAssetReportEventsAsync' выполнен успешно");
+            }
+            
+            catch (Exception exception)
+            {
+                logger.Info(exception, "Ошибка при выполнении метода 'LoadAssetReportEventsAsync'");
+            }
+            
+        }
     private async Task LoadDailyCandlesAsync()
     {
         try
@@ -249,9 +265,9 @@ public class JobService(
             await marketEventService.CheckRsiOverOverSoldInputMarketEventAsync();
             await marketEventService.CheckRsiOverOverSoldOutputMarketEventAsync();
             await marketEventService.CheckCrossPriceLevelMarketEventAsync();
-            await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
-            await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
-            await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
+            // await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
+            // await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
+            // await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
             await marketEventService.CheckForecastReleasedMarketEventAsync();
             
             logger.Info("Метод 'CheckMarketEventsAsync' выполнен успешно");

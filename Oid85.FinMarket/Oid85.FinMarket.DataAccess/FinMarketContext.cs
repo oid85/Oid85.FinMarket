@@ -23,7 +23,8 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<ForecastTargetEntity> ForecastTargetEntities { get; set; }
     public DbSet<ForecastConsensusEntity> ForecastConsensusEntities { get; set; }
     public DbSet<MarketEventEntity> MarketEventEntities { get; set; }
-
+    public DbSet<AssetReportEventEntity> AssetReportEventEntities { get; set; }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
     {
         optionBuilder.UseSnakeCaseNamingConvention();
