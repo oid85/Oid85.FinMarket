@@ -38,6 +38,7 @@ public class JobService(
         await LoadLastPricesAsync();
         await LoadFiveMinuteCandlesAsync();
         await ProcessSpreadPairsAsync();
+        await ProcessMultiplicatorsAsync();
         await CheckIntradayMarketEventsAsync();
         await SendNotificationsAsync();
     }
