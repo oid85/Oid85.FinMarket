@@ -171,12 +171,12 @@ public class ReportDataFactory(
             if (instrument is null)
                 continue;
             
-            var data = new List<ReportParameter>
-            {
-                GetTicker(instrument.Ticker), 
+            List<ReportParameter> data =
+            [
+                GetTicker(instrument.Ticker),
                 GetSector(instrument.Sector),
                 GetString(normalizeService.NormalizeInstrumentName(instrument.Name))
-            };
+            ];
             
             foreach (var date in dates)
             {
@@ -224,12 +224,12 @@ public class ReportDataFactory(
             if (instrument is null)
                 continue;
             
-            var data = new List<ReportParameter>
-            {
-                GetTicker(instrument.Ticker), 
+            List<ReportParameter> data =
+            [
+                GetTicker(instrument.Ticker),
                 GetSector(instrument.Sector),
                 GetString(normalizeService.NormalizeInstrumentName(instrument.Name))
-            };
+            ];
 
             foreach (var date in dates)
             {
@@ -267,8 +267,8 @@ public class ReportDataFactory(
             string instrumentName = instrument?.Name ?? string.Empty;
             string color = await colorHelper.GetColorYieldDividend(profitPrc);
 
-            var data = new List<ReportParameter>
-            {
+            List<ReportParameter> data =
+            [
                 GetTicker(dividendInfo.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentName)),
                 GetDate(dividendInfo.RecordDate),
@@ -276,7 +276,7 @@ public class ReportDataFactory(
                 GetRuble(dividendInfo.Dividend),
                 GetPercent(dividendInfo.DividendPrc, color),
                 GetPercent(profitPrc, color)
-            };
+            ];
             
             foreach (var date in dates)
                 data.Add(dividendInfo.RecordDate == date
@@ -534,7 +534,7 @@ public class ReportDataFactory(
         var spreads = await spreadRepository.GetAllAsync();
             
         var reportData = CreateNewReportDataWithHeaders(
-            ["1", "2", "Тикер 1", "Тикер 2", "Цена 1", "Цена 2", "Спред", "Спред, %", "Конт./Бэкв."]);
+            [string.Empty, string.Empty, "Тикер", "Тикер", "Цена", "Цена", "Спред", "Спред, %", "Конт./Бэкв."]);
         
         reportData.Title = "Спреды";
 
@@ -611,12 +611,12 @@ public class ReportDataFactory(
             string sector = instrument?.Sector ?? string.Empty;
             string instrumentName = instrument?.Name ?? string.Empty;
 
-            var data = new List<ReportParameter>
-            {
+            List<ReportParameter> data =
+            [
                 GetTicker(ticker),
                 GetSector(sector),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentName))
-            };
+            ];
             
             foreach (var date in dates)
                 data.Add(assetReportEvent.ReportDate == date
@@ -637,8 +637,14 @@ public class ReportDataFactory(
         var reportData = CreateNewReportDataWithHeaders(["Параметр"], dates);
         reportData.Title = CreateTitleWithDates("Индекс страха и жадности", from, to);
 
-        List<string> parameters = [
-            "Индекс силы и жадности", "Рыночный моментум", "Волатильность рынка", "Ширина рынка", "Сила цен акций"];
+        List<string> parameters = 
+        [
+            KnownFeedGreedIndexFields.FeerGreedIndex, 
+            KnownFeedGreedIndexFields.MarketMomentum, 
+            KnownFeedGreedIndexFields.MarketVolatility, 
+            KnownFeedGreedIndexFields.StockPriceBreadth, 
+            KnownFeedGreedIndexFields.StockPriceStrength
+        ];
         
         foreach (var parameter in parameters)
         {
@@ -654,27 +660,27 @@ public class ReportDataFactory(
                     
                     switch (parameter)
                     {
-                        case "Индекс силы и жадности":
+                        case KnownFeedGreedIndexFields.FeerGreedIndex:
                             color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
                             data.Add(GetPercent(feerGreedIndex.Value, color));
                             break;
                         
-                        case "Рыночный моментум":
+                        case KnownFeedGreedIndexFields.MarketMomentum:
                             color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
                             data.Add(GetPercent(feerGreedIndex.MarketMomentum, color));
                             break;
                         
-                        case "Волатильность рынка":
+                        case KnownFeedGreedIndexFields.MarketVolatility:
                             color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
                             data.Add(GetPercent(feerGreedIndex.MarketVolatility, color));
                             break;
                         
-                        case "Ширина рынка":
+                        case KnownFeedGreedIndexFields.StockPriceBreadth:
                             color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
                             data.Add(GetPercent(feerGreedIndex.StockPriceBreadth, color));
                             break;
                         
-                        case "Сила цен акций":
+                        case KnownFeedGreedIndexFields.StockPriceStrength:
                             color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
                             data.Add(GetPercent(feerGreedIndex.StockPriceStrength, color));
                             break;
