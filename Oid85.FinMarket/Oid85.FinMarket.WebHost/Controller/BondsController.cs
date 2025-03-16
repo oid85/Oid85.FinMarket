@@ -35,6 +35,23 @@ public class BondsController(
             });
     
     /// <summary>
+    /// Получить тикеры отфильтрованных облигаций
+    /// </summary>
+    [HttpGet("filter-list-tickers")]
+    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetBondsFilterListAsync() =>
+        await GetResponseAsync(
+            async () => (await instrumentService.GetBondsByFilter())
+                .Select(x => x.Ticker)
+                .ToList(),
+            result => new BaseResponse<List<string>>
+            {
+                Result = result
+            });
+    
+    /// <summary>
     /// Загрузить справочник облигаций
     /// </summary>
     [HttpGet("load-catalog")]

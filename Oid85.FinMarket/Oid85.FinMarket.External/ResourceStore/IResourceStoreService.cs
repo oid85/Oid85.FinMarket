@@ -35,7 +35,7 @@ public interface IResourceStoreService
     /// <summary>
     /// Получить тикеры индекса Московской биржи
     /// </summary>
-    Task<List<string>> GetIMoexTickersAsync();
+    Task<List<string>> GetIndexMoexTickersAsync();
     
     /// <summary>
     /// Получить мультипликатор

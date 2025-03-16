@@ -8,7 +8,8 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/[controller]")]
 [ApiController]
 public class DebugController(
-    IMarketEventService marketEventService) 
+    IMarketEventService marketEventService,
+    IMultiplicatorService multiplicatorService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -20,7 +21,7 @@ public class DebugController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Debug()
     {
-        await marketEventService.CheckStrikeDayMarketEventAsync();
+        await multiplicatorService.ProcessMultiplicatorsAsync();
         return Ok();
     }
 }

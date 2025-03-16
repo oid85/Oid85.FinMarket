@@ -61,9 +61,15 @@ public class CandleRepository(
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
-    public async Task<List<Candle>> GetLastYearAsync(Guid instrumentId)
+    public async Task<List<Candle>> GetLastYearAsync(Guid instrumentId) =>
+        await GetLastYearsAsync(instrumentId, 1);
+
+    public async Task<List<Candle>> GetLastTwoYearsAsync(Guid instrumentId) =>
+        await GetLastYearsAsync(instrumentId, 2);
+
+    private async Task<List<Candle>> GetLastYearsAsync(Guid instrumentId, int years)
     {
-        var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
+        var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1 * years));
         var to = DateOnly.FromDateTime(DateTime.Today);
         
         var entities = await context.CandleEntities

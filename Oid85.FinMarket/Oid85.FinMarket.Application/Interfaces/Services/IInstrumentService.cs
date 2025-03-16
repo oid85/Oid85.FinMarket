@@ -16,6 +16,11 @@ public interface IInstrumentService
     /// Получить акции из списка наблюдения
     /// </summary>
     Task<List<Share>> GetSharesInWatchlist();
+
+    /// <summary>
+    /// Получить акции из индекса Московской биржи
+    /// </summary>
+    Task<List<Share>> GetSharesInIndexMoex();
     
     /// <summary>
     /// Получить облигации из списка наблюдения

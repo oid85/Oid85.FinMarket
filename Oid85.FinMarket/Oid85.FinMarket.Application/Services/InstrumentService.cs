@@ -38,6 +38,14 @@ public class InstrumentService(
     }
 
     /// <inheritdoc />
+    public async Task<List<Share>> GetSharesInIndexMoex()
+    {
+        var tickers = await resourceStoreService.GetIndexMoexTickersAsync();
+        var items = await shareRepository.GetByTickersAsync(tickers);
+        return items;
+    }
+    
+    /// <inheritdoc />
     public async Task<List<Bond>> GetBondsInWatchlist()
     {
         var tickers = await resourceStoreService.GetBondsWatchlistAsync();

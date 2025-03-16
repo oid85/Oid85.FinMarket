@@ -10,6 +10,7 @@ public class JobService(
     IAnalyseService analyseService,
     ISpreadService spreadService,
     IMultiplicatorService multiplicatorService,
+    IFeerGreedIndexService feerGreedIndexService,
     IMarketEventService marketEventService,
     ISendService sendService) 
     : IJobService
@@ -28,6 +29,7 @@ public class JobService(
         await AnalyseAsync();
         await ProcessSpreadPairsAsync();
         await ProcessMultiplicatorsAsync();
+        await ProcessFeerGreedAsync();
         await CheckDailyMarketEventsAsync();
         await SendNotificationsAsync();
     }
@@ -237,6 +239,21 @@ public class JobService(
         }
     }
 
+    private async Task ProcessFeerGreedAsync()
+    {
+        try
+        {
+            await feerGreedIndexService.ProcessFeerGreedAsync();
+            
+            logger.Info("Метод 'ProcessFeerGreedAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'ProcessFeerGreedAsync'");
+        }
+    }
+    
     private async Task CheckIntradayMarketEventsAsync()
     {
         try

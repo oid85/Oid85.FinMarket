@@ -41,7 +41,7 @@ public class ResourceStoreService(
             "watchLists", "indexes.json")) ?? [];
 
     /// <inheritdoc />
-    public async Task<List<string>> GetIMoexTickersAsync() =>
+    public async Task<List<string>> GetIndexMoexTickersAsync() =>
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "tickerLists", "imoex.json")) ?? [];

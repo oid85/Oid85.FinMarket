@@ -546,7 +546,7 @@ public static class DataAccessMapper
             SpreadPricePosition = entity.SpreadPricePosition
         };
     
-        public static AssetReportEventEntity Map(AssetReportEvent model) =>
+    public static AssetReportEventEntity Map(AssetReportEvent model) =>
         new()
         {
             InstrumentId = model.InstrumentId,
@@ -565,5 +565,28 @@ public static class DataAccessMapper
             PeriodYear = entity.PeriodYear,
             PeriodNum = entity.PeriodNum,
             Type = entity.Type
+        };
+    
+    public static FearGreedIndexEntity Map(FearGreedIndex model) =>
+        new()
+        {
+            Date = model.Date,
+            MarketMomentum = model.MarketMomentum,
+            MarketVolatility = model.MarketVolatility,
+            StockPriceBreadth = model.StockPriceBreadth,
+            StockPriceStrength = model.StockPriceStrength,
+            Value = model.Value
+        };
+    
+    public static FearGreedIndex Map(FearGreedIndexEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            Date = entity.Date,
+            MarketMomentum = entity.MarketMomentum,
+            MarketVolatility = entity.MarketVolatility,
+            StockPriceBreadth = entity.StockPriceBreadth,
+            StockPriceStrength = entity.StockPriceStrength,
+            Value = entity.Value
         };
 }

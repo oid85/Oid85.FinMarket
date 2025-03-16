@@ -22,7 +22,7 @@ public class MultiplicatorRepository(
         foreach (var multiplicator in multiplicators)
             if (!await context.MultiplicatorEntities
                     .AnyAsync(x => 
-                        x.TickerAo == multiplicator.TickerAo ||
+                        x.TickerAo == multiplicator.TickerAo &&
                         x.TickerAp == multiplicator.TickerAp))
                 entities.Add(DataAccessMapper.Map(multiplicator));
             else

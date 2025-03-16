@@ -4,6 +4,7 @@ using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Reports;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 
@@ -59,20 +60,6 @@ public class ReportDataFactory(
         string fromString = from.ToString(KnownDateTimeFormats.DateISO);
         string toString = to.ToString(KnownDateTimeFormats.DateISO);
         return $"{title} с {fromString} по {toString}";
-    }
-
-    private static List<DateOnly> GetDates(DateOnly from, DateOnly to)
-    {
-        var curDate = from;
-        var dates = new List<DateOnly>();
-
-        while (curDate <= to)
-        {
-            dates.Add(curDate);
-            curDate = curDate.AddDays(1);
-        }
-
-        return dates;
     }
 
     private static double CalculateBondCouponProfitPercent(Bond bond, BondCoupon? coupon)
@@ -166,7 +153,7 @@ public class ReportDataFactory(
         var analyseResults = await GetAnalyseResults(
             instrumentIds, [analyseType], from, to);
 
-        var dates = GetDates(from, to);
+        var dates = DateHelper.GetDates(from, to);
         var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
         reportData.Title = CreateTitleWithDates(analyseType, from, to);
         
@@ -219,7 +206,7 @@ public class ReportDataFactory(
         var analyseResults = await GetAnalyseResults(
             instrumentIds, analyseTypes, from, to);
             
-        var dates = GetDates(from, to);
+        var dates = DateHelper.GetDates(from, to);
         var reportData = CreateNewReportDataWithHeaders(["Тикер", "Сектор", "Эмитент"], dates);
         reportData.Title = reportData.Title = CreateTitleWithDates("Aggregated", from, to);
 
@@ -267,7 +254,7 @@ public class ReportDataFactory(
         int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         var from = DateOnly.FromDateTime(DateTime.Today);
         var to = from.AddDays(days);
-        var dates = GetDates(from, to);
+        var dates = DateHelper.GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
             ["Тикер", "Эмитент", "Фикс. р.", "Объяв.", "Размер, руб", "Дох-ть, %", "Тек. дох-ть, %"], dates);
@@ -452,7 +439,7 @@ public class ReportDataFactory(
         var bonds = await bondRepository.GetAsync(instrumentIds);
         var startDate = DateOnly.FromDateTime(DateTime.Today);
         var endDate = DateOnly.FromDateTime(DateTime.Today).AddDays(days);
-        var dates = GetDates(startDate, endDate);
+        var dates = DateHelper.GetDates(startDate, endDate);
         
         var reportData = CreateNewReportDataWithHeaders(
             [
@@ -611,7 +598,7 @@ public class ReportDataFactory(
         int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         var from = DateOnly.FromDateTime(DateTime.Today);
         var to = from.AddDays(days);
-        var dates = GetDates(from, to);
+        var dates = DateHelper.GetDates(from, to);
         
         var reportData = CreateNewReportDataWithHeaders(
             ["Тикер", "Сектор", "Наименование"], dates);
