@@ -11,37 +11,37 @@ public interface ISharesReportService
     /// <summary>
     /// Отчет Аггрегированный анализ
     /// </summary>
-    Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request);
 
     /// <summary>
     /// Отчет Анализ Супертренд
     /// </summary>
-    Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetSupertrendAnalyseAsync(DateRangeRequest request);
 
     /// <summary>
     /// Отчет Анализ Последовательность свечей одного цвета
     /// </summary>
-    Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetCandleSequenceAnalyseAsync(DateRangeRequest request);
 
     /// <summary>
     /// Отчет Анализ Растущий объем
     /// </summary>
-    Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetCandleVolumeAnalyseAsync(DateRangeRequest request);
 
     /// <summary>
     /// Отчет Анализ RSI
     /// </summary>
-    Task<ReportData> GetRsiAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetRsiAnalyseAsync(DateRangeRequest request);
     
     /// <summary>
     /// Отчет Доходность LTM
     /// </summary>
-    Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request);
     
     /// <summary>
     /// Отчет Максимальная просадка от максимума
     /// </summary>
-    Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(GetAnalyseRequest request);    
+    Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(DateRangeRequest request);    
     
     /// <summary>
     /// Отчет Дивиденды
@@ -72,4 +72,9 @@ public interface ISharesReportService
     /// Отчет Отчеты по эмитентам
     /// </summary>
     Task<ReportData> GetAssetReportEventsAnalyseAsync();
+
+    /// <summary>
+    /// Отчет Индекс страха и жадности
+    /// </summary>
+    Task<ReportData> GetFearGreedIndexAsync(DateRangeRequest request);
 }

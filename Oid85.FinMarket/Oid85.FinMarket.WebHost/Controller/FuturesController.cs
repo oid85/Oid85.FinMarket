@@ -134,7 +134,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetAggregatedAnalyseAsync(
-        [FromBody] GetAnalyseRequest request) =>
+        [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
             () => reportService.GetAggregatedAnalyseAsync(request),
             result => new BaseResponse<ReportData>
@@ -150,7 +150,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetSupertrendAnalyseAsync(
-        [FromBody] GetAnalyseRequest request) =>
+        [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
             () => reportService.GetSupertrendAnalyseAsync(request),
             result => new BaseResponse<ReportData>
@@ -166,7 +166,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetCandleSequenceAnalyseAsync(
-        [FromBody] GetAnalyseRequest request) =>
+        [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
             () => reportService.GetCandleSequenceAnalyseAsync(request),
             result => new BaseResponse<ReportData>
@@ -182,7 +182,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetCandleVolumeAnalyseAsync(
-        [FromBody] GetAnalyseRequest request) =>
+        [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
             () => reportService.GetCandleVolumeAnalyseAsync(request),
             result => new BaseResponse<ReportData>
@@ -198,7 +198,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetRsiAnalyseAsync(
-        [FromBody] GetAnalyseRequest request) =>
+        [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
             () => reportService.GetRsiAnalyseAsync(request),
             result => new BaseResponse<ReportData>
@@ -214,7 +214,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetYieldLtmAnalyseAsync(
-        [FromBody] GetAnalyseRequest request) =>
+        [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
             () => reportService.GetYieldLtmAnalyseAsync(request),
             result => new BaseResponse<ReportData>

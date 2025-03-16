@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.Application.Models.Requests;
 
-public class GetAnalyseRequest
+public class DateRangeRequest
 {
     [JsonPropertyName("from")]
     public DateOnly From { get; set; } = DateOnly.MinValue;

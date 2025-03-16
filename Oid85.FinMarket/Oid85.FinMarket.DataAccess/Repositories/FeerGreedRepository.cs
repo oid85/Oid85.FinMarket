@@ -8,7 +8,6 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class FeerGreedRepository(
     FinMarketContext context) 
-
     : IFeerGreedRepository
 {
     public async Task AddAsync(List<FearGreedIndex> indexes)
@@ -27,11 +26,8 @@ public class FeerGreedRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<FearGreedIndex>> GetLastYearAsync()
+    public async Task<List<FearGreedIndex>> GetAsync(DateOnly from, DateOnly to)
     {
-        var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
-        var to = DateOnly.FromDateTime(DateTime.Today);
-        
         var entities = await context.FearGreedIndexEntities
             .Where(x => 
                 x.Date >= from &&

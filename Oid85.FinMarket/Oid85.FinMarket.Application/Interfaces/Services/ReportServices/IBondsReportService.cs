@@ -11,22 +11,22 @@ public interface IBondsReportService
     /// <summary>
     /// Отчет Аггрегированный анализ
     /// </summary>
-    Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request);
 
     /// <summary>
     /// Отчет Анализ Супертренд
     /// </summary>
-    Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetSupertrendAnalyseAsync(DateRangeRequest request);
 
     /// <summary>
     /// Отчет Анализ Последовательность свечей одного цвета
     /// </summary>
-    Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetCandleSequenceAnalyseAsync(DateRangeRequest request);
 
     /// <summary>
     /// Отчет Анализ Растущий объем
     /// </summary>
-    Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request);
+    Task<ReportData> GetCandleVolumeAnalyseAsync(DateRangeRequest request);
     
     /// <summary>
     /// Отчет Купоны

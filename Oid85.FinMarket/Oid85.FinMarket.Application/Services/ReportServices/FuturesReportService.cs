@@ -19,7 +19,7 @@ public class FuturesReportService(
         (await instrumentService.GetFuturesInWatchlist()).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
-    public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateAggregatedReportDataAsync(
             await GetInstrumentIds(), 
             [
@@ -30,35 +30,35 @@ public class FuturesReportService(
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetSupertrendAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.Supertrend, 
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetCandleSequenceAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.CandleSequence, 
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetCandleVolumeAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.CandleVolume, 
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetRsiAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetRsiAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.Rsi, 
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetYieldLtmAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.YieldLtm, 

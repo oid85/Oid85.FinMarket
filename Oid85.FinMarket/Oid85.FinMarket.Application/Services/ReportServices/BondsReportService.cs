@@ -18,7 +18,7 @@ public class BondsReportService(
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
-    public async Task<ReportData> GetAggregatedAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateAggregatedReportDataAsync(
             await GetInstrumentIds(), 
             [
@@ -29,21 +29,21 @@ public class BondsReportService(
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetSupertrendAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetSupertrendAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.Supertrend, 
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetCandleSequenceAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetCandleSequenceAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.CandleSequence, 
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetCandleVolumeAnalyseAsync(GetAnalyseRequest request) =>
+    public async Task<ReportData> GetCandleVolumeAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(), 
             KnownAnalyseTypes.CandleVolume, 

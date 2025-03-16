@@ -5,5 +5,5 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 public interface IFeerGreedRepository
 {
     Task AddAsync(List<FearGreedIndex> indexes);
-    Task<List<FearGreedIndex>> GetLastYearAsync();
+    Task<List<FearGreedIndex>> GetAsync(DateOnly from, DateOnly to);
 }

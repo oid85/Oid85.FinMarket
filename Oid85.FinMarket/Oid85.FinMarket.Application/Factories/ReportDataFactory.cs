@@ -27,6 +27,7 @@ public class ReportDataFactory(
     IInstrumentService instrumentService,
     ISpreadRepository spreadRepository,
     IMarketEventRepository marketEventRepository,
+    IFeerGreedRepository feerGreedRepository,
     INormalizeService normalizeService) 
     : IReportDataFactory
 {
@@ -412,14 +413,14 @@ public class ReportDataFactory(
             
             string colorRecommendation = await colorHelper.GetColorForecastRecommendation(forecastConsensus.RecommendationString);
 
-            string colorCurrentPrice = colorHelper.GetColorForForecastPrice(
+            string colorCurrentPrice = ColorHelper.GetColorForForecastPrice(
                 forecastConsensus.CurrentPrice, forecastConsensus.MinTarget, forecastConsensus.MaxTarget);
             
             reportData.Data.Add(
             [
                 GetTicker(instrument.Ticker),
                 GetSector(instrument.Sector),
-                GetString(normalizeService.NormalizeInstrumentName(instrument?.Name ?? string.Empty)),
+                GetString(normalizeService.NormalizeInstrumentName(instrument.Name)),
                 GetString(forecastConsensus.RecommendationString, colorRecommendation),
                 GetCurrency(forecastConsensus.Currency),
                 GetRuble(forecastConsensus.CurrentPrice, colorCurrentPrice),
@@ -625,6 +626,72 @@ public class ReportDataFactory(
             reportData.Data.Add(data);
         }
         
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateFearGreedIndexReportDataAsync(DateOnly from, DateOnly to)
+    {
+        var feerGreedIndexes = await feerGreedRepository.GetAsync(from, to);
+
+        var dates = DateHelper.GetDates(from, to);
+        var reportData = CreateNewReportDataWithHeaders(["Параметр"], dates);
+        reportData.Title = CreateTitleWithDates("Индекс страха и жадности", from, to);
+
+        List<string> parameters = [
+            "Индекс силы и жадности", "Рыночный моментум", "Волатильность рынка", "Ширина рынка", "Сила цен акций"];
+        
+        foreach (var parameter in parameters)
+        {
+            List<ReportParameter> data = [GetString(parameter)];
+            
+            foreach (var date in dates)
+            {
+                var feerGreedIndex = feerGreedIndexes.FirstOrDefault(x => x.Date == date);
+
+                if (feerGreedIndex is not null)
+                {
+                    string color;
+                    
+                    switch (parameter)
+                    {
+                        case "Индекс силы и жадности":
+                            color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
+                            data.Add(GetPercent(feerGreedIndex.Value, color));
+                            break;
+                        
+                        case "Рыночный моментум":
+                            color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
+                            data.Add(GetPercent(feerGreedIndex.MarketMomentum, color));
+                            break;
+                        
+                        case "Волатильность рынка":
+                            color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
+                            data.Add(GetPercent(feerGreedIndex.MarketVolatility, color));
+                            break;
+                        
+                        case "Ширина рынка":
+                            color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
+                            data.Add(GetPercent(feerGreedIndex.StockPriceBreadth, color));
+                            break;
+                        
+                        case "Сила цен акций":
+                            color = ColorHelper.RedYellowGreenScale(feerGreedIndex.Value);
+                            data.Add(GetPercent(feerGreedIndex.StockPriceStrength, color));
+                            break;
+                        
+                        default:
+                            data.Add(GetString(string.Empty));
+                            break;
+                    }
+                }
+
+                else
+                    data.Add(GetString(string.Empty));
+            }
+                
+            reportData.Data.Add(data);
+        }
+            
         return reportData;
     }
 }

@@ -25,10 +25,10 @@ public class ColorHelper(
                 return await GetColorRsi(analyseResult.ResultString);
             
             case KnownAnalyseTypes.YieldLtm:
-                return GetColorYieldLtm(analyseResult.ResultNumber);
+                return GreenScale(analyseResult.ResultNumber);
             
             case KnownAnalyseTypes.DrawdownFromMaximum:
-                return GetColorDrawdownFromMaximum(analyseResult.ResultNumber);            
+                return RedScale(analyseResult.ResultNumber);            
             
             case KnownAnalyseTypes.Aggregated:
                 return await GetColorAggregated((int) analyseResult.ResultNumber);
@@ -48,22 +48,6 @@ public class ColorHelper(
         
         return resource.Color;
     }
-
-    public string GetColorYieldLtm(double value)
-    {
-        double h = value > 0 ? 128.0 : 0.0;
-        double step = 0.006;
-        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Max(0.2, 0.8 - Math.Abs(value) * step));
-        return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
-    }
-
-    public string GetColorDrawdownFromMaximum(double value)
-    {
-        double h = 0.0;
-        double step = 0.006;
-        var colorHsl = ConvertHelper.HsLtoRgb(h, 1, double.Max(0.2, 0.8 - Math.Abs(value) * step));
-        return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
-    }    
     
     public async Task<string> GetColorYieldCoupon(double value)
     {
@@ -197,11 +181,44 @@ public class ColorHelper(
         return resource.Color;
     }
 
-    public string GetColorForForecastPrice(double price, double minTarget, double maxTarget)
+    public static string GetColorForForecastPrice(double price, double minTarget, double maxTarget)
     {
         if (price >= minTarget && price <= maxTarget)
             return KnownColors.Green;
         
         return KnownColors.White;
+    }
+
+    public static string GreenScale(double value)
+    {
+        double h = value > 0 ? 128.0 : 0.0;
+        const double s = 1.0;
+        double l = double.Max(0.2, 0.8 - Math.Abs(value) * 0.006);
+        
+        var colorHsl = ConvertHelper.HsLtoRgb(h, s, l);
+        
+        return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
+    }
+
+    public static string RedScale(double value)
+    {
+        const double h = 0.0;
+        const double s = 1.0;
+        double l = double.Max(0.2, 0.8 - Math.Abs(value) * 0.006);
+        
+        var colorHsl = ConvertHelper.HsLtoRgb(h, s, l);
+        
+        return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
+    } 
+    
+    public static string RedYellowGreenScale(double value)
+    {
+        double h = value * 1.25;
+        const double s = 1.0;
+        const double l = 0.5;
+        
+        var colorHsl = ConvertHelper.HsLtoRgb(h, s, l);
+        
+        return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }
 }
