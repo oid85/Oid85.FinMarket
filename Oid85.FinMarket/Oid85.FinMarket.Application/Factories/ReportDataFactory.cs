@@ -398,8 +398,8 @@ public class ReportDataFactory(
         
         var reportData = CreateNewReportDataWithHeaders(
         [
-            "Тикер", "Эмитент", "Прогноз", "Валюта", "Тек. цена", "Мин. цена прогноза", 
-            "Макс. цена прогноза", "Изм. цены", "Отн. изм. цены"
+            "Тикер", "Эмитент", "Прогноз", "Валюта", "Тек. цена", "Мин. цена прогноза", "Макс. цена прогноза",
+			"Мин. потенциал", "Макс. потенциал"
         ]);
 
         reportData.Title = "Консенсус-прогнозы";
@@ -416,6 +416,9 @@ public class ReportDataFactory(
             string colorCurrentPrice = ColorHelper.GetColorForForecastPrice(
                 forecastConsensus.CurrentPrice, forecastConsensus.MinTarget, forecastConsensus.MaxTarget);
             
+			double minTargetPrc = ((forecastConsensus.MinTarget - forecastConsensus.CurrentPrice) / forecastConsensus.CurrentPrice) * 100.0;
+			double maxTargetPrc = ((forecastConsensus.MaxTarget - forecastConsensus.CurrentPrice) / forecastConsensus.CurrentPrice) * 100.0;
+			
             reportData.Data.Add(
             [
                 GetTicker(instrument.Ticker),
@@ -426,8 +429,8 @@ public class ReportDataFactory(
                 GetRuble(forecastConsensus.CurrentPrice, colorCurrentPrice),
                 GetRuble(forecastConsensus.MinTarget),
                 GetRuble(forecastConsensus.MaxTarget),
-                GetRuble(forecastConsensus.PriceChange),
-                GetPercent(forecastConsensus.PriceChangeRel)
+				GetPercent(minTargetPrc, minTargetPrc > 0.0 ? KnownColors.Green : KnownColors.Red),
+                GetPercent(maxTargetPrc, maxTargetPrc > 0.0 ? KnownColors.Green : KnownColors.Red)
             ]);
         }
 
