@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Responses;
+using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
@@ -8,8 +9,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/[controller]")]
 [ApiController]
 public class DebugController(
-    IMarketEventService marketEventService,
-    IMultiplicatorService multiplicatorService) 
+    IJobService jobService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -21,7 +21,8 @@ public class DebugController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Debug()
     {
-        await multiplicatorService.ProcessMultiplicatorsAsync();
+        await jobService.Every15Minutes();
+        
         return Ok();
     }
 }

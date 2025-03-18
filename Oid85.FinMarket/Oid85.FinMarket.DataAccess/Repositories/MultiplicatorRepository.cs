@@ -40,7 +40,7 @@ public class MultiplicatorRepository(
         {
             await context.MultiplicatorEntities
                 .Where(x => 
-                    x.TickerAo == multiplicator.TickerAo ||
+                    x.TickerAo == multiplicator.TickerAo &&
                     x.TickerAp == multiplicator.TickerAp)
                 .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.TotalSharesAo, multiplicator.TotalSharesAo)
@@ -81,7 +81,7 @@ public class MultiplicatorRepository(
         {
             await context.MultiplicatorEntities
                 .Where(x => 
-                    x.TickerAo == multiplicator.TickerAo ||
+                    x.TickerAo == multiplicator.TickerAo &&
                     x.TickerAp == multiplicator.TickerAp)
                 .ExecuteUpdateAsync(x => x
                         .SetProperty(entity => entity.MarketCapitalization, multiplicator.MarketCapitalization)
