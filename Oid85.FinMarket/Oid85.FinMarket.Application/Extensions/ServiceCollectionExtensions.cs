@@ -7,9 +7,11 @@ using Oid85.FinMarket.Application.Factories;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Application.Services.AnalyseServices;
+using Oid85.FinMarket.Application.Services.DiagramServices;
 using Oid85.FinMarket.Application.Services.ReportServices;
 using Oid85.FinMarket.Common.KnownConstants;
 
@@ -20,21 +22,25 @@ public static class ServiceCollectionExtensions
     public static void ConfigureApplicationServices(
         this IServiceCollection services)
     {
-        services.AddTransient<ILoadService, LoadService>();
-        services.AddTransient<IAnalyseService, AnalyseService>();
         services.AddTransient<CandleSequenceAnalyseService>();
         services.AddTransient<CandleVolumeAnalyseService>();
         services.AddTransient<DrawdownFromMaximumAnalyseService>();
         services.AddTransient<RsiAnalyseService>();
         services.AddTransient<SupertrendAnalyseService>();
         services.AddTransient<YieldLtmAnalyseService>();
+        services.AddTransient<ColorHelper>();
+        
         services.AddTransient<ISharesReportService, SharesReportService>();
         services.AddTransient<IIndexesReportService, IndexesReportService>();
         services.AddTransient<IFuturesReportService, FuturesReportService>();
         services.AddTransient<ICurrenciesReportService, CurrenciesReportService>();
         services.AddTransient<IBondsReportService, BondsReportService>();
+        
+        services.AddTransient<ISharesDiagramService, SharesDiagramService>();
+        
+        services.AddTransient<ILoadService, LoadService>();
+        services.AddTransient<IAnalyseService, AnalyseService>();
         services.AddTransient<ISendService, SendService>();
-        services.AddTransient<ColorHelper>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<ISpreadService, SpreadService>();
         services.AddTransient<IMultiplicatorService, MultiplicatorService>();
@@ -45,6 +51,7 @@ public static class ServiceCollectionExtensions
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();
+        services.AddTransient<IDiagramDataFactory, DiagramDataFactory>();
     }
     
     public static async Task RegisterHangfireJobs(
