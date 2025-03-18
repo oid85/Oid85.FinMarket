@@ -602,7 +602,7 @@ public class ReportDataFactory(
     {
         var marketEvents = (await marketEventRepository.GetActivatedAsync())
             .Where(x => instrumentIds.Contains(x.InstrumentId))
-            .OrderBy(x => new DateTime(x.Date, x.Time));
+            .OrderByDescending(x => new DateTime(x.Date, x.Time));
         
         var reportData = CreateNewReportDataWithHeaders(
             ["Тикер", "Сектор", "Наименование", "Дата", "Время", "Текст"]);
