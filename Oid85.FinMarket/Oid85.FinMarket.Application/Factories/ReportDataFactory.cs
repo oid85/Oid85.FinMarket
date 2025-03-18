@@ -300,16 +300,16 @@ public class ReportDataFactory(
                 "Сектор", 
                 "Эмитент", 
                 "Бета-коэфф.", 
-                "Кол-во акций об., млн",
-                "Кол-во акций пр., млн",
+                "Кол-во ао, млн",
+                "Кол-во ап, млн",
                 "Выручка", 
                 "Чист. приб.",
                 "Опер. приб.",
                 "Рыноч. кап.", 
                 "EBITDA", 
                 "EV",
-                "Total debt",
-                "Net debt",
+                "TotalDebt",
+                "NetDebt",
                 "P/E", 
                 "P/B",
                 "P/BV", 
@@ -319,8 +319,8 @@ public class ReportDataFactory(
                 "Чист. проц. маржа", 
                 "Своб. ден. поток", 
                 "EV/EBITDA", 
-                "Total debt/EBITDA", 
-                "Net debt/EBITDA"
+                "TotalDebt/EBITDA", 
+                "NetDebt/EBITDA"
             ]);
 
         reportData.Title = "Мультипликаторы";
