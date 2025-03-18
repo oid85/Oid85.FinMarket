@@ -7,9 +7,20 @@ public class DateHelper
         var curDate = from;
         var dates = new List<DateOnly>();
 
+        var daysOfWeek = new List<DayOfWeek>()
+        {
+            DayOfWeek.Monday,
+            DayOfWeek.Tuesday,
+            DayOfWeek.Wednesday,
+            DayOfWeek.Thursday,
+            DayOfWeek.Friday
+        };
+        
         while (curDate <= to)
         {
-            dates.Add(curDate);
+            if (daysOfWeek.Contains(curDate.DayOfWeek))
+                dates.Add(curDate);
+            
             curDate = curDate.AddDays(1);
         }
 
