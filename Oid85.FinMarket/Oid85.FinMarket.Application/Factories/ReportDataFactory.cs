@@ -316,8 +316,8 @@ public class ReportDataFactory(
                 "EPS", 
                 "ROE", 
                 "ROA", 
-                "Чист. проц. маржа", 
-                "Св. ден. поток", 
+                "NIM", 
+                "FCF", 
                 "EV/EBITDA", 
                 "TotalDebt/EBITDA", 
                 "NetDebt/EBITDA"
