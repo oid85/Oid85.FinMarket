@@ -187,12 +187,10 @@ public class FeerGreedIndexService(
         return dates.ToDictionary(x => x, _ => 0.0);
     }
     
-    private List<DateOnly> GetDates()
-    {
-        var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
-        var to = DateOnly.FromDateTime(DateTime.Today);
-        return DateHelper.GetDates(from, to);
-    }
+    private static List<DateOnly> GetDates() => 
+        DateHelper.GetDates(
+            DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), 
+            DateOnly.FromDateTime(DateTime.Today));
     
     private async Task<Dictionary<Guid, List<Candle>>> CreateDataDictionaryAsync()
     {
@@ -203,7 +201,7 @@ public class FeerGreedIndexService(
         foreach (var share in shares)
         {
             var candles = await candleRepository.GetLastTwoYearsAsync(share.InstrumentId);
-            dictionary.Add(share.Id, candles);
+            dictionary.Add(share.InstrumentId, candles);
         }
 
         return dictionary;
