@@ -1,5 +1,4 @@
-﻿using NLog;
-using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models;
@@ -8,7 +7,6 @@ using Skender.Stock.Indicators;
 namespace Oid85.FinMarket.Application.Services;
 
 public class FeerGreedIndexService(
-    ILogger logger,
     IInstrumentService instrumentService,
     IInstrumentRepository instrumentRepository,
     IFeerGreedRepository feerGreedRepository,
@@ -39,8 +37,14 @@ public class FeerGreedIndexService(
             var strength = normalizedBreadths[date];
             
             // Для расчета индекса берется среднее значение показателей, нормированных от 0 до 100
-            // Значения Моментум и Волатильности берутся с удвоенным весом
-            var feerGreedIndexValue = (momentum * 2.0 + volatility * 2.0 + breadth + strength) / 4.0;
+            var values = new List<double>();
+            
+            if (momentum != 0.0) values.Add(momentum);
+            if (volatility != 0.0) values.Add(volatility);
+            if (breadth != 0.0) values.Add(breadth);
+            if (strength != 0.0) values.Add(strength);
+            
+            var feerGreedIndexValue = values.Count != 0 ? values.Average() : 0.0;
 
             var feerGreedIndex = new FearGreedIndex
             {
