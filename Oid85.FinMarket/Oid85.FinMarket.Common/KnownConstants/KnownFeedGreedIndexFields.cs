@@ -6,5 +6,5 @@ public static class KnownFeedGreedIndexFields
     public const string MarketVolatility = "Волатильность рынка";
     public const string StockPriceBreadth = "Ширина рынка";
     public const string StockPriceStrength = "Сила цен акций";
-    public const string FeerGreedIndex = "Индекс силы и жадности";
+    public const string FeerGreedIndex = "Индекс страха и жадности";
 }
