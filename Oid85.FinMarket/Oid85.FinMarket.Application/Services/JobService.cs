@@ -37,11 +37,11 @@ public class JobService(
     /// <inheritdoc />
     public async Task Every15Minutes()
     {
-        await ProcessMultiplicatorsAsync();
         await LoadLastPricesAsync();
         await LoadFiveMinuteCandlesAsync();
         await ProcessSpreadPairsAsync();
         await ProcessMultiplicatorsAsync();
+        await ProcessFeerGreedAsync();
         await CheckIntradayMarketEventsAsync();
         await SendNotificationsAsync();
     }
