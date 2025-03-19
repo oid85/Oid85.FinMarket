@@ -77,7 +77,9 @@ public class MarketEventRepository(
                     x.InstrumentId == marketEvent.InstrumentId &&
                     x.MarketEventType == marketEvent.MarketEventType)
                 .ExecuteUpdateAsync(x => x
-                        .SetProperty(entity => entity.IsActive, value));
+                    .SetProperty(entity => entity.IsActive, value)
+                    .SetProperty(entity => entity.Date, DateOnly.FromDateTime(DateTime.UtcNow))
+                    .SetProperty(entity => entity.Time, TimeOnly.FromDateTime(DateTime.UtcNow)));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
