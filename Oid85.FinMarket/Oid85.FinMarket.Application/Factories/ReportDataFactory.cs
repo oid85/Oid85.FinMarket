@@ -670,6 +670,7 @@ public class ReportDataFactory(
 
     public async Task<ReportData> CreateFearGreedIndexReportDataAsync(DateOnly from, DateOnly to)
     {
+        
         var feerGreedIndexes = await feerGreedRepository.GetAsync(from, to);
 
         var dates = DateHelper.GetDates(from, to);
@@ -691,6 +692,13 @@ public class ReportDataFactory(
             
             foreach (var date in dates)
             {
+                // Не выводим за сегодняшний день, т.к. дневные свечи еще не подгружены
+                if (date == DateOnly.FromDateTime(DateTime.Today))
+                {
+                    data.Add(GetString(string.Empty));
+                    continue;
+                }
+
                 var feerGreedIndex = feerGreedIndexes.FirstOrDefault(x => x.Date == date);
 
                 if (feerGreedIndex is not null)
