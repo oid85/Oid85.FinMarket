@@ -115,8 +115,25 @@ public class ColorHelper(
         return resource.Color;
     }
     
+    public async Task<string> GetColorPeAsync(double value)
+    {
+        if (value == 0.0)
+            return KnownColors.White;
+        
+        var colorPalette = await resourceStoreService.GetColorPalettePeAsync();
+        var resource = colorPalette.FirstOrDefault(x => value >= x.LowLevel && value <= x.HighLevel);
+
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.Color;
+    }    
+    
     public async Task<string> GetColorEvToEbitda(double value)
     {
+        if (value == 0.0)
+            return KnownColors.White;
+        
         var colorPalette = await resourceStoreService.GetColorPaletteEvToEbitdaAsync();
         var resource = colorPalette.FirstOrDefault(x => value >= x.LowLevel && value <= x.HighLevel);
 
@@ -128,7 +145,24 @@ public class ColorHelper(
     
     public async Task<string> GetColorNetDebtToEbitda(double value)
     {
+        if (value == 0.0)
+            return KnownColors.White;
+        
         var colorPalette = await resourceStoreService.GetColorPaletteNetDebtToEbitdaAsync();
+        var resource = colorPalette.FirstOrDefault(x => value >= x.LowLevel && value <= x.HighLevel);
+
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.Color;
+    }
+    
+    public async Task<string> GetColorTotalDebtToEbitda(double value)
+    {
+        if (value == 0.0)
+            return KnownColors.White;
+        
+        var colorPalette = await resourceStoreService.GetColorPaletteTotalDebtToEbitdaAsync();
         var resource = colorPalette.FirstOrDefault(x => value >= x.LowLevel && value <= x.HighLevel);
 
         if (resource is null)

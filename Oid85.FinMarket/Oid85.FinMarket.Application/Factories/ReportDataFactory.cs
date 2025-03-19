@@ -332,9 +332,6 @@ public class ReportDataFactory(
             if (multiplicator is null)
                 continue;
 
-            string colorEvToEbitda = await colorHelper.GetColorEvToEbitda(multiplicator.EvToEbitda);
-            string colorNetDebtToEbitda = await colorHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda);
-            
             List<ReportParameter> data =
             [
                 GetTicker(share.Ticker),
@@ -351,7 +348,7 @@ public class ReportDataFactory(
                 GetNumber(multiplicator.Ev),
                 GetNumber(multiplicator.TotalDebt),
                 GetNumber(multiplicator.NetDebt),
-                GetNumber(multiplicator.Pe),
+                GetNumber(multiplicator.Pe, await colorHelper.GetColorPeAsync(multiplicator.Pe)),
                 GetNumber(multiplicator.Pb),
                 GetNumber(multiplicator.Pbv),
                 GetNumber(multiplicator.Eps),
@@ -359,9 +356,9 @@ public class ReportDataFactory(
                 GetNumber(multiplicator.Roa),
                 GetNumber(multiplicator.NetInterestMargin),
                 GetNumber(multiplicator.FreeCashFlow),
-                GetNumber(multiplicator.EvToEbitda, colorEvToEbitda),
-                GetNumber(multiplicator.TotalDebtToEbitda),
-                GetNumber(multiplicator.NetDebtToEbitda, colorNetDebtToEbitda)
+                GetNumber(multiplicator.EvToEbitda, await colorHelper.GetColorEvToEbitda(multiplicator.EvToEbitda)),
+                GetNumber(multiplicator.TotalDebtToEbitda, await colorHelper.GetColorTotalDebtToEbitda(multiplicator.NetDebtToEbitda)),
+                GetNumber(multiplicator.NetDebtToEbitda, await colorHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda))
             ];
             
             reportData.Data.Add(data);

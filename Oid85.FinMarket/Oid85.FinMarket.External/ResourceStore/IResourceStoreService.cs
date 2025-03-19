@@ -113,6 +113,11 @@ public interface IResourceStoreService
     Task<List<RangeColorResource>> GetColorPaletteNetDebtToEbitdaAsync();
     
     /// <summary>
+    /// Получить цветовую палитру для TotalDebt / EBITDA
+    /// </summary>
+    Task<List<RangeColorResource>> GetColorPaletteTotalDebtToEbitdaAsync();
+    
+    /// <summary>
     /// Получить цветовую палитру для SpreadPricePosition
     /// </summary>
     Task<List<ValueColorResource<string>>> GetColorPaletteSpreadPricePositionAsync();

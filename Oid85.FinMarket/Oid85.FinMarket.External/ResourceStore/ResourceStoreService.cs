@@ -149,6 +149,12 @@ public class ResourceStoreService(
                 "colorPalettes", "limits", "netDebtEbitdaLimits.json")) ?? [];
 
     /// <inheritdoc />
+    public async Task<List<RangeColorResource>> GetColorPaletteTotalDebtToEbitdaAsync() =>
+        await ReadAsync<List<RangeColorResource>>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "colorPalettes", "limits", "totalDebtEbitdaLimits.json")) ?? [];
+
+    /// <inheritdoc />
     public async Task<List<ValueColorResource<string>>> GetColorPaletteSpreadPricePositionAsync() =>
         await ReadAsync<List<ValueColorResource<string>>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
