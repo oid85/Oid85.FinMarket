@@ -7,14 +7,10 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.Application.Factories;
 
 public class DiagramDataFactory(
+    IInstrumentRepository instrumentRepository,
     ICandleRepository candleRepository) 
     : IDiagramDataFactory
 {
-    private static List<DateOnly> GetDates() => 
-        DateHelper.GetDates(
-            DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), 
-            DateOnly.FromDateTime(DateTime.Today));
-
     private async Task<Dictionary<Guid, List<Candle>>> CreateDataDictionaryAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to)
     {
@@ -28,16 +24,12 @@ public class DiagramDataFactory(
 
         return dictionary;
     }
-    
-    public async Task<DiagramData<DateOnly, double>> CreateClosePricesDiagramDataAsync(
-        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+
+    private DiagramData<DateOnly, double?> CreateNewDateOnlyDiagramData(List<DateOnly> dates)
     {
-        var dates = GetDates();
-        var data = await CreateDataDictionaryAsync(instrumentIds, from, to);
-        
-        var diagrgamData = new DiagramData<DateOnly, double>
+        var diagrgamData = new DiagramData<DateOnly, double?>
         {
-            Title = "Графики цен",
+            Title = "Графики",
             AxisX =
             {
                 Title = "Дата",
@@ -45,12 +37,39 @@ public class DiagramDataFactory(
             }
         };
 
+        return diagrgamData;
+    }
+
+    private async Task<Axis<double?>> CreateClosePricesAxisYByInstrumentIdAsync(
+        Guid instrumentId, List<Candle> candles, List<DateOnly> dates)
+    {
+        var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+        var axis = new Axis<double?> { Title = instrument?.Ticker ?? string.Empty };
+        
+        foreach (var date in dates)
+        {
+            var candle = candles.FirstOrDefault(x => x.Date == date);
+
+            if (candle == null)
+                axis.Values.Add(null);
+            else
+                axis.Values.Add(candle.Close);
+        }
+
+        return axis;
+    }
+
+    public async Task<DiagramData<DateOnly, double?>> CreateClosePricesDiagramDataAsync(
+        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+    {
+        var dates = DateHelper.GetDates(from, to);
+        var data = await CreateDataDictionaryAsync(instrumentIds, from, to);
+        var diagrgamData = CreateNewDateOnlyDiagramData(dates);
+
         foreach (var instrumentId in instrumentIds)
         {
-            foreach (var date in dates)
-            {
-                
-            }
+            var axis = await CreateClosePricesAxisYByInstrumentIdAsync(instrumentId, data[instrumentId], dates);
+            diagrgamData.AxisesY.Add(axis);
         }
 
         return diagrgamData;
