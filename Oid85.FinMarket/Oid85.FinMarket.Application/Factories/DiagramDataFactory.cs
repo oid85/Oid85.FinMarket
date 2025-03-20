@@ -30,27 +30,20 @@ public class DiagramDataFactory(
     {
         var dates = DateHelper.GetDates(from, to);
         var data = await CreateDataDictionaryAsync(instrumentIds, from, to);
-        var simpleDiagramData = new SimpleDiagramData
-        {
-            Title = "Графики"
-        };
+        var simpleDiagramData = new SimpleDiagramData { Title = "Графики" };
         
         foreach (var instrumentId in instrumentIds)
         {
             var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
-            
-            var dataPointSeries = new DataPointSeries()
-            {
-                Title = instrument?.Ticker ?? string.Empty
-            };
+            var dataPointSeries = new DataPointSeries { Title = instrument?.Ticker ?? string.Empty };
 
             foreach (var date in dates)
             {
                 var candle = data[instrumentId].FirstOrDefault(x => x.Date == date);
-
+                
                 dataPointSeries.Data.Add(candle is null
-                    ? new DataPoint {Date = date, Value = null}
-                    : new DataPoint {Date = date, Value = candle.Close});
+                    ? new DataPoint { Date = date, Value = null }
+                    : new DataPoint { Date = date, Value = candle.Close });
             }
             
             simpleDiagramData.Data.Add(dataPointSeries);
