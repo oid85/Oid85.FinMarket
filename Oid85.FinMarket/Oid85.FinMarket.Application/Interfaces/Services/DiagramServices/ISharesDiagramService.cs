@@ -5,5 +5,5 @@ namespace Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 
 public interface ISharesDiagramService
 {
-    Task<DiagramData<DateOnly, double?>> GetClosePricesAsync(DateRangeRequest request);
+    Task<SimpleDiagramData> GetClosePricesAsync(DateRangeRequest request);
 }

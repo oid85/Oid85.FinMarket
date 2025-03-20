@@ -379,14 +379,14 @@ public class SharesController(
     /// Диаграмма График цен закрытия
     /// </summary>
     [HttpPost("diagram/close-prices")]
-    [ProducesResponseType(typeof(BaseResponse<DiagramData<DateOnly, double?>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<DiagramData<DateOnly, double?>>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<DiagramData<DateOnly, double?>>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetClosePricesAsync(
         [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
             () => diagramService.GetClosePricesAsync(request),
-            result => new BaseResponse<DiagramData<DateOnly, double?>>
+            result => new BaseResponse<SimpleDiagramData>
             {
                 Result = result
             });    

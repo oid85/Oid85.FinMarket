@@ -1,7 +1,7 @@
 ﻿namespace Oid85.FinMarket.Application.Models.Diagrams;
 
-public class Axis<T>
+public class SimpleDiagramData
 {
     public string Title { get; set; } = string.Empty;
-    public List<T> Values { get; set; } = [];
+    public List<DataPointSeries> Data { get; set; } = new();
 }

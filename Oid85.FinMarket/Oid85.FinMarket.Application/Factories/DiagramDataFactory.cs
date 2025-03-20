@@ -25,53 +25,37 @@ public class DiagramDataFactory(
         return dictionary;
     }
 
-    private DiagramData<DateOnly, double?> CreateNewDateOnlyDiagramData(List<DateOnly> dates)
-    {
-        var diagrgamData = new DiagramData<DateOnly, double?>
-        {
-            Title = "Графики",
-            AxisX =
-            {
-                Title = "Дата",
-                Values = dates
-            }
-        };
-
-        return diagrgamData;
-    }
-
-    private async Task<Axis<double?>> CreateClosePricesAxisYByInstrumentIdAsync(
-        Guid instrumentId, List<Candle> candles, List<DateOnly> dates)
-    {
-        var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
-        var axis = new Axis<double?> { Title = instrument?.Ticker ?? string.Empty };
-        
-        foreach (var date in dates)
-        {
-            var candle = candles.FirstOrDefault(x => x.Date == date);
-
-            if (candle == null)
-                axis.Values.Add(null);
-            else
-                axis.Values.Add(candle.Close);
-        }
-
-        return axis;
-    }
-
-    public async Task<DiagramData<DateOnly, double?>> CreateClosePricesDiagramDataAsync(
+    public async Task<SimpleDiagramData> CreateClosePricesDiagramDataAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to)
     {
         var dates = DateHelper.GetDates(from, to);
         var data = await CreateDataDictionaryAsync(instrumentIds, from, to);
-        var diagrgamData = CreateNewDateOnlyDiagramData(dates);
-
+        var simpleDiagramData = new SimpleDiagramData
+        {
+            Title = "Графики"
+        };
+        
         foreach (var instrumentId in instrumentIds)
         {
-            var axis = await CreateClosePricesAxisYByInstrumentIdAsync(instrumentId, data[instrumentId], dates);
-            diagrgamData.AxisesY.Add(axis);
+            var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+            
+            var dataPointSeries = new DataPointSeries()
+            {
+                Title = instrument?.Ticker ?? string.Empty
+            };
+
+            foreach (var date in dates)
+            {
+                var candle = data[instrumentId].FirstOrDefault(x => x.Date == date);
+
+                dataPointSeries.Data.Add(candle is null
+                    ? new DataPoint {Date = date, Value = null}
+                    : new DataPoint {Date = date, Value = candle.Close});
+            }
+            
+            simpleDiagramData.Data.Add(dataPointSeries);
         }
 
-        return diagrgamData;
+        return simpleDiagramData;
     }
 }
