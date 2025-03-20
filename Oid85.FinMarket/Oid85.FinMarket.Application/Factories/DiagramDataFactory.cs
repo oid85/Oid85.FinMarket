@@ -41,7 +41,7 @@ public class DiagramDataFactory(
             {
                 var candle = data[instrumentId].FirstOrDefault(x => x.Date == date);
                 
-                dataPointSeries.Data.Add(candle is null
+                dataPointSeries.Series.Add(candle is null
                     ? new DataPoint { Date = date, Value = null }
                     : new DataPoint { Date = date, Value = candle.Close });
             }

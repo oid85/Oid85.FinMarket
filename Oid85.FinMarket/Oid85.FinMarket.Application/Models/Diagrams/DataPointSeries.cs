@@ -3,5 +3,5 @@
 public class DataPointSeries
 {
     public string Title { get; set; } = string.Empty;
-    public List<DataPoint> Data { get; set; } = [];
+    public List<DataPoint> Series { get; set; } = [];
 }
