@@ -617,7 +617,7 @@ public class ReportDataFactory(
             [
                 GetTicker(instrument.Ticker),
                 GetSector(instrument.Sector),
-                GetTicker(normalizeService.NormalizeInstrumentName(marketEvent.InstrumentName), color),
+                GetString(normalizeService.NormalizeInstrumentName(marketEvent.InstrumentName), color),
                 GetString(marketEvent.Date.ToString(KnownDateTimeFormats.DateISO), color),
                 GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO), color),
                 GetString(marketEvent.MarketEventText, color)

@@ -24,10 +24,10 @@ public class MarketEventRepository(
     }
 
     public Task ActivateAsync(MarketEvent marketEvent) =>
-        SetIsActiveFlagAsync(marketEvent, true);
+        SetIsActiveFlagTrueAsync(marketEvent);
 
     public Task DeactivateAsync(MarketEvent marketEvent) =>
-        SetIsActiveFlagAsync(marketEvent, false);
+        SetIsActiveFlagFalseAsync(marketEvent);
 
     public Task MarkAsSentAsync(MarketEvent marketEvent) =>
         SetSentNotificationFlagAsync(marketEvent, true);
@@ -66,7 +66,7 @@ public class MarketEventRepository(
         }
     }
 
-    private async Task SetIsActiveFlagAsync(MarketEvent marketEvent, bool value)
+    private async Task SetIsActiveFlagTrueAsync(MarketEvent marketEvent)
     {
         await using var transaction = await context.Database.BeginTransactionAsync();
         
@@ -75,9 +75,37 @@ public class MarketEventRepository(
             await context.MarketEventEntities
                 .Where(x => 
                     x.InstrumentId == marketEvent.InstrumentId &&
-                    x.MarketEventType == marketEvent.MarketEventType)
+                    x.MarketEventType == marketEvent.MarketEventType &&
+                    x.IsActive == false)
                 .ExecuteUpdateAsync(x => x
-                    .SetProperty(entity => entity.IsActive, value)
+                    .SetProperty(entity => entity.IsActive, true)
+                    .SetProperty(entity => entity.Date, DateOnly.FromDateTime(DateTime.UtcNow))
+                    .SetProperty(entity => entity.Time, TimeOnly.FromDateTime(DateTime.UtcNow)));
+            
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+            
+        catch (Exception exception)
+        {
+            await transaction.RollbackAsync();
+            logger.Error(exception);
+        }
+    }
+    
+    private async Task SetIsActiveFlagFalseAsync(MarketEvent marketEvent)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        
+        try
+        {
+            await context.MarketEventEntities
+                .Where(x => 
+                    x.InstrumentId == marketEvent.InstrumentId &&
+                    x.MarketEventType == marketEvent.MarketEventType &&
+                    x.IsActive == true)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(entity => entity.IsActive, false)
                     .SetProperty(entity => entity.Date, DateOnly.FromDateTime(DateTime.UtcNow))
                     .SetProperty(entity => entity.Time, TimeOnly.FromDateTime(DateTime.UtcNow)));
             
