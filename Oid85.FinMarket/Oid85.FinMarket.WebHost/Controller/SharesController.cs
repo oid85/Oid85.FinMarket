@@ -376,18 +376,34 @@ public class SharesController(
             });
     
     /// <summary>
-    /// Диаграмма График цен закрытия
+    /// Диаграмма График цен закрытия (дневные)
     /// </summary>
-    [HttpPost("diagram/close-prices")]
+    [HttpPost("diagram/daily-close-prices")]
     [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetClosePricesAsync(
+    public Task<IActionResult> GetDailyClosePricesAsync(
         [FromBody] DateRangeRequest request) =>
         GetResponseAsync(
-            () => diagramService.GetClosePricesAsync(request),
+            () => diagramService.GetDailyClosePricesAsync(request),
             result => new BaseResponse<SimpleDiagramData>
             {
                 Result = result
             });    
+    
+    /// <summary>
+    /// Диаграмма График цен закрытия (5 мин)
+    /// </summary>
+    [HttpPost("diagram/five-minutes-close-prices")]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetFiveMinutesClosePricesAsync(
+        [FromBody] DateRangeRequest request) =>
+        GetResponseAsync(
+            () => diagramService.GetFiveMinutesClosePricesAsync(request),
+            result => new BaseResponse<SimpleDiagramData>
+            {
+                Result = result
+            });  
 }

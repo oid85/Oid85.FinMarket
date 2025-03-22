@@ -8,10 +8,11 @@ namespace Oid85.FinMarket.Application.Factories;
 
 public class DiagramDataFactory(
     IInstrumentRepository instrumentRepository,
-    ICandleRepository candleRepository) 
+    ICandleRepository candleRepository,
+    IFiveMinuteCandleRepository fiveMinuteCandleRepository) 
     : IDiagramDataFactory
 {
-    private async Task<Dictionary<Guid, List<Candle>>> CreateDataDictionaryAsync(
+    private async Task<Dictionary<Guid, List<Candle>>> CreateDailyDataDictionaryAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to)
     {
         var dictionary = new Dictionary<Guid, List<Candle>>();
@@ -25,12 +26,55 @@ public class DiagramDataFactory(
         return dictionary;
     }
 
-    public async Task<SimpleDiagramData> CreateClosePricesDiagramDataAsync(
+    private async Task<Dictionary<Guid, List<FiveMinuteCandle>>> CreateFiveMinutesDataDictionaryAsync(
+        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+    {
+        var dictionary = new Dictionary<Guid, List<FiveMinuteCandle>>();
+
+        foreach (var instrumentId in instrumentIds)
+        {
+            var candles = await fiveMinuteCandleRepository.GetAsync(instrumentId, from, to);
+            dictionary.Add(instrumentId, candles);
+        }
+
+        return dictionary;
+    }    
+    
+    public async Task<SimpleDiagramData> CreateDailyClosePricesDiagramDataAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to)
     {
         var dates = DateHelper.GetDates(from, to);
-        var data = await CreateDataDictionaryAsync(instrumentIds, from, to);
+        var data = await CreateDailyDataDictionaryAsync(instrumentIds, from, to);
         var simpleDiagramData = new SimpleDiagramData { Title = "Графики" };
+        
+        foreach (var instrumentId in instrumentIds)
+        {
+            var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+            string ticker = instrument?.Ticker ?? string.Empty;
+            string name = instrument?.Name ?? string.Empty;
+            
+            var dataPointSeries = new DataPointSeries { Title = $"{name} ({ticker})" };
+
+            foreach (var date in dates)
+            {
+                var candle = data[instrumentId].FirstOrDefault(x => x.Date == date);
+                
+                dataPointSeries.Series.Add(candle is null
+                    ? new DataPoint { Date = date, Value = null }
+                    : new DataPoint { Date = date, Value = candle.Close });
+            }
+            
+            simpleDiagramData.Data.Add(dataPointSeries);
+        }
+
+        return simpleDiagramData;
+    }
+
+    public async Task<SimpleDiagramData> CreateFiveMinutesClosePricesDiagramDataAsync(List<Guid> instrumentIds, DateOnly from, DateOnly to)
+    {
+        var dates = DateHelper.GetDates(from, to);
+        var data = await CreateDailyDataDictionaryAsync(instrumentIds, from, to);
+        var simpleDiagramData = new SimpleDiagramData { Title = "Графики (5 мин)" };
         
         foreach (var instrumentId in instrumentIds)
         {

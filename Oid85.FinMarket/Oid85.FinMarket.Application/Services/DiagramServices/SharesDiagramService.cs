@@ -15,6 +15,9 @@ public class SharesDiagramService(
         (await instrumentService.GetSharesInWatchlist())
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
-    public async Task<SimpleDiagramData> GetClosePricesAsync(DateRangeRequest request) =>
-        await diagramDataFactory.CreateClosePricesDiagramDataAsync(await GetInstrumentIds(), request.From, request.To);
+    public async Task<SimpleDiagramData> GetDailyClosePricesAsync(DateRangeRequest request) =>
+        await diagramDataFactory.CreateDailyClosePricesDiagramDataAsync(await GetInstrumentIds(), request.From, request.To);
+
+    public async Task<SimpleDiagramData> GetFiveMinutesClosePricesAsync(DateRangeRequest request) =>
+        await diagramDataFactory.CreateFiveMinutesClosePricesDiagramDataAsync(await GetInstrumentIds(), request.From, request.To);
 }

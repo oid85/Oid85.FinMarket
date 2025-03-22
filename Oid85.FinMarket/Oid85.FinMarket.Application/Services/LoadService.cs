@@ -83,22 +83,10 @@ public class LoadService(
 
         foreach (var instrument in instruments)
         {
-            var lastCandle = await fiveMinuteCandleRepository.GetLastAsync(instrument.InstrumentId);
-
-            if (lastCandle is null || (lastCandle.Date.ToDateTime(TimeOnly.MinValue) - DateTime.Today).TotalDays > 5)
-            {
-                const int days = 5;
-                var candles = await tinkoffService.GetFiveMinuteCandlesAsync(
-                    instrument.InstrumentId, DateTime.UtcNow.AddDays(-1 * days), DateTime.UtcNow);
-                await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
-            }
-
-            else
-            {
-                var candles = await tinkoffService.GetFiveMinuteCandlesAsync(
-                    instrument.InstrumentId, lastCandle.Date.ToDateTime(lastCandle.Time), DateTime.UtcNow);
-                await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
-            }
+            var candles = await tinkoffService.GetFiveMinuteCandlesAsync(
+                instrument.InstrumentId, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+            
+            await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
         }
         
         return true;

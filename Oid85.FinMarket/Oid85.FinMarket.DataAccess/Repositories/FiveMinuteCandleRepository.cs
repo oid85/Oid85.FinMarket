@@ -81,9 +81,25 @@ public class FiveMinuteCandleRepository(
 
     public async Task<List<FiveMinuteCandle>> GetLastWeekCandlesAsync(Guid instrumentId)
     {
-        var from = DateOnly.FromDateTime(DateTime.Today.AddDays(-70));
+        var from = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));
         var to = DateOnly.FromDateTime(DateTime.Today);
         
+        var entities = await context.FiveMinuteCandleEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .Where(x => 
+                x.Date >= from &&
+                x.Date <= to)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return entities.Count == 0 ? [] : entities
+            .Select(DataAccessMapper.Map)
+            .OrderBy(x => x.DateTime)
+            .ToList();
+    }
+
+    public async Task<List<FiveMinuteCandle>> GetAsync(Guid instrumentId, DateOnly from, DateOnly to)
+    {
         var entities = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
