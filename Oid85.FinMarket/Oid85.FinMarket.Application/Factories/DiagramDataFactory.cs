@@ -35,7 +35,10 @@ public class DiagramDataFactory(
         foreach (var instrumentId in instrumentIds)
         {
             var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
-            var dataPointSeries = new DataPointSeries { Title = instrument?.Ticker ?? string.Empty };
+            string ticker = instrument?.Ticker ?? string.Empty;
+            string name = instrument?.Name ?? string.Empty;
+            
+            var dataPointSeries = new DataPointSeries { Title = $"{name} ({ticker})" };
 
             foreach (var date in dates)
             {
