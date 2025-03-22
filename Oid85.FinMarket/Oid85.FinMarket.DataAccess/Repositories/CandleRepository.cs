@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models;
 
@@ -11,41 +12,22 @@ public class CandleRepository(
 {
     public async Task AddOrUpdateAsync(List<Candle> candles)
     {
-        if (candles is [])
+        var completedCandles = candles
+            .Where(x => x.IsComplete).ToList();
+        
+        if (completedCandles is [])
             return;
+
+        var entities = new List<CandleEntity>();
         
-        var lastCandle = await GetLastAsync(candles.First().InstrumentId);
+        foreach (var candle in completedCandles)
+            if (!await context.CandleEntities
+                    .AnyAsync(x => 
+                        x.InstrumentId == candle.InstrumentId
+                        && x.Date == candle.Date))
+                entities.Add(DataAccessMapper.Map(candle));
 
-        if (lastCandle is null)
-        {
-            var entities = candles.Select(DataAccessMapper.Map);
-            await context.CandleEntities.AddRangeAsync(entities);
-        }
-        
-        else
-        {
-            if (!lastCandle.IsComplete)
-            {
-                var candle = candles.Find(x => x.Date == lastCandle.Date);
-
-                if (candle is not null)
-                {
-                    var entity = await context.CandleEntities
-                        .FirstAsync(x => 
-                            x.Date == candle.Date &&
-                            x.InstrumentId == candle.InstrumentId);
-
-                    DataAccessMapper.Map(ref entity, candle);
-                }
-            }
-
-            var entities = candles
-                .Select(DataAccessMapper.Map)
-                .Where(x => x.Date > lastCandle.Date);
-                
-            await context.CandleEntities.AddRangeAsync(entities);  
-        }
-
+        await context.CandleEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
     
