@@ -2,6 +2,6 @@
 
 public class DataPoint
 {
-    public DateOnly Date { get; set; }
+    public string Date { get; set; }
     public double? Value { get; set; }
 }

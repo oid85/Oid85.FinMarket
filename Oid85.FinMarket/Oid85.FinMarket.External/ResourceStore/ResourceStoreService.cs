@@ -133,16 +133,20 @@ public class ResourceStoreService(
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "colorPalettes", "limits", "yieldCouponLimits.json")) ?? [];
+    
+    /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPalettePeAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "colorPalettes", "limits", "peLimits.json")) ?? [];
 
+    /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPaletteEvToEbitdaAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "colorPalettes", "limits", "evEbitdaLimits.json")) ?? [];
 
+    /// <inheritdoc />
     public async Task<List<RangeColorResource>> GetColorPaletteNetDebtToEbitdaAsync() =>
         await ReadAsync<List<RangeColorResource>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
