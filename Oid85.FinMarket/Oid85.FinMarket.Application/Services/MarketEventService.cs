@@ -534,22 +534,15 @@ public class MarketEventService(
 
             foreach (var share in shares)
             {
-                var candles = await fiveMinuteCandleRepository.GetLastWeekCandlesAsync(share.InstrumentId);
+                var candles = (await fiveMinuteCandleRepository.GetLastWeekCandlesAsync(share.InstrumentId))
+                    .OrderBy(x => x.DateTime)
+                    .TakeLast(24)
+                    .ToList();
                 
-                if (candles.Count < 2)
+                if (candles.Count < 24)
                     continue;
                 
-                // Объем последней свечи больше, чем объем 90% свечей
-                long volume = candles[^1].Volume;
-                int countCandlesLessVolume = candles.Count(x => x.Volume < volume);
-                bool condition = (double) countCandlesLessVolume / (double) candles.Count >= 0.9;
-                
-                // Объем, в течение 2 свечей растет
-                condition &= candles[^1].Volume > candles[^2].Volume;
-                
-                // Последние 2 свечи белые
-                condition &= candles[^1].Close > candles[^1].Open;
-                condition &= candles[^2].Close > candles[^2].Open;
+                bool condition = false;
                 
                 var marketEvent = await CreateMarketEvent(
                     share.InstrumentId, 
