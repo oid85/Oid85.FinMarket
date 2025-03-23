@@ -534,6 +534,7 @@ public class MarketEventService(
 
             foreach (var share in shares)
             {
+                // Последние 24 5-минутки (2 часа)
                 var candles = (await fiveMinuteCandleRepository.GetLastWeekCandlesAsync(share.InstrumentId))
                     .OrderBy(x => x.DateTime)
                     .TakeLast(24)
@@ -542,7 +543,7 @@ public class MarketEventService(
                 if (candles.Count < 24)
                     continue;
                 
-                bool condition = false;
+                bool condition = HasAnomalyCandleBody(candles) && HasAnomalyCandleVolume(candles);
                 
                 var marketEvent = await CreateMarketEvent(
                     share.InstrumentId, 
@@ -559,6 +560,57 @@ public class MarketEventService(
         {
             logger.Error(exception);
         }
+
+        bool HasAnomalyCandleBody(List<FiveMinuteCandle> candles)
+        {
+            for (int i = 0; i < candles.Count; i++)
+            {
+                if (!IsWhiteCandle(candles[i]))
+                    continue;
+
+                double body = Math.Abs(candles[i].Open - candles[i].Close);
+                
+                double maxOtherCandlesBody = candles
+                    .Where(x => x.Id !=  candles[i].Id)
+                    .Select(x => Math.Abs(x.Open - x.Close))
+                    .Max();
+                
+                if (body == 0.0 || maxOtherCandlesBody == 0.0)
+                    continue;
+
+                if (body > 2 * maxOtherCandlesBody)
+                    return true;
+            }
+            
+            return false;
+        }
+        
+        bool HasAnomalyCandleVolume(List<FiveMinuteCandle> candles)
+        {
+            for (int i = 0; i < candles.Count; i++)
+            {
+                if (!IsWhiteCandle(candles[i]))
+                    continue;
+
+                long volume = candles[i].Volume;
+                
+                long maxOtherCandlesVolume = candles
+                    .Where(x => x.Id !=  candles[i].Id)
+                    .Select(x => x.Volume)
+                    .Max();
+                
+                if (volume == 0.0 || maxOtherCandlesVolume == 0.0)
+                    continue;
+
+                if (volume > 2 * maxOtherCandlesVolume)
+                    return true;
+            }
+            
+            return false;
+        }
+
+        bool IsWhiteCandle(FiveMinuteCandle candle) => 
+            candle.Close > candle.Open;
     }
 
     private async Task<MarketEvent> CreateMarketEvent(
