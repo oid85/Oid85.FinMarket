@@ -42,7 +42,7 @@ public class JobService(
         await ProcessSpreadPairsAsync();
         await ProcessMultiplicatorsAsync();
         await ProcessFeerGreedAsync();
-        await CheckIntradayMarketEventsAsync();
+        await CheckIntraDayMarketEventsAsync();
         await SendNotificationsAsync();
     }
 
@@ -255,18 +255,18 @@ public class JobService(
         }
     }
     
-    private async Task CheckIntradayMarketEventsAsync()
+    private async Task CheckIntraDayMarketEventsAsync()
     {
         try
         {
-            await marketEventService.CheckStrikeDayMarketEventAsync();
+            await marketEventService.CheckIntraDayImpulseMarketEventAsync();
             
-            logger.Info("Метод 'CheckIntradayMarketEventsAsync' выполнен успешно");
+            logger.Info("Метод 'CheckIntraDayMarketEventsAsync' выполнен успешно");
         }
         
         catch (Exception exception)
         {
-            logger.Info(exception, "Ошибка при выполнении метода 'CheckIntradayMarketEventsAsync'");
+            logger.Info(exception, "Ошибка при выполнении метода 'CheckIntraDayMarketEventsAsync'");
         }
     }
     
@@ -284,9 +284,9 @@ public class JobService(
             await marketEventService.CheckRsiOverOverSoldInputMarketEventAsync();
             await marketEventService.CheckRsiOverOverSoldOutputMarketEventAsync();
             await marketEventService.CheckCrossPriceLevelMarketEventAsync();
-            // await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
-            // await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
-            // await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
+            await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
+            await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
+            await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
             await marketEventService.CheckForecastReleasedMarketEventAsync();
             
             logger.Info("Метод 'CheckMarketEventsAsync' выполнен успешно");

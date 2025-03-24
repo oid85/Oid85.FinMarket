@@ -526,7 +526,7 @@ public class MarketEventService(
     }
 
     /// <inheritdoc />
-    public async Task CheckStrikeDayMarketEventAsync()
+    public async Task CheckIntraDayImpulseMarketEventAsync()
     {
         try
         {
@@ -547,8 +547,8 @@ public class MarketEventService(
                 
                 var marketEvent = await CreateMarketEvent(
                     share.InstrumentId, 
-                    KnownMarketEventTypes.StrikeDay,
-                    $"(!!!) Ударный день '{share.Ticker}'");
+                    KnownMarketEventTypes.IntraDayImpulse,
+                    $"Импульс внутри дня '{share.Ticker}'");
 
                 marketEvent.IsActive = condition;
                 
@@ -569,16 +569,23 @@ public class MarketEventService(
                     continue;
 
                 double body = Math.Abs(candles[i].Open - candles[i].Close);
+                double closePrice = candles[i].Close;
                 
                 double maxOtherCandlesBody = candles
                     .Where(x => x.Id !=  candles[i].Id)
                     .Select(x => Math.Abs(x.Open - x.Close))
                     .Max();
                 
+                double maxOtherCandlesClosePrice = candles
+                    .Where(x => x.Id !=  candles[i].Id)
+                    .Select(x => x.Close)
+                    .Max();                
+                
                 if (body == 0.0 || maxOtherCandlesBody == 0.0)
                     continue;
 
-                if (body > 2 * maxOtherCandlesBody)
+                if (body > 2 * maxOtherCandlesBody && 
+                    closePrice > maxOtherCandlesClosePrice)
                     return true;
             }
             
