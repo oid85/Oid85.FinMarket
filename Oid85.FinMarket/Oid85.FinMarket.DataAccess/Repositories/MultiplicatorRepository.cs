@@ -9,7 +9,8 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class MultiplicatorRepository(
     ILogger logger,
-    FinMarketContext context) 
+    FinMarketContext context,
+    IInstrumentRepository instrumentRepository) 
     : IMultiplicatorRepository
 {
     public async Task AddOrUpdateAsync(List<Multiplicator> multiplicators)
@@ -119,5 +120,23 @@ public class MultiplicatorRepository(
                 x.TickerAp == ticker);
         
         return entity is null ? null : DataAccessMapper.Map(entity);
+    }
+
+    public async Task<List<Multiplicator>> GetAsync(List<Guid> instrumentIds)
+    {
+        var tickers = (await instrumentRepository.GetAsync(instrumentIds))
+            .Select(x => x.Ticker).ToList();
+        
+        return (await context.MultiplicatorEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => 
+                    tickers.Contains(x.TickerAo) ||
+                    tickers.Contains(x.TickerAp))
+                .OrderBy(x => x.TickerAo)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+        
     }
 }

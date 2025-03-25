@@ -67,7 +67,7 @@ public class FeerGreedIndexService(
     /// </summary>
     private async Task<Dictionary<DateOnly, double>> GetMarketMomentumAsync()
     {
-        var indexMoex = await instrumentRepository.GetByTickerAsync("IMOEX");
+        var indexMoex = await instrumentRepository.GetAsync("IMOEX");
         var candles = (await candleRepository.GetLastYearAsync(indexMoex!.InstrumentId))
             .Where(x => x.IsComplete).ToList();
         
@@ -79,7 +79,7 @@ public class FeerGreedIndexService(
     /// </summary>
     private async Task<Dictionary<DateOnly, double>> GetMarketVolatilityAsync()
     {
-        var indexRvi = await instrumentRepository.GetByTickerAsync("RVI");
+        var indexRvi = await instrumentRepository.GetAsync("RVI");
         var candles = (await candleRepository.GetLastYearAsync(indexRvi!.InstrumentId))
             .Where(x => x.IsComplete).ToList();
 

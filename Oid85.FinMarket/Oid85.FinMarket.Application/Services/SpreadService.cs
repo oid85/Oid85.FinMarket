@@ -115,7 +115,7 @@ public class SpreadService(
 
         if (!string.IsNullOrEmpty(foreverFutureTicker))
             foreverFutureInstrumentId =
-                (await instrumentRepository.GetByTickerAsync(foreverFutureTicker))!.InstrumentId;
+                (await instrumentRepository.GetAsync(foreverFutureTicker))!.InstrumentId;
 
         var spreads = new List<Spread>();
 

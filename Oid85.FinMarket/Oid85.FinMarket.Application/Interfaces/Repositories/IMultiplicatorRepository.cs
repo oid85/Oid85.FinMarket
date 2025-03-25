@@ -8,4 +8,5 @@ public interface IMultiplicatorRepository
     Task UpdateCalculateFieldsAsync(Multiplicator multiplicator);
     Task<List<Multiplicator>> GetAllAsync();
     Task<Multiplicator?> GetAsync(string ticker);
+    Task<List<Multiplicator>> GetAsync(List<Guid> instrumentIds);
 }

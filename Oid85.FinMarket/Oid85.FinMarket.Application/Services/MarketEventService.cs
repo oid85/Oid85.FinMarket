@@ -360,7 +360,7 @@ public class MarketEventService(
         
             foreach (var instrumentId in instrumentIds)
             {
-                string ticker = (await instrumentRepository.GetByInstrumentIdAsync(instrumentId))!.Ticker;
+                string ticker = (await instrumentRepository.GetAsync(instrumentId))!.Ticker;
                 var priceLevels = await resourceStoreService.GetPriceLevelsAsync(ticker);
             
                 foreach (var priceLevel in priceLevels)
@@ -625,7 +625,7 @@ public class MarketEventService(
         string marketEventType,
         string marketEventText)
     {
-        var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+        var instrument = await instrumentRepository.GetAsync(instrumentId);
         
         var marketEvent =  new MarketEvent
         {

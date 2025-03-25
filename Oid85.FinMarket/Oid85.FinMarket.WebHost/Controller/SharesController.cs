@@ -406,4 +406,19 @@ public class SharesController(
             {
                 Result = result
             });  
+    
+    /// <summary>
+    /// Диаграмма Мультипликаторы MCap, P/E, NetDebt/EBITDA
+    /// </summary>
+    [HttpPost("diagram/multiplicators-mcap-pe-netdebtebitda")]
+    [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetMultiplicatorsMCapPENetDebtEbitdaAsync() =>
+        GetResponseAsync(
+            diagramService.GetMultiplicatorsMCapPENetDebtEbitdaAsync,
+            result => new BaseResponse<BubbleDiagramData>
+            {
+                Result = result
+            });     
 }

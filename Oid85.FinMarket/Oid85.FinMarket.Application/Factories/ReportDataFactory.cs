@@ -166,7 +166,7 @@ public class ReportDataFactory(
             if (instrumentAnalyseResults is [])
                 continue;
             
-            var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+            var instrument = await instrumentRepository.GetAsync(instrumentId);
             
             if (instrument is null)
                 continue;
@@ -219,7 +219,7 @@ public class ReportDataFactory(
             if (instrumentAnalyseResults is [])
                 continue;
             
-            var instrument = await instrumentRepository.GetByInstrumentIdAsync(instrumentId);
+            var instrument = await instrumentRepository.GetAsync(instrumentId);
             
             if (instrument is null)
                 continue;
@@ -262,7 +262,7 @@ public class ReportDataFactory(
         
         foreach (var dividendInfo in dividendInfos)
         {
-            var instrument = await instrumentRepository.GetByInstrumentIdAsync(dividendInfo.InstrumentId);
+            var instrument = await instrumentRepository.GetAsync(dividendInfo.InstrumentId);
             var profitPrc = await CalculateDividendProfitPercentAsync(dividendInfo);
             string instrumentName = instrument?.Name ?? string.Empty;
             string color = await colorHelper.GetColorYieldDividend(profitPrc);
@@ -437,7 +437,7 @@ public class ReportDataFactory(
 
         foreach (var forecastConsensus in forecastConsensuses)
         {
-            var instrument = await instrumentRepository.GetByTickerAsync(forecastConsensus.Ticker);
+            var instrument = await instrumentRepository.GetAsync(forecastConsensus.Ticker);
 
             if (instrument is null)
                 continue;
@@ -606,7 +606,7 @@ public class ReportDataFactory(
         
         foreach (var marketEvent in marketEvents)
         {
-            var instrument = await instrumentRepository.GetByInstrumentIdAsync(marketEvent.InstrumentId);
+            var instrument = await instrumentRepository.GetAsync(marketEvent.InstrumentId);
             
             if (instrument is null)
                 continue;
@@ -640,7 +640,7 @@ public class ReportDataFactory(
         
         foreach (var assetReportEvent in assetReportEvents)
         {
-            var instrument = await instrumentRepository.GetByInstrumentIdAsync(assetReportEvent.InstrumentId);
+            var instrument = await instrumentRepository.GetAsync(assetReportEvent.InstrumentId);
             string ticker = instrument?.Ticker ?? string.Empty;
             string sector = instrument?.Sector ?? string.Empty;
             string instrumentName = instrument?.Name ?? string.Empty;
