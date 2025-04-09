@@ -132,13 +132,13 @@ public class ReportDataFactory(
         new (KnownDisplayTypes.Date, value.ToString(KnownDateTimeFormats.DateISO), color);     
     
     private static ReportParameter GetRuble(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Ruble, value.ToString(), color);     
+        new (KnownDisplayTypes.Ruble, value.ToString("N2").TrimEnd('0').TrimEnd(','), color);     
     
     private static ReportParameter GetPercent(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Percent, value.ToString(), color);     
+        new (KnownDisplayTypes.Percent, value.ToString("N2").TrimEnd('0').TrimEnd(','), color);     
     
     private static ReportParameter GetNumber(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Number, value.ToString(), color);
+        new (KnownDisplayTypes.Number, value.ToString("N2").TrimEnd('0').TrimEnd(','), color);
     
     private static ReportParameter GetCurrency(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.Currency, value, color);  
@@ -240,7 +240,7 @@ public class ReportDataFactory(
                 int resultNumber = CalculateAggregateAnalyseResult(instrumentAnalyseResultsByDate);
                 string color = await colorHelper.GetColorAggregated(resultNumber);
                 var candle = await candleRepository.GetAsync(instrumentId, date);
-                string price = candle?.Close.ToString("N5").TrimEnd('0') ?? string.Empty;
+                string price = candle?.Close.ToString("N5").TrimEnd('0').TrimEnd(',') ?? string.Empty;
                 data.Add(GetAnalyseResult(price, color));
             }
                 
