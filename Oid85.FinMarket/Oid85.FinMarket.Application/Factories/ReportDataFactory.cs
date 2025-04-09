@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Globalization;
+using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
@@ -131,13 +132,13 @@ public class ReportDataFactory(
         new (KnownDisplayTypes.Date, value.ToString(KnownDateTimeFormats.DateISO), color);     
     
     private static ReportParameter GetRuble(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Ruble, value.ToString("N2"), color);     
+        new (KnownDisplayTypes.Ruble, value.ToString(), color);     
     
     private static ReportParameter GetPercent(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Percent, value.ToString("N2"), color);     
+        new (KnownDisplayTypes.Percent, value.ToString(), color);     
     
     private static ReportParameter GetNumber(double value, string color = KnownColors.White) =>
-        new (KnownDisplayTypes.Number, value.ToString("N2"), color);
+        new (KnownDisplayTypes.Number, value.ToString(), color);
     
     private static ReportParameter GetCurrency(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.Currency, value, color);  
@@ -239,7 +240,7 @@ public class ReportDataFactory(
                 int resultNumber = CalculateAggregateAnalyseResult(instrumentAnalyseResultsByDate);
                 string color = await colorHelper.GetColorAggregated(resultNumber);
                 var candle = await candleRepository.GetAsync(instrumentId, date);
-                string price = candle?.Close.ToString("N2") ?? string.Empty;
+                string price = candle?.Close.ToString("N5").TrimEnd('0') ?? string.Empty;
                 data.Add(GetAnalyseResult(price, color));
             }
                 
