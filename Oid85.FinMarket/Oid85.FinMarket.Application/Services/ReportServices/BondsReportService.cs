@@ -9,12 +9,12 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class BondsReportService(
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     IReportDataFactory reportDataFactory) 
     : IBondsReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await instrumentService.GetBondsInWatchlist())
+        (await tickerListUtilService.GetBondsInWatchlist())
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
@@ -52,13 +52,13 @@ public class BondsReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetCouponAnalyseAsync() =>
         await reportDataFactory.CreateBondCouponReportDataAsync(
-            (await instrumentService.GetBondsInWatchlist())
+            (await tickerListUtilService.GetBondsInWatchlist())
             .Select(x => x.InstrumentId).ToList());
 
     /// <inheritdoc />
     public async Task<ReportData> GetBondSelectionAsync() =>
         await reportDataFactory.CreateBondCouponReportDataAsync(
-            (await instrumentService.GetBondsByFilter())
+            (await tickerListUtilService.GetBondsByFilter())
             .Select(x => x.InstrumentId).ToList());
 
     /// <inheritdoc />

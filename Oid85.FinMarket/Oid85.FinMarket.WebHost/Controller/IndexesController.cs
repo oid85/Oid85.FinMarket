@@ -14,7 +14,7 @@ public class IndexesController(
     ILoadService loadService,
     IAnalyseService analyseService,
     IIndexesReportService reportService,
-    IInstrumentService instrumentService) 
+    ITickerListUtilService tickerListUtilService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -26,7 +26,7 @@ public class IndexesController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetIndexesWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await instrumentService.GetFinIndexesInWatchlist())
+            async () => (await tickerListUtilService.GetFinIndexesInWatchlist())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

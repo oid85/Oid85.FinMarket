@@ -25,7 +25,7 @@ public class ReportDataFactory(
     IForecastConsensusRepository forecastConsensusRepository,
     IAssetReportEventRepository assetReportEventRepository,
     ColorHelper colorHelper,
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     ISpreadRepository spreadRepository,
     IMarketEventRepository marketEventRepository,
     IFeerGreedRepository feerGreedRepository,
@@ -292,7 +292,7 @@ public class ReportDataFactory(
 
     public async Task<ReportData> CreateMultiplicatorReportDataAsync()
     {
-        var shares = (await instrumentService.GetSharesInWatchlist())
+        var shares = (await tickerListUtilService.GetSharesInWatchlist())
             .OrderBy(x => x.Sector);
 
         var reportData = CreateNewReportDataWithHeaders(

@@ -3,9 +3,9 @@
 namespace Oid85.FinMarket.Application.Interfaces.Services;
 
 /// <summary>
-/// Сервис инструментов
+/// Сервис работы со списками тикеров
 /// </summary>
-public interface IInstrumentService
+public interface ITickerListUtilService
 {
     /// <summary>
     /// Получить Id инструментов из списка наблюдения

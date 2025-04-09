@@ -9,12 +9,12 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class SharesReportService(
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     IReportDataFactory reportDataFactory)
     : ISharesReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await instrumentService.GetSharesInWatchlist())
+        (await tickerListUtilService.GetSharesInWatchlist())
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />

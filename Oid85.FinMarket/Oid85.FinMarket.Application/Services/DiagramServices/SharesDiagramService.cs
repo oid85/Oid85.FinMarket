@@ -7,12 +7,12 @@ using Oid85.FinMarket.Application.Models.Requests;
 namespace Oid85.FinMarket.Application.Services.DiagramServices;
 
 public class SharesDiagramService(
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     IDiagramDataFactory diagramDataFactory) 
     : ISharesDiagramService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await instrumentService.GetSharesInWatchlist())
+        (await tickerListUtilService.GetSharesInWatchlist())
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
     public async Task<SimpleDiagramData> GetDailyClosePricesAsync(DateRangeRequest request) =>

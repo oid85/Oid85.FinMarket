@@ -10,7 +10,7 @@ namespace Oid85.FinMarket.Application.Services;
 /// <inheritdoc />
 public class MarketEventService(
     ILogger logger,
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
@@ -26,7 +26,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -65,7 +65,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -104,7 +104,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -140,7 +140,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -176,7 +176,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -212,7 +212,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -248,7 +248,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -284,7 +284,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -320,7 +320,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -356,7 +356,7 @@ public class MarketEventService(
     {
         try
         {
-            var instrumentIds = await instrumentService.GetInstrumentIdsInWatchlist();
+            var instrumentIds = await tickerListUtilService.GetInstrumentIdsInWatchlist();
         
             foreach (var instrumentId in instrumentIds)
             {
@@ -499,7 +499,7 @@ public class MarketEventService(
     {
         try
         {
-            var shares = await instrumentService.GetSharesInWatchlist();
+            var shares = await tickerListUtilService.GetSharesInWatchlist();
             var forecasts = await forecastConsensusRepository.GetAllAsync();
 
             foreach (var share in shares)
@@ -530,7 +530,7 @@ public class MarketEventService(
     {
         try
         {
-            var shares = await instrumentService.GetSharesInWatchlist();
+            var shares = await tickerListUtilService.GetSharesInWatchlist();
 
             foreach (var share in shares)
             {

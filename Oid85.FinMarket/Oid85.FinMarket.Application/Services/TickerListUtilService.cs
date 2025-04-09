@@ -6,14 +6,14 @@ using Oid85.FinMarket.External.ResourceStore;
 namespace Oid85.FinMarket.Application.Services;
 
 /// <inheritdoc />
-public class InstrumentService(
+public class TickerListUtilService(
     IResourceStoreService resourceStoreService,
     IShareRepository shareRepository,
     IBondRepository bondRepository,
     IFutureRepository futureRepository,
     ICurrencyRepository currencyRepository,
     IIndexRepository indexRepository
-    ) : IInstrumentService
+    ) : ITickerListUtilService
 {
     /// <inheritdoc />
     public async Task<List<Guid>> GetInstrumentIdsInWatchlist()

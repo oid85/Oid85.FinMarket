@@ -17,7 +17,7 @@ public class SharesController(
     IAnalyseService analyseService,
     ISharesReportService reportService,
     ISharesDiagramService diagramService,
-    IInstrumentService instrumentService)
+    ITickerListUtilService tickerListUtilService)
     : FinMarketBaseController
 {
     /// <summary>
@@ -29,7 +29,7 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetSharesWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await instrumentService.GetSharesInWatchlist())
+            async () => (await tickerListUtilService.GetSharesInWatchlist())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

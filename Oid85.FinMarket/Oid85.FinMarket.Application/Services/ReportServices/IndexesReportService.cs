@@ -9,12 +9,12 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class IndexesReportService(
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     IReportDataFactory reportDataFactory) 
     : IIndexesReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await instrumentService.GetFinIndexesInWatchlist()).Select(x => x.InstrumentId).ToList();
+        (await tickerListUtilService.GetFinIndexesInWatchlist()).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>

@@ -14,7 +14,7 @@ public class BondsController(
     ILoadService loadService,
     IAnalyseService analyseService,
     IBondsReportService reportService,
-    IInstrumentService instrumentService) 
+    ITickerListUtilService tickerListUtilService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -26,7 +26,7 @@ public class BondsController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetBondsWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await instrumentService.GetBondsInWatchlist())
+            async () => (await tickerListUtilService.GetBondsInWatchlist())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>
@@ -43,7 +43,7 @@ public class BondsController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetBondsFilterListAsync() =>
         await GetResponseAsync(
-            async () => (await instrumentService.GetBondsByFilter())
+            async () => (await tickerListUtilService.GetBondsByFilter())
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

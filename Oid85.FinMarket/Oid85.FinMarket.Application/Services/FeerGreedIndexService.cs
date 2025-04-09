@@ -7,7 +7,7 @@ using Skender.Stock.Indicators;
 namespace Oid85.FinMarket.Application.Services;
 
 public class FeerGreedIndexService(
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     IInstrumentRepository instrumentRepository,
     IFeerGreedRepository feerGreedRepository,
     ICandleRepository candleRepository) 
@@ -194,7 +194,7 @@ public class FeerGreedIndexService(
     
     private async Task<Dictionary<Guid, List<Candle>>> CreateDataDictionaryAsync()
     {
-        var shares = await instrumentService.GetSharesInIndexMoex();
+        var shares = await tickerListUtilService.GetSharesInIndexMoex();
 
         var dictionary = new Dictionary<Guid, List<Candle>>();
         

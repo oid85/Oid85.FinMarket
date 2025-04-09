@@ -11,12 +11,12 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 /// <inheritdoc />
 public class FuturesReportService(
-    IInstrumentService instrumentService,
+    ITickerListUtilService tickerListUtilService,
     IReportDataFactory reportDataFactory)
     : IFuturesReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await instrumentService.GetFuturesInWatchlist()).Select(x => x.InstrumentId).ToList();
+        (await tickerListUtilService.GetFuturesInWatchlist()).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>
