@@ -13,7 +13,7 @@ public class GetCandlesService(
     ILogger logger,
     InvestApiClient client)
 {
-    private const int DelayInMilliseconds = 50;
+    private const int DelayInMilliseconds = 100;
     
     public Task<List<Candle>> GetDailyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to) =>

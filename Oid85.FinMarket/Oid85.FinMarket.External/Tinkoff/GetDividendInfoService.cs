@@ -12,7 +12,7 @@ public class GetDividendInfoService(
     ILogger logger,
     InvestApiClient client)
 {
-    private const int DelayInMilliseconds = 50;
+    private const int DelayInMilliseconds = 100;
     
     public async Task<List<DividendInfo>> GetDividendInfoAsync(
     List<Share> shares)

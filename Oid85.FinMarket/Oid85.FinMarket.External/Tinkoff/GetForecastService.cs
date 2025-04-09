@@ -10,7 +10,7 @@ public class GetForecastService(
     ILogger logger,
     InvestApiClient client)
 {
-    private const int DelayInMilliseconds = 50;
+    private const int DelayInMilliseconds = 100;
     
     public async Task<(List<ForecastTarget>, ForecastConsensus)> GetForecastAsync(Guid instrumentId)
     {

@@ -12,7 +12,7 @@ public class GetBondCouponsService(
     ILogger logger,
     InvestApiClient client)
 {
-    private const int DelayInMilliseconds = 50;
+    private const int DelayInMilliseconds = 100;
     
     public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
     {
