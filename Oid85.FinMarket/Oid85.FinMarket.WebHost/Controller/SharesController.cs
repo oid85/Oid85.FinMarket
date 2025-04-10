@@ -399,7 +399,7 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetFiveMinutesClosePricesAsync(
-        [FromBody] DateRangeRequest request) =>
+        [FromBody] DateTimeRangeRequest request) =>
         GetResponseAsync(
             () => diagramService.GetFiveMinutesClosePricesAsync(request),
             result => new BaseResponse<SimpleDiagramData>

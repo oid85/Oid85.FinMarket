@@ -27,26 +27,14 @@ public static class DateHelper
         return dates;
     }
 
-    public static List<DateTime> GetFiveMinutesDateTimes(DateOnly from, DateOnly to)
+    public static List<DateTime> GetFiveMinutesDateTimes(DateTime from, DateTime to)
     {
-        var curDate = from.ToDateTime(TimeOnly.MinValue);
+        var cur = from;
         var dates = new List<DateTime>();
-
-        var daysOfWeek = new List<DayOfWeek>()
-        {
-            DayOfWeek.Monday,
-            DayOfWeek.Tuesday,
-            DayOfWeek.Wednesday,
-            DayOfWeek.Thursday,
-            DayOfWeek.Friday
-        };
         
-        while (curDate <= to.ToDateTime(TimeOnly.MaxValue))
+        while (cur <= to)
         {
-            if (daysOfWeek.Contains(curDate.DayOfWeek))
-                dates.Add(curDate);
-            
-            curDate = curDate.AddDays(1);
+            cur = cur.AddMinutes(5);
         }
 
         return dates;

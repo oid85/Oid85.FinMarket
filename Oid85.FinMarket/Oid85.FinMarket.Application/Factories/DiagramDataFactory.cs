@@ -29,7 +29,7 @@ public class DiagramDataFactory(
     }
 
     private async Task<Dictionary<Guid, List<FiveMinuteCandle>>> CreateFiveMinutesDataDictionaryAsync(
-        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+        List<Guid> instrumentIds, DateTime from, DateTime to)
     {
         var dictionary = new Dictionary<Guid, List<FiveMinuteCandle>>();
 
@@ -73,7 +73,7 @@ public class DiagramDataFactory(
     }
 
     public async Task<SimpleDiagramData> CreateFiveMinutesClosePricesDiagramDataAsync(
-        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+        List<Guid> instrumentIds, DateTime from, DateTime to)
     {
         var dateTimes = DateHelper.GetFiveMinutesDateTimes(from, to);
         var data = await CreateFiveMinutesDataDictionaryAsync(instrumentIds, from, to);

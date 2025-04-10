@@ -18,7 +18,7 @@ public class SharesDiagramService(
     public async Task<SimpleDiagramData> GetDailyClosePricesAsync(DateRangeRequest request) =>
         await diagramDataFactory.CreateDailyClosePricesDiagramDataAsync(await GetInstrumentIds(), request.From, request.To);
 
-    public async Task<SimpleDiagramData> GetFiveMinutesClosePricesAsync(DateRangeRequest request) =>
+    public async Task<SimpleDiagramData> GetFiveMinutesClosePricesAsync(DateTimeRangeRequest request) =>
         await diagramDataFactory.CreateFiveMinutesClosePricesDiagramDataAsync(await GetInstrumentIds(), request.From, request.To);
 
     public async Task<BubbleDiagramData> GetMultiplicatorsMCapPENetDebtEbitdaAsync() =>
