@@ -31,9 +31,12 @@ public static class DateHelper
     {
         var curDateTime = from;
         var dates = new List<DateTime>();
-        
-        while (curDateTime <= to) 
+
+        while (curDateTime <= to)
+        {
+            dates.Add(curDateTime);
             curDateTime = curDateTime.AddMinutes(5);
+        }
 
         return dates;
     }

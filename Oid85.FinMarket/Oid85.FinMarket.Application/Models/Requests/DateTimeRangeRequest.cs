@@ -5,8 +5,8 @@ namespace Oid85.FinMarket.Application.Models.Requests;
 public class DateTimeRangeRequest
 {
     [JsonPropertyName("from")]
-    public DateTime From { get; set; } = DateTime.MinValue;
+    public string From { get; set; } = string.Empty;
     
     [JsonPropertyName("to")]
-    public DateTime To { get; set; } = DateTime.MaxValue;
+    public string To { get; set; } = string.Empty;
 }
