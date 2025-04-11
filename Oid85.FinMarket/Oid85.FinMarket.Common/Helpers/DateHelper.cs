@@ -29,13 +29,11 @@ public static class DateHelper
 
     public static List<DateTime> GetFiveMinutesDateTimes(DateTime from, DateTime to)
     {
-        var cur = from;
+        var curDateTime = from;
         var dates = new List<DateTime>();
         
-        while (cur <= to)
-        {
-            cur = cur.AddMinutes(5);
-        }
+        while (curDateTime <= to) 
+            curDateTime = curDateTime.AddMinutes(5);
 
         return dates;
     }

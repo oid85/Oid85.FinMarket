@@ -77,18 +77,21 @@ public class FiveMinuteCandleRepository(
             .ToList();
     }
 
-    public async Task<List<FiveMinuteCandle>> GetAsync(Guid instrumentId, DateOnly from, DateOnly to)
+    public async Task<List<FiveMinuteCandle>> GetAsync(Guid instrumentId, DateTime from, DateTime to)
     {
         var entities = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
-                x.Date >= from &&
-                x.Date <= to)
+                x.Date >= DateOnly.FromDateTime(from) &&
+                x.Date <= DateOnly.FromDateTime(to))
             .AsNoTracking()
             .ToListAsync();
 
         return entities.Count == 0 ? [] : entities
             .Select(DataAccessMapper.Map)
+            .Where(x => 
+                x.DateTime >= from &&
+                x.DateTime <= to)
             .OrderBy(x => x.DateTime)
             .ToList();
     }
