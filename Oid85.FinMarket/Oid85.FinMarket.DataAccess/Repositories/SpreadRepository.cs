@@ -47,6 +47,7 @@ public class SpreadRepository(
                         .SetProperty(entity => entity.PriceDifference, spread.PriceDifference)
                         .SetProperty(entity => entity.PriceDifferencePrc, spread.PriceDifferencePrc)
                         .SetProperty(entity => entity.Funding, spread.Funding)
+                        .SetProperty(entity => entity.Multiplier, spread.Multiplier)
                         .SetProperty(entity => entity.SpreadPricePosition, spread.SpreadPricePosition));
             
             await context.SaveChangesAsync();

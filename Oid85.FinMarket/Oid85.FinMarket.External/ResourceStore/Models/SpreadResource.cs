@@ -24,11 +24,5 @@ public class SpreadResource
     /// </summary>
     [JsonPropertyName("futureTickerPrefix")]
     public string FutureTickerPrefix { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Множитель
-    /// </summary>
-    [JsonPropertyName("multiplier")]
-    public double Multiplier { get; set; } = 1.0;
 }
 

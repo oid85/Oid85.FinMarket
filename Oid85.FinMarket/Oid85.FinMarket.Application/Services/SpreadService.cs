@@ -49,7 +49,6 @@ public class SpreadService(
         foreach (var resource in spreadResources)
             spreads.AddRange(await GetSpreadsAsync(
                 resource.BaseAssetTicker, 
-                resource.Multiplier, 
                 resource.ForeverFutureTicker, 
                 resource.FutureTickerPrefix));
         
@@ -69,12 +68,12 @@ public class SpreadService(
                 }) 
                 continue;
 
-            // В зависимости от порядка цен, домножаем на коэффициент
-            spread.PriceDifference = spread.SecondInstrumentPrice / spread.FirstInstrumentPrice > 2.0
-                ? spread.SecondInstrumentPrice - spread.FirstInstrumentPrice * spread.Multiplier
-                : spread.SecondInstrumentPrice - spread.FirstInstrumentPrice;
+            double multiplier = GetMultiplier(spread.FirstInstrumentPrice, spread.SecondInstrumentPrice);
             
-            spread.PriceDifferencePrc = spread.PriceDifference / spread.SecondInstrumentPrice * 100.0; 
+            // Рассчитываем спред
+            spread.PriceDifference = spread.SecondInstrumentPrice - spread.FirstInstrumentPrice * multiplier;
+            spread.PriceDifferencePrc = spread.PriceDifference / spread.SecondInstrumentPrice * 100.0;
+            spread.Multiplier = multiplier;
             spread.DateTime = DateTime.UtcNow;
             
             /*
@@ -92,10 +91,38 @@ public class SpreadService(
         
         return spreads;
     }
-    
+
+    private double GetMultiplier(double firstInstrumentPrice, double secondInstrumentPrice)
+    {
+        if (secondInstrumentPrice / firstInstrumentPrice > 1500.0)
+            return 1000.0;
+        
+        if (secondInstrumentPrice / firstInstrumentPrice > 150.0)
+            return 100.0;
+        
+        if (secondInstrumentPrice / firstInstrumentPrice > 15.0)
+            return 10.0;
+        
+        if (secondInstrumentPrice / firstInstrumentPrice > 1.5)
+            return 1.0;
+        
+        if (firstInstrumentPrice / secondInstrumentPrice > 1500.0)
+            return 1.0 / 1000.0;
+        
+        if (firstInstrumentPrice / secondInstrumentPrice > 150.0)
+            return 1.0 / 100.0;
+        
+        if (firstInstrumentPrice / secondInstrumentPrice > 15.0)
+            return 1.0 / 10.0;
+        
+        if (firstInstrumentPrice / secondInstrumentPrice > 1.5)
+            return 1.0 / 1.0;
+        
+        return 1.0;
+    }
+
     private async Task<List<Spread>> GetSpreadsAsync(
         string baseAssetTicker,
-        double multiplier,
         string foreverFutureTicker,
         string futureTickerPrefix)
     {
@@ -128,8 +155,7 @@ public class SpreadService(
                 FirstInstrumentRole = KnownSpreadRoles.BaseActive,
                 SecondInstrumentId = foreverFutureInstrumentId,
                 SecondInstrumentTicker = foreverFutureTicker,
-                SecondInstrumentRole = KnownSpreadRoles.ForeverFuture,
-                Multiplier = multiplier
+                SecondInstrumentRole = KnownSpreadRoles.ForeverFuture
             });
 
         // Вечный фьючерс - фьючерс
@@ -143,8 +169,7 @@ public class SpreadService(
                     FirstInstrumentRole = KnownSpreadRoles.ForeverFuture,
                     SecondInstrumentId = future.InstrumentId,
                     SecondInstrumentTicker = future.Ticker,
-                    SecondInstrumentRole = KnownSpreadRoles.Future,
-                    Multiplier = multiplier
+                    SecondInstrumentRole = KnownSpreadRoles.Future
                 });
             }
 
@@ -158,8 +183,7 @@ public class SpreadService(
                 FirstInstrumentRole = KnownSpreadRoles.BaseActive,
                 SecondInstrumentId = future.InstrumentId,
                 SecondInstrumentTicker = future.Ticker,
-                SecondInstrumentRole = KnownSpreadRoles.Future,
-                Multiplier = multiplier
+                SecondInstrumentRole = KnownSpreadRoles.Future
             });
         }
 
@@ -173,8 +197,7 @@ public class SpreadService(
                 FirstInstrumentRole = KnownSpreadRoles.NearFuture,
                 SecondInstrumentId = futures[i].InstrumentId,
                 SecondInstrumentTicker = futures[i].Ticker,
-                SecondInstrumentRole = KnownSpreadRoles.FarFuture,
-                Multiplier = 1
+                SecondInstrumentRole = KnownSpreadRoles.FarFuture
             });
         }
         
