@@ -652,10 +652,22 @@ public class ReportDataFactory(
                 GetSector(sector),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentName))
             ];
+
+            // Цвет для типов отчетов
+            string color = KnownColors.White;
+            
+            if (assetReportEvent.Type == KnownAssetReportPeriodTypes.PeriodTypeQuarter)
+                color = KnownColors.Yellow;
+            
+            if (assetReportEvent.Type == KnownAssetReportPeriodTypes.PeriodTypeSemiannual)
+                color = KnownColors.Blue;
+            
+            if (assetReportEvent.Type == KnownAssetReportPeriodTypes.PeriodTypeAnnual)
+                color = KnownColors.Green;
             
             foreach (var date in dates)
                 data.Add(assetReportEvent.ReportDate == date
-                    ? GetAssetReportEvent(string.Empty, KnownColors.Green)
+                    ? GetAssetReportEvent(string.Empty, color)
                     : GetString(string.Empty));
 
             reportData.Data.Add(data);
