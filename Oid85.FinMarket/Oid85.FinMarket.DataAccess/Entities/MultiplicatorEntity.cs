@@ -73,6 +73,12 @@ public class MultiplicatorEntity : AuditableEntity
     public double Ev { get; set; }
     
     /// <summary>
+    /// BV
+    /// </summary>
+    [Column("bv")]
+    public double Bv { get; set; }
+    
+    /// <summary>
     /// ROE
     /// </summary>
     [Column("roe")]

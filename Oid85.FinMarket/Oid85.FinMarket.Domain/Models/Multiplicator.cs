@@ -63,6 +63,11 @@ public class Multiplicator
     public double Ev { get; set; }
     
     /// <summary>
+    /// BV
+    /// </summary>
+    public double Bv { get; set; }
+    
+    /// <summary>
     /// ROE
     /// </summary>
     public double Roe { get; set; }

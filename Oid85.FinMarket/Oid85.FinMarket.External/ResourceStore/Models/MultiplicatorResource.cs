@@ -86,6 +86,12 @@ public class MultiplicatorResource
     public ValueUnitResource<double> Ev { get; set; } = new();
     
     /// <summary>
+    /// BV
+    /// </summary>
+    [JsonPropertyName("bv")]
+    public ValueUnitResource<double> Bv { get; set; } = new();    
+    
+    /// <summary>
     /// ROE
     /// </summary>
     [JsonPropertyName("roe")]
