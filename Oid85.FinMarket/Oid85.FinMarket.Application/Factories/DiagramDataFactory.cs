@@ -105,7 +105,7 @@ public class DiagramDataFactory(
         return simpleDiagramData;
     }
 
-    public async Task<BubbleDiagramData> CreateMultiplicatorsMCapPENetDebtEbitdaAsync(List<Guid> instrumentIds)
+    public async Task<BubbleDiagramData> CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(List<Guid> instrumentIds)
     {
         var multiplicators = await multiplicatorRepository.GetAsync(instrumentIds);
         var bubbleDiagramData = new BubbleDiagramData { Title = "MCap, P/E, NetDebt/EBITDA" };
