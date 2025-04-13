@@ -414,9 +414,9 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetMultiplicatorsMCapPENetDebtEbitdaAsync() =>
+    public Task<IActionResult> GetMultiplicatorsMCapPeNetDebtEbitdaAsync() =>
         GetResponseAsync(
-            diagramService.GetMultiplicatorsMCapPENetDebtEbitdaAsync,
+            diagramService.GetMultiplicatorsMCapPeNetDebtEbitdaAsync,
             result => new BaseResponse<BubbleDiagramData>
             {
                 Result = result

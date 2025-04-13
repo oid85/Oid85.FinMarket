@@ -24,6 +24,6 @@ public class SharesDiagramService(
             System.Convert.ToDateTime(request.From),
             System.Convert.ToDateTime(request.To));
 
-    public async Task<BubbleDiagramData> GetMultiplicatorsMCapPENetDebtEbitdaAsync() =>
+    public async Task<BubbleDiagramData> GetMultiplicatorsMCapPeNetDebtEbitdaAsync() =>
         await diagramDataFactory.CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(await GetInstrumentIds());
 }

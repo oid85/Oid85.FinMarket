@@ -7,5 +7,5 @@ public interface ISharesDiagramService
 {
     Task<SimpleDiagramData> GetDailyClosePricesAsync(DateRangeRequest request);
     Task<SimpleDiagramData> GetFiveMinutesClosePricesAsync(DateTimeRangeRequest request);
-    Task<BubbleDiagramData> GetMultiplicatorsMCapPENetDebtEbitdaAsync();
+    Task<BubbleDiagramData> GetMultiplicatorsMCapPeNetDebtEbitdaAsync();
 }
