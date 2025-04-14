@@ -656,16 +656,7 @@ public class ReportDataFactory(
             ];
 
             // Цвет для типов отчетов
-            string color = KnownColors.White;
-            
-            if (assetReportEvent.Type == KnownAssetReportPeriodTypes.PeriodTypeQuarter)
-                color = KnownColors.Yellow;
-            
-            if (assetReportEvent.Type == KnownAssetReportPeriodTypes.PeriodTypeSemiannual)
-                color = KnownColors.Blue;
-            
-            if (assetReportEvent.Type == KnownAssetReportPeriodTypes.PeriodTypeAnnual)
-                color = KnownColors.Green;
+            string color = await colorHelper.GetColorForAssetReporType(assetReportEvent.Type);
             
             foreach (var date in dates)
                 data.Add(assetReportEvent.ReportDate == date

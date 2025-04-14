@@ -183,6 +183,12 @@ public class ResourceStoreService(
                 "colorPalettes", "riskLevel.json")) ?? [];
 
     /// <inheritdoc />
+    public async Task<List<ValueColorResource<string>>> GetColorPaletteAssetReportTypeAsync() =>
+        await ReadAsync<List<ValueColorResource<string>>>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "colorPalettes", "assetReportType.json")) ?? [];
+
+    /// <inheritdoc />
     public async Task<FilterBondsResource?> GetFilterBondsResourceAsync() =>
         await ReadAsync<FilterBondsResource>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,

@@ -204,6 +204,17 @@ public class ColorHelper(
         return resource.Color;
     }
     
+    public async Task<string> GetColorForAssetReporType(string value)
+    {
+        var colorPalette = await resourceStoreService.GetColorPaletteAssetReportTypeAsync();
+        var resource = colorPalette.FirstOrDefault(x => x.Value == value);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.Color;
+    }    
+    
     public async Task<string> GetColorRiskLevel(string value)
     {
         var colorPalette = await resourceStoreService.GetColorPaletteRiskLevelAsync();
