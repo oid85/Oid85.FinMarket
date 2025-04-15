@@ -9,4 +9,7 @@ public class DateRangeRequest
     
     [JsonPropertyName("to")]
     public DateOnly To { get; set; } = DateOnly.MaxValue;
+    
+    [JsonPropertyName("tickerList")]
+    public string TickerList { get; set; } = string.Empty;
 }

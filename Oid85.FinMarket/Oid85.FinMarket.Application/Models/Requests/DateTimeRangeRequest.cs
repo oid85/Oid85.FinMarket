@@ -9,4 +9,7 @@ public class DateTimeRangeRequest
     
     [JsonPropertyName("to")]
     public string To { get; set; } = string.Empty;
+    
+    [JsonPropertyName("tickerList")]
+    public string TickerList { get; set; } = string.Empty;
 }

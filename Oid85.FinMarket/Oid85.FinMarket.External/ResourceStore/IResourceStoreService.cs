@@ -151,4 +151,9 @@ public interface IResourceStoreService
     /// Получить фильтр отправки рыночных событий в телеграмм
     /// </summary>
     Task<List<EnableNameResource>> GetSendFilterAsync();
+    
+    /// <summary>
+    /// Получить список тикеров
+    /// </summary>
+    Task<TickerListResource> GetTickerListAsync();
 }

@@ -15,42 +15,37 @@ public class TickerListUtilService(
     IIndexRepository indexRepository
     ) : ITickerListUtilService
 {
+    public async Task<List<Share>> GetSharesByTickerListAsync(string tickerList)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<List<Bond>> GetBondsByTickerListAsync(string tickerList)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<List<Future>> GeFuturesByTickerListAsync(string tickerList)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerList)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerList)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <inheritdoc />
     public async Task<List<Guid>> GetInstrumentIdsInWatchlist()
     {
         var instrumentIds = new List<Guid>();
         
-        instrumentIds.AddRange((await GetSharesInWatchlist()).Select(x => x.InstrumentId));
-        instrumentIds.AddRange((await GetBondsInWatchlist()).Select(x => x.InstrumentId));
-        instrumentIds.AddRange((await GetFuturesInWatchlist()).Select(x => x.InstrumentId));
-        instrumentIds.AddRange((await GetCurrenciesInWatchlist()).Select(x => x.InstrumentId));
-        instrumentIds.AddRange((await GetFinIndexesInWatchlist()).Select(x => x.InstrumentId));
-        
         return instrumentIds;
-    }
-
-    /// <inheritdoc />
-    public async Task<List<Share>> GetSharesInWatchlist()
-    {
-        var tickers = await resourceStoreService.GetSharesWatchlistAsync();
-        var items = await shareRepository.GetByTickersAsync(tickers);
-        return items;
-    }
-
-    /// <inheritdoc />
-    public async Task<List<Share>> GetSharesInIndexMoex()
-    {
-        var tickers = await resourceStoreService.GetIndexMoexTickersAsync();
-        var items = await shareRepository.GetByTickersAsync(tickers);
-        return items;
-    }
-    
-    /// <inheritdoc />
-    public async Task<List<Bond>> GetBondsInWatchlist()
-    {
-        var tickers = await resourceStoreService.GetBondsWatchlistAsync();
-        var items = await bondRepository.GetByTickersAsync(tickers);
-        return items;
     }
 
     /// <inheritdoc />
@@ -81,30 +76,6 @@ public class TickerListUtilService(
                 x.LastPrice <= filter.Price.Max)
             .ToList();
         
-        return items;
-    }
-
-    /// <inheritdoc />
-    public async Task<List<Future>> GetFuturesInWatchlist()
-    {
-        var tickers = await resourceStoreService.GetFuturesWatchlistAsync();
-        var items = await futureRepository.GetByTickersAsync(tickers);
-        return items;
-    }
-
-    /// <inheritdoc />
-    public async Task<List<Currency>> GetCurrenciesInWatchlist()
-    {
-        var tickers = await resourceStoreService.GetCurrenciesWatchlistAsync();
-        var items = await currencyRepository.GetByTickersAsync(tickers);
-        return items;
-    }
-
-    /// <inheritdoc />
-    public async Task<List<FinIndex>> GetFinIndexesInWatchlist()
-    {
-        var tickers = await resourceStoreService.GetIndexesWatchlistAsync();
-        var items = await indexRepository.GetByTickersAsync(tickers);
         return items;
     }
 }
