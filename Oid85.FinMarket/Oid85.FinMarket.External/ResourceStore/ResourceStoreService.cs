@@ -200,6 +200,11 @@ public class ResourceStoreService(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "filters", "filterSendMarketEvent.json")) ?? [];
 
+    public async Task<TickerListResource> GetTickerListAsync(string tickerListName) =>
+        await ReadAsync<TickerListResource>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "tickerLists", $"{tickerListName}.json")) ?? new();
+
     private async Task<T?> ReadAsync<T>(string path)
     {
         if (!File.Exists(path))

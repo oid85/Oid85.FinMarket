@@ -14,7 +14,8 @@ public class IndexesReportService(
     : IIndexesReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await tickerListUtilService.GetFinIndexesInWatchlist()).Select(x => x.InstrumentId).ToList();
+        (await tickerListUtilService.GetFinIndexesByTickerListAsync(KnownTickerLists.IndexesWatchlist))
+        .OrderBy(x => x.Ticker).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>

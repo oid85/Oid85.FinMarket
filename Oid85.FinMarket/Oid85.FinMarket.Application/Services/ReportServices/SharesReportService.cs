@@ -14,7 +14,7 @@ public class SharesReportService(
     : ISharesReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await tickerListUtilService.GetSharesInWatchlist())
+        (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist))
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />

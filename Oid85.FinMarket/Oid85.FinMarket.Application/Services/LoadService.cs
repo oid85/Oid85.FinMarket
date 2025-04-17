@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.External.Tinkoff;
 
@@ -36,7 +37,7 @@ public class LoadService(
 
     public async Task<bool> LoadShareLastPricesAsync()
     {
-        var shares = await tickerListUtilService.GetSharesInWatchlist();
+        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
         var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
@@ -48,7 +49,7 @@ public class LoadService(
 
     public async Task<bool> LoadShareDailyCandlesAsync()
     {
-        var instruments = await tickerListUtilService.GetSharesInWatchlist();
+        var instruments = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -79,7 +80,7 @@ public class LoadService(
 
     public async Task<bool> LoadShareFiveMinuteCandlesAsync()
     {
-        var instruments = await tickerListUtilService.GetSharesInWatchlist();
+        var instruments = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -94,7 +95,7 @@ public class LoadService(
 
     public async Task<bool> LoadForecastsAsync()
     {
-        var instruments = await tickerListUtilService.GetSharesInWatchlist();
+        var instruments = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -108,7 +109,7 @@ public class LoadService(
 
     public async Task<bool> LoadAssetReportEventsAsync()
     {
-        var shares = await tickerListUtilService.GetSharesInWatchlist();
+        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
         var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
         var assetReportEvents = await tinkoffService.GetAssetReportEventsAsync(instrumentIds);
         await assetReportEventRepository.AddAsync(assetReportEvents);
@@ -129,7 +130,7 @@ public class LoadService(
 
     public async Task<bool> LoadFutureLastPricesAsync()
     {
-        var futures = await tickerListUtilService.GetFuturesInWatchlist();
+        var futures = await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist);
         var instrumentIds = futures.Select(x => x.InstrumentId).ToList();
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
@@ -141,7 +142,7 @@ public class LoadService(
 
     public async Task<bool> LoadFutureDailyCandlesAsync()
     {
-        var instruments = await tickerListUtilService.GetFuturesInWatchlist();
+        var instruments = await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -200,8 +201,8 @@ public class LoadService(
     
     public async Task<bool> LoadIndexLastPricesAsync()
     {
-        var indicatives = await tickerListUtilService.GetFinIndexesInWatchlist();
-        var instrumentIds = indicatives.Select(x => x.InstrumentId).ToList();
+        var indexes = await tickerListUtilService.GetFinIndexesByTickerListAsync(KnownTickerLists.IndexesWatchlist);
+        var instrumentIds = indexes.Select(x => x.InstrumentId).ToList();
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
         for (int i = 0; i < instrumentIds.Count; i++) 
@@ -212,7 +213,7 @@ public class LoadService(
 
     public async Task<bool> LoadIndexDailyCandlesAsync()
     {
-        var instruments = await tickerListUtilService.GetFinIndexesInWatchlist();
+        var instruments = await tickerListUtilService.GetFinIndexesByTickerListAsync(KnownTickerLists.IndexesWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -254,7 +255,7 @@ public class LoadService(
 
     public async Task<bool> LoadCurrencyLastPricesAsync()
     {
-        var currencies = await tickerListUtilService.GetCurrenciesInWatchlist();
+        var currencies = await tickerListUtilService.GetCurrenciesByTickerListAsync(KnownTickerLists.CurrenciesWatchlist);
         var instrumentIds = currencies.Select(x => x.InstrumentId).ToList();
         var lastPrices = await tinkoffService.GetPricesAsync(instrumentIds);
 
@@ -266,7 +267,7 @@ public class LoadService(
 
     public async Task<bool> LoadCurrencyDailyCandlesAsync()
     {
-        var instruments = await tickerListUtilService.GetCurrenciesInWatchlist();
+        var instruments = await tickerListUtilService.GetCurrenciesByTickerListAsync(KnownTickerLists.CurrenciesWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -297,7 +298,7 @@ public class LoadService(
 
     public async Task<bool> LoadDividendInfosAsync()
     {
-        var shares = await tickerListUtilService.GetSharesInWatchlist();
+        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
         var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
         await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
             
@@ -317,7 +318,7 @@ public class LoadService(
     public async Task<bool> LoadBondLastPricesAsync()
     {
         var bonds = await tickerListUtilService.GetBondsByFilter();
-        var watchlistBonds = await tickerListUtilService.GetBondsInWatchlist();
+        var watchlistBonds = await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist);
 
         var instrumentIds = bonds.Select(x => x.InstrumentId).ToList();
         
@@ -335,7 +336,7 @@ public class LoadService(
 
     public async Task<bool> LoadBondDailyCandlesAsync()
     {
-        var instruments = await tickerListUtilService.GetBondsInWatchlist();
+        var instruments = await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -367,7 +368,7 @@ public class LoadService(
     public async Task<bool> LoadBondCouponsAsync()
     {
         var bonds = await tickerListUtilService.GetBondsByFilter();
-        var watchlistBonds = await tickerListUtilService.GetBondsInWatchlist();
+        var watchlistBonds = await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist);
 
         var bondInstrumentIds = bonds.Select(x => x.InstrumentId).ToList();
         

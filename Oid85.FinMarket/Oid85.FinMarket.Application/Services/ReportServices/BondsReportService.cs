@@ -14,7 +14,7 @@ public class BondsReportService(
     : IBondsReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await tickerListUtilService.GetBondsInWatchlist())
+        (await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist))
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
@@ -52,7 +52,7 @@ public class BondsReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetCouponAnalyseAsync() =>
         await reportDataFactory.CreateBondCouponReportDataAsync(
-            (await tickerListUtilService.GetBondsInWatchlist())
+            (await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist))
             .Select(x => x.InstrumentId).ToList());
 
     /// <inheritdoc />

@@ -1,6 +1,7 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.Helpers;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Skender.Stock.Indicators;
 
@@ -194,7 +195,7 @@ public class FeerGreedIndexService(
     
     private async Task<Dictionary<Guid, List<Candle>>> CreateDataDictionaryAsync()
     {
-        var shares = await tickerListUtilService.GetSharesInIndexMoex();
+        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesImoex);
 
         var dictionary = new Dictionary<Guid, List<Candle>>();
         

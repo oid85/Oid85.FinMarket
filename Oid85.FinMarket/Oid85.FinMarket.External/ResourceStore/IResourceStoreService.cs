@@ -153,7 +153,7 @@ public interface IResourceStoreService
     Task<List<EnableNameResource>> GetSendFilterAsync();
     
     /// <summary>
-    /// Получить список тикеров
+    /// Получить список тикеров по наименованию
     /// </summary>
-    Task<TickerListResource> GetTickerListAsync();
+    Task<TickerListResource> GetTickerListAsync(string tickerListName);
 }

@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
 
@@ -15,35 +16,62 @@ public class TickerListUtilService(
     IIndexRepository indexRepository
     ) : ITickerListUtilService
 {
-    public async Task<List<Share>> GetSharesByTickerListAsync(string tickerList)
+    /// <inheritdoc />
+    public async Task<List<Share>> GetSharesByTickerListAsync(string tickerListName)
     {
-        throw new NotImplementedException();
+        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
+        var shares = await shareRepository.GetByTickersAsync(tickerListResource.Tickers);
+        return shares;
     }
 
-    public async Task<List<Bond>> GetBondsByTickerListAsync(string tickerList)
+    /// <inheritdoc />
+    public async Task<List<Bond>> GetBondsByTickerListAsync(string tickerListName)
     {
-        throw new NotImplementedException();
+        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
+        var bonds = await bondRepository.GetByTickersAsync(tickerListResource.Tickers);
+        return bonds;
     }
 
-    public async Task<List<Future>> GeFuturesByTickerListAsync(string tickerList)
+    /// <inheritdoc />
+    public async Task<List<Future>> GetFuturesByTickerListAsync(string tickerListName)
     {
-        throw new NotImplementedException();
+        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
+        var futures = await futureRepository.GetByTickersAsync(tickerListResource.Tickers);
+        return futures;
     }
 
-    public async Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerList)
+    /// <inheritdoc />
+    public async Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerListName)
     {
-        throw new NotImplementedException();
+        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
+        var currencies = await currencyRepository.GetByTickersAsync(tickerListResource.Tickers);
+        return currencies;
     }
 
-    public async Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerList)
+    /// <inheritdoc />
+    public async Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerListName)
     {
-        throw new NotImplementedException();
+        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
+        var finIndexes = await indexRepository.GetByTickersAsync(tickerListResource.Tickers);
+        return finIndexes;
     }
 
     /// <inheritdoc />
     public async Task<List<Guid>> GetInstrumentIdsInWatchlist()
     {
+        var shares = await GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
+        var bonds = await GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist);
+        var futures = await GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist);
+        var currencies = await GetCurrenciesByTickerListAsync(KnownTickerLists.CurrenciesWatchlist);
+        var indexes = await GetFinIndexesByTickerListAsync(KnownTickerLists.IndexesWatchlist);
+     
         var instrumentIds = new List<Guid>();
+        
+        instrumentIds.AddRange(shares.Select(x => x.InstrumentId));
+        instrumentIds.AddRange(bonds.Select(x => x.InstrumentId));
+        instrumentIds.AddRange(futures.Select(x => x.InstrumentId));
+        instrumentIds.AddRange(currencies.Select(x => x.InstrumentId));
+        instrumentIds.AddRange(indexes.Select(x => x.InstrumentId));
         
         return instrumentIds;
     }

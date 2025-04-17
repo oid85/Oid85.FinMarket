@@ -1,4 +1,5 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Common.KnownConstants;
 
 namespace Oid85.FinMarket.Application.Services.AnalyseServices;
 
@@ -16,7 +17,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> DailyAnalyseSharesAsync()
     {
-        var instruments = await tickerListUtilService.GetSharesInWatchlist();
+        var instruments = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
 
         foreach (var instrument in instruments)
         {
@@ -35,7 +36,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> DailyAnalyseBondsAsync()
     {
-        var instruments = await tickerListUtilService.GetBondsInWatchlist();
+        var instruments = await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist);
         
         foreach (var instrument in instruments)
         {
@@ -51,7 +52,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> DailyAnalyseCurrenciesAsync()
     {
-        var instruments = await tickerListUtilService.GetCurrenciesInWatchlist();
+        var instruments = await tickerListUtilService.GetCurrenciesByTickerListAsync(KnownTickerLists.CurrenciesWatchlist);
         
         foreach (var instrument in instruments)
         {
@@ -69,7 +70,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> DailyAnalyseFuturesAsync()
     {
-        var instruments = await tickerListUtilService.GetFuturesInWatchlist();
+        var instruments = await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist);
         
         foreach (var instrument in instruments)
         {
@@ -87,7 +88,7 @@ public class AnalyseService(
     /// <inheritdoc />
     public async Task<bool> DailyAnalyseIndexesAsync()
     {
-        var instruments = await tickerListUtilService.GetFinIndexesInWatchlist();
+        var instruments = await tickerListUtilService.GetFinIndexesByTickerListAsync(KnownTickerLists.IndexesWatchlist);
         
         foreach (var instrument in instruments)
         {

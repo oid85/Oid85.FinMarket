@@ -4,6 +4,7 @@ using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
@@ -28,7 +29,7 @@ public class FuturesController(
     [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetFuturesWatchListAsync() =>
         await GetResponseAsync(
-            async () => (await tickerListUtilService.GetFuturesInWatchlist())
+            async () => (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist))
                 .Select(x => x.Ticker)
                 .ToList(),
             result => new BaseResponse<List<string>>

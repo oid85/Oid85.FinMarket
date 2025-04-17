@@ -499,7 +499,7 @@ public class MarketEventService(
     {
         try
         {
-            var shares = await tickerListUtilService.GetSharesInWatchlist();
+            var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
             var forecasts = await forecastConsensusRepository.GetAllAsync();
 
             foreach (var share in shares)
@@ -530,7 +530,7 @@ public class MarketEventService(
     {
         try
         {
-            var shares = await tickerListUtilService.GetSharesInWatchlist();
+            var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
 
             foreach (var share in shares)
             {

@@ -7,11 +7,35 @@ namespace Oid85.FinMarket.Application.Interfaces.Services;
 /// </summary>
 public interface ITickerListUtilService
 {
-    Task<List<Share>> GetSharesByTickerListAsync(string tickerList);
-    Task<List<Bond>> GetBondsByTickerListAsync(string tickerList);
-    Task<List<Future>> GeFuturesByTickerListAsync(string tickerList);
-    Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerList);
-    Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerList);
+    /// <summary>
+    /// Получить акции из указанного тикерлиста
+    /// </summary>
+    /// <param name="tickerListName">Наименование тикерлиста</param>
+    Task<List<Share>> GetSharesByTickerListAsync(string tickerListName);
+    
+    /// <summary>
+    /// Получить облигации из указанного тикерлиста
+    /// </summary>
+    /// <param name="tickerListName">Наименование тикерлиста</param>
+    Task<List<Bond>> GetBondsByTickerListAsync(string tickerListName);
+    
+    /// <summary>
+    /// Получить фьючерсы из указанного тикерлиста
+    /// </summary>
+    /// <param name="tickerListName">Наименование тикерлиста</param>
+    Task<List<Future>> GetFuturesByTickerListAsync(string tickerListName);
+    
+    /// <summary>
+    /// Получить валюты из указанного тикерлиста
+    /// </summary>
+    /// <param name="tickerListName">Наименование тикерлиста</param>
+    Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerListName);
+    
+    /// <summary>
+    /// Получить индексы из указанного тикерлиста
+    /// </summary>
+    /// <param name="tickerListName">Наименование тикерлиста</param>
+    Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerListName);
     
     /// <summary>
     /// Получить Id инструментов из списка наблюдения

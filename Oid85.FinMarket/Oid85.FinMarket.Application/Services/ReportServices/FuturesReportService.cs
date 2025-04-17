@@ -16,7 +16,8 @@ public class FuturesReportService(
     : IFuturesReportService
 {
     private async Task<List<Guid>> GetInstrumentIds() =>
-        (await tickerListUtilService.GetFuturesInWatchlist()).Select(x => x.InstrumentId).ToList();
+        (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist))
+        .OrderBy(x => x.Ticker).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>

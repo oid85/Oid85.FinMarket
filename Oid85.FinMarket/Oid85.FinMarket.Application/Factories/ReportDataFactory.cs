@@ -292,7 +292,7 @@ public class ReportDataFactory(
 
     public async Task<ReportData> CreateMultiplicatorReportDataAsync()
     {
-        var shares = (await tickerListUtilService.GetSharesInWatchlist())
+        var shares = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist))
             .OrderBy(x => x.Sector);
 
         var reportData = CreateNewReportDataWithHeaders(
