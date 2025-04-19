@@ -107,4 +107,16 @@ public class SpreadRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
+
+    public async Task<List<Spread>> GetAsync(List<Guid> instrumentIds) =>
+        (await context.SpreadEntities
+            .Where(x => 
+                instrumentIds.Contains(x.FirstInstrumentId) ||
+                instrumentIds.Contains(x.SecondInstrumentId))
+            .Where(x => !x.IsDeleted)
+            .OrderBy(x => x.FirstInstrumentTicker)
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(DataAccessMapper.Map)
+        .ToList();
 }

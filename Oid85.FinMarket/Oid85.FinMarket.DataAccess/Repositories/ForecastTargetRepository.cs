@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.DataAccess.Mapping;
@@ -38,4 +37,15 @@ public class ForecastTargetRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
+
+    public async Task<List<ForecastTarget>> GetAsync(List<Guid> instrumentIds) =>
+        (await context.ForecastTargetEntities
+            .Where(x => instrumentIds.Contains(x.InstrumentId))
+            .Where(x => !x.IsDeleted)
+            .OrderBy(x => x.Ticker)
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(DataAccessMapper.Map)
+        .ToList();
+
 }

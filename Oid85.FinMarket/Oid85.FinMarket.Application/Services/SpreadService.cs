@@ -29,8 +29,8 @@ public class SpreadService(
         
         foreach (var spread in spreads)
         {
-            var firstFuture = await futureRepository.GetByTickerAsync(spread.FirstInstrumentTicker);
-            var secondFuture = await futureRepository.GetByTickerAsync(spread.SecondInstrumentTicker);
+            var firstFuture = await futureRepository.GetAsync(spread.FirstInstrumentTicker);
+            var secondFuture = await futureRepository.GetAsync(spread.SecondInstrumentTicker);
 
             if ((firstFuture is not null && 
                  firstFuture.ExpirationDate <= DateOnly.FromDateTime(DateTime.UtcNow.Date)) ||

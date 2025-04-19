@@ -76,10 +76,10 @@ public class MultiplicatorService(
             async Task<double> GetMarketCapitalization(Multiplicator multiplicator)
             {
                 var shareAo = await shareRepository
-                    .GetByTickerAsync(multiplicator.TickerAo);
+                    .GetAsync(multiplicator.TickerAo);
             
                 var shareAp = await shareRepository
-                    .GetByTickerAsync(multiplicator.TickerAp);
+                    .GetAsync(multiplicator.TickerAp);
 
                 double priceAo = shareAo?.LastPrice ?? 0.0;
                 double priceAp = shareAp?.LastPrice ?? 0.0;

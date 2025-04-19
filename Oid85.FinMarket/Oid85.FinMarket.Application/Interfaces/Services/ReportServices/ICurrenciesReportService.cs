@@ -41,5 +41,5 @@ public interface ICurrenciesReportService
     /// <summary>
     /// Отчет Рыночные события
     /// </summary>
-    Task<ReportData> GetActiveMarketEventsAnalyseAsync();
+    Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request);
 }

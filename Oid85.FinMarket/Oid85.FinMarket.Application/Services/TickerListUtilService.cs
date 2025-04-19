@@ -20,7 +20,7 @@ public class TickerListUtilService(
     public async Task<List<Share>> GetSharesByTickerListAsync(string tickerListName)
     {
         var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var shares = await shareRepository.GetByTickersAsync(tickerListResource.Tickers);
+        var shares = await shareRepository.GetAsync(tickerListResource.Tickers);
         return shares;
     }
 
@@ -28,7 +28,7 @@ public class TickerListUtilService(
     public async Task<List<Bond>> GetBondsByTickerListAsync(string tickerListName)
     {
         var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var bonds = await bondRepository.GetByTickersAsync(tickerListResource.Tickers);
+        var bonds = await bondRepository.GetAsync(tickerListResource.Tickers);
         return bonds;
     }
 
@@ -36,7 +36,7 @@ public class TickerListUtilService(
     public async Task<List<Future>> GetFuturesByTickerListAsync(string tickerListName)
     {
         var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var futures = await futureRepository.GetByTickersAsync(tickerListResource.Tickers);
+        var futures = await futureRepository.GetAsync(tickerListResource.Tickers);
         return futures;
     }
 
@@ -44,7 +44,7 @@ public class TickerListUtilService(
     public async Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerListName)
     {
         var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var currencies = await currencyRepository.GetByTickersAsync(tickerListResource.Tickers);
+        var currencies = await currencyRepository.GetAsync(tickerListResource.Tickers);
         return currencies;
     }
 
@@ -52,7 +52,7 @@ public class TickerListUtilService(
     public async Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerListName)
     {
         var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var finIndexes = await indexRepository.GetByTickersAsync(tickerListResource.Tickers);
+        var finIndexes = await indexRepository.GetAsync(tickerListResource.Tickers);
         return finIndexes;
     }
 

@@ -41,5 +41,5 @@ public interface IIndexesReportService
     /// <summary>
     /// Отчет Рыночные события
     /// </summary>
-    Task<ReportData> GetActiveMarketEventsAnalyseAsync();
+    Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request);
 }

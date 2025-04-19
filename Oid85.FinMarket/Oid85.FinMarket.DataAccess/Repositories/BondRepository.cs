@@ -68,7 +68,7 @@ public class BondRepository(
         .Select(DataAccessMapper.Map)
         .ToList();
 
-    public async Task<List<Bond>> GetByTickersAsync(List<string> tickers) =>
+    public async Task<List<Bond>> GetAsync(List<string> tickers) =>
         (await context.BondEntities
             .Where(x => !x.IsDeleted)
             .Where(x => tickers.Contains(x.Ticker))

@@ -277,9 +277,10 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetDividendAnalyseAsync() =>
+    public Task<IActionResult> GetDividendAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            reportService.GetDividendAnalyseAsync,
+            () => reportService.GetDividendAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -292,9 +293,10 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetMultiplicatorAnalyseAsync() =>
+    public Task<IActionResult> GetMultiplicatorAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            reportService.GetMultiplicatorAnalyseAsync,
+            () => reportService.GetMultiplicatorAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -307,9 +309,10 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetForecastTargetAnalyseAsync() =>
+    public Task<IActionResult> GetForecastTargetAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            reportService.GetForecastTargetAnalyseAsync,
+            () => reportService.GetForecastTargetAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -322,9 +325,10 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetForecastConsensusAnalyseAsync() =>
+    public Task<IActionResult> GetForecastConsensusAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            reportService.GetForecastConsensusAnalyseAsync,
+            () => reportService.GetForecastConsensusAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -337,9 +341,10 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetActiveMarketEventsAnalyseAsync() =>
+    public Task<IActionResult> GetActiveMarketEventsAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            reportService.GetActiveMarketEventsAnalyseAsync,
+            () => reportService.GetActiveMarketEventsAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -352,9 +357,10 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetAssetReportEventsAnalyseAsync() =>
+    public Task<IActionResult> GetAssetReportEventsAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            reportService.GetAssetReportEventsAnalyseAsync,
+            () => reportService.GetAssetReportEventsAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
@@ -415,9 +421,10 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetMultiplicatorsMCapPeNetDebtEbitdaAsync() =>
+    public Task<IActionResult> GetMultiplicatorsMCapPeNetDebtEbitdaAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            diagramService.GetMultiplicatorsMCapPeNetDebtEbitdaAsync,
+            () => diagramService.GetMultiplicatorsMCapPeNetDebtEbitdaAsync(request),
             result => new BaseResponse<BubbleDiagramData>
             {
                 Result = result

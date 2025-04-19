@@ -7,6 +7,6 @@ public interface IFutureRepository
     Task AddAsync(List<Future> futures);
     Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
     Task<List<Future>> GetAllAsync();
-    Task<List<Future>> GetByTickersAsync(List<string> tickers);
-    Task<Future?> GetByTickerAsync(string ticker);
+    Task<List<Future>> GetAsync(List<string> tickers);
+    Task<Future?> GetAsync(string ticker);
 }

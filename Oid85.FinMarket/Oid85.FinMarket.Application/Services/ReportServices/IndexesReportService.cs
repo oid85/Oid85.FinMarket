@@ -13,14 +13,14 @@ public class IndexesReportService(
     IReportDataFactory reportDataFactory) 
     : IIndexesReportService
 {
-    private async Task<List<Guid>> GetInstrumentIds() =>
-        (await tickerListUtilService.GetFinIndexesByTickerListAsync(KnownTickerLists.IndexesWatchlist))
+    private async Task<List<Guid>> GetInstrumentIds(string tickerList) =>
+        (await tickerListUtilService.GetFinIndexesByTickerListAsync(tickerList))
         .OrderBy(x => x.Ticker).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateAggregatedReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             [
                 KnownAnalyseTypes.Supertrend,
                 KnownAnalyseTypes.CandleSequence,
@@ -31,40 +31,40 @@ public class IndexesReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.Supertrend, 
             request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.CandleSequence, 
             request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetRsiAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.Rsi, 
             request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.YieldLtm, 
             request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetDrawdownFromMaximumAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.DrawdownFromMaximum, 
             request.From, request.To);
     
     /// <inheritdoc />
-    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync() => 
+    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request) => 
         await reportDataFactory.CreateActiveMarketEventsReportDataAsync(
-            await GetInstrumentIds());
+            await GetInstrumentIds(request.TickerList));
 }

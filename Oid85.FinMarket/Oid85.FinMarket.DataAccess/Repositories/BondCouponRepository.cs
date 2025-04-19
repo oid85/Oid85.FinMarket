@@ -56,7 +56,7 @@ public class BondCouponRepository(
         }
     }
     
-    public async Task<List<BondCoupon>> GetByInstrumentIdsAsync(List<Guid> instrumentIds) =>
+    public async Task<List<BondCoupon>> GetAsync(List<Guid> instrumentIds) =>
         (await context.BondCouponEntities
             .Where(x => 
                 instrumentIds.Contains(x.InstrumentId))

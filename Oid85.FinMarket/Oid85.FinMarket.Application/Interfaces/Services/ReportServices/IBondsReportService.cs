@@ -31,7 +31,7 @@ public interface IBondsReportService
     /// <summary>
     /// Отчет Купоны
     /// </summary>
-    Task<ReportData> GetCouponAnalyseAsync();
+    Task<ReportData> GetCouponAnalyseAsync(TickerListRequest request);
 
     /// <summary>
     /// Отчет Подборка облигаций
@@ -41,5 +41,5 @@ public interface IBondsReportService
     /// <summary>
     /// Отчет Рыночные события
     /// </summary>
-    Task<ReportData> GetActiveMarketEventsAnalyseAsync();
+    Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request);
 }

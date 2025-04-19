@@ -46,32 +46,32 @@ public interface ISharesReportService
     /// <summary>
     /// Отчет Дивиденды
     /// </summary>
-    Task<ReportData> GetDividendAnalyseAsync();
+    Task<ReportData> GetDividendAnalyseAsync(TickerListRequest request);
     
     /// <summary>
     /// Отчет Мультипликаторы
     /// </summary>
-    Task<ReportData> GetMultiplicatorAnalyseAsync();
+    Task<ReportData> GetMultiplicatorAnalyseAsync(TickerListRequest request);
 
     /// <summary>
     /// Отчет Прогнозы
     /// </summary>
-    Task<ReportData> GetForecastTargetAnalyseAsync();
+    Task<ReportData> GetForecastTargetAnalyseAsync(TickerListRequest request);
 
     /// <summary>
     /// Отчет Консенсус-прогнозы
     /// </summary>
-    Task<ReportData> GetForecastConsensusAnalyseAsync();
+    Task<ReportData> GetForecastConsensusAnalyseAsync(TickerListRequest request);
     
     /// <summary>
     /// Отчет Рыночные события
     /// </summary>
-    Task<ReportData> GetActiveMarketEventsAnalyseAsync();
+    Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request);
 
     /// <summary>
     /// Отчет Отчеты по эмитентам
     /// </summary>
-    Task<ReportData> GetAssetReportEventsAnalyseAsync();
+    Task<ReportData> GetAssetReportEventsAnalyseAsync(TickerListRequest request);
 
     /// <summary>
     /// Отчет Индекс страха и жадности

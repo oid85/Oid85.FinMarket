@@ -13,14 +13,14 @@ public class BondsReportService(
     IReportDataFactory reportDataFactory) 
     : IBondsReportService
 {
-    private async Task<List<Guid>> GetInstrumentIds() =>
-        (await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist))
+    private async Task<List<Guid>> GetInstrumentIds(string tickerList) =>
+        (await tickerListUtilService.GetBondsByTickerListAsync(tickerList))
         .OrderBy(x => x.Sector).Select(x => x.InstrumentId).ToList();
     
     /// <inheritdoc />
     public async Task<ReportData> GetAggregatedAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateAggregatedReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             [
                 KnownAnalyseTypes.Supertrend,
                 KnownAnalyseTypes.CandleSequence,
@@ -31,29 +31,28 @@ public class BondsReportService(
     /// <inheritdoc />
     public async Task<ReportData> GetSupertrendAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.Supertrend, 
             request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleSequenceAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.CandleSequence, 
             request.From, request.To);
 
     /// <inheritdoc />
     public async Task<ReportData> GetCandleVolumeAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
-            await GetInstrumentIds(), 
+            await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.CandleVolume, 
             request.From, request.To);
 
     /// <inheritdoc />
-    public async Task<ReportData> GetCouponAnalyseAsync() =>
+    public async Task<ReportData> GetCouponAnalyseAsync(TickerListRequest request) =>
         await reportDataFactory.CreateBondCouponReportDataAsync(
-            (await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist))
-            .Select(x => x.InstrumentId).ToList());
+            await GetInstrumentIds(request.TickerList));
 
     /// <inheritdoc />
     public async Task<ReportData> GetBondSelectionAsync() =>
@@ -62,7 +61,7 @@ public class BondsReportService(
             .Select(x => x.InstrumentId).ToList());
 
     /// <inheritdoc />
-    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync() => 
+    public async Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request) => 
         await reportDataFactory.CreateActiveMarketEventsReportDataAsync(
-            await GetInstrumentIds());
+            await GetInstrumentIds(request.TickerList));
 }

@@ -8,5 +8,5 @@ public interface IBondRepository
     Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
     Task<List<Bond>> GetAllAsync();
     Task<List<Bond>> GetAsync(List<Guid> instrumentIds);
-    Task<List<Bond>> GetByTickersAsync(List<string> tickers);
+    Task<List<Bond>> GetAsync(List<string> tickers);
 }

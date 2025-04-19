@@ -59,7 +59,7 @@ public class FutureRepository(
         .Select(DataAccessMapper.Map)
         .ToList();
 
-    public async Task<List<Future>> GetByTickersAsync(List<string> tickers) =>
+    public async Task<List<Future>> GetAsync(List<string> tickers) =>
         (await context.FutureEntities
             .Where(x => !x.IsDeleted)
             .Where(x => tickers.Contains(x.Ticker))
@@ -69,7 +69,7 @@ public class FutureRepository(
         .Select(DataAccessMapper.Map)
         .ToList();
 
-    public async Task<Future?> GetByTickerAsync(string ticker)
+    public async Task<Future?> GetAsync(string ticker)
     {
         var entity = await context.FutureEntities
             .Where(x => !x.IsDeleted)

@@ -50,7 +50,7 @@ public class ShareRepository(
         }
     }
     
-    public async Task<List<Share>> GetByTickersAsync(List<string> tickers) =>
+    public async Task<List<Share>> GetAsync(List<string> tickers) =>
         (await context.ShareEntities
             .Where(x => !x.IsDeleted)
             .Where(x => tickers.Contains(x.Ticker))
@@ -60,7 +60,7 @@ public class ShareRepository(
         .Select(DataAccessMapper.Map)
         .ToList();
 
-    public async Task<Share?> GetByTickerAsync(string ticker)
+    public async Task<Share?> GetAsync(string ticker)
     {
         var entity = await context.ShareEntities
             .Where(x => !x.IsDeleted)
@@ -70,7 +70,7 @@ public class ShareRepository(
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
-    public async Task<Share?> GetByInstrumentIdAsync(Guid instrumentId)
+    public async Task<Share?> GetAsync(Guid instrumentId)
     {
         var entity = await context.ShareEntities
             .Where(x => !x.IsDeleted)
@@ -79,4 +79,14 @@ public class ShareRepository(
         
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
+
+    public async Task<List<Share>> GetAsync(List<Guid> instrumentIds) =>
+        (await context.ShareEntities
+            .Where(x => !x.IsDeleted)
+            .Where(x => instrumentIds.Contains(x.InstrumentId))
+            .OrderBy(x => x.Ticker)
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(DataAccessMapper.Map)
+        .ToList();
 }

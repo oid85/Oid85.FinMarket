@@ -36,4 +36,13 @@ public class DividendInfoRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
+
+    public async Task<List<DividendInfo>> GetAsync(List<Guid> instrumentIds) =>
+        (await context.DividendInfoEntities
+            .Where(x => instrumentIds.Contains(x.InstrumentId))
+            .OrderBy(x => x.DividendPrc)
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(DataAccessMapper.Map)
+        .ToList();
 }

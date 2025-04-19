@@ -4,7 +4,6 @@ using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
-using Bond = Tinkoff.InvestApi.V1.Bond;
 
 namespace Oid85.FinMarket.External.Tinkoff;
 

@@ -51,7 +51,7 @@ public class IndexRepository(
         }
     }
     
-    public async Task<List<FinIndex>> GetByTickersAsync(List<string> tickers) =>
+    public async Task<List<FinIndex>> GetAsync(List<string> tickers) =>
         (await context.IndicativeEntities
             .Where(x => !x.IsDeleted)
             .Where(x => tickers.Contains(x.Ticker))

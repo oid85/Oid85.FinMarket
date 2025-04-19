@@ -198,9 +198,10 @@ public class IndexesController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetActiveMarketEventsAnalyseAsync() =>
+    public Task<IActionResult> GetActiveMarketEventsAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            reportService.GetActiveMarketEventsAnalyseAsync,
+            () => reportService.GetActiveMarketEventsAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result

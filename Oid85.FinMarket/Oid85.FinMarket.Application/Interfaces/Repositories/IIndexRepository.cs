@@ -6,5 +6,5 @@ public interface IIndexRepository
 {
     Task AddAsync(List<FinIndex> indexes);
     Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
-    Task<List<FinIndex>> GetByTickersAsync(List<string> tickers);
+    Task<List<FinIndex>> GetAsync(List<string> tickers);
 }

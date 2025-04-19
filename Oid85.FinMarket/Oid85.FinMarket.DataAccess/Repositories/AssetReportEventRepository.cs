@@ -37,4 +37,13 @@ public class AssetReportEventRepository(
             .ToListAsync())
         .Select(DataAccessMapper.Map)
         .ToList();
+
+    public async Task<List<AssetReportEvent>> GetAsync(List<Guid> instrumentIds) =>
+        (await context.AssetReportEventEntities
+            .Where(x=> instrumentIds.Contains(x.InstrumentId))
+            .OrderBy(x => x.ReportDate)
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(DataAccessMapper.Map)
+        .ToList();
 }

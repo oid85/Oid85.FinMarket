@@ -41,10 +41,10 @@ public interface IFuturesReportService
     /// <summary>
     /// Отчет Анализ спреда
     /// </summary>
-    Task<ReportData> GetSpreadAnalyseAsync();
+    Task<ReportData> GetSpreadAnalyseAsync(TickerListRequest request);
     
     /// <summary>
     /// Отчет Рыночные события
     /// </summary>
-    Task<ReportData> GetActiveMarketEventsAnalyseAsync();
+    Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request);
 }

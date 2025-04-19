@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.DataAccess.Mapping;
@@ -30,6 +29,16 @@ public class ForecastConsensusRepository(
     
     public async Task<List<ForecastConsensus>> GetAllAsync() =>
         (await context.ForecastConsensusEntities
+            .Where(x => !x.IsDeleted)
+            .OrderBy(x => x.Ticker)
+            .AsNoTracking()
+            .ToListAsync())
+        .Select(DataAccessMapper.Map)
+        .ToList();
+
+    public async Task<List<ForecastConsensus>> GetAsync(List<Guid> instrumentIds) =>
+        (await context.ForecastConsensusEntities
+            .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x => !x.IsDeleted)
             .OrderBy(x => x.Ticker)
             .AsNoTracking()

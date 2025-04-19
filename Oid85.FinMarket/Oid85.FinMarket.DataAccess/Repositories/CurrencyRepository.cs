@@ -50,7 +50,7 @@ public class CurrencyRepository(
         }
     }
     
-    public async Task<List<Currency>> GetByTickersAsync(List<string> tickers) =>
+    public async Task<List<Currency>> GetAsync(List<string> tickers) =>
         (await context.CurrencyEntities
             .Where(x => !x.IsDeleted)
             .Where(x => tickers.Contains(x.Ticker))

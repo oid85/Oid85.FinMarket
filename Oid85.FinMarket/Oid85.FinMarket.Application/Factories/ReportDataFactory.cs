@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
@@ -25,7 +24,6 @@ public class ReportDataFactory(
     IForecastConsensusRepository forecastConsensusRepository,
     IAssetReportEventRepository assetReportEventRepository,
     ColorHelper colorHelper,
-    ITickerListUtilService tickerListUtilService,
     ISpreadRepository spreadRepository,
     IMarketEventRepository marketEventRepository,
     IFeerGreedRepository feerGreedRepository,
@@ -83,7 +81,7 @@ public class ReportDataFactory(
     
     private async ValueTask<double> CalculateDividendProfitPercentAsync(DividendInfo dividendInfo)
     {
-        var share = await shareRepository.GetByInstrumentIdAsync(dividendInfo.InstrumentId);
+        var share = await shareRepository.GetAsync(dividendInfo.InstrumentId);
 
         if (share is null)
             return 0.0;
@@ -250,9 +248,9 @@ public class ReportDataFactory(
         return reportData;
     }
 
-    public async Task<ReportData> CreateDividendInfoReportDataAsync()
+    public async Task<ReportData> CreateDividendInfoReportDataAsync(List<Guid> instrumentIds)
     {
-        var dividendInfos = await dividendInfoRepository.GetAllAsync();
+        var dividendInfos = await dividendInfoRepository.GetAsync(instrumentIds);
         int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         var from = DateOnly.FromDateTime(DateTime.Today);
         var to = from.AddDays(days);
@@ -290,9 +288,9 @@ public class ReportDataFactory(
         return reportData;
     }
 
-    public async Task<ReportData> CreateMultiplicatorReportDataAsync()
+    public async Task<ReportData> CreateMultiplicatorReportDataAsync(List<Guid> instrumentIds)
     {
-        var shares = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist))
+        var shares = (await shareRepository.GetAsync(instrumentIds))
             .OrderBy(x => x.Sector);
 
         var reportData = CreateNewReportDataWithHeaders(
@@ -368,10 +366,11 @@ public class ReportDataFactory(
         return reportData;
     }
 
-    public async Task<ReportData> CreateForecastTargetReportDataAsync()
+    public async Task<ReportData> CreateForecastTargetReportDataAsync(List<Guid> instrumentIds)
     {
-        var forecastTargets = (await forecastTargetRepository.GetAllAsync())
+        var forecastTargets = (await forecastTargetRepository.GetAsync(instrumentIds))
             .Where(x => !string.IsNullOrEmpty(x.Ticker)).ToList();
+        
         var actualForecastTargets = new List<ForecastTarget>();
 
         foreach (var forecastTarget in forecastTargets)
@@ -425,9 +424,9 @@ public class ReportDataFactory(
         return reportData;
     }
 
-    public async Task<ReportData> CreateForecastConsensusReportDataAsync()
+    public async Task<ReportData> CreateForecastConsensusReportDataAsync(List<Guid> instrumentIds)
     {
-        var forecastConsensuses = (await forecastConsensusRepository.GetAllAsync())
+        var forecastConsensuses = (await forecastConsensusRepository.GetAsync(instrumentIds))
             .Where(x => !string.IsNullOrEmpty(x.Ticker)).ToList();
         
         var reportData = CreateNewReportDataWithHeaders(
@@ -488,7 +487,7 @@ public class ReportDataFactory(
         reportData.Title = "Купоны";
         
         var bondCoupons = (await bondCouponRepository
-            .GetByInstrumentIdsAsync(instrumentIds))
+            .GetAsync(instrumentIds))
             .Where(x =>
                 x.CouponDate >= startDate &&
                 x.CouponDate <= endDate)
@@ -566,9 +565,9 @@ public class ReportDataFactory(
         return reportData;
     }
 
-    public async Task<ReportData> CreateSpreadReportDataAsync()
+    public async Task<ReportData> CreateSpreadReportDataAsync(List<Guid> instrumentIds)
     {
-        var spreads = await spreadRepository.GetAllAsync();
+        var spreads = await spreadRepository.GetAsync(instrumentIds);
             
         var reportData = CreateNewReportDataWithHeaders(
             [string.Empty, string.Empty, "Тикер", "Тикер", "Цена", "Цена", "Спред", "Спред, %", "Конт./Бэкв."]);
@@ -632,7 +631,7 @@ public class ReportDataFactory(
 
     public async Task<ReportData> CreateAssetReportEventsReportDataAsync(List<Guid> instrumentIds)
     {
-        var assetReportEvents = await assetReportEventRepository.GetAllAsync();
+        var assetReportEvents = await assetReportEventRepository.GetAsync(instrumentIds);
         int days = configuration.GetValue<int>(KnownSettingsKeys.ApplicationSettingsOutputWindowInDays);
         var from = DateOnly.FromDateTime(DateTime.Today);
         var to = from.AddDays(days);
