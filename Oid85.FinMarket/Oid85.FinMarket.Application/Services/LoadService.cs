@@ -116,8 +116,7 @@ public class LoadService(
         
         return true;
     }
-
-
+    
     public async Task<bool> LoadFuturesAsync()
     {
         var futures = await tinkoffService.GetFuturesAsync();

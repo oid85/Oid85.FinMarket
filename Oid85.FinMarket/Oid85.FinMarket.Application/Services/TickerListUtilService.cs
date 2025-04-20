@@ -3,6 +3,7 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
+using Oid85.FinMarket.External.ResourceStore.Models;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -17,44 +18,54 @@ public class TickerListUtilService(
     ) : ITickerListUtilService
 {
     /// <inheritdoc />
-    public async Task<List<Share>> GetSharesByTickerListAsync(string tickerListName)
-    {
-        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var shares = await shareRepository.GetAsync(tickerListResource.Tickers);
-        return shares;
-    }
+    public async Task<List<Share>> GetSharesByTickerListAsync(string tickerListName) => 
+        await shareRepository.GetAsync(
+            (await resourceStoreService.GetTickerListAsync(tickerListName)).Tickers);
 
     /// <inheritdoc />
-    public async Task<List<Bond>> GetBondsByTickerListAsync(string tickerListName)
-    {
-        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var bonds = await bondRepository.GetAsync(tickerListResource.Tickers);
-        return bonds;
-    }
+    public async Task<List<Bond>> GetBondsByTickerListAsync(string tickerListName) => 
+        await bondRepository.GetAsync(
+            (await resourceStoreService.GetTickerListAsync(tickerListName)).Tickers);
 
     /// <inheritdoc />
     public async Task<List<Future>> GetFuturesByTickerListAsync(string tickerListName)
     {
-        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var futures = await futureRepository.GetAsync(tickerListResource.Tickers);
-        return futures;
+        var tickersFromResource = (await resourceStoreService.GetTickerListAsync(tickerListName)).Tickers;
+        var tickersFromDatabase = (await futureRepository.GetAllAsync())
+            .Where(x => x.ExpirationDate >= DateOnly.FromDateTime(DateTime.Today))
+            .Select(x => x.Ticker).ToList();
+
+        var tickers = new List<string>();
+
+        foreach (var tickerFromDatabase in tickersFromDatabase)
+            foreach (var tickerFromResource in tickersFromResource)
+                if (tickerFromResource.Length == 2) // Если тикер фьючерса задан как маска
+                {
+                    if (tickerFromDatabase[0] == tickerFromResource[0] &&
+                        tickerFromDatabase[1] == tickerFromResource[1])
+                        if (!tickers.Contains(tickerFromDatabase))
+                            tickers.Add(tickerFromDatabase);
+                }
+                
+                else
+                {
+                    if (tickerFromDatabase == tickerFromResource)
+                        if (!tickers.Contains(tickerFromDatabase))
+                            tickers.Add(tickerFromDatabase);
+                }
+        
+        return await futureRepository.GetAsync(tickers);
     }
 
     /// <inheritdoc />
-    public async Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerListName)
-    {
-        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var currencies = await currencyRepository.GetAsync(tickerListResource.Tickers);
-        return currencies;
-    }
+    public async Task<List<Currency>> GetCurrenciesByTickerListAsync(string tickerListName) => 
+        await currencyRepository.GetAsync(
+            (await resourceStoreService.GetTickerListAsync(tickerListName)).Tickers);
 
     /// <inheritdoc />
-    public async Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerListName)
-    {
-        var tickerListResource = await resourceStoreService.GetTickerListAsync(tickerListName);
-        var finIndexes = await indexRepository.GetAsync(tickerListResource.Tickers);
-        return finIndexes;
-    }
+    public async Task<List<FinIndex>> GetFinIndexesByTickerListAsync(string tickerListName) => 
+        await indexRepository.GetAsync(
+            (await resourceStoreService.GetTickerListAsync(tickerListName)).Tickers);
 
     /// <inheritdoc />
     public async Task<List<Guid>> GetInstrumentIdsInWatchlist()
