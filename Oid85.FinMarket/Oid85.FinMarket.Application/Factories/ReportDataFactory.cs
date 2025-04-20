@@ -602,9 +602,30 @@ public class ReportDataFactory(
             .OrderByDescending(x => new DateTime(x.Date, x.Time));
         
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Сектор", "Наименование", "Дата", "Время", "Текст"]);
+            [
+                "Тикер", "Сектор", "Наименование", 
+                "SupertrendUp", "SupertrendDown", "CandleVolumeUp", "CandleSequenceWhite", "CandleSequenceBlack",
+                "RsiOverBoughtInput", "RsiOverBoughtOutput", "RsiOverSoldInput", "RsiOverSoldOutput",
+                "CrossPriceLevel", "SpreadGreaterPercent1", "SpreadGreaterPercent2", "SpreadGreaterPercent3",
+                "ForecastReleased", "IntraDayImpulse"
+            ]);
         
         reportData.Title = "Активные рыночные события";
+
+        foreach (var instrumentId in instrumentIds)
+        {
+            var instrument = await instrumentRepository.GetAsync(instrumentId);
+            
+            if (instrument is null)
+                continue;
+            
+            reportData.Data.Add(
+            [
+                GetTicker(instrument.Ticker),
+                GetSector(instrument.Sector),
+                GetString(normalizeService.NormalizeInstrumentName(instrument.Name)),
+            ]);
+        }
         
         foreach (var marketEvent in marketEvents)
         {
