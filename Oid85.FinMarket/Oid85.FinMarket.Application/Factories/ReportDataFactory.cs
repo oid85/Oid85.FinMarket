@@ -599,15 +599,16 @@ public class ReportDataFactory(
     {
         var marketEvents = (await marketEventRepository.GetActivatedAsync())
             .Where(x => instrumentIds.Contains(x.InstrumentId))
-            .OrderByDescending(x => new DateTime(x.Date, x.Time));
+            .OrderByDescending(x => new DateTime(x.Date, x.Time))
+            .ToList();
         
         var reportData = CreateNewReportDataWithHeaders(
             [
                 "Тикер", "Сектор", "Наименование", 
-                "SupertrendUp", "SupertrendDown", "CandleVolumeUp", "CandleSequenceWhite", "CandleSequenceBlack",
-                "RsiOverBoughtInput", "RsiOverBoughtOutput", "RsiOverSoldInput", "RsiOverSoldOutput",
-                "CrossPriceLevel", "SpreadGreaterPercent1", "SpreadGreaterPercent2", "SpreadGreaterPercent3",
-                "ForecastReleased", "IntraDayImpulse"
+                "ST Up", "ST Down", "Vol Up", "Candle White", "Candle Black",
+                "RSI O/B In", "RSI O/B Out", "RSI O/S In", "RSI O/S Out",
+                "Cross", "Spread 1%", "Spread 2%", "Spread 3%",
+                "Forecast", "IntDay Impulse"
             ]);
         
         reportData.Title = "Активные рыночные события";
@@ -618,33 +619,45 @@ public class ReportDataFactory(
             
             if (instrument is null)
                 continue;
-            
+
             reportData.Data.Add(
             [
                 GetTicker(instrument.Ticker),
                 GetSector(instrument.Sector),
                 GetString(normalizeService.NormalizeInstrumentName(instrument.Name)),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.SupertrendUp),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.SupertrendDown),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.CandleVolumeUp),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.CandleSequenceWhite),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.CandleSequenceBlack),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.RsiOverBoughtInput),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.RsiOverBoughtOutput),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.RsiOverSoldInput),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.RsiOverSoldOutput),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.CrossPriceLevel),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent1),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent2),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent3),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.ForecastReleased),
+                await GetMarketEventReportParameter(KnownMarketEventTypes.IntraDayImpulse)
             ]);
-        }
-        
-        foreach (var marketEvent in marketEvents)
-        {
-            var instrument = await instrumentRepository.GetAsync(marketEvent.InstrumentId);
             
-            if (instrument is null)
-                continue;
-            
-            string color = await colorHelper.GetColorMarketEvent(marketEvent.MarketEventType);
-            
-            reportData.Data.Add(
-            [
-                GetTicker(instrument.Ticker),
-                GetSector(instrument.Sector),
-                GetString(normalizeService.NormalizeInstrumentName(marketEvent.InstrumentName), color),
-                GetString(marketEvent.Date.ToString(KnownDateTimeFormats.DateISO), color),
-                GetString(marketEvent.Time.ToString(KnownDateTimeFormats.TimeISO), color),
-                GetString(marketEvent.MarketEventText, color)
-            ]);
+            continue;
+
+            async Task<ReportParameter> GetMarketEventReportParameter(string marketEventType)
+            {
+                var marketEvent = marketEvents
+                    .FirstOrDefault(x => 
+                        x.InstrumentId == instrumentId &&
+                        x.MarketEventType == marketEventType);
+                
+                if (marketEvent is null)
+                    return GetString(string.Empty);
+                
+                string color = await colorHelper.GetColorMarketEvent(marketEventType);
+                
+                return GetString(string.Empty, color);
+            }
         }
         
         return reportData;
