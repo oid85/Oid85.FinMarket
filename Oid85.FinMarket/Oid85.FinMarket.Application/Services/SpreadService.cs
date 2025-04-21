@@ -94,28 +94,28 @@ public class SpreadService(
 
     private double GetMultiplier(double firstInstrumentPrice, double secondInstrumentPrice)
     {
-        if (secondInstrumentPrice / firstInstrumentPrice > 1500.0)
+        if (secondInstrumentPrice / firstInstrumentPrice > 1000.0)
             return 1000.0;
         
-        if (secondInstrumentPrice / firstInstrumentPrice > 150.0)
+        if (secondInstrumentPrice / firstInstrumentPrice > 100.0)
             return 100.0;
         
-        if (secondInstrumentPrice / firstInstrumentPrice > 15.0)
+        if (secondInstrumentPrice / firstInstrumentPrice > 10.0)
             return 10.0;
         
-        if (secondInstrumentPrice / firstInstrumentPrice > 1.5)
+        if (secondInstrumentPrice / firstInstrumentPrice > 1.0)
             return 1.0;
         
-        if (firstInstrumentPrice / secondInstrumentPrice > 1500.0)
+        if (firstInstrumentPrice / secondInstrumentPrice > 1000.0)
             return 1.0 / 1000.0;
         
-        if (firstInstrumentPrice / secondInstrumentPrice > 150.0)
+        if (firstInstrumentPrice / secondInstrumentPrice > 100.0)
             return 1.0 / 100.0;
         
-        if (firstInstrumentPrice / secondInstrumentPrice > 15.0)
+        if (firstInstrumentPrice / secondInstrumentPrice > 10.0)
             return 1.0 / 10.0;
         
-        if (firstInstrumentPrice / secondInstrumentPrice > 1.5)
+        if (firstInstrumentPrice / secondInstrumentPrice > 1.0)
             return 1.0 / 1.0;
         
         return 1.0;
