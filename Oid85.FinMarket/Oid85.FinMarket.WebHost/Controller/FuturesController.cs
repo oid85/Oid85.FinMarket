@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
+using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
@@ -16,6 +18,7 @@ public class FuturesController(
     ILoadService loadService,
     IAnalyseService analyseService,
     IFuturesReportService reportService,
+    IFuturesDiagramService diagramService,
     ISpreadService spreadService, 
     ITickerListUtilService tickerListUtilService) 
     : FinMarketBaseController
@@ -253,4 +256,20 @@ public class FuturesController(
             {
                 Result = result
             });    
+    
+    /// <summary>
+    /// Диаграмма График цен закрытия (дневные)
+    /// </summary>
+    [HttpPost("diagram/daily-close-prices")]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetDailyClosePricesAsync(
+        [FromBody] DateRangeRequest request) =>
+        GetResponseAsync(
+            () => diagramService.GetDailyClosePricesAsync(request),
+            result => new BaseResponse<SimpleDiagramData>
+            {
+                Result = result
+            });
 }

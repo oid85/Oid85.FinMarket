@@ -396,7 +396,7 @@ public class SharesController(
             result => new BaseResponse<SimpleDiagramData>
             {
                 Result = result
-            });    
+            });
     
     /// <summary>
     /// Диаграмма График цен закрытия (5 мин)
@@ -412,7 +412,7 @@ public class SharesController(
             result => new BaseResponse<SimpleDiagramData>
             {
                 Result = result
-            });  
+            });
     
     /// <summary>
     /// Диаграмма Мультипликаторы MCap, P/E, NetDebt/EBITDA
