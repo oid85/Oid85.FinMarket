@@ -8,6 +8,31 @@ namespace Oid85.FinMarket.Application.Interfaces.Services;
 public interface ITickerListUtilService
 {
     /// <summary>
+    /// Получить все акции из всех тикерлистов
+    /// </summary>
+    Task<List<Share>> GetAllSharesInTickerListsAsync();
+    
+    /// <summary>
+    /// Получить все облигации из всех тикерлистов
+    /// </summary>
+    Task<List<Bond>> GetAllBondsInTickerListsAsync();
+    
+    /// <summary>
+    /// Получить все фьючерсы из всех тикерлистов
+    /// </summary>
+    Task<List<Future>> GetAllFuturesInTickerListsAsync();
+    
+    /// <summary>
+    /// Получить все валюты из всех тикерлистов
+    /// </summary>
+    Task<List<Currency>> GetAllCurrenciesInTickerListsAsync();    
+    
+    /// <summary>
+    /// Получить все индексы из всех тикерлистов
+    /// </summary>
+    Task<List<FinIndex>> GetAllIndexesInTickerListsAsync(); 
+    
+    /// <summary>
     /// Получить акции из указанного тикерлиста
     /// </summary>
     /// <param name="tickerListName">Наименование тикерлиста</param>

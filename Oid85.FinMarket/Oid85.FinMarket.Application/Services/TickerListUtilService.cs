@@ -3,7 +3,6 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
-using Oid85.FinMarket.External.ResourceStore.Models;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -17,6 +16,95 @@ public class TickerListUtilService(
     IIndexRepository indexRepository
     ) : ITickerListUtilService
 {
+    /// <inheritdoc />
+    public async Task<List<Share>> GetAllSharesInTickerListsAsync()
+    {
+        List<string> tickers = 
+        [
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesExporters)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesImoex)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesMaterials)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesPortfolio)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesRosseti)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesWatchlist)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesEchelonsEchelon1)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesEchelonsEchelon2)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesEchelonsEchelon3)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsBanks)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsEnerg)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsFinance)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsHousingAndUtilities)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsIronAndSteelIndustry)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsIt)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsMining)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsNonFerrousMetallurgy)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsOilAndGas)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsrRetail)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsTelecom)).Tickers
+        ];
+
+        return await shareRepository.GetAsync(tickers.Distinct().ToList());
+    }
+
+    /// <inheritdoc />
+    public async Task<List<Bond>> GetAllBondsInTickerListsAsync()
+    {
+        List<string> tickers = 
+            [
+                ..(await GetBondsByFilter()).Select(x => x.Ticker).ToList(), 
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsCorp)).Tickers,
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsCouponEveryMonth)).Tickers,
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsMunicipals)).Tickers,
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsOfz)).Tickers,
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsPortfolio)).Tickers,
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsReplacement)).Tickers,
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsWatchlist)).Tickers
+            ];
+
+        return await bondRepository.GetAsync(tickers.Distinct().ToList());
+    }
+
+    /// <inheritdoc />
+    public async Task<List<Future>> GetAllFuturesInTickerListsAsync()
+    {
+        List<string> tickers = 
+        [
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesCny)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesEur)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesGld)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesMoex)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesNg)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesPortfolio)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesRi)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesUsd)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.FuturesWatchlist)).Tickers
+        ];
+
+        return await futureRepository.GetAsync(tickers.Distinct().ToList());
+    }
+
+    /// <inheritdoc />
+    public async Task<List<Currency>> GetAllCurrenciesInTickerListsAsync()
+    {
+        List<string> tickers = 
+        [
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.CurrenciesWatchlist)).Tickers
+        ];
+
+        return await currencyRepository.GetAsync(tickers.Distinct().ToList());
+    }
+    
+    /// <inheritdoc />
+    public async Task<List<FinIndex>> GetAllIndexesInTickerListsAsync()
+    {
+        List<string> tickers = 
+        [
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.IndexesWatchlist)).Tickers
+        ];
+
+        return await indexRepository.GetAsync(tickers.Distinct().ToList());
+    }
+
     /// <inheritdoc />
     public async Task<List<Share>> GetSharesByTickerListAsync(string tickerListName) => 
         await shareRepository.GetAsync(
