@@ -12,8 +12,8 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    [Migration("20250312155626_AddAssetReportEventsTable")]
-    partial class AddAssetReportEventsTable
+    [Migration("20250423150647_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -103,7 +103,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.HasIndex("InstrumentId")
                         .HasDatabaseName("ix_asset_report_events_instrument_id");
 
-                    b.ToTable("asset_report_events", "storage");
+                    b.ToTable("asset_report_events", "public");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.BondCouponEntity", b =>
@@ -439,6 +439,44 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.ToTable("dividend_infos", "public");
                 });
 
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.FearGreedIndexEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<double>("MarketMomentum")
+                        .HasColumnType("double precision")
+                        .HasColumnName("market_momentum");
+
+                    b.Property<double>("MarketVolatility")
+                        .HasColumnType("double precision")
+                        .HasColumnName("market_volatility");
+
+                    b.Property<double>("StockPriceBreadth")
+                        .HasColumnType("double precision")
+                        .HasColumnName("stock_price_breadth");
+
+                    b.Property<double>("StockPriceStrength")
+                        .HasColumnType("double precision")
+                        .HasColumnName("stock_price_strength");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double precision")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_fear_greed_index");
+
+                    b.ToTable("fear_greed_index", "storage");
+                });
+
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.FinIndexEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -534,6 +572,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date")
                         .HasColumnName("date");
+
+                    b.Property<long>("DateTimeTicks")
+                        .HasColumnType("bigint")
+                        .HasColumnName("datetime");
 
                     b.Property<double>("High")
                         .HasColumnType("double precision")
@@ -973,6 +1015,10 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                     b.Property<double>("Beta")
                         .HasColumnType("double precision")
                         .HasColumnName("beta");
+
+                    b.Property<double>("Bv")
+                        .HasColumnType("double precision")
+                        .HasColumnName("bv");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
