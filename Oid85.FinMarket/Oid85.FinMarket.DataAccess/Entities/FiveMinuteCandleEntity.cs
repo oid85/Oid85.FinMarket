@@ -53,6 +53,13 @@ public class FiveMinuteCandleEntity : BaseEntity
     [Column("time", TypeName = "time")]
     public TimeOnly Time { get; set; }
     
+    
+    /// <summary>
+    /// Метка времени
+    /// </summary>
+    [Column("datetime", TypeName = "timestamp")]
+    public DateTime DateTime { get; set; }
+    
     /// <summary>
     /// Свеча сформирована
     /// </summary>

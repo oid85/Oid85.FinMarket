@@ -47,6 +47,15 @@ public static class ConvertHelper
         return TimeOnly.FromDateTime(timestamp.ToDateTime());
     }
     
+    public static DateTime TimestampToDateTime(Timestamp timestamp)
+    {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (timestamp is null)
+            return DateTime.MinValue;
+
+        return timestamp.ToDateTime();
+    }    
+    
     public static string Base64Encode(string text) => 
         Convert.ToBase64String(
             System.Text.Encoding.UTF8.GetBytes(text));

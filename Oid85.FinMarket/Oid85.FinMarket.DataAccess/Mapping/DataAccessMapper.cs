@@ -224,7 +224,7 @@ public static class DataAccessMapper
             Volume = entity.Volume,
             Date = entity.Date,
             Time = entity.Time,
-            DateTime = new DateTime(entity.Date, entity.Time),
+            DateTime = entity.DateTime,
             IsComplete = entity.IsComplete
         };
     

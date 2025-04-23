@@ -166,6 +166,7 @@ public static class TinkoffMapper
             Volume = historicCandle.Volume,
             Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
             Time = ConvertHelper.TimestampToTimeOnly(historicCandle.Time),
+            DateTime = ConvertHelper.TimestampToDateTime(historicCandle.Time),
             IsComplete = historicCandle.IsComplete
         };
     
