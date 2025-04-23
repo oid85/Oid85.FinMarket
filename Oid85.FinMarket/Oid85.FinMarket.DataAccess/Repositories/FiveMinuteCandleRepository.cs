@@ -60,20 +60,20 @@ public class FiveMinuteCandleRepository(
 
     public async Task<List<FiveMinuteCandle>> GetLastWeekCandlesAsync(Guid instrumentId)
     {
-        var from = DateTime.UtcNow.AddDays(-7);
-        var to = DateTime.UtcNow;
+        var from = DateTime.UtcNow.AddDays(-7).Ticks;
+        var to = DateTime.UtcNow.Ticks;
         
         var entities = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
-                x.DateTime >= from &&
-                x.DateTime <= to)
+                x.DateTimeTicks >= from &&
+                x.DateTimeTicks <= to)
             .AsNoTracking()
             .ToListAsync();
 
         return entities.Count == 0 ? [] : entities
             .Select(DataAccessMapper.Map)
-            .OrderBy(x => x.DateTime)
+            .OrderBy(x => x.DateTimeTicks)
             .ToList();
     }
 
@@ -82,17 +82,17 @@ public class FiveMinuteCandleRepository(
         var entities = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
-                x.DateTime >= from &&
-                x.DateTime <= to)
+                x.DateTimeTicks >= from.Ticks &&
+                x.DateTimeTicks <= to.Ticks)
             .AsNoTracking()
             .ToListAsync();
 
         return entities.Count == 0 ? [] : entities
             .Select(DataAccessMapper.Map)
             .Where(x => 
-                x.DateTime >= from &&
-                x.DateTime <= to)
-            .OrderBy(x => x.DateTime)
+                x.DateTimeTicks >= from.Ticks &&
+                x.DateTimeTicks <= to.Ticks)
+            .OrderBy(x => x.DateTimeTicks)
             .ToList();
     }
 }

@@ -536,7 +536,7 @@ public class MarketEventService(
             {
                 // Последние 24 5-минутки (2 часа)
                 var candles = (await fiveMinuteCandleRepository.GetLastWeekCandlesAsync(share.InstrumentId))
-                    .OrderBy(x => x.DateTime)
+                    .OrderBy(x => x.DateTimeTicks)
                     .TakeLast(24)
                     .ToList();
                 

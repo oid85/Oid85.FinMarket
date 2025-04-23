@@ -13,5 +13,5 @@ public class FiveMinuteCandle : Candle
     /// <summary>
     /// Метка времени
     /// </summary>
-    public DateTime DateTime { get; set; }
+    public long DateTimeTicks { get; set; }
 }

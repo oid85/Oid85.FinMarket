@@ -209,6 +209,7 @@ public static class DataAccessMapper
             Volume = model.Volume,
             Date = model.Date,
             Time = model.Time,
+            DateTimeTicks = model.DateTimeTicks,
             IsComplete = model.IsComplete
         };
     
@@ -224,7 +225,7 @@ public static class DataAccessMapper
             Volume = entity.Volume,
             Date = entity.Date,
             Time = entity.Time,
-            DateTime = entity.DateTime,
+            DateTimeTicks = entity.DateTimeTicks,
             IsComplete = entity.IsComplete
         };
     

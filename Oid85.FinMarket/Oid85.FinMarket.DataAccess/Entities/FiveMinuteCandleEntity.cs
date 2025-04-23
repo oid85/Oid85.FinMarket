@@ -57,8 +57,8 @@ public class FiveMinuteCandleEntity : BaseEntity
     /// <summary>
     /// Метка времени
     /// </summary>
-    [Column("datetime", TypeName = "timestamp with time zone")]
-    public DateTime DateTime { get; set; }
+    [Column("datetime")]
+    public long DateTimeTicks { get; set; }
     
     /// <summary>
     /// Свеча сформирована
