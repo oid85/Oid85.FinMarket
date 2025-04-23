@@ -57,7 +57,7 @@ public class FiveMinuteCandleEntity : BaseEntity
     /// <summary>
     /// Метка времени
     /// </summary>
-    [Column("datetime", TypeName = "timestamp")]
+    [Column("datetime", TypeName = "timestamp with time zone")]
     public DateTime DateTime { get; set; }
     
     /// <summary>
