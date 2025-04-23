@@ -60,14 +60,14 @@ public class FiveMinuteCandleRepository(
 
     public async Task<List<FiveMinuteCandle>> GetLastWeekCandlesAsync(Guid instrumentId)
     {
-        var from = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));
-        var to = DateOnly.FromDateTime(DateTime.Today);
+        var from = DateTime.UtcNow.AddDays(-7);
+        var to = DateTime.UtcNow;
         
         var entities = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
-                x.Date >= from &&
-                x.Date <= to)
+                x.DateTime >= from &&
+                x.DateTime <= to)
             .AsNoTracking()
             .ToListAsync();
 
