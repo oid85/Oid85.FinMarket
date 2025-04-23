@@ -1,12 +1,13 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using NLog;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.External.Tinkoff;
 
 namespace Oid85.FinMarket.Application.Services;
 
 public class LoadService(
+    ILogger logger,
     ITinkoffService tinkoffService,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
@@ -86,6 +87,8 @@ public class LoadService(
         {
             var candles = await tinkoffService.GetFiveMinuteCandlesAsync(
                 instrument.InstrumentId, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
+            
+            logger.Trace($"Загрузка {candles.Count} свечей 5min по инструменту '{instrument.Name}' ({instrument.InstrumentId})");
             
             await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
         }
