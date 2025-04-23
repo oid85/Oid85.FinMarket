@@ -82,8 +82,8 @@ public class FiveMinuteCandleRepository(
         var entities = await context.FiveMinuteCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
-                x.Date >= DateOnly.FromDateTime(from) &&
-                x.Date <= DateOnly.FromDateTime(to))
+                x.DateTime >= from &&
+                x.DateTime <= to)
             .AsNoTracking()
             .ToListAsync();
 
