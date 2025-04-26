@@ -56,6 +56,7 @@ public class TickerListUtilService(
                 ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsCouponEveryMonth)).Tickers,
                 ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsMunicipals)).Tickers,
                 ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsOfz)).Tickers,
+                ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsLongOfz)).Tickers,
                 ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsPortfolio)).Tickers,
                 ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsReplacement)).Tickers,
                 ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.BondsWatchlist)).Tickers

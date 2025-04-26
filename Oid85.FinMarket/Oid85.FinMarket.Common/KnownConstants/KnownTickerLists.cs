@@ -27,6 +27,7 @@ public static class KnownTickerLists
     public const string BondsCouponEveryMonth = "bonds/coupon_every_month";
     public const string BondsMunicipals = "bonds/municipals";
     public const string BondsOfz = "bonds/ofz";
+	public const string BondsLongOfz = "bonds/long_ofz";
     public const string BondsPortfolio = "bonds/portfolio";
     public const string BondsReplacement = "bonds/replacement";
     public const string BondsWatchlist = "bonds/watchlist";
