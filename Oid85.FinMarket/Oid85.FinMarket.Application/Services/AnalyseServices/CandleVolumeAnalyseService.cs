@@ -78,15 +78,22 @@ public class CandleVolumeAnalyseService(
     
     (string, double) GetResult(List<Candle> candles)
     {
+        // Объем последней свечи выше, чем у всех предыдущих
         var lastVolume = candles.Last().Volume;
         var prevVolumes = candles
             .Select(x => x.Volume)
             .Take(candles.Count - 1);
 
-        // Объем последней свечи выше, чем у всех предыдущих
-        if (lastVolume > prevVolumes.Max())
-            return (KnownVolumeDirections.Up, 1.0);
+        bool extremalVolume = lastVolume > prevVolumes.Max();
 
+        // Объем растет в течении 3 свечей
+        bool grossVolume = 
+            candles[^2].Volume > candles[^3].Volume &&
+            candles[^1].Volume > candles[^2].Volume;
+            
+        if (extremalVolume && grossVolume)
+            return (KnownVolumeDirections.Up, 1.0);
+        
         return (string.Empty, 0.0);
     }
 }
