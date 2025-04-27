@@ -51,7 +51,7 @@ public class ResourceStoreService(
     {
         string directoryPath = Path.Combine(
             configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "multiplicators", "ltm");
+            "multiplicators");
 
         var filePathes = Directory.GetFiles(directoryPath);
 
