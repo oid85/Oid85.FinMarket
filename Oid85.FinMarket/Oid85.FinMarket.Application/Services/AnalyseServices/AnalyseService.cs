@@ -48,6 +48,8 @@ public class AnalyseService(
             await supertrendAnalyseService.SupertrendAnalyseAsync(instrument.InstrumentId);
             await candleSequenceAnalyseService.CandleSequenceAnalyseAsync(instrument.InstrumentId);
             await candleVolumeAnalyseService.CandleVolumeAnalyseAsync(instrument.InstrumentId);
+            await atrAnalyseService.AtrAnalyseAsync(instrument.InstrumentId);
+            await donchianAnalyseService.DonchianAnalyseAsync(instrument.InstrumentId);			
         }            
             
         return true;
@@ -66,6 +68,8 @@ public class AnalyseService(
             await rsiAnalyseService.RsiAnalyseAsync(instrument.InstrumentId);
             await yieldLtmAnalyseService.YieldLtmAnalyseAsync(instrument.InstrumentId);
             await drawdownFromMaximumAnalyseService.DrawdownFromMaximumAnalyseAsync(instrument.InstrumentId);
+            await atrAnalyseService.AtrAnalyseAsync(instrument.InstrumentId);
+            await donchianAnalyseService.DonchianAnalyseAsync(instrument.InstrumentId);
         }
             
         return true;
@@ -84,6 +88,8 @@ public class AnalyseService(
             await candleVolumeAnalyseService.CandleVolumeAnalyseAsync(instrument.InstrumentId);
             await rsiAnalyseService.RsiAnalyseAsync(instrument.InstrumentId);
             await yieldLtmAnalyseService.YieldLtmAnalyseAsync(instrument.InstrumentId);
+            await atrAnalyseService.AtrAnalyseAsync(instrument.InstrumentId);
+            await donchianAnalyseService.DonchianAnalyseAsync(instrument.InstrumentId);			
         }
             
         return true;
@@ -102,6 +108,8 @@ public class AnalyseService(
             await rsiAnalyseService.RsiAnalyseAsync(instrument.InstrumentId);
             await yieldLtmAnalyseService.YieldLtmAnalyseAsync(instrument.InstrumentId);
             await drawdownFromMaximumAnalyseService.DrawdownFromMaximumAnalyseAsync(instrument.InstrumentId);
+            await atrAnalyseService.AtrAnalyseAsync(instrument.InstrumentId);
+            await donchianAnalyseService.DonchianAnalyseAsync(instrument.InstrumentId);			
         }
             
         return true;
