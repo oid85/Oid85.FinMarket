@@ -45,10 +45,12 @@ public class DonchianAnalyseService(
             {
                 var candle = candles.Find(x => x.Date == DateOnly.FromDateTime(donchianResult.Date));
                 
+				var price = (candle.Low + candle.High + candle.Close + candle.Close) / 4.0;
+				
                 if (candle is null)
                     continue;
                 
-                var (resultString, resultNumber) = GetResult(donchianResult, Convert.ToDecimal(candle.Close));
+                var (resultString, resultNumber) = GetResult(donchianResult, Convert.ToDecimal(price));
                 
                 var analyseResult = new AnalyseResult()
                 {
