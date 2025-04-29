@@ -28,6 +28,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<RsiAnalyseService>();
         services.AddTransient<SupertrendAnalyseService>();
         services.AddTransient<YieldLtmAnalyseService>();
+        services.AddTransient<AtrAnalyseService>();
+        services.AddTransient<DonchianAnalyseService>();
+        
         services.AddTransient<ColorHelper>();
         
         services.AddTransient<ISharesReportService, SharesReportService>();

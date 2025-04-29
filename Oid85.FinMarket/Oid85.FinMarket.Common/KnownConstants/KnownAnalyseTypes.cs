@@ -9,4 +9,6 @@ public static class KnownAnalyseTypes
     public const string YieldLtm = "YieldLtm";
     public const string DrawdownFromMaximum = "DrawdownFromMaximum";
     public const string Aggregated = "Aggregated";
+    public const string Atr = "Atr";
+    public const string Donchian = "Donchian";
 }
