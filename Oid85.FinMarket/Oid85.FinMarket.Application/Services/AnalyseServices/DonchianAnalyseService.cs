@@ -1,5 +1,6 @@
 ﻿using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Skender.Stock.Indicators;
@@ -38,17 +39,19 @@ public class DonchianAnalyseService(
                 })
                 .ToList();
 
-            var donchianResults = quotes.GetDonchian(lookbackPeriods);
+            var donchianResults = quotes.GetDonchian(lookbackPeriods).ToList();
+            donchianResults = ListHelper.ShiftRight(donchianResults)!;
+            
             var analyseResults = new List<AnalyseResult>();
             
             foreach (var donchianResult in donchianResults)
             {
                 var candle = candles.Find(x => x.Date == DateOnly.FromDateTime(donchianResult.Date));
-                
-				var price = (candle.Low + candle.High + candle.Close + candle.Close) / 4.0;
 				
                 if (candle is null)
                     continue;
+                
+                var price = (candle.Low + candle.High + candle.Close + candle.Close) / 4.0;
                 
                 var (resultString, resultNumber) = GetResult(donchianResult, Convert.ToDecimal(price));
                 

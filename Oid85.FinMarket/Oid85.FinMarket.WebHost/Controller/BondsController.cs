@@ -195,6 +195,38 @@ public class BondsController(
             });
     
     /// <summary>
+    /// Отчет ATR
+    /// </summary>
+    [HttpPost("report/atr-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetAtrAnalyseAsync(
+        [FromBody] DateRangeRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetAtrAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Отчет Donchian
+    /// </summary>
+    [HttpPost("report/donchian-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetDonchianAnalyseAsync(
+        [FromBody] DateRangeRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetDonchianAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });    
+    
+    /// <summary>
     /// Отчет Купоны
     /// </summary>
     [HttpPost("report/coupon-analyse")]

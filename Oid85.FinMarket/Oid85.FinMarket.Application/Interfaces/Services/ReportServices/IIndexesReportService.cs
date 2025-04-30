@@ -29,6 +29,16 @@ public interface IIndexesReportService
     Task<ReportData> GetRsiAnalyseAsync(DateRangeRequest request);
     
     /// <summary>
+    /// Отчет Анализ ATR
+    /// </summary>
+    Task<ReportData> GetAtrAnalyseAsync(DateRangeRequest request);
+    
+    /// <summary>
+    /// Отчет Анализ Donchian
+    /// </summary>
+    Task<ReportData> GetDonchianAnalyseAsync(DateRangeRequest request);    
+    
+    /// <summary>
     /// Отчет Доходность LTM
     /// </summary>
     Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request);

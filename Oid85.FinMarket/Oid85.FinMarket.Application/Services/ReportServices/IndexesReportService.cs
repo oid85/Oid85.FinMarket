@@ -50,6 +50,20 @@ public class IndexesReportService(
             request.From, request.To);
 
     /// <inheritdoc />
+    public async Task<ReportData> GetAtrAnalyseAsync(DateRangeRequest request) =>
+        await reportDataFactory.CreateReportDataAsync(
+            await GetInstrumentIds(request.TickerList), 
+            KnownAnalyseTypes.Atr, 
+            request.From, request.To);    
+    
+    /// <inheritdoc />
+    public async Task<ReportData> GetDonchianAnalyseAsync(DateRangeRequest request) =>
+        await reportDataFactory.CreateReportDataAsync(
+            await GetInstrumentIds(request.TickerList), 
+            KnownAnalyseTypes.Donchian, 
+            request.From, request.To);        
+    
+    /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(request.TickerList), 
