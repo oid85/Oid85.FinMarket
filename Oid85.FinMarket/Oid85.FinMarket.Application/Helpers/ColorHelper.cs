@@ -28,7 +28,7 @@ public class ColorHelper(
                 return await GetColorDonchian(analyseResult.ResultString);            
             
             case KnownAnalyseTypes.Atr:
-                return RedYellowGreenScale(analyseResult.ResultNumber);            
+                return GreenYellowRedScale(analyseResult.ResultNumber);
             
             case KnownAnalyseTypes.YieldLtm:
                 return GreenScale(analyseResult.ResultNumber);
@@ -283,4 +283,7 @@ public class ColorHelper(
         
         return ConvertHelper.RgbToHex(colorHsl.r, colorHsl.g, colorHsl.b);
     }
+    
+    public static string GreenYellowRedScale(double value) => 
+        RedYellowGreenScale(100.0 - value);
 }
