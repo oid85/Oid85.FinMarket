@@ -24,6 +24,12 @@ public class ColorHelper(
             case KnownAnalyseTypes.Rsi:
                 return await GetColorRsi(analyseResult.ResultString);
             
+            case KnownAnalyseTypes.Donchian:
+                return await GetColorDonchian(analyseResult.ResultString);            
+            
+            case KnownAnalyseTypes.Atr:
+                return RedYellowGreenScale(analyseResult.ResultNumber);            
+            
             case KnownAnalyseTypes.YieldLtm:
                 return GreenScale(analyseResult.ResultNumber);
             
@@ -114,6 +120,17 @@ public class ColorHelper(
         
         return resource.Color;
     }
+    
+    public async Task<string> GetColorDonchian(string value)
+    {
+        var colorPalette = await resourceStoreService.GetColorPaletteTrendDirectionAsync();
+        var resource = colorPalette.FirstOrDefault(x => x.Value == value);
+        
+        if (resource is null)
+            return KnownColors.White;
+        
+        return resource.Color;
+    }    
     
     public async Task<string> GetColorPeAsync(double value)
     {

@@ -185,9 +185,14 @@ public class ReportDataFactory(
                 {
                     string color = await colorHelper.GetColorByAnalyseType(analyseType, analyseResult);
 
-                    data.Add(analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum
-                        ? GetPercent(analyseResult.ResultNumber, color)
-                        : GetAnalyseResult(string.Empty, color));
+                    if (analyseType is KnownAnalyseTypes.YieldLtm or KnownAnalyseTypes.DrawdownFromMaximum)
+                        data.Add(GetPercent(analyseResult.ResultNumber, color));
+                    
+                    else if (analyseType is KnownAnalyseTypes.Atr)
+                        data.Add(GetNumber(analyseResult.ResultNumber, color));                    
+                    
+                    else
+                        data.Add(GetAnalyseResult(string.Empty, color));
                 }
 
                 else
