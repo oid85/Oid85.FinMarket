@@ -2,6 +2,7 @@ using Hangfire;
 using Oid85.FinMarket.WebHost.Extensions;
 using Oid85.FinMarket.External.Extensions;
 using Oid85.FinMarket.Application.Extensions;
+using Oid85.FinMarket.Common.Converters;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Extensions;
 
@@ -13,7 +14,12 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
             
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+            });
+        
         builder.Services.AddMemoryCache();
         builder.Services.ConfigureLogger();
         builder.Services.ConfigureSwagger(builder.Configuration);
