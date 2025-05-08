@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Responses;
+using Oid85.FinMarket.Application.Services.AnalyseServices;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
@@ -9,7 +10,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/[controller]")]
 [ApiController]
 public class DebugController(
-    ITickerListUtilService tickerListUtilService) 
+    DonchianAnalyseService donchianAnalyseService) 
     : FinMarketBaseController
 {
     /// <summary>
@@ -21,7 +22,7 @@ public class DebugController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Debug()
     {
-        await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist);
+        await donchianAnalyseService.DonchianAnalyseAsync(Guid.Parse("1e19953d-01c6-4ecd-a5f4-53ae3ed44029"));
         
         return Ok();
     }
