@@ -39,66 +39,6 @@ public class CurrenciesController(
             });
     
     /// <summary>
-    /// Загрузить справочник валют
-    /// </summary>
-    [HttpGet("load-catalog")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadCurrenciesAsync() =>
-        GetResponseAsync(
-            loadService.LoadCurrenciesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-        
-    /// <summary>
-    /// Подгрузить свечи по валют
-    /// </summary>
-    [HttpGet("load-daily-candles")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadCurrencyDailyCandlesAsync() =>
-        GetResponseAsync(
-            loadService.LoadCurrencyDailyCandlesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Загрузить последние цены валют
-    /// </summary>
-    [HttpGet("load-last-prices")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadCurrencyLastPricesAsync() =>
-        GetResponseAsync(
-            loadService.LoadCurrencyLastPricesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Выполнить анализ валют
-    /// </summary>
-    [HttpGet("daily-analyse")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> DailyAnalyseCurrenciesAsync() =>
-        GetResponseAsync(
-            analyseService.DailyAnalyseCurrenciesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-    
-    /// <summary>
     /// Отчет Сводный анализ
     /// </summary>
     [HttpPost("report/aggregated-analyse")]

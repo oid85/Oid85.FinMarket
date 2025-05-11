@@ -39,66 +39,6 @@ public class IndexesController(
             });
     
     /// <summary>
-    /// Загрузить справочник индексов
-    /// </summary>
-    [HttpGet("load-catalog")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadIndexesAsync() =>
-        GetResponseAsync(
-            loadService.LoadIndexesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-        
-    /// <summary>
-    /// Подгрузить свечи по индексов
-    /// </summary>
-    [HttpGet("load-daily-candles")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadIndexDailyCandlesAsync() =>
-        GetResponseAsync(
-            loadService.LoadIndexDailyCandlesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Загрузить последние цены индексов
-    /// </summary>
-    [HttpGet("load-last-prices")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> LoadIndexLastPricesAsync() =>
-        GetResponseAsync(
-            loadService.LoadIndexLastPricesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Выполнить анализ индексов
-    /// </summary>
-    [HttpGet("daily-analyse")]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> DailyAnalyseIndexesAsync() =>
-        GetResponseAsync(
-            analyseService.DailyAnalyseIndexesAsync,
-            result => new BaseResponse<bool>
-            {
-                Result = result
-            });
-    
-    /// <summary>
     /// Отчет Сводный анализ
     /// </summary>
     [HttpPost("report/aggregated-analyse")]
