@@ -7,7 +7,7 @@ using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
 
-[Route("api/[controller]")]
+[Route("api/debug")]
 [ApiController]
 public class DebugController(
     DonchianAnalyseService donchianAnalyseService) 
