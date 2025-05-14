@@ -26,17 +26,15 @@ public class LoadService(
     IAssetReportEventRepository assetReportEventRepository)
     : ILoadService
 {
-    public async Task<bool> LoadSharesAsync()
+    public async Task LoadSharesAsync()
     {
         var shares = await tinkoffService.GetSharesAsync();
         await shareRepository.AddAsync(shares);
         var instruments = shares.Select(DomainMapper.Map).ToList();
         await instrumentRepository.AddOrUpdateAsync(instruments);
-
-        return true;
     }
 
-    public async Task<bool> LoadShareLastPricesAsync()
+    public async Task LoadShareLastPricesAsync()
     {
         var shares = await tickerListUtilService.GetAllSharesInTickerListsAsync();
         var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
@@ -44,11 +42,9 @@ public class LoadService(
 
         for (int i = 0; i < instrumentIds.Count; i++) 
             await shareRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
-        
-        return true;
     }
 
-    public async Task<bool> LoadShareDailyCandlesAsync()
+    public async Task LoadShareDailyCandlesAsync()
     {
         var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
 
@@ -75,11 +71,9 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
         }
-        
-        return true;
     }
 
-    public async Task<bool> LoadShareFiveMinuteCandlesAsync()
+    public async Task LoadShareFiveMinuteCandlesAsync()
     {
         var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
 
@@ -92,11 +86,9 @@ public class LoadService(
             
             await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
         }
-        
-        return true;
     }
 
-    public async Task<bool> LoadForecastsAsync()
+    public async Task LoadForecastsAsync()
     {
         var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
 
@@ -106,31 +98,25 @@ public class LoadService(
             await forecastTargetRepository.AddAsync(targets);
             await forecastConsensusRepository.AddAsync([consensus]);
         }
-        
-        return true;
     }
 
-    public async Task<bool> LoadAssetReportEventsAsync()
+    public async Task LoadAssetReportEventsAsync()
     {
         var shares = await tickerListUtilService.GetAllSharesInTickerListsAsync();
         var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
         var assetReportEvents = await tinkoffService.GetAssetReportEventsAsync(instrumentIds);
         await assetReportEventRepository.AddAsync(assetReportEvents);
-        
-        return true;
     }
     
-    public async Task<bool> LoadFuturesAsync()
+    public async Task LoadFuturesAsync()
     {
         var futures = await tinkoffService.GetFuturesAsync();
         await futureRepository.AddAsync(futures);
         var instruments = futures.Select(DomainMapper.Map).ToList();
         await instrumentRepository.AddOrUpdateAsync(instruments);
-        
-        return true;
     }
 
-    public async Task<bool> LoadFutureLastPricesAsync()
+    public async Task LoadFutureLastPricesAsync()
     {
         var futures = await tickerListUtilService.GetAllFuturesInTickerListsAsync();
         var instrumentIds = futures.Select(x => x.InstrumentId).ToList();
@@ -138,11 +124,9 @@ public class LoadService(
 
         for (int i = 0; i < instrumentIds.Count; i++) 
             await futureRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
-        
-        return true;
     }
 
-    public async Task<bool> LoadFutureDailyCandlesAsync()
+    public async Task LoadFutureDailyCandlesAsync()
     {
         var instruments = await tickerListUtilService.GetAllFuturesInTickerListsAsync();
 
@@ -169,11 +153,9 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
         }
-        
-        return true;
     }
 
-    public async Task<bool> LoadSpreadLastPricesAsync()
+    public async Task LoadSpreadLastPricesAsync()
     {
         var spreads = await spreadRepository.GetAllAsync();
         var firstInstrumentIds = spreads.Select(x => x.FirstInstrumentId).Distinct().ToList();
@@ -186,22 +168,18 @@ public class LoadService(
             
         for (int i = 0; i < secondLastPrices.Count; i++) 
             await spreadRepository.UpdateLastPricesAsync(secondInstrumentIds[i], secondLastPrices[i]);            
-            
-        return true;
     }
 
 
-    public async Task<bool> LoadIndexesAsync()
+    public async Task LoadIndexesAsync()
     {
         var indexes = await tinkoffService.GetIndexesAsync();
         await indexRepository.AddAsync(indexes);
         var instruments = indexes.Select(DomainMapper.Map).ToList();
         await instrumentRepository.AddOrUpdateAsync(instruments);
-            
-        return true;
     }
     
-    public async Task<bool> LoadIndexLastPricesAsync()
+    public async Task LoadIndexLastPricesAsync()
     {
         var indexes = await tickerListUtilService.GetAllIndexesInTickerListsAsync();
         var instrumentIds = indexes.Select(x => x.InstrumentId).ToList();
@@ -209,11 +187,9 @@ public class LoadService(
 
         for (int i = 0; i < instrumentIds.Count; i++) 
             await indexRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
-
-        return true;
     }
 
-    public async Task<bool> LoadIndexDailyCandlesAsync()
+    public async Task LoadIndexDailyCandlesAsync()
     {
         var instruments = await tickerListUtilService.GetAllIndexesInTickerListsAsync();
 
@@ -240,22 +216,18 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
         }
-        
-        return true;
     }
 
     
-    public async Task<bool> LoadCurrenciesAsync()
+    public async Task LoadCurrenciesAsync()
     {
         var currencies = await tinkoffService.GetCurrenciesAsync();
         await currencyRepository.AddAsync(currencies);
         var instruments = currencies.Select(DomainMapper.Map).ToList();
         await instrumentRepository.AddOrUpdateAsync(instruments);
-            
-        return true;
     }
 
-    public async Task<bool> LoadCurrencyLastPricesAsync()
+    public async Task LoadCurrencyLastPricesAsync()
     {
         var currencies = await tickerListUtilService.GetAllCurrenciesInTickerListsAsync();
         var instrumentIds = currencies.Select(x => x.InstrumentId).ToList();
@@ -263,11 +235,9 @@ public class LoadService(
 
         for (int i = 0; i < instrumentIds.Count; i++) 
             await currencyRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
-
-        return true;
     }
 
-    public async Task<bool> LoadCurrencyDailyCandlesAsync()
+    public async Task LoadCurrencyDailyCandlesAsync()
     {
         var instruments = await tickerListUtilService.GetAllCurrenciesInTickerListsAsync();
 
@@ -294,30 +264,24 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
         }
-        
-        return true;
     }
 
-    public async Task<bool> LoadDividendInfosAsync()
+    public async Task LoadDividendInfosAsync()
     {
         var shares = await tickerListUtilService.GetAllSharesInTickerListsAsync();
         var dividendInfos = await tinkoffService.GetDividendInfoAsync(shares);
         await dividendInfoRepository.AddOrUpdateAsync(dividendInfos);
-            
-        return true;
     }
     
-    public async Task<bool> LoadBondsAsync()
+    public async Task LoadBondsAsync()
     {
         var bonds = await tinkoffService.GetBondsAsync();
         await bondRepository.AddAsync(bonds);
         var instruments = bonds.Select(DomainMapper.Map).ToList();
         await instrumentRepository.AddOrUpdateAsync(instruments);
-            
-        return true;
     }
     
-    public async Task<bool> LoadBondLastPricesAsync()
+    public async Task LoadBondLastPricesAsync()
     {
         var bonds = await tickerListUtilService.GetAllBondsInTickerListsAsync();
         var instrumentIds = bonds.Select(x => x.InstrumentId).ToList();
@@ -325,11 +289,9 @@ public class LoadService(
 
         for (int i = 0; i < instrumentIds.Count; i++) 
             await bondRepository.UpdateLastPricesAsync(instrumentIds[i], lastPrices[i]);
-            
-        return true;
     }
 
-    public async Task<bool> LoadBondDailyCandlesAsync()
+    public async Task LoadBondDailyCandlesAsync()
     {
         var instruments = await tickerListUtilService.GetAllBondsInTickerListsAsync();
 
@@ -356,16 +318,12 @@ public class LoadService(
                 await candleRepository.AddOrUpdateAsync(candles);
             }
         }
-        
-        return true;
     }
 
-    public async Task<bool> LoadBondCouponsAsync()
+    public async Task LoadBondCouponsAsync()
     {
         var bonds = await tickerListUtilService.GetAllBondsInTickerListsAsync();
         var bondCoupons = await tinkoffService.GetBondCouponsAsync(bonds);
         await bondCouponRepository.AddAsync(bondCoupons);
-            
-        return true;
     }
 }

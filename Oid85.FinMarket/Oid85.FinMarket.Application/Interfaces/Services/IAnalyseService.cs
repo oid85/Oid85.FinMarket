@@ -29,4 +29,9 @@ public interface IAnalyseService
     /// Анализ индексов
     /// </summary>
     Task<bool> DailyAnalyseIndexesAsync();
+    
+    /// <summary>
+    /// Анализ сектора Нефтегаз
+    /// </summary>
+    Task<bool> DailyAnalyseOilAndGasSectorIndexAsync();    
 }

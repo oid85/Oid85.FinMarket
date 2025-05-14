@@ -55,6 +55,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITickerListUtilService, TickerListUtilService>();
         services.AddTransient<INormalizeService, NormalizeService>();
         services.AddTransient<IFeerGreedIndexService, FeerGreedIndexService>();
+        services.AddTransient<ISectorIndexService, SectorIndexService>();
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();

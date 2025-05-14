@@ -11,6 +11,7 @@ public class JobService(
     ISpreadService spreadService,
     IMultiplicatorService multiplicatorService,
     IFeerGreedIndexService feerGreedIndexService,
+    ISectorIndexService sectorIndexService,
     IMarketEventService marketEventService,
     ISendService sendService) 
     : IJobService
@@ -26,6 +27,8 @@ public class JobService(
         await LoadDailyCandlesAsync();
         await LoadForecastsAsync();
         await AnalyseAsync();
+        await CalculateSectorIndexDailyCandlesAsync();
+        await AnalyseSectorsAsync();
         await ProcessSpreadPairsAsync();
         await ProcessMultiplicatorsAsync();
         await ProcessFeerGreedAsync();
@@ -139,6 +142,7 @@ public class JobService(
             }
             
         }
+    
     private async Task LoadDailyCandlesAsync()
     {
         try
@@ -158,6 +162,21 @@ public class JobService(
         }
     }
 
+    private async Task CalculateSectorIndexDailyCandlesAsync()
+    {
+        try
+        {
+            await sectorIndexService.CalculateOilAndGasSectorIndexDailyCandlesAsync();
+            
+            logger.Info("Метод 'CalculateSectorIndexDailyCandlesAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'CalculateSectorIndexDailyCandlesAsync'");
+        }
+    }
+    
     private async Task LoadFiveMinuteCandlesAsync()
     {
         try
@@ -188,6 +207,7 @@ public class JobService(
         }
     }
 
+    
     private async Task AnalyseAsync()
     {
         try
@@ -207,6 +227,21 @@ public class JobService(
         }
     }
 
+    private async Task AnalyseSectorsAsync()
+    {
+        try
+        {
+            await analyseService.DailyAnalyseOilAndGasSectorIndexAsync();
+            
+            logger.Info("Метод 'AnalyseSectorsAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'AnalyseSectorsAsync'");
+        }
+    }    
+    
     private async Task ProcessSpreadPairsAsync()
     {
         try

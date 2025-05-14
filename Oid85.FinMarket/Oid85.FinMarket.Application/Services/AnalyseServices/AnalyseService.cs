@@ -114,4 +114,16 @@ public class AnalyseService(
             
         return true;
     }
+
+    public async Task<bool> DailyAnalyseOilAndGasSectorIndexAsync()
+    {
+        // Вызов методов анализа
+        await supertrendAnalyseService.SupertrendAnalyseAsync(KnownInstrumentIds.OilAndGasSectorIndex);
+        await yieldLtmAnalyseService.YieldLtmAnalyseAsync(KnownInstrumentIds.OilAndGasSectorIndex);
+        await drawdownFromMaximumAnalyseService.DrawdownFromMaximumAnalyseAsync(KnownInstrumentIds.OilAndGasSectorIndex);
+        await atrAnalyseService.AtrAnalyseAsync(KnownInstrumentIds.OilAndGasSectorIndex);
+        await donchianAnalyseService.DonchianAnalyseAsync(KnownInstrumentIds.OilAndGasSectorIndex);
+        
+        return true;
+    }
 }
