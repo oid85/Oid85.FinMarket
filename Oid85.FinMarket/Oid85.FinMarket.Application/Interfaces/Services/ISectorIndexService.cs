@@ -3,7 +3,7 @@
 public interface ISectorIndexService
 {
     /// <summary>
-    /// Расчет виртуальных свечей сектора Нефтегаз
+    /// Расчет свечей индекса сектора Нефтегаз
     /// </summary>
     /// <returns></returns>
     Task CalculateOilAndGasSectorIndexDailyCandlesAsync();

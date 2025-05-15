@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 
@@ -11,30 +12,94 @@ public class SectorIndexService(
 {
     /// <inheritdoc />
     public Task CalculateOilAndGasSectorIndexDailyCandlesAsync() =>
-        CalculateSectorIndexDailyCandlesAsync(KnownTickerLists.SharesSectorsOilAndGas);
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.OilAndGasSectorIndex, 
+            KnownTickerLists.SharesSectorsOilAndGas);
     
-    private async Task CalculateSectorIndexDailyCandlesAsync(string tickerList)
+    private async Task CalculateSectorIndexDailyCandlesAsync(Guid instrumentId, string tickerList)
     {
         var shares = await tickerListUtilService.GetSharesByTickerListAsync(tickerList);
         var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
-        var candles = await CreateSectorIndexDailyCandles(instrumentIds);
+        var candles = await CreateSectorIndexDailyCandles(instrumentId, instrumentIds);
         await candleRepository.AddOrUpdateAsync(candles);
     }
 
-    private async Task<List<Candle>> CreateSectorIndexDailyCandles(List<Guid> instrumentIds)
+    private async Task<List<Candle>> CreateSectorIndexDailyCandles(Guid instrumentId, List<Guid> instrumentIds)
     {
-        var dictionary = await CreateDailyDataDictionaryAsync(
-            instrumentIds, new DateOnly(2022, 1, 1), DateOnly.FromDateTime(DateTime.Today));
-
+        var from = new DateOnly(2022, 1, 1);
+        var to = DateOnly.FromDateTime(DateTime.Today);
+        var dictionary = await CreateDailyDataDictionaryAsync(instrumentIds, from, to);
         var normalizeDictionary = NormalizeDictionary(dictionary);
+        var dates = DateHelper.GetDates(from, to);
+
+        var sectorCandles = new List<Candle>();
+
+        foreach (var date in dates)
+        {
+            var sectorCandle = new Candle
+            {
+                InstrumentId = instrumentId,
+                Open = 0.0,
+                Close = 0.0,
+                High = 0.0,
+                Low = 0.0,
+                Date = date,
+                IsComplete = true
+            };
+            
+            foreach (var item in normalizeDictionary)
+            {
+                var candle = item.Value.FirstOrDefault(x => x.Date == date);
+
+                if (candle is not null)
+                {
+                    sectorCandle.Open += candle.Open;
+                    sectorCandle.Close += candle.Close;
+                    sectorCandle.High += candle.High;
+                    sectorCandle.Low += candle.Low;
+                }
+            }
+            
+            sectorCandles.Add(sectorCandle);
+        }
+
+        return sectorCandles;
     }
 
     private static Dictionary<Guid, List<Candle>> NormalizeDictionary(Dictionary<Guid, List<Candle>> dictionary)
     {
-        for (int i = 0; i < dictionary.Keys.Count; i++)
-        {
+        var result = new Dictionary<Guid, List<Candle>>();
 
+        foreach (var item in dictionary)
+        {
+            var normalizedCandles = NormalizeCandles(item.Value);
+            result.Add(item.Key, normalizedCandles);
         }
+
+        return result;
+    }
+
+    private static List<Candle> NormalizeCandles(List<Candle> candles)
+    {
+        var result = new List<Candle>();
+
+        for (int i = 0; i < candles.Count; i++)
+        {
+            var normalizedCandle = new Candle()
+            {
+                InstrumentId = candles[i].InstrumentId,
+                Open = candles[i].Open / candles[0].Open,
+                Close = candles[i].Close / candles[0].Close,
+                High = candles[i].High / candles[0].High,
+                Low = candles[i].Low / candles[0].Low,
+                Date = candles[i].Date,
+                IsComplete = true
+            };
+            
+            result.Add(normalizedCandle);
+        }
+        
+        return result;
     }
 
     private async Task<Dictionary<Guid, List<Candle>>> CreateDailyDataDictionaryAsync(
