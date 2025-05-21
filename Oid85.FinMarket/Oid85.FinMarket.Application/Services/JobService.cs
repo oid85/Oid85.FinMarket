@@ -232,6 +232,16 @@ public class JobService(
         try
         {
             await analyseService.DailyAnalyseOilAndGasSectorIndexAsync();
+            await analyseService.DailyAnalyseBanksSectorIndexAsync();
+            await analyseService.DailyAnalyseEnergSectorIndexAsync();
+            await analyseService.DailyAnalyseFinanceSectorIndexAsync();
+            await analyseService.DailyAnalyseHousingAndUtilitiesSectorIndexAsync();
+            await analyseService.DailyAnalyseIronAndSteelIndustrySectorIndexAsync();
+            await analyseService.DailyAnalyseItSectorIndexAsync();
+            await analyseService.DailyAnalyseMiningSectorIndexAsync();
+            await analyseService.DailyAnalyseNonFerrousMetallurgySectorIndexAsync();
+            await analyseService.DailyAnalyseRetailSectorIndexAsync();
+            await analyseService.DailyAnalyseTelecomSectorIndexAsync();
             
             logger.Info("Метод 'AnalyseSectorsAsync' выполнен успешно");
         }

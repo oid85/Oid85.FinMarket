@@ -14,8 +14,6 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/currencies")]
 [ApiController]
 public class CurrenciesController(
-    ILoadService loadService,
-    IAnalyseService analyseService,
     ICurrenciesReportService reportService,
     ICurrenciesDiagramService diagramService,
     ITickerListUtilService tickerListUtilService) 

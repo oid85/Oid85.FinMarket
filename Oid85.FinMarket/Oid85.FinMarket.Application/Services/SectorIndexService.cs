@@ -15,7 +15,57 @@ public class SectorIndexService(
         CalculateSectorIndexDailyCandlesAsync(
             KnownInstrumentIds.OilAndGasSectorIndex, 
             KnownTickerLists.SharesSectorsOilAndGas);
-    
+
+    public Task CalculateBanksSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.BanksSectorIndex, 
+            KnownTickerLists.SharesSectorsBanks);
+
+    public Task CalculateEnergSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.EnergSectorIndex, 
+            KnownTickerLists.SharesSectorsEnerg);
+
+    public Task CalculateFinanceSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.FinanceSectorIndex, 
+            KnownTickerLists.SharesSectorsFinance);
+
+    public Task CalculateHousingAndUtilitiesSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.HousingAndUtilitiesSectorIndex, 
+            KnownTickerLists.SharesSectorsHousingAndUtilities);
+
+    public Task CalculateIronAndSteelIndustrySectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.IronAndSteelIndustrySectorIndex, 
+            KnownTickerLists.SharesSectorsIronAndSteelIndustry);
+
+    public Task CalculateItSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.ItSectorIndex, 
+            KnownTickerLists.SharesSectorsIt);
+
+    public Task CalculateMiningSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.MiningSectorIndex, 
+            KnownTickerLists.SharesSectorsMining);
+
+    public Task CalculateNonFerrousMetallurgySectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.NonFerrousMetallurgySectorIndex, 
+            KnownTickerLists.SharesSectorsNonFerrousMetallurgy);
+
+    public Task CalculateRetailSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.RetailSectorIndex, 
+            KnownTickerLists.SharesSectorsrRetail);
+
+    public Task CalculateTelecomSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.TelecomSectorIndex, 
+            KnownTickerLists.SharesSectorsTelecom);
+
     private async Task CalculateSectorIndexDailyCandlesAsync(Guid instrumentId, string tickerList)
     {
         var shares = await tickerListUtilService.GetSharesByTickerListAsync(tickerList);

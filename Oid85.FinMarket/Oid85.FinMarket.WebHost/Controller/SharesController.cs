@@ -14,8 +14,6 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/shares")]
 [ApiController]
 public class SharesController(
-    ILoadService loadService,
-    IAnalyseService analyseService,
     ISharesReportService reportService,
     ISharesDiagramService diagramService,
     ITickerListUtilService tickerListUtilService)

@@ -14,8 +14,6 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/indexes")]
 [ApiController]
 public class IndexesController(
-    ILoadService loadService,
-    IAnalyseService analyseService,
     IIndexesReportService reportService,
     IIndexesDiagramService diagramService,
     ITickerListUtilService tickerListUtilService) 

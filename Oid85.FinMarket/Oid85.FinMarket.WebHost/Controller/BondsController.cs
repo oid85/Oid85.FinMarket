@@ -14,8 +14,6 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/bonds")]
 [ApiController]
 public class BondsController(
-    ILoadService loadService,
-    IAnalyseService analyseService,
     IBondsReportService reportService,
     IBondsDiagramService diagramService,
     ITickerListUtilService tickerListUtilService) 

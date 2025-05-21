@@ -15,11 +15,8 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/futures")]
 [ApiController]
 public class FuturesController(
-    ILoadService loadService,
-    IAnalyseService analyseService,
     IFuturesReportService reportService,
     IFuturesDiagramService diagramService,
-    ISpreadService spreadService, 
     ITickerListUtilService tickerListUtilService) 
     : FinMarketBaseController
 {
