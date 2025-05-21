@@ -18,6 +18,7 @@ public class LoadService(
     ITickerListUtilService tickerListUtilService,
     ICandleRepository candleRepository,
     IFiveMinuteCandleRepository fiveMinuteCandleRepository,
+    IHourlyCandleRepository hourlyCandleRepository,
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
     IInstrumentRepository instrumentRepository,
@@ -248,7 +249,7 @@ public class LoadService(
             if (lastCandle is null)
             {
                 int currentYear = DateTime.Now.Year;
-                const int years = 3;
+                const int years = 5;
 
                 for (int year = currentYear - years; year <= currentYear; year++)
                 {
@@ -266,6 +267,50 @@ public class LoadService(
         }
     }
 
+    public async Task<bool> LoadHistoryShareDailyCandlesAsync()
+    {
+        int currentYear = DateTime.Now.Year;
+        const int years = 5;
+        
+        var instruments = await tickerListUtilService.GetAllCurrenciesInTickerListsAsync();
+        
+        foreach (var instrument in instruments)
+        {
+            for (int year = currentYear - years; year <= currentYear; year++)
+            {
+                var candles = await tinkoffService.GetDailyCandlesAsync(instrument.InstrumentId, year);
+                await candleRepository.AddOrUpdateAsync(candles);
+            }
+        }
+
+        return true;
+    }
+
+    public async Task<bool> LoadHistoryShareHourlyCandlesAsync()
+    {
+        int currentYear = DateTime.Now.Year;
+        const int years = 5;
+        
+        var instruments = await tickerListUtilService.GetAllCurrenciesInTickerListsAsync();
+        
+        foreach (var instrument in instruments)
+        {
+            for (int year = currentYear - years; year <= currentYear; year++)
+            {
+                for (int month = 1; month <= 12; month++)
+                {
+                    var from = new DateOnly(year, month, 1);
+                    var to = from.AddDays(31);
+                    
+                    var candles = await tinkoffService.GetHourlyCandlesAsync(instrument.InstrumentId, from, to);
+                    await hourlyCandleRepository.AddOrUpdateAsync(candles);
+                }
+            }
+        }
+
+        return true;
+    }
+    
     public async Task LoadDividendInfosAsync()
     {
         var shares = await tickerListUtilService.GetAllSharesInTickerListsAsync();

@@ -28,6 +28,11 @@ public class TinkoffService(
         getCandlesService.GetDailyCandlesAsync(instrumentId, year);
 
     /// <inheritdoc />
+    public Task<List<HourlyCandle>> GetHourlyCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to) =>
+        getCandlesService.GetHourlyCandlesAsync(instrumentId, from, to);
+
+    /// <inheritdoc />
     public Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
         Guid instrumentId, DateTime from, DateTime to) =>
         getCandlesService.GetFiveMinuteCandlesAsync(instrumentId, from, to);

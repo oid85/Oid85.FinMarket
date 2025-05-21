@@ -16,9 +16,40 @@ namespace Oid85.FinMarket.WebHost.Controller;
 public class SharesController(
     ISharesReportService reportService,
     ISharesDiagramService diagramService,
-    ITickerListUtilService tickerListUtilService)
+    ITickerListUtilService tickerListUtilService,
+    ILoadService loadService)
     : FinMarketBaseController
 {
+    /// <summary>
+    /// Подгрузить историю дневных свечей
+    /// </summary>
+    [HttpGet("load-history-daily-candles")]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadHistoryShareDailyCandlesAsync() =>
+        GetResponseAsync(
+            loadService.LoadHistoryShareDailyCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });
+    
+    /// <summary>
+    /// Подгрузить историю часовых свечей
+    /// </summary>
+    [HttpGet("load-history-hourly-candles")]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> LoadHistoryShareHourlyCandlesAsync() =>
+        GetResponseAsync(
+            loadService.LoadHistoryShareHourlyCandlesAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });    
+    
     /// <summary>
     /// Получить тикеры акций из листа наблюдения
     /// </summary>

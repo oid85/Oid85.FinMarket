@@ -32,4 +32,6 @@ public interface ILoadService
     Task LoadCurrenciesAsync();
     Task LoadCurrencyLastPricesAsync();
     Task LoadCurrencyDailyCandlesAsync();
+    Task<bool> LoadHistoryShareDailyCandlesAsync();
+    Task<bool> LoadHistoryShareHourlyCandlesAsync();
 }

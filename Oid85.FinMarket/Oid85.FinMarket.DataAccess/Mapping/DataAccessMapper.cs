@@ -183,6 +183,52 @@ public static class DataAccessMapper
             DividendPrc = entity.DividendPrc
         };
     
+    public static void Map(ref HourlyCandleEntity? entity, HourlyCandle model)
+    {
+        entity ??= new HourlyCandleEntity();
+        
+        entity.InstrumentId = model.InstrumentId;
+        entity.Open = model.Open;
+        entity.Close = model.Close;
+        entity.High = model.High;
+        entity.Low = model.Low;
+        entity.Volume = model.Volume;
+        entity.Date = model.Date;
+        entity.Time = model.Time;
+        entity.IsComplete = model.IsComplete;
+    }
+    
+    public static HourlyCandleEntity Map(HourlyCandle model) =>
+        new()
+        {
+            InstrumentId = model.InstrumentId,
+            Open = model.Open,
+            Close = model.Close,
+            High = model.High,
+            Low = model.Low,
+            Volume = model.Volume,
+            Date = model.Date,
+            Time = model.Time,
+            DateTimeTicks = model.DateTimeTicks,
+            IsComplete = model.IsComplete
+        };
+    
+    public static HourlyCandle Map(HourlyCandleEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            InstrumentId = entity.InstrumentId,
+            Open = entity.Open,
+            Close = entity.Close,
+            High = entity.High,
+            Low = entity.Low,
+            Volume = entity.Volume,
+            Date = entity.Date,
+            Time = entity.Time,
+            DateTimeTicks = entity.DateTimeTicks,
+            IsComplete = entity.IsComplete
+        };    
+    
     public static void Map(ref FiveMinuteCandleEntity? entity, FiveMinuteCandle model)
     {
         entity ??= new FiveMinuteCandleEntity();

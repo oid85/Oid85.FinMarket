@@ -19,6 +19,12 @@ public interface ITinkoffService
     public Task<List<Candle>> GetDailyCandlesAsync(Guid instrumentId, int year);
         
     /// <summary>
+    /// Получить часовые свечи
+    /// </summary>
+    Task<List<HourlyCandle>> GetHourlyCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to);
+    
+    /// <summary>
     /// Получить 5-минутные свечи за период
     /// </summary>
     Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(

@@ -28,6 +28,13 @@ public class GetCandlesService(
             ConvertHelper.DateOnlyToTimestamp(new DateOnly(year, 1, 1)), 
             ConvertHelper.DateOnlyToTimestamp(new DateOnly(year, 12, 31)));
     
+    public Task<List<HourlyCandle>> GetHourlyCandlesAsync(
+        Guid instrumentId, DateOnly from, DateOnly to) =>
+        GetHourlyCandlesAsync(
+            instrumentId, 
+            ConvertHelper.DateOnlyToTimestamp(from), 
+            ConvertHelper.DateOnlyToTimestamp(to));
+    
     public Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
         Guid instrumentId, DateTime from, DateTime to) =>
         GetFiveMinuteCandlesAsync(
@@ -51,6 +58,22 @@ public class GetCandlesService(
         return candles;
     }
 
+    private async Task<List<HourlyCandle>> GetHourlyCandlesAsync(
+        Guid instrumentId, Timestamp from, Timestamp to)
+    {
+        await Task.Delay(DelayInMilliseconds);
+        
+        var request = CreateGetCandlesRequest(instrumentId, from, to, CandleInterval.Hour);
+        var response = await SendGetCandlesRequest(request);
+
+        if (response is null)
+            return [];
+
+        var candles = response.Candles.Select(TinkoffMapper.MapHourlyCandle).ToList();
+        candles.ForEach(x => x.InstrumentId = instrumentId);
+        return candles;
+    }    
+    
     private async Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
     {
