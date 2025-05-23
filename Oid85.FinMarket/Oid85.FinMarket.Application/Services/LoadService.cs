@@ -272,7 +272,7 @@ public class LoadService(
         int currentYear = DateTime.Now.Year;
         const int years = 5;
         
-        var instruments = await tickerListUtilService.GetAllCurrenciesInTickerListsAsync();
+        var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
         
         foreach (var instrument in instruments)
         {
@@ -291,7 +291,7 @@ public class LoadService(
         int currentYear = DateTime.Now.Year;
         const int years = 5;
         
-        var instruments = await tickerListUtilService.GetAllCurrenciesInTickerListsAsync();
+        var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
         
         foreach (var instrument in instruments)
         {
