@@ -25,6 +25,12 @@ public class OptimizationResultEntity : AuditableEntity
     public string StrategyId { get; set; } = string.Empty;
     
     /// <summary>
+    /// Описание стратегии
+    /// </summary>
+    [Column("strategy_description"), MaxLength(1000)]
+    public string StrategyDescription { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Версия стратегии
     /// </summary>
     [Column("strategy_version")]
