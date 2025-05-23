@@ -273,14 +273,20 @@ public class LoadService(
         const int years = 5;
         
         var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
+
+        int count = 0;
         
         foreach (var instrument in instruments)
         {
+            count++;
+            
             for (int year = currentYear - years; year <= currentYear; year++)
             {
                 var candles = await tinkoffService.GetDailyCandlesAsync(instrument.InstrumentId, year);
                 await candleRepository.AddOrUpdateAsync(candles);
             }
+            
+            logger.Info($"Загружены свечи по инструменту '{instrument.Ticker}'. {count} из {instruments.Count}");
         }
 
         return true;
@@ -293,8 +299,12 @@ public class LoadService(
         
         var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
         
+        int count = 0;
+        
         foreach (var instrument in instruments)
         {
+            count++;
+            
             for (int year = currentYear - years; year <= currentYear; year++)
             {
                 for (int month = 1; month <= 12; month++)
@@ -306,6 +316,8 @@ public class LoadService(
                     await hourlyCandleRepository.AddOrUpdateAsync(candles);
                 }
             }
+            
+            logger.Info($"Загружены свечи по инструменту '{instrument.Ticker}'. {count} из {instruments.Count}");
         }
 
         return true;
