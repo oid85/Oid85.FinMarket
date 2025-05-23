@@ -7,9 +7,6 @@ public interface IDiagramDataFactory
     Task<SimpleDiagramData> CreateDailyClosePricesDiagramDataAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to);
 
-    Task<SimpleDiagramData> CreateFiveMinutesClosePricesDiagramDataAsync(
-        List<Guid> instrumentIds, DateTime from, DateTime to);
-
     Task<BubbleDiagramData> CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(
         List<Guid> instrumentIds);
 }

@@ -25,12 +25,6 @@ public interface ITinkoffService
         Guid instrumentId, DateOnly from, DateOnly to);
     
     /// <summary>
-    /// Получить 5-минутные свечи за период
-    /// </summary>
-    Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
-        Guid instrumentId, DateTime from, DateTime to);
-    
-    /// <summary>
     /// Получить последние цены
     /// </summary>
     public Task<List<double>> GetPricesAsync(List<Guid> instrumentIds);

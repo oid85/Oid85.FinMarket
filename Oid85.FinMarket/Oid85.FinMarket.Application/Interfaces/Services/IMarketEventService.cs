@@ -74,9 +74,4 @@ public interface IMarketEventService
     /// Расчет рыночного события Реализация прогноза
     /// </summary>
     Task CheckForecastReleasedMarketEventAsync();
-    
-    /// <summary>
-    /// Расчет рыночного события Ударный день
-    /// </summary>
-    Task CheckIntraDayImpulseMarketEventAsync();
 }

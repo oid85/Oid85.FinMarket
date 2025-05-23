@@ -643,8 +643,7 @@ public class ReportDataFactory(
                 await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent1),
                 await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent2),
                 await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent3),
-                await GetMarketEventReportParameter(KnownMarketEventTypes.ForecastReleased),
-                await GetMarketEventReportParameter(KnownMarketEventTypes.IntraDayImpulse)
+                await GetMarketEventReportParameter(KnownMarketEventTypes.ForecastReleased)
             ]);
             
             continue;

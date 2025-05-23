@@ -34,13 +34,6 @@ public class GetCandlesService(
             instrumentId, 
             ConvertHelper.DateOnlyToTimestamp(from), 
             ConvertHelper.DateOnlyToTimestamp(to));
-    
-    public Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
-        Guid instrumentId, DateTime from, DateTime to) =>
-        GetFiveMinuteCandlesAsync(
-            instrumentId, 
-            ConvertHelper.DateTimeToTimestamp(from), 
-            ConvertHelper.DateTimeToTimestamp(to));
 
     private async Task<List<Candle>> GetDailyCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
@@ -73,22 +66,6 @@ public class GetCandlesService(
         candles.ForEach(x => x.InstrumentId = instrumentId);
         return candles;
     }    
-    
-    private async Task<List<FiveMinuteCandle>> GetFiveMinuteCandlesAsync(
-        Guid instrumentId, Timestamp from, Timestamp to)
-    {
-        await Task.Delay(DelayInMilliseconds);
-        
-        var request = CreateGetCandlesRequest(instrumentId, from, to, CandleInterval._5Min);
-        var response = await SendGetCandlesRequest(request);
-
-        if (response is null)
-            return [];
-        
-        var candles = response.Candles.Select(TinkoffMapper.MapFiveMinuteCandle).ToList();
-        candles.ForEach(x => x.InstrumentId = instrumentId);
-        return candles;
-    }
     
     private async Task<GetCandlesResponse?> SendGetCandlesRequest(GetCandlesRequest request)
     {

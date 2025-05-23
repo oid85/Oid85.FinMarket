@@ -10,7 +10,6 @@ namespace Oid85.FinMarket.Application.Factories;
 public class DiagramDataFactory(
     IInstrumentRepository instrumentRepository,
     ICandleRepository candleRepository,
-    IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IMultiplicatorRepository multiplicatorRepository) 
     : IDiagramDataFactory
 {
@@ -27,20 +26,6 @@ public class DiagramDataFactory(
 
         return dictionary;
     }
-
-    private async Task<Dictionary<Guid, List<FiveMinuteCandle>>> CreateFiveMinutesDataDictionaryAsync(
-        List<Guid> instrumentIds, DateTime from, DateTime to)
-    {
-        var dictionary = new Dictionary<Guid, List<FiveMinuteCandle>>();
-
-        foreach (var instrumentId in instrumentIds)
-        {
-            var candles = await fiveMinuteCandleRepository.GetAsync(instrumentId, from, to);
-            dictionary.Add(instrumentId, candles);
-        }
-
-        return dictionary;
-    }    
     
     public async Task<SimpleDiagramData> CreateDailyClosePricesDiagramDataAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to)
@@ -71,40 +56,7 @@ public class DiagramDataFactory(
 
         return simpleDiagramData;
     }
-
-    public async Task<SimpleDiagramData> CreateFiveMinutesClosePricesDiagramDataAsync(
-        List<Guid> instrumentIds, DateTime from, DateTime to)
-    {
-        var dateTimes = DateHelper.GetFiveMinutesDateTimes(from, to);
-        var data = await CreateFiveMinutesDataDictionaryAsync(instrumentIds, from, to);
-        var simpleDiagramData = new SimpleDiagramData { Title = "Графики (5 мин)" };
-        
-        foreach (var instrumentId in instrumentIds)
-        {
-            var instrument = await instrumentRepository.GetAsync(instrumentId);
-            string ticker = instrument?.Ticker ?? string.Empty;
-            string name = instrument?.Name ?? string.Empty;
-            
-            var dataPointSeries = new SimpleDataPointSeries { Title = $"{name} ({ticker})" };
-
-            foreach (var dateTime in dateTimes)
-            {
-                var candle = data[instrumentId].FirstOrDefault(
-                    x => 
-                        x.Date == DateOnly.FromDateTime(dateTime) &&
-                        x.Time == TimeOnly.FromDateTime(dateTime));
-                
-                dataPointSeries.Series.Add(candle is null
-                    ? new SimpleDataPoint { Date = dateTime.ToString(KnownDateTimeFormats.DateTimeISO), Value = null }
-                    : new SimpleDataPoint { Date = dateTime.ToString(KnownDateTimeFormats.DateTimeISO), Value = candle.Close });
-            }
-            
-            simpleDiagramData.Data.Add(dataPointSeries);
-        }
-
-        return simpleDiagramData;
-    }
-
+    
     public async Task<BubbleDiagramData> CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(List<Guid> instrumentIds)
     {
         var multiplicators = await multiplicatorRepository.GetAsync(instrumentIds);

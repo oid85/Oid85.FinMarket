@@ -340,22 +340,6 @@ public class SharesController(
             });
     
     /// <summary>
-    /// Диаграмма График цен закрытия (5 мин)
-    /// </summary>
-    [HttpPost("diagram/five-minutes-close-prices")]
-    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetFiveMinutesClosePricesAsync(
-        [FromBody] DateTimeRangeRequest request) =>
-        GetResponseAsync(
-            () => diagramService.GetFiveMinutesClosePricesAsync(request),
-            result => new BaseResponse<SimpleDiagramData>
-            {
-                Result = result
-            });
-    
-    /// <summary>
     /// Диаграмма Мультипликаторы MCap, P/E, NetDebt/EBITDA
     /// </summary>
     [HttpPost("diagram/multiplicators-mcap-pe-netdebtebitda")]

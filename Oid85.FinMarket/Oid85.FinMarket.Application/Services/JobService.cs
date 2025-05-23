@@ -40,9 +40,7 @@ public class JobService(
     public async Task Every15Minutes()
     {
         await LoadLastPricesAsync();
-        await LoadFiveMinuteCandlesAsync();
         await ProcessSpreadPairsAsync();
-        await CheckIntraDayMarketEventsAsync();
         await SendNotificationsAsync();
     }
 
@@ -177,21 +175,6 @@ public class JobService(
         }
     }
     
-    private async Task LoadFiveMinuteCandlesAsync()
-    {
-        try
-        {
-            await loadService.LoadShareFiveMinuteCandlesAsync();
-            
-            logger.Info("Метод 'LoadFiveMinuteCandlesAsync' выполнен успешно");
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Info(exception, "Ошибка при выполнении метода 'LoadFiveMinuteCandlesAsync'");
-        }
-    }
-    
     private async Task LoadForecastsAsync()
     {
         try
@@ -294,21 +277,6 @@ public class JobService(
         catch (Exception exception)
         {
             logger.Info(exception, "Ошибка при выполнении метода 'ProcessFeerGreedAsync'");
-        }
-    }
-    
-    private async Task CheckIntraDayMarketEventsAsync()
-    {
-        try
-        {
-            await marketEventService.CheckIntraDayImpulseMarketEventAsync();
-            
-            logger.Info("Метод 'CheckIntraDayMarketEventsAsync' выполнен успешно");
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Info(exception, "Ошибка при выполнении метода 'CheckIntraDayMarketEventsAsync'");
         }
     }
     

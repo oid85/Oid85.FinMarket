@@ -17,7 +17,6 @@ public class LoadService(
     ICurrencyRepository currencyRepository,
     ITickerListUtilService tickerListUtilService,
     ICandleRepository candleRepository,
-    IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IHourlyCandleRepository hourlyCandleRepository,
     IDividendInfoRepository dividendInfoRepository,
     IBondCouponRepository bondCouponRepository,
@@ -71,21 +70,6 @@ public class LoadService(
                     instrument.InstrumentId, lastCandle.Date, DateOnly.FromDateTime(DateTime.Today));
                 await candleRepository.AddOrUpdateAsync(candles);
             }
-        }
-    }
-
-    public async Task LoadShareFiveMinuteCandlesAsync()
-    {
-        var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
-
-        foreach (var instrument in instruments)
-        {
-            var candles = await tinkoffService.GetFiveMinuteCandlesAsync(
-                instrument.InstrumentId, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow);
-            
-            logger.Trace($"Загрузка {candles.Count} свечей 5min по инструменту '{instrument.Name}' ({instrument.InstrumentId})");
-            
-            await fiveMinuteCandleRepository.AddOrUpdateAsync(candles);
         }
     }
 

@@ -156,23 +156,6 @@ public static class TinkoffMapper
             PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
         };
     
-    public static FiveMinuteCandle MapFiveMinuteCandle(HistoricCandle historicCandle) =>
-        new()
-        {
-            Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
-            Close = ConvertHelper.QuotationToDouble(historicCandle.Close),
-            High = ConvertHelper.QuotationToDouble(historicCandle.High),
-            Low = ConvertHelper.QuotationToDouble(historicCandle.Low),
-            Volume = historicCandle.Volume,
-            Date = ConvertHelper.TimestampToDateOnly(historicCandle.Time),
-            Time = ConvertHelper.TimestampToTimeOnly(historicCandle.Time),
-            DateTimeTicks = new DateTime(
-                ConvertHelper.TimestampToDateOnly(historicCandle.Time), 
-                ConvertHelper.TimestampToTimeOnly(historicCandle.Time))
-                .Ticks,
-            IsComplete = historicCandle.IsComplete
-        };
-    
     public static HourlyCandle MapHourlyCandle(HistoricCandle historicCandle) =>
         new()
         {

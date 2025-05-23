@@ -14,7 +14,6 @@ public class MarketEventService(
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
     ICandleRepository candleRepository,
-    IFiveMinuteCandleRepository fiveMinuteCandleRepository,
     IInstrumentRepository instrumentRepository,
     ISpreadRepository spreadRepository,
     IResourceStoreService resourceStoreService,
@@ -524,102 +523,7 @@ public class MarketEventService(
             logger.Error(exception);
         }
     }
-
-    /// <inheritdoc />
-    public async Task CheckIntraDayImpulseMarketEventAsync()
-    {
-        try
-        {
-            var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesWatchlist);
-
-            foreach (var share in shares)
-            {
-                // Последние 24 5-минутки (2 часа)
-                var candles = (await fiveMinuteCandleRepository.GetLastWeekCandlesAsync(share.InstrumentId))
-                    .OrderBy(x => x.DateTimeTicks)
-                    .TakeLast(24)
-                    .ToList();
-                
-                if (candles.Count < 24)
-                    continue;
-                
-                bool condition = HasAnomalyCandleBody(candles) && HasAnomalyCandleVolume(candles);
-                
-                var marketEvent = await CreateMarketEvent(
-                    share.InstrumentId, 
-                    KnownMarketEventTypes.IntraDayImpulse,
-                    $"Импульс внутри дня '{share.Ticker}'");
-
-                marketEvent.IsActive = condition;
-                
-                await SaveMarketEventAsync(marketEvent);
-            }
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-        }
-
-        bool HasAnomalyCandleBody(List<FiveMinuteCandle> candles)
-        {
-            for (int i = 0; i < candles.Count; i++)
-            {
-                if (!IsWhiteCandle(candles[i]))
-                    continue;
-
-                double body = Math.Abs(candles[i].Open - candles[i].Close);
-                double closePrice = candles[i].Close;
-                
-                double maxOtherCandlesBody = candles
-                    .Where(x => x.Id !=  candles[i].Id)
-                    .Select(x => Math.Abs(x.Open - x.Close))
-                    .Max();
-                
-                double maxOtherCandlesClosePrice = candles
-                    .Where(x => x.Id !=  candles[i].Id)
-                    .Select(x => x.Close)
-                    .Max();                
-                
-                if (body == 0.0 || maxOtherCandlesBody == 0.0)
-                    continue;
-
-                if (body > 2 * maxOtherCandlesBody && 
-                    closePrice > maxOtherCandlesClosePrice)
-                    return true;
-            }
-            
-            return false;
-        }
-        
-        bool HasAnomalyCandleVolume(List<FiveMinuteCandle> candles)
-        {
-            for (int i = 0; i < candles.Count; i++)
-            {
-                if (!IsWhiteCandle(candles[i]))
-                    continue;
-
-                long volume = candles[i].Volume;
-                
-                long maxOtherCandlesVolume = candles
-                    .Where(x => x.Id !=  candles[i].Id)
-                    .Select(x => x.Volume)
-                    .Max();
-                
-                if (volume == 0.0 || maxOtherCandlesVolume == 0.0)
-                    continue;
-
-                if (volume > 2 * maxOtherCandlesVolume)
-                    return true;
-            }
-            
-            return false;
-        }
-
-        bool IsWhiteCandle(FiveMinuteCandle candle) => 
-            candle.Close > candle.Open;
-    }
-
+    
     private async Task<MarketEvent> CreateMarketEvent(
         Guid instrumentId,
         string marketEventType,
