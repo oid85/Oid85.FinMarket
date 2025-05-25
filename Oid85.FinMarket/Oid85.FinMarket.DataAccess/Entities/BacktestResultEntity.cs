@@ -113,4 +113,16 @@ public class BacktestResultEntity : AuditableEntity
     /// </summary>
     [Column("sharp_ratio")]
     public double SharpRatio { get; set; }
+    
+    /// <summary>
+    /// Доходность всего, %
+    /// </summary>
+    [Column("total_return")]
+    public double TotalReturn { get; set; }
+    
+    /// <summary>
+    /// Доходность годовая, %;
+    /// </summary>
+    [Column("annual_yield_return")]
+    public double AnnualYieldReturn { get; set; }
 }
