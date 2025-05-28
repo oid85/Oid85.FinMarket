@@ -17,4 +17,5 @@ public static class KnownInstrumentIds
     public static Guid NonFerrousMetallurgySectorIndex = Guid.Parse("da5ae557-fb6c-4cc2-886d-4bc4aedce12a");
     public static Guid RetailSectorIndex = Guid.Parse("6d35ac04-9c84-4c4d-b2fa-7aae12b2fcdd");
     public static Guid TelecomSectorIndex = Guid.Parse("f039936b-5183-46d1-a262-feff6b83a377");
+    public static Guid TransportSectorIndex = Guid.Parse("b0d7ac17-6042-48ab-ad79-076bf950e451");
 }

@@ -84,4 +84,9 @@ public interface IAnalyseService
     /// Анализ сектора Телеком
     /// </summary>
     Task<bool> DailyAnalyseTelecomSectorIndexAsync();
+    
+    /// <summary>
+    /// Анализ сектора Транспорт
+    /// </summary>
+    Task<bool> DailyAnalyseTransportSectorIndexAsync();
 }

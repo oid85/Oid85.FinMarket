@@ -22,6 +22,7 @@ public static class KnownTickerLists
     public const string SharesSectorsOilAndGas = "shares/sectors/oilAndGas";
     public const string SharesSectorsrRetail = "shares/sectors/retail";
     public const string SharesSectorsTelecom = "shares/sectors/telecom";
+    public const string SharesSectorsTransport = "shares/sectors/transport";
     
     public const string BondsCorp = "bonds/corp";
     public const string BondsCouponEveryMonth = "bonds/couponEveryMonth";

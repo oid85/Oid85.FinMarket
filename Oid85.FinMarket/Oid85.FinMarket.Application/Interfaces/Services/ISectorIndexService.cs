@@ -67,4 +67,10 @@ public interface ISectorIndexService
     /// </summary>
     /// <returns></returns>
     Task CalculateTelecomSectorIndexDailyCandlesAsync();
+    
+    /// <summary>
+    /// Расчет свечей индекса сектора Транспорт
+    /// </summary>
+    /// <returns></returns>
+    Task CalculateTransportSectorIndexDailyCandlesAsync();
 }

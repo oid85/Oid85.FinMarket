@@ -246,4 +246,16 @@ public class AnalyseService(
         
         return true;
     }
+
+    public async Task<bool> DailyAnalyseTransportSectorIndexAsync()
+    {
+        // Вызов методов анализа
+        await supertrendAnalyseService.SupertrendAnalyseAsync(KnownInstrumentIds.TransportSectorIndex);
+        await yieldLtmAnalyseService.YieldLtmAnalyseAsync(KnownInstrumentIds.TransportSectorIndex);
+        await drawdownFromMaximumAnalyseService.DrawdownFromMaximumAnalyseAsync(KnownInstrumentIds.TransportSectorIndex);
+        await atrAnalyseService.AtrAnalyseAsync(KnownInstrumentIds.TransportSectorIndex);
+        await donchianAnalyseService.DonchianAnalyseAsync(KnownInstrumentIds.TransportSectorIndex);
+        
+        return true;
+    }
 }

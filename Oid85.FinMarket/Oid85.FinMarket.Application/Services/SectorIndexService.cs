@@ -8,7 +8,8 @@ namespace Oid85.FinMarket.Application.Services;
 
 public class SectorIndexService(
     ITickerListUtilService tickerListUtilService,
-    ICandleRepository candleRepository) : ISectorIndexService
+    ICandleRepository candleRepository) 
+    : ISectorIndexService
 {
     /// <inheritdoc />
     public Task CalculateOilAndGasSectorIndexDailyCandlesAsync() =>
@@ -65,6 +66,11 @@ public class SectorIndexService(
         CalculateSectorIndexDailyCandlesAsync(
             KnownInstrumentIds.TelecomSectorIndex, 
             KnownTickerLists.SharesSectorsTelecom);
+
+    public Task CalculateTransportSectorIndexDailyCandlesAsync() =>
+        CalculateSectorIndexDailyCandlesAsync(
+            KnownInstrumentIds.TransportSectorIndex, 
+            KnownTickerLists.SharesSectorsTransport);
 
     private async Task CalculateSectorIndexDailyCandlesAsync(Guid instrumentId, string tickerList)
     {

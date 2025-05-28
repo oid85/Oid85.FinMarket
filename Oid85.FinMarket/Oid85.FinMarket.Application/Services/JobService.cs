@@ -225,6 +225,7 @@ public class JobService(
             await analyseService.DailyAnalyseNonFerrousMetallurgySectorIndexAsync();
             await analyseService.DailyAnalyseRetailSectorIndexAsync();
             await analyseService.DailyAnalyseTelecomSectorIndexAsync();
+            await analyseService.DailyAnalyseTransportSectorIndexAsync();
             
             logger.Info("Метод 'AnalyseSectorsAsync' выполнен успешно");
         }

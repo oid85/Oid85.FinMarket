@@ -105,6 +105,15 @@ internal class InstrumentEntityConfiguration : EntityConfigurationBase<Instrumen
             Name = "Telecom Sector Index",  
             Ticker = "TSI",
             Type = "Index"
+        },
+        
+        new()
+        {
+            Id = Guid.Parse("e5d093cd-e00d-4603-9c81-c33aa0a1bbc6"),
+            InstrumentId = KnownInstrumentIds.TransportSectorIndex,
+            Name = "Transport Sector Index",  
+            Ticker = "TRSI",
+            Type = "Index"
         }
     };
 
