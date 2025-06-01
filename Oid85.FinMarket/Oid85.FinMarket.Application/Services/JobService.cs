@@ -25,6 +25,7 @@ public class JobService(
         await LoadBondCouponsAsync();
         await LoadDividendInfosAsync();
         await LoadDailyCandlesAsync();
+        await LoadHourlyCandlesAsync();
         await LoadForecastsAsync();
         await AnalyseAsync();
         await CalculateSectorIndexDailyCandlesAsync();
@@ -160,6 +161,21 @@ public class JobService(
         }
     }
 
+    private async Task LoadHourlyCandlesAsync()
+    {
+        try
+        {
+            await loadService.LoadShareHourlyCandlesAsync();
+            
+            logger.Info("Метод 'LoadHourlyCandlesAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'LoadHourlyCandlesAsync'");
+        }
+    }    
+    
     private async Task CalculateSectorIndexDailyCandlesAsync()
     {
         try

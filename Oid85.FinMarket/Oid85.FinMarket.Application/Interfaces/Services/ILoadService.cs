@@ -8,6 +8,7 @@ public interface ILoadService
     Task LoadSharesAsync();
     Task LoadShareLastPricesAsync();
     Task LoadShareDailyCandlesAsync();
+    Task LoadShareHourlyCandlesAsync();
     Task LoadForecastsAsync();
     Task LoadAssetReportEventsAsync();
     

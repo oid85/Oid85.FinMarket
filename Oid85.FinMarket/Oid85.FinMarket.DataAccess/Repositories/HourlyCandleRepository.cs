@@ -31,4 +31,16 @@ public class HourlyCandleRepository(
         await context.HourlyCandleEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
+
+    public async Task<HourlyCandle?> GetLastAsync(Guid instrumentId)
+    {
+        var entity = await context.HourlyCandleEntities
+            .Where(x => x.InstrumentId == instrumentId)
+            .OrderByDescending(x => x.Date)
+            .Take(1)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+
+        return entity is null ? null : DataAccessMapper.Map(entity);
+    }
 }

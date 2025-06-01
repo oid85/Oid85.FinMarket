@@ -54,14 +54,7 @@ public class LoadService(
 
             if (lastCandle is null)
             {
-                int currentYear = DateTime.Now.Year;
-                const int years = 3;
 
-                for (int year = currentYear - years; year <= currentYear; year++)
-                {
-                    var candles = await tinkoffService.GetDailyCandlesAsync(instrument.InstrumentId, year);
-                    await candleRepository.AddOrUpdateAsync(candles);
-                }
             }
 
             else
@@ -69,6 +62,28 @@ public class LoadService(
                 var candles = await tinkoffService.GetDailyCandlesAsync(
                     instrument.InstrumentId, lastCandle.Date, DateOnly.FromDateTime(DateTime.Today));
                 await candleRepository.AddOrUpdateAsync(candles);
+            }
+        }
+    }
+
+    public async Task LoadShareHourlyCandlesAsync()
+    {
+        var instruments = await tickerListUtilService.GetAllSharesInTickerListsAsync();
+
+        foreach (var instrument in instruments)
+        {
+            var lastCandle = await hourlyCandleRepository.GetLastAsync(instrument.InstrumentId);
+
+            if (lastCandle is null)
+            {
+
+            }
+
+            else
+            {
+                var candles = await tinkoffService.GetHourlyCandlesAsync(
+                    instrument.InstrumentId, lastCandle.Date, DateOnly.FromDateTime(DateTime.Today));
+                await hourlyCandleRepository.AddOrUpdateAsync(candles);
             }
         }
     }
