@@ -1,4 +1,5 @@
 ﻿using Oid85.FinMarket.External.ResourceStore.Models;
+using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
 namespace Oid85.FinMarket.External.ResourceStore;
 
@@ -156,4 +157,14 @@ public interface IResourceStoreService
     /// Получить список тикеров по наименованию
     /// </summary>
     Task<TickerListResource> GetTickerListAsync(string tickerListName);
+    
+    /// <summary>
+    /// Получить настройки Алго
+    /// </summary>
+    Task<AlgoConfigResource> GetAlgoConfigAsync();
+    
+    /// <summary>
+    /// Получить список стратегий Алго
+    /// </summary>
+    Task<List<AlgoStrategyResource>> GetAlgoStrategiesAsync();
 }

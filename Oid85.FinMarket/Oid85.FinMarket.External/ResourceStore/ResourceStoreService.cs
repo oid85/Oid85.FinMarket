@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.ResourceStore.Models;
+using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
 namespace Oid85.FinMarket.External.ResourceStore;
 
@@ -200,10 +201,23 @@ public class ResourceStoreService(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "filters", "filterSendMarketEvent.json")) ?? [];
 
+    /// <inheritdoc />
     public async Task<TickerListResource> GetTickerListAsync(string tickerListName) =>
         await ReadAsync<TickerListResource>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "tickerLists", $"{tickerListName}.json")) ?? new();
+
+    /// <inheritdoc />
+    public async Task<AlgoConfigResource> GetAlgoConfigAsync() =>
+        await ReadAsync<AlgoConfigResource>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "algo", "config.json")) ?? new();
+
+    /// <inheritdoc />
+    public async Task<List<AlgoStrategyResource>> GetAlgoStrategiesAsync() =>
+        await ReadAsync<List<AlgoStrategyResource>>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "algo", "strategies.json")) ?? [];
 
     private async Task<T?> ReadAsync<T>(string path)
     {
