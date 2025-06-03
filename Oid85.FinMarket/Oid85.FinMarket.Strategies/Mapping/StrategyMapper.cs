@@ -5,7 +5,7 @@ namespace Oid85.FinMarket.Strategies.Mapping;
 
 public static class StrategyMapper
 {
-    public static AlgoCandle Map(DailyCandle model) =>
+    public static Candle Map(DailyCandle model) =>
         new()
         {
             Open = model.Open,
@@ -16,7 +16,7 @@ public static class StrategyMapper
             Date = new DateTime(model.Date, TimeOnly.MinValue)
         };    
     
-    public static AlgoCandle Map(HourlyCandle model) =>
+    public static Candle Map(HourlyCandle model) =>
         new()
         {
             Open = model.Open,

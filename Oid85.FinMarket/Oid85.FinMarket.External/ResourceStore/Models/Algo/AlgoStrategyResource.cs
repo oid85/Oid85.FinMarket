@@ -14,6 +14,12 @@ public class AlgoStrategyResource
     public Guid Id { get; set; }
     
     /// <summary>
+    /// Флаг включена/выключена
+    /// </summary>
+    [JsonPropertyName("enable")]
+    public bool Enable { get; set; }    
+    
+    /// <summary>
     ///  Наименование стратегии
     /// </summary>
     [JsonPropertyName("name")]

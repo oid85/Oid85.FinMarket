@@ -1,0 +1,134 @@
+﻿using System.Collections.Concurrent;
+using System.Security.Cryptography;
+using Newtonsoft.Json.Serialization;
+using NLog;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.External.ResourceStore;
+using Oid85.FinMarket.External.ResourceStore.Models.Algo;
+using Oid85.FinMarket.Strategies.Models;
+
+namespace Oid85.FinMarket.Application.Services.Algo;
+
+public class AlgoEngine(
+    ILogger logger,
+    IDailyCandleRepository dailyCandleRepository,
+    IHourlyCandleRepository hourlyCandleRepository,
+    IResourceStoreService resourceStoreService)
+{
+    public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
+    public ConcurrentDictionary<string, List<Candle>> HourlyCandles { get; set; } = new();
+    public ConcurrentDictionary<Guid, List<Strategy>> Strategies { get; set; } = new();
+
+    private AlgoConfigResource _algoConfigResource = new();
+    private List<AlgoStrategyResource> _algoStrategyResource = new();
+    
+    private bool _isOptimization;
+    
+    /// <summary>
+    /// Инициализация AlgoEngine для бэктеста
+    /// </summary>
+    public async Task InitBacktestAsync()
+    {
+        _isOptimization = false;
+        
+        // Читаем настройки из ресурсов
+        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        _algoStrategyResource = await resourceStoreService.GetAlgoStrategiesAsync();
+        
+        await InitDailyCandlesAsync();
+        await InitHourlyCandlesAsync();
+    }
+
+    /// <summary>
+    /// Инициализация AlgoEngine для оптимизации
+    /// </summary>
+    public async Task InitOptimizationAsync()
+    {
+        _isOptimization = true;
+        
+        // Читаем настройки из ресурсов
+        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        _algoStrategyResource = await resourceStoreService.GetAlgoStrategiesAsync();
+
+        await InitDailyCandlesAsync();
+        await InitHourlyCandlesAsync();
+    }
+
+    private async Task InitDailyCandlesAsync()
+    {
+        var dates = GetDailyDates();
+
+        foreach (string ticker in _algoConfigResource.Tickers)
+        {
+            
+        }
+    }
+
+    private async Task InitHourlyCandlesAsync()
+    {
+        var dates = GetHourlyDates();
+        
+        foreach (string ticker in _algoConfigResource.Tickers)
+        {
+            
+        }
+    }
+    
+    private (DateOnly From, DateOnly To) GetDailyDates()
+    {
+        DateOnly from;
+        DateOnly to;
+        
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        
+        if (_isOptimization)
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.DailyStabilizationPeriodInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+            
+            to = today.AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+        }
+
+        else
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.DailyStabilizationPeriodInDays);
+            
+            to = today;
+        }
+
+        return (from, to);
+    }
+    
+    private (DateOnly From, DateOnly To) GetHourlyDates()
+    {
+        DateOnly from;
+        DateOnly to;
+        
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        
+        if (_isOptimization)
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.HourlyStabilizationPeriodInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+            
+            to = today.AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+        }
+
+        else
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfig.HourlyStabilizationPeriodInDays);
+            
+            to = today;
+        }
+        
+        return (from, to);
+    }
+}

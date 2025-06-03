@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Strategies.Models;
 
-public class AlgoCandle
+public class Candle
 {
     /// <summary>
     /// Номер

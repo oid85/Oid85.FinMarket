@@ -5,6 +5,7 @@ using Oid85.FinMarket.Application.Extensions;
 using Oid85.FinMarket.Common.Converters;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.DataAccess.Extensions;
+using Oid85.FinMarket.Strategies.Extensions;
 
 namespace Oid85.FinMarket.WebHost;
 
@@ -28,6 +29,7 @@ public class Program
         builder.Services.ConfigureExternalServices(builder.Configuration);
         builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
         builder.Services.ConfigureHangfire();
+        builder.Services.ConfigureStrategies();
             
         builder.Services.AddWindowsService(options =>
         {
