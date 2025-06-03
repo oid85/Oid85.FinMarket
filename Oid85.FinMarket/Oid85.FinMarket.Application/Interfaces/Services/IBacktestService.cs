@@ -2,5 +2,5 @@
 
 public interface IBacktestService
 {
-    Task Run();
+    Task<bool> BacktestAsync();
 }

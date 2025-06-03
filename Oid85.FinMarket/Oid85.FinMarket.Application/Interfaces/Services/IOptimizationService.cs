@@ -2,5 +2,5 @@
 
 public interface IOptimizationService
 {
-    Task Run();
+    Task<bool> OptimizeAsync();
 }

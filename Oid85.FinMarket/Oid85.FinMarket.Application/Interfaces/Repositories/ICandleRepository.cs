@@ -10,4 +10,5 @@ public interface ICandleRepository
     Task<List<Candle>> GetLastTwoYearsAsync(Guid instrumentId);
     Task<Candle?> GetAsync(Guid instrumentId, DateOnly date);
     Task<List<Candle>> GetAsync(Guid instrumentId, DateOnly from, DateOnly to);
+    Task<List<Candle>> GetAsync(string ticker, DateOnly from, DateOnly to);
 }
