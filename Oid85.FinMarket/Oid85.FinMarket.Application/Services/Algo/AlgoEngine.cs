@@ -71,6 +71,9 @@ public class AlgoEngine(
             var candles = (await dailyCandleRepository.GetAsync(ticker, dates.From, dates.To))
                 .Select(StrategyMapper.Map).ToList();
 
+            for (int i = 0; i < candles.Count; i++)
+                candles[i].Index = i;
+            
             DailyCandles.TryAdd(ticker, candles);
         }
     }
@@ -84,6 +87,9 @@ public class AlgoEngine(
             var candles = (await hourlyCandleRepository.GetAsync(ticker, dates.From, dates.To))
                 .Select(StrategyMapper.Map).ToList();
 
+            for (int i = 0; i < candles.Count; i++)
+                candles[i].Index = i;            
+            
             DailyCandles.TryAdd(ticker, candles);
         }
     }

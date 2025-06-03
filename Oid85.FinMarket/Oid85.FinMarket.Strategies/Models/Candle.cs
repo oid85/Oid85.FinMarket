@@ -3,9 +3,9 @@
 public class Candle
 {
     /// <summary>
-    /// Номер
+    /// Индекс свечи
     /// </summary>
-    public long Number { get; set; }
+    public int Index { get; set; }
     
     /// <summary>
     /// Цена открытия

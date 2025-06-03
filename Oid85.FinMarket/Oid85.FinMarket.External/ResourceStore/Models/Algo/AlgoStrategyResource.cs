@@ -26,6 +26,12 @@ public class AlgoStrategyResource
     public string Name { get; set; } = string.Empty;
     
     /// <summary>
+    ///  Описание стратегии
+    /// </summary>
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = string.Empty;
+    
+    /// <summary>
     ///  Таймфрейм стратегии
     /// </summary>
     [JsonPropertyName("timeframe")]
