@@ -155,7 +155,7 @@ public static class TinkoffMapper
             PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
         };
     
-    public static HourlyDailyCandle MapHourlyCandle(HistoricCandle historicCandle) =>
+    public static HourlyCandle MapHourlyCandle(HistoricCandle historicCandle) =>
         new()
         {
             Open = ConvertHelper.QuotationToDouble(historicCandle.Open),

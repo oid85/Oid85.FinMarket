@@ -27,7 +27,7 @@ public class GetCandlesService(
             ConvertHelper.DateOnlyToTimestamp(new DateOnly(year, 1, 1)), 
             ConvertHelper.DateOnlyToTimestamp(new DateOnly(year, 12, 31)));
     
-    public Task<List<HourlyDailyCandle>> GetHourlyCandlesAsync(
+    public Task<List<HourlyCandle>> GetHourlyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to) =>
         GetHourlyCandlesAsync(
             instrumentId, 
@@ -50,7 +50,7 @@ public class GetCandlesService(
         return candles;
     }
 
-    private async Task<List<HourlyDailyCandle>> GetHourlyCandlesAsync(
+    private async Task<List<HourlyCandle>> GetHourlyCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
     {
         await Task.Delay(DelayInMilliseconds);

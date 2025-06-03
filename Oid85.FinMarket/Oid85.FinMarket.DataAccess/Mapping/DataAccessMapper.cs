@@ -183,7 +183,7 @@ public static class DataAccessMapper
             DividendPrc = entity.DividendPrc
         };
     
-    public static void Map(ref HourlyCandleEntity? entity, HourlyDailyCandle model)
+    public static void Map(ref HourlyCandleEntity? entity, HourlyCandle model)
     {
         entity ??= new HourlyCandleEntity();
         
@@ -198,7 +198,7 @@ public static class DataAccessMapper
         entity.IsComplete = model.IsComplete;
     }
     
-    public static HourlyCandleEntity Map(HourlyDailyCandle model) =>
+    public static HourlyCandleEntity Map(HourlyCandle model) =>
         new()
         {
             InstrumentId = model.InstrumentId,
@@ -213,7 +213,7 @@ public static class DataAccessMapper
             IsComplete = model.IsComplete
         };
     
-    public static HourlyDailyCandle Map(HourlyCandleEntity entity) =>
+    public static HourlyCandle Map(HourlyCandleEntity entity) =>
         new()
         {
             Id = entity.Id,

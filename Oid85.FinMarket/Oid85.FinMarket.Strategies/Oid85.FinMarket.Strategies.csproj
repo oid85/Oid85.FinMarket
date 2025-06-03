@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Oid85.FinMarket.Domain\Oid85.FinMarket.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

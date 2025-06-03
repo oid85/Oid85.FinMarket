@@ -3,7 +3,7 @@
 /// <summary>
 /// Часовая свеча
 /// </summary>
-public class HourlyDailyCandle : DailyCandle
+public class HourlyCandle : DailyCandle
 {
     /// <summary>
     /// Время

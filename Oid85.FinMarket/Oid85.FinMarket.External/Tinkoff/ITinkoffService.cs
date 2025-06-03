@@ -21,7 +21,7 @@ public interface ITinkoffService
     /// <summary>
     /// Получить часовые свечи
     /// </summary>
-    Task<List<HourlyDailyCandle>> GetHourlyCandlesAsync(
+    Task<List<HourlyCandle>> GetHourlyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to);
     
     /// <summary>

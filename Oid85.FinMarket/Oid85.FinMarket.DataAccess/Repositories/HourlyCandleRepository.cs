@@ -10,7 +10,7 @@ public class HourlyCandleRepository(
     FinMarketContext context) 
     : IHourlyCandleRepository
 {
-    public async Task AddOrUpdateAsync(List<HourlyDailyCandle> candles)
+    public async Task AddOrUpdateAsync(List<HourlyCandle> candles)
     {
         var completedCandles = candles
             .Where(x => x.IsComplete).ToList();
@@ -32,7 +32,7 @@ public class HourlyCandleRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task<HourlyDailyCandle?> GetLastAsync(Guid instrumentId)
+    public async Task<HourlyCandle?> GetLastAsync(Guid instrumentId)
     {
         var entity = await context.HourlyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)

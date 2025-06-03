@@ -1,20 +1,12 @@
-﻿namespace Oid85.FinMarket.Domain.Models;
+﻿namespace Oid85.FinMarket.Strategies.Models;
 
-/// <summary>
-/// Дневная свеча
-/// </summary>
-public class DailyCandle
+public class AlgoCandle
 {
     /// <summary>
-    /// Id
+    /// Номер
     /// </summary>
-    public Guid Id { get; set; }
-
-    /// <summary>
-    /// Id инструмента
-    /// </summary>
-    public Guid InstrumentId { get; set; }
-
+    public long Number { get; set; }
+    
     /// <summary>
     /// Цена открытия
     /// </summary>
@@ -43,10 +35,5 @@ public class DailyCandle
     /// <summary>
     /// Дата
     /// </summary>
-    public DateOnly Date { get; set; }
-
-    /// <summary>
-    /// Свеча сформирована
-    /// </summary>
-    public bool IsComplete { get; set; }
+    public DateTime Date { get; set; }
 }
