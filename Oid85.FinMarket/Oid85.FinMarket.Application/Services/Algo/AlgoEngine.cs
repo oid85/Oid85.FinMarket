@@ -5,6 +5,7 @@ using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
+using Oid85.FinMarket.Strategies.Mapping;
 using Oid85.FinMarket.Strategies.Models;
 
 namespace Oid85.FinMarket.Application.Services.Algo;
@@ -37,6 +38,7 @@ public class AlgoEngine(
         
         await InitDailyCandlesAsync();
         await InitHourlyCandlesAsync();
+        await InitStrategiesAsync();
     }
 
     /// <summary>
@@ -52,6 +54,12 @@ public class AlgoEngine(
 
         await InitDailyCandlesAsync();
         await InitHourlyCandlesAsync();
+        await InitStrategiesAsync();
+    }
+
+    private async Task InitStrategiesAsync()
+    {
+        
     }
 
     private async Task InitDailyCandlesAsync()
@@ -60,7 +68,10 @@ public class AlgoEngine(
 
         foreach (string ticker in _algoConfigResource.Tickers)
         {
-            
+            var candles = (await dailyCandleRepository.GetAsync(ticker, dates.From, dates.To))
+                .Select(StrategyMapper.Map).ToList();
+
+            DailyCandles.TryAdd(ticker, candles);
         }
     }
 
@@ -70,7 +81,10 @@ public class AlgoEngine(
         
         foreach (string ticker in _algoConfigResource.Tickers)
         {
-            
+            var candles = (await hourlyCandleRepository.GetAsync(ticker, dates.From, dates.To))
+                .Select(StrategyMapper.Map).ToList();
+
+            DailyCandles.TryAdd(ticker, candles);
         }
     }
     

@@ -43,4 +43,24 @@ public class HourlyCandleRepository(
 
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
+
+    public async Task<List<HourlyCandle>> GetAsync(string ticker, DateOnly from, DateOnly to)
+    {
+        var instrumentEntity = await context.InstrumentEntities
+            .FirstOrDefaultAsync(x => x.Ticker == ticker);
+
+        if (instrumentEntity is null)
+            return [];
+        
+        var entities = await context.HourlyCandleEntities
+            .Where(x => x.InstrumentId == instrumentEntity.InstrumentId)
+            .Where(x => 
+                x.Date >= from &&
+                x.Date <= to)
+            .OrderBy(x => x.Date)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return entities.Count == 0 ? [] : entities.Select(DataAccessMapper.Map).ToList();
+    }
 }
