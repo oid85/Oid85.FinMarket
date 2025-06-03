@@ -5,9 +5,9 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class CandleEntityConfiguration : EntityConfigurationBase<CandleEntity>
+internal class DailyCandleEntityConfiguration : EntityConfigurationBase<DailyCandleEntity>
 {
-    public override void Configure(EntityTypeBuilder<CandleEntity> builder)
+    public override void Configure(EntityTypeBuilder<DailyCandleEntity> builder)
     {
         base.Configure(builder);
         

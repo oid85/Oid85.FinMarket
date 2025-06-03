@@ -88,7 +88,7 @@ public static class DataAccessMapper
             RiskLevel = entity.RiskLevel
         };
     
-    public static CandleEntity Map(Candle model) =>
+    public static DailyCandleEntity Map(DailyCandle model) =>
         new()
         {
             InstrumentId = model.InstrumentId,
@@ -101,7 +101,7 @@ public static class DataAccessMapper
             IsComplete = model.IsComplete
         };
     
-    public static Candle Map(CandleEntity entity) =>
+    public static DailyCandle Map(DailyCandleEntity entity) =>
         new()
         {
             Id = entity.Id,
@@ -115,9 +115,9 @@ public static class DataAccessMapper
             IsComplete = entity.IsComplete
         };
     
-    public static void Map(ref CandleEntity? entity, Candle model)
+    public static void Map(ref DailyCandleEntity? entity, DailyCandle model)
     {
-        entity ??= new CandleEntity();
+        entity ??= new DailyCandleEntity();
         
         entity.InstrumentId = model.InstrumentId;
         entity.Open = model.Open;
@@ -183,7 +183,7 @@ public static class DataAccessMapper
             DividendPrc = entity.DividendPrc
         };
     
-    public static void Map(ref HourlyCandleEntity? entity, HourlyCandle model)
+    public static void Map(ref HourlyCandleEntity? entity, HourlyDailyCandle model)
     {
         entity ??= new HourlyCandleEntity();
         
@@ -198,7 +198,7 @@ public static class DataAccessMapper
         entity.IsComplete = model.IsComplete;
     }
     
-    public static HourlyCandleEntity Map(HourlyCandle model) =>
+    public static HourlyCandleEntity Map(HourlyDailyCandle model) =>
         new()
         {
             InstrumentId = model.InstrumentId,
@@ -213,7 +213,7 @@ public static class DataAccessMapper
             IsComplete = model.IsComplete
         };
     
-    public static HourlyCandle Map(HourlyCandleEntity entity) =>
+    public static HourlyDailyCandle Map(HourlyCandleEntity entity) =>
         new()
         {
             Id = entity.Id,

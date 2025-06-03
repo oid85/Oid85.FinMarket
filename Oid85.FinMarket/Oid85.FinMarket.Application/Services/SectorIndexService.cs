@@ -8,7 +8,7 @@ namespace Oid85.FinMarket.Application.Services;
 
 public class SectorIndexService(
     ITickerListUtilService tickerListUtilService,
-    ICandleRepository candleRepository) 
+    IDailyCandleRepository dailyCandleRepository) 
     : ISectorIndexService
 {
     /// <inheritdoc />
@@ -77,10 +77,10 @@ public class SectorIndexService(
         var shares = await tickerListUtilService.GetSharesByTickerListAsync(tickerList);
         var instrumentIds = shares.Select(x => x.InstrumentId).ToList();
         var candles = await CreateSectorIndexDailyCandles(instrumentId, instrumentIds);
-        await candleRepository.AddOrUpdateAsync(candles);
+        await dailyCandleRepository.AddOrUpdateAsync(candles);
     }
 
-    private async Task<List<Candle>> CreateSectorIndexDailyCandles(Guid instrumentId, List<Guid> instrumentIds)
+    private async Task<List<DailyCandle>> CreateSectorIndexDailyCandles(Guid instrumentId, List<Guid> instrumentIds)
     {
         var from = new DateOnly(2022, 1, 1);
         var to = DateOnly.FromDateTime(DateTime.Today);
@@ -88,11 +88,11 @@ public class SectorIndexService(
         var normalizeDictionary = NormalizeDictionary(dictionary);
         var dates = DateHelper.GetDates(from, to);
 
-        var sectorCandles = new List<Candle>();
+        var sectorCandles = new List<DailyCandle>();
 
         foreach (var date in dates)
         {
-            var sectorCandle = new Candle
+            var sectorCandle = new DailyCandle
             {
                 InstrumentId = instrumentId,
                 Open = 0.0,
@@ -122,9 +122,9 @@ public class SectorIndexService(
         return sectorCandles;
     }
 
-    private static Dictionary<Guid, List<Candle>> NormalizeDictionary(Dictionary<Guid, List<Candle>> dictionary)
+    private static Dictionary<Guid, List<DailyCandle>> NormalizeDictionary(Dictionary<Guid, List<DailyCandle>> dictionary)
     {
-        var result = new Dictionary<Guid, List<Candle>>();
+        var result = new Dictionary<Guid, List<DailyCandle>>();
 
         foreach (var item in dictionary)
         {
@@ -135,13 +135,13 @@ public class SectorIndexService(
         return result;
     }
 
-    private static List<Candle> NormalizeCandles(List<Candle> candles)
+    private static List<DailyCandle> NormalizeCandles(List<DailyCandle> candles)
     {
-        var result = new List<Candle>();
+        var result = new List<DailyCandle>();
 
         for (int i = 0; i < candles.Count; i++)
         {
-            var normalizedCandle = new Candle()
+            var normalizedCandle = new DailyCandle()
             {
                 InstrumentId = candles[i].InstrumentId,
                 Open = candles[i].Open / candles[0].Open,
@@ -158,14 +158,14 @@ public class SectorIndexService(
         return result;
     }
 
-    private async Task<Dictionary<Guid, List<Candle>>> CreateDailyDataDictionaryAsync(
+    private async Task<Dictionary<Guid, List<DailyCandle>>> CreateDailyDataDictionaryAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to)
     {
-        var dictionary = new Dictionary<Guid, List<Candle>>();
+        var dictionary = new Dictionary<Guid, List<DailyCandle>>();
 
         foreach (var instrumentId in instrumentIds)
         {
-            var candles = await candleRepository.GetAsync(instrumentId, from, to);
+            var candles = await dailyCandleRepository.GetAsync(instrumentId, from, to);
             dictionary.Add(instrumentId, candles);
         }
 

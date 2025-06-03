@@ -13,7 +13,7 @@ public class MarketEventService(
     ITickerListUtilService tickerListUtilService,
     IMarketEventRepository marketEventRepository,
     IAnalyseResultRepository analyseResultRepository,
-    ICandleRepository candleRepository,
+    IDailyCandleRepository dailyCandleRepository,
     IInstrumentRepository instrumentRepository,
     ISpreadRepository spreadRepository,
     IResourceStoreService resourceStoreService,
@@ -369,7 +369,7 @@ public class MarketEventService(
                         KnownMarketEventTypes.CrossPriceLevel,
                         $"Достигнут уровень '{priceLevel.Value}'");
                     
-                    var lastCandle = await candleRepository.GetLastAsync(instrumentId);
+                    var lastCandle = await dailyCandleRepository.GetLastAsync(instrumentId);
                 
                     marketEvent.IsActive =
                         lastCandle is not null &&

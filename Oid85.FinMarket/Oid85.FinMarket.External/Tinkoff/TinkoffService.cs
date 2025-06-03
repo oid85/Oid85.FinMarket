@@ -1,5 +1,4 @@
 ﻿using Oid85.FinMarket.Domain.Models;
-using Candle = Oid85.FinMarket.Domain.Models.Candle;
 using Share = Oid85.FinMarket.Domain.Models.Share;
 using Bond = Oid85.FinMarket.Domain.Models.Bond;
 using Currency = Oid85.FinMarket.Domain.Models.Currency;
@@ -19,16 +18,16 @@ public class TinkoffService(
     : ITinkoffService
 {
     // <inheritdoc />
-    public Task<List<Candle>> GetDailyCandlesAsync(
+    public Task<List<DailyCandle>> GetDailyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to) =>
         getCandlesService.GetDailyCandlesAsync(instrumentId, from, to);
 
     /// <inheritdoc />
-    public Task<List<Candle>> GetDailyCandlesAsync(Guid instrumentId, int year) =>
+    public Task<List<DailyCandle>> GetDailyCandlesAsync(Guid instrumentId, int year) =>
         getCandlesService.GetDailyCandlesAsync(instrumentId, year);
 
     /// <inheritdoc />
-    public Task<List<HourlyCandle>> GetHourlyCandlesAsync(
+    public Task<List<HourlyDailyCandle>> GetHourlyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to) =>
         getCandlesService.GetHourlyCandlesAsync(instrumentId, from, to);
     

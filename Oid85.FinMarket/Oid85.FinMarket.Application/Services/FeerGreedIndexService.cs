@@ -11,7 +11,7 @@ public class FeerGreedIndexService(
     ITickerListUtilService tickerListUtilService,
     IInstrumentRepository instrumentRepository,
     IFeerGreedRepository feerGreedRepository,
-    ICandleRepository candleRepository) 
+    IDailyCandleRepository dailyCandleRepository) 
     : IFeerGreedIndexService
 {
     public async Task ProcessFeerGreedAsync()
@@ -69,7 +69,7 @@ public class FeerGreedIndexService(
     private async Task<Dictionary<DateOnly, double>> GetMarketMomentumAsync()
     {
         var indexMoex = await instrumentRepository.GetAsync("IMOEX");
-        var candles = (await candleRepository.GetLastYearAsync(indexMoex!.InstrumentId))
+        var candles = (await dailyCandleRepository.GetLastYearAsync(indexMoex!.InstrumentId))
             .Where(x => x.IsComplete).ToList();
         
         return SeriesToAverageRatio(candles, 125);
@@ -81,7 +81,7 @@ public class FeerGreedIndexService(
     private async Task<Dictionary<DateOnly, double>> GetMarketVolatilityAsync()
     {
         var indexRvi = await instrumentRepository.GetAsync("RVI");
-        var candles = (await candleRepository.GetLastYearAsync(indexRvi!.InstrumentId))
+        var candles = (await dailyCandleRepository.GetLastYearAsync(indexRvi!.InstrumentId))
             .Where(x => x.IsComplete).ToList();
 
         return SeriesToAverageRatio(candles, 50);
@@ -150,7 +150,7 @@ public class FeerGreedIndexService(
         return (Strengths: strengths, Breadths: breadths);
     }
     
-    private Dictionary<DateOnly, double> SeriesToAverageRatio(List<Candle> candles, int movingAveragePeriod)
+    private Dictionary<DateOnly, double> SeriesToAverageRatio(List<DailyCandle> candles, int movingAveragePeriod)
     {
         if (candles is [])
             return [];
@@ -193,15 +193,15 @@ public class FeerGreedIndexService(
             DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), 
             DateOnly.FromDateTime(DateTime.Today));
     
-    private async Task<Dictionary<Guid, List<Candle>>> CreateDataDictionaryAsync()
+    private async Task<Dictionary<Guid, List<DailyCandle>>> CreateDataDictionaryAsync()
     {
         var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.SharesImoex);
 
-        var dictionary = new Dictionary<Guid, List<Candle>>();
+        var dictionary = new Dictionary<Guid, List<DailyCandle>>();
         
         foreach (var share in shares)
         {
-            var candles = await candleRepository.GetLastTwoYearsAsync(share.InstrumentId);
+            var candles = await dailyCandleRepository.GetLastTwoYearsAsync(share.InstrumentId);
             dictionary.Add(share.InstrumentId, candles);
         }
 
@@ -223,13 +223,13 @@ public class FeerGreedIndexService(
         return result;
     }
 
-    private Quote Map(Candle candle) =>
+    private Quote Map(DailyCandle dailyCandle) =>
         new()
         {
-            Open = Convert.ToDecimal(candle.Open),
-            Close = Convert.ToDecimal(candle.Close),
-            High = Convert.ToDecimal(candle.High),
-            Low = Convert.ToDecimal(candle.Low),
-            Date = candle.Date.ToDateTime(TimeOnly.MinValue)
+            Open = Convert.ToDecimal(dailyCandle.Open),
+            Close = Convert.ToDecimal(dailyCandle.Close),
+            High = Convert.ToDecimal(dailyCandle.High),
+            Low = Convert.ToDecimal(dailyCandle.Low),
+            Date = dailyCandle.Date.ToDateTime(TimeOnly.MinValue)
         };
 }

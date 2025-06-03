@@ -3,7 +3,6 @@ using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Tinkoff.InvestApi.V1;
 using Bond = Oid85.FinMarket.Domain.Models.Bond;
-using Candle = Oid85.FinMarket.Domain.Models.Candle;
 using Currency = Oid85.FinMarket.Domain.Models.Currency;
 using Future = Oid85.FinMarket.Domain.Models.Future;
 using Share = Oid85.FinMarket.Domain.Models.Share;
@@ -156,7 +155,7 @@ public static class TinkoffMapper
             PayOneBond = ConvertHelper.MoneyValueToDouble(coupon.PayOneBond)
         };
     
-    public static HourlyCandle MapHourlyCandle(HistoricCandle historicCandle) =>
+    public static HourlyDailyCandle MapHourlyCandle(HistoricCandle historicCandle) =>
         new()
         {
             Open = ConvertHelper.QuotationToDouble(historicCandle.Open),
@@ -173,7 +172,7 @@ public static class TinkoffMapper
             IsComplete = historicCandle.IsComplete
         };    
     
-    public static Candle MapCandle(HistoricCandle historicCandle) =>
+    public static DailyCandle MapCandle(HistoricCandle historicCandle) =>
         new()
         {
             Open = ConvertHelper.QuotationToDouble(historicCandle.Open),

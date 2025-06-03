@@ -8,14 +8,14 @@ namespace Oid85.FinMarket.Application.Services.AnalyseServices;
 
 public class AtrAnalyseService(
     ILogger logger,
-    ICandleRepository candleRepository,
+    IDailyCandleRepository dailyCandleRepository,
     IAnalyseResultRepository analyseResultRepository)
 {
     public async Task AtrAnalyseAsync(Guid instrumentId)
     {
         try
         {
-            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
+            var candles = (await dailyCandleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 

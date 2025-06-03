@@ -8,14 +8,14 @@ namespace Oid85.FinMarket.Application.Services.AnalyseServices;
 
 public class RsiAnalyseService(
     ILogger logger,
-    ICandleRepository candleRepository,
+    IDailyCandleRepository dailyCandleRepository,
     IAnalyseResultRepository analyseResultRepository)
 {
     public async Task RsiAnalyseAsync(Guid instrumentId)
     {
         try
         {
-            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
+            var candles = (await dailyCandleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 

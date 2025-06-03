@@ -7,14 +7,14 @@ namespace Oid85.FinMarket.Application.Services.AnalyseServices;
 
 public class CandleVolumeAnalyseService(
     ILogger logger,
-    ICandleRepository candleRepository,
+    IDailyCandleRepository dailyCandleRepository,
     IAnalyseResultRepository analyseResultRepository)
 {
     public async Task CandleVolumeAnalyseAsync(Guid instrumentId)
     {
         try
         {
-            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
+            var candles = (await dailyCandleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -41,7 +41,7 @@ public class CandleVolumeAnalyseService(
 
                 else
                 {
-                    var candlesForAnalyse = new List<Candle>()
+                    var candlesForAnalyse = new List<DailyCandle>()
                     {
                         candles[i - 9],
                         candles[i - 8],
@@ -76,7 +76,7 @@ public class CandleVolumeAnalyseService(
         }
     }    
     
-    (string, double) GetResult(List<Candle> candles)
+    (string, double) GetResult(List<DailyCandle> candles)
     {
         // Объем последней свечи выше, чем у всех предыдущих
         var lastVolume = candles.Last().Volume;

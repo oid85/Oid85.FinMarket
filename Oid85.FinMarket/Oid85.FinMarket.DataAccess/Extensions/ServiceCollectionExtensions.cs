@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IBondCouponRepository, BondCouponRepository>();
         services.AddTransient<IDividendInfoRepository, DividendInfoRepository>();
         services.AddTransient<IAnalyseResultRepository, AnalyseResultRepository>();
-        services.AddTransient<ICandleRepository, CandleRepository>();
+        services.AddTransient<IDailyCandleRepository, DailyCandleRepository>();
         services.AddTransient<IHourlyCandleRepository, HourlyCandleRepository>();
         services.AddTransient<IInstrumentRepository, InstrumentRepository>();
         services.AddTransient<ISpreadRepository, SpreadRepository>();

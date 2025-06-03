@@ -6,11 +6,11 @@ using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class CandleRepository(
+public class DailyCandleRepository(
     FinMarketContext context) 
-    : ICandleRepository
+    : IDailyCandleRepository
 {
-    public async Task AddOrUpdateAsync(List<Candle> candles)
+    public async Task AddOrUpdateAsync(List<DailyCandle> candles)
     {
         var completedCandles = candles
             .Where(x => x.IsComplete).ToList();
@@ -18,22 +18,22 @@ public class CandleRepository(
         if (completedCandles is [])
             return;
 
-        var entities = new List<CandleEntity>();
+        var entities = new List<DailyCandleEntity>();
         
         foreach (var candle in completedCandles)
-            if (!await context.CandleEntities
+            if (!await context.DailyCandleEntities
                     .AnyAsync(x => 
                         x.InstrumentId == candle.InstrumentId
                         && x.Date == candle.Date))
                 entities.Add(DataAccessMapper.Map(candle));
 
-        await context.CandleEntities.AddRangeAsync(entities);
+        await context.DailyCandleEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
     
-    public async Task<Candle?> GetLastAsync(Guid instrumentId)
+    public async Task<DailyCandle?> GetLastAsync(Guid instrumentId)
     {
-        var entity = await context.CandleEntities
+        var entity = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .OrderByDescending(x => x.Date)
             .Take(1)
@@ -43,18 +43,18 @@ public class CandleRepository(
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
-    public async Task<List<Candle>> GetLastYearAsync(Guid instrumentId) =>
+    public async Task<List<DailyCandle>> GetLastYearAsync(Guid instrumentId) =>
         await GetLastYearsAsync(instrumentId, 1);
 
-    public async Task<List<Candle>> GetLastTwoYearsAsync(Guid instrumentId) =>
+    public async Task<List<DailyCandle>> GetLastTwoYearsAsync(Guid instrumentId) =>
         await GetLastYearsAsync(instrumentId, 2);
 
-    private async Task<List<Candle>> GetLastYearsAsync(Guid instrumentId, int years)
+    private async Task<List<DailyCandle>> GetLastYearsAsync(Guid instrumentId, int years)
     {
         var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1 * years));
         var to = DateOnly.FromDateTime(DateTime.Today);
         
-        var entities = await context.CandleEntities
+        var entities = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
                 x.Date >= from &&
@@ -66,9 +66,9 @@ public class CandleRepository(
         return entities.Count == 0 ? [] : entities.Select(DataAccessMapper.Map).ToList();
     }
 
-    public async Task<Candle?> GetAsync(Guid instrumentId, DateOnly date)
+    public async Task<DailyCandle?> GetAsync(Guid instrumentId, DateOnly date)
     {
-        var entity = await context.CandleEntities
+        var entity = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date == date)
             .AsNoTracking()
@@ -77,9 +77,9 @@ public class CandleRepository(
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
-    public async Task<List<Candle>> GetAsync(Guid instrumentId, DateOnly from, DateOnly to)
+    public async Task<List<DailyCandle>> GetAsync(Guid instrumentId, DateOnly from, DateOnly to)
     {
-        var entities = await context.CandleEntities
+        var entities = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
                 x.Date >= from &&
@@ -91,7 +91,7 @@ public class CandleRepository(
         return entities.Count == 0 ? [] : entities.Select(DataAccessMapper.Map).ToList();
     }
 
-    public async Task<List<Candle>> GetAsync(string ticker, DateOnly from, DateOnly to)
+    public async Task<List<DailyCandle>> GetAsync(string ticker, DateOnly from, DateOnly to)
     {
         var instrumentEntity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
@@ -99,7 +99,7 @@ public class CandleRepository(
         if (instrumentEntity is null)
             return [];
         
-        var entities = await context.CandleEntities
+        var entities = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentEntity.InstrumentId)
             .Where(x => 
                 x.Date >= from &&

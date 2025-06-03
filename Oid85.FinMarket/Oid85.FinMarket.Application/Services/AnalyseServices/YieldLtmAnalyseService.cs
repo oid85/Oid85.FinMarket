@@ -7,14 +7,14 @@ namespace Oid85.FinMarket.Application.Services.AnalyseServices;
 
 public class YieldLtmAnalyseService(
     ILogger logger,
-    ICandleRepository candleRepository,
+    IDailyCandleRepository dailyCandleRepository,
     IAnalyseResultRepository analyseResultRepository)
 {
     public async Task YieldLtmAnalyseAsync(Guid instrumentId)
     {
         try
         {
-            var candles = (await candleRepository.GetLastYearAsync(instrumentId))
+            var candles = (await dailyCandleRepository.GetLastYearAsync(instrumentId))
                 .Where(x => x.IsComplete)
                 .ToList();
 
@@ -59,7 +59,7 @@ public class YieldLtmAnalyseService(
         }
     }
     
-    (string, double) GetResult(List<Candle> candles)
+    (string, double) GetResult(List<DailyCandle> candles)
     {
         double firstPrice = candles.First().Close;
         double lastPrice = candles.Last().Close;

@@ -9,18 +9,18 @@ namespace Oid85.FinMarket.Application.Factories;
 
 public class DiagramDataFactory(
     IInstrumentRepository instrumentRepository,
-    ICandleRepository candleRepository,
+    IDailyCandleRepository dailyCandleRepository,
     IMultiplicatorRepository multiplicatorRepository) 
     : IDiagramDataFactory
 {
-    private async Task<Dictionary<Guid, List<Candle>>> CreateDailyDataDictionaryAsync(
+    private async Task<Dictionary<Guid, List<DailyCandle>>> CreateDailyDataDictionaryAsync(
         List<Guid> instrumentIds, DateOnly from, DateOnly to)
     {
-        var dictionary = new Dictionary<Guid, List<Candle>>();
+        var dictionary = new Dictionary<Guid, List<DailyCandle>>();
 
         foreach (var instrumentId in instrumentIds)
         {
-            var candles = await candleRepository.GetAsync(instrumentId, from, to);
+            var candles = await dailyCandleRepository.GetAsync(instrumentId, from, to);
             dictionary.Add(instrumentId, candles);
         }
 

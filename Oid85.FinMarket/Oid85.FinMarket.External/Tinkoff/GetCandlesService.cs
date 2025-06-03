@@ -5,7 +5,6 @@ using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
-using Candle = Oid85.FinMarket.Domain.Models.Candle;
 
 namespace Oid85.FinMarket.External.Tinkoff;
 
@@ -15,27 +14,27 @@ public class GetCandlesService(
 {
     private const int DelayInMilliseconds = 100;
     
-    public Task<List<Candle>> GetDailyCandlesAsync(
+    public Task<List<DailyCandle>> GetDailyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to) =>
         GetDailyCandlesAsync(
             instrumentId, 
             ConvertHelper.DateOnlyToTimestamp(from), 
             ConvertHelper.DateOnlyToTimestamp(to));
     
-    public Task<List<Candle>> GetDailyCandlesAsync(Guid instrumentId, int year) =>
+    public Task<List<DailyCandle>> GetDailyCandlesAsync(Guid instrumentId, int year) =>
         GetDailyCandlesAsync(
             instrumentId, 
             ConvertHelper.DateOnlyToTimestamp(new DateOnly(year, 1, 1)), 
             ConvertHelper.DateOnlyToTimestamp(new DateOnly(year, 12, 31)));
     
-    public Task<List<HourlyCandle>> GetHourlyCandlesAsync(
+    public Task<List<HourlyDailyCandle>> GetHourlyCandlesAsync(
         Guid instrumentId, DateOnly from, DateOnly to) =>
         GetHourlyCandlesAsync(
             instrumentId, 
             ConvertHelper.DateOnlyToTimestamp(from), 
             ConvertHelper.DateOnlyToTimestamp(to));
 
-    private async Task<List<Candle>> GetDailyCandlesAsync(
+    private async Task<List<DailyCandle>> GetDailyCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
     {
         await Task.Delay(DelayInMilliseconds);
@@ -51,7 +50,7 @@ public class GetCandlesService(
         return candles;
     }
 
-    private async Task<List<HourlyCandle>> GetHourlyCandlesAsync(
+    private async Task<List<HourlyDailyCandle>> GetHourlyCandlesAsync(
         Guid instrumentId, Timestamp from, Timestamp to)
     {
         await Task.Delay(DelayInMilliseconds);
