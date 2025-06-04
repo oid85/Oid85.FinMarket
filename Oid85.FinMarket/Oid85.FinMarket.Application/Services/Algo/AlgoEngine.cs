@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Cryptography;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
@@ -14,14 +15,15 @@ public class AlgoEngine(
     ILogger logger,
     IDailyCandleRepository dailyCandleRepository,
     IHourlyCandleRepository hourlyCandleRepository,
-    IResourceStoreService resourceStoreService)
+    IResourceStoreService resourceStoreService,
+    IServiceProvider serviceProvider)
 {
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
     public ConcurrentDictionary<string, List<Candle>> HourlyCandles { get; set; } = new();
-    public ConcurrentDictionary<Guid, List<Strategy>> Strategies { get; set; } = new();
+    public ConcurrentDictionary<Guid, Strategy> Strategies { get; set; } = new();
 
     private AlgoConfigResource _algoConfigResource = new();
-    private List<AlgoStrategyResource> _algoStrategyResource = new();
+    private List<AlgoStrategyResource> _algoStrategyResources = new();
     
     private bool _isOptimization;
     
@@ -34,11 +36,11 @@ public class AlgoEngine(
         
         // Читаем настройки из ресурсов
         _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        _algoStrategyResource = await resourceStoreService.GetAlgoStrategiesAsync();
+        _algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
         
         await InitDailyCandlesAsync();
         await InitHourlyCandlesAsync();
-        await InitStrategiesAsync();
+        InitStrategies();
     }
 
     /// <summary>
@@ -50,16 +52,20 @@ public class AlgoEngine(
         
         // Читаем настройки из ресурсов
         _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        _algoStrategyResource = await resourceStoreService.GetAlgoStrategiesAsync();
+        _algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
 
         await InitDailyCandlesAsync();
         await InitHourlyCandlesAsync();
-        await InitStrategiesAsync();
+        InitStrategies();
     }
 
-    private async Task InitStrategiesAsync()
+    private void InitStrategies()
     {
-        
+        foreach (var algoStrategyResource in _algoStrategyResources)
+        {
+            var strategy = serviceProvider.GetRequiredKeyedService<Strategy>(algoStrategyResource.Name);
+            Strategies.TryAdd(algoStrategyResource.Id, strategy);
+        }
     }
 
     private async Task InitDailyCandlesAsync()

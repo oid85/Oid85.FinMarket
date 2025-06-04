@@ -9,12 +9,14 @@ public class BacktestService(
     ILogger logger,
     IDailyCandleRepository dailyCandleRepository,
     IHourlyCandleRepository hourlyCandleRepository,
-    IResourceStoreService resourceStoreService) 
+    IResourceStoreService resourceStoreService,
+    IServiceProvider serviceProvider) 
     : AlgoEngine(
         logger,
         dailyCandleRepository, 
         hourlyCandleRepository,
-        resourceStoreService), 
+        resourceStoreService,
+        serviceProvider), 
         IBacktestService
 {
     public async Task<bool> BacktestAsync()

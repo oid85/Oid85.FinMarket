@@ -9,12 +9,14 @@ public class OptimizationService(
     ILogger logger,
     IDailyCandleRepository dailyCandleRepository,
     IHourlyCandleRepository hourlyCandleRepository,
-    IResourceStoreService resourceStoreService) 
+    IResourceStoreService resourceStoreService,
+    IServiceProvider serviceProvider) 
     : AlgoEngine(
         logger,
         dailyCandleRepository,
         hourlyCandleRepository,
-        resourceStoreService), 
+        resourceStoreService,
+        serviceProvider), 
         IOptimizationService
 {
     public async Task<bool> OptimizeAsync()
