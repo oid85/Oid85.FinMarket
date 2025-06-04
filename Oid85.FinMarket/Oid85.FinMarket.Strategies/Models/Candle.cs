@@ -35,5 +35,5 @@ public class Candle
     /// <summary>
     /// Дата
     /// </summary>
-    public DateTime Date { get; set; }
+    public DateTime DateTime { get; set; }
 }

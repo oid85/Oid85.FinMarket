@@ -8,4 +8,9 @@
     <PackageReference Include="NLog.Targets.Seq" />
     <PackageReference Include="Tinkoff.InvestApi" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="alglibnet2">
+      <HintPath>..\libs\alglibnet2.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

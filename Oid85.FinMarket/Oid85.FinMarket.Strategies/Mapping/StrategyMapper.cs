@@ -13,7 +13,7 @@ public static class StrategyMapper
             High = model.High,
             Low = model.Low,
             Volume = model.Volume,
-            Date = new DateTime(model.Date, TimeOnly.MinValue)
+            DateTime = new DateTime(model.Date, TimeOnly.MinValue)
         };    
     
     public static Candle Map(HourlyCandle model) =>
@@ -24,6 +24,6 @@ public static class StrategyMapper
             High = model.High,
             Low = model.Low,
             Volume = model.Volume,
-            Date = new DateTime(model.Date, model.Time)
+            DateTime = new DateTime(model.Date, model.Time)
         };     
 }
