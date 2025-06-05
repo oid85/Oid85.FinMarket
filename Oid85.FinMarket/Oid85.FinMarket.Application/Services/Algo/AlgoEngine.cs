@@ -20,7 +20,7 @@ public class AlgoEngine(
 {
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
     public ConcurrentDictionary<string, List<Candle>> HourlyCandles { get; set; } = new();
-    public ConcurrentDictionary<Guid, Strategy> Strategies { get; set; } = new();
+    public ConcurrentDictionary<Guid, Strategy> StrategyDictionary { get; set; } = new();
 
     private AlgoConfigResource _algoConfigResource = new();
     private List<AlgoStrategyResource> _algoStrategyResources = new();
@@ -64,7 +64,7 @@ public class AlgoEngine(
         foreach (var algoStrategyResource in _algoStrategyResources)
         {
             var strategy = serviceProvider.GetRequiredKeyedService<Strategy>(algoStrategyResource.Name);
-            Strategies.TryAdd(algoStrategyResource.Id, strategy);
+            StrategyDictionary.TryAdd(algoStrategyResource.Id, strategy);
         }
     }
 
