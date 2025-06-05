@@ -4,7 +4,7 @@ using WealthLab.Indicators;
 
 namespace Oid85.FinMarket.WealthLab.Centaur.Indicators
 {
-    public class VChannelUpHelper : IndicatorHelper
+    public class VolatilityChannelUpHelper : IndicatorHelper
     {
         public override string Description { get { return @"Volatility Channel Up"; } }
         public override Type IndicatorType { get { return typeof(VChannelUp); } }

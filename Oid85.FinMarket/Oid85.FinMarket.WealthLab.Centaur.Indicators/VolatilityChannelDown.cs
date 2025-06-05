@@ -17,7 +17,7 @@ namespace Oid85.FinMarket.WealthLab.Centaur.Indicators
         public override string URL { get { return @""; } }
     }
 
-    public class VChannelDown : DataSeries
+    public class VolatilityChannelDown : DataSeries
     {
         public VChannelDown(Bars bars, int period, double koeff, string description)
             : base(bars, description)
