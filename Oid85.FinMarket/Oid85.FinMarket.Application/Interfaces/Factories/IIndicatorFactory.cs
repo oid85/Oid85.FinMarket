@@ -4,5 +4,5 @@ public interface IIndicatorFactory
 {
     List<double> Highest(List<double> values, int period);
     List<double> Lowest(List<double> values, int period);
-    List<double> Ema(List<double> values, int period);
+    List<double> Sma(List<double> values, int period);
 }

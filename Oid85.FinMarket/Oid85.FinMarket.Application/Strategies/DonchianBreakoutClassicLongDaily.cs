@@ -30,10 +30,10 @@ namespace Oid85.FinMarket.Application.Strategies
 
             // Сглаживание
             int smoothPeriod = 5;
-            highLevelEntry = indicatorFactory.Ema(highLevelEntry, smoothPeriod);
-            lowLevelEntry = indicatorFactory.Ema(lowLevelEntry, smoothPeriod);
-            highLevelExit = indicatorFactory.Ema(highLevelExit, smoothPeriod);
-            lowLevelExit = indicatorFactory.Ema(lowLevelExit, smoothPeriod);
+            highLevelEntry = indicatorFactory.Sma(highLevelEntry, smoothPeriod);
+            lowLevelEntry = indicatorFactory.Sma(lowLevelEntry, smoothPeriod);
+            highLevelExit = indicatorFactory.Sma(highLevelExit, smoothPeriod);
+            lowLevelExit = indicatorFactory.Sma(lowLevelExit, smoothPeriod);
 
             // Сдвиг вправо на одну свечу
             highLevelEntry = highLevelEntry.Shift(1);

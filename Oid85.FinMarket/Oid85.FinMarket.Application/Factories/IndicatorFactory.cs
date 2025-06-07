@@ -10,8 +10,6 @@ public class IndicatorFactory : IIndicatorFactory
     public List<double> Lowest(List<double> values, int period) => 
         values.Select((_, i) => i - period < 0 ? 0.0 : values.Skip(i - period).Take(period + 1).Min()).ToList();
 
-    public List<double> Ema(List<double> values, int period)
-    {
-        throw new NotImplementedException();
-    }
+    public List<double> Sma(List<double> values, int period) => 
+        values.Select((_, i) => i - period < 0 ? 0.0 : values.Skip(i - period).Take(period + 1).Average()).ToList();
 }
