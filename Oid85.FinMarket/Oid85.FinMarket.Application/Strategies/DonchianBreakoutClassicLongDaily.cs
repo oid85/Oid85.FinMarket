@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Models;
+using Oid85.FinMarket.Application.Models.Algo;
 using Oid85.FinMarket.Common.MathExtensions;
 
 namespace Oid85.FinMarket.Application.Strategies

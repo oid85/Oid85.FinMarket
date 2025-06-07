@@ -50,10 +50,16 @@ public class OptimizationService(
                     _ => []
                 };
 
+                if (strategy.Candles is [])
+                    continue;
+                
                 var parameterSets = GetParameterSets(algoStrategyResource.Params);
 
                 foreach (var parameterSet in parameterSets)
                 {
+                    if (parameterSet.Count == 0) 
+                        continue;
+                    
                     strategy.Parameters = parameterSet;
                     strategy.Execute();
                 }
@@ -65,16 +71,45 @@ public class OptimizationService(
 
     private static List<Dictionary<string, int>> GetParameterSets(List<StrategyParam> strategyParams)
     {
+        var result = new List<Dictionary<string, int>>();
+        
         switch (strategyParams.Count)
         {
             case 1:
-                break;
+                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step) 
+                    result.Add(
+                        new Dictionary<string, int>
+                        {
+                            [strategyParams[0].Name] = paramValue1
+                        });
+
+                return result;
             
             case 2:
-                break;
+                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step) 
+                for (int paramValue2 = strategyParams[1].Min; paramValue2 <= strategyParams[1].Max; paramValue2 += strategyParams[1].Step) 
+                    result.Add(
+                        new Dictionary<string, int>
+                        {
+                            [strategyParams[0].Name] = paramValue1,
+                            [strategyParams[1].Name] = paramValue2
+                        });
+
+                return result;
             
             case 3:
-                break;            
+                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step) 
+                for (int paramValue2 = strategyParams[1].Min; paramValue2 <= strategyParams[1].Max; paramValue2 += strategyParams[1].Step)
+                for (int paramValue3 = strategyParams[2].Min; paramValue3 <= strategyParams[2].Max; paramValue3 += strategyParams[2].Step)
+                    result.Add(
+                        new Dictionary<string, int>
+                        {
+                            [strategyParams[0].Name] = paramValue1,
+                            [strategyParams[1].Name] = paramValue2,
+                            [strategyParams[2].Name] = paramValue3
+                        });
+                
+                return result;     
         }
 
         throw new Exception("Количество параметров больше 3. Оптимизация выполняться не будет");

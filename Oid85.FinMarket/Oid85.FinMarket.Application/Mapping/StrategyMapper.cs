@@ -1,4 +1,5 @@
 ﻿using Oid85.FinMarket.Application.Models;
+using Oid85.FinMarket.Application.Models.Algo;
 using Oid85.FinMarket.Domain.Models;
 
 namespace Oid85.FinMarket.Application.Mapping;

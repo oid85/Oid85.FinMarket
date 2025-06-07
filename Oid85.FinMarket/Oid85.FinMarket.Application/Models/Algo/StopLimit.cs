@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Application.Models;
+﻿namespace Oid85.FinMarket.Application.Models.Algo;
 
 public class StopLimit
 {
