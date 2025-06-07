@@ -10,11 +10,13 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.Algo;
 using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
+using Oid85.FinMarket.Application.Models;
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Application.Services.Algo;
 using Oid85.FinMarket.Application.Services.AnalyseServices;
 using Oid85.FinMarket.Application.Services.DiagramServices;
 using Oid85.FinMarket.Application.Services.ReportServices;
+using Oid85.FinMarket.Application.Strategies;
 using Oid85.FinMarket.Common.KnownConstants;
 
 namespace Oid85.FinMarket.Application.Extensions;
@@ -65,6 +67,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();
         services.AddTransient<IDiagramDataFactory, DiagramDataFactory>();
+        services.AddTransient<IIndicatorFactory, IndicatorFactory>();
+        
+        services.AddKeyedTransient<Strategy, DonchianBreakoutClassicLongDaily>("DonchianBreakoutClassicLongDaily");
     }
     
     public static async Task RegisterHangfireJobs(

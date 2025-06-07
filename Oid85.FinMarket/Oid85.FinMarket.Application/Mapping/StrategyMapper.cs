@@ -1,7 +1,7 @@
-﻿using Oid85.FinMarket.Domain.Models;
-using Oid85.FinMarket.Strategies.Models;
+﻿using Oid85.FinMarket.Application.Models;
+using Oid85.FinMarket.Domain.Models;
 
-namespace Oid85.FinMarket.Strategies.Mapping;
+namespace Oid85.FinMarket.Application.Mapping;
 
 public static class StrategyMapper
 {

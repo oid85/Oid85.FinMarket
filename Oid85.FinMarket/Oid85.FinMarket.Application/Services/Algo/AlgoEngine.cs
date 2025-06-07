@@ -4,10 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Mapping;
+using Oid85.FinMarket.Application.Models;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
-using Oid85.FinMarket.Strategies.Mapping;
-using Oid85.FinMarket.Strategies.Models;
 
 namespace Oid85.FinMarket.Application.Services.Algo;
 

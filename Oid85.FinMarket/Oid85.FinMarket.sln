@@ -15,17 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.Application
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.DataAccess", "Oid85.FinMarket.DataAccess\Oid85.FinMarket.DataAccess.csproj", "{A31976AA-9586-4A6F-8C52-ADF43E74C911}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.Strategies", "Oid85.FinMarket.Strategies\Oid85.FinMarket.Strategies.csproj", "{F7718B75-EB6A-46C3-92E0-88A56CEA5EC9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.WealthLab.Centaur.Indicators", "Oid85.FinMarket.WealthLab.Centaur.Indicators\Oid85.FinMarket.WealthLab.Centaur.Indicators.csproj", "{FDE28C00-F330-4B68-A24F-E681F1751ADD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{803A2CE6-5952-46B7-9DA0-E79E6C0C4330}"
-	ProjectSection(SolutionItems) = preProject
-		libs\alglibnet2.dll = libs\alglibnet2.dll
-		libs\WealthLab.dll = libs\WealthLab.dll
-		libs\WealthLab.Indicators.Community.dll = libs\WealthLab.Indicators.Community.dll
-		libs\WealthLab.Indicators.dll = libs\WealthLab.Indicators.dll
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Oid85.FinMarket.Application", "Test.Oid85.FinMarket.Application\Test.Oid85.FinMarket.Application.csproj", "{9176ED4C-9ACF-484A-A63C-76FC3B900114}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,14 +47,10 @@ Global
 		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A31976AA-9586-4A6F-8C52-ADF43E74C911}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7718B75-EB6A-46C3-92E0-88A56CEA5EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7718B75-EB6A-46C3-92E0-88A56CEA5EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7718B75-EB6A-46C3-92E0-88A56CEA5EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7718B75-EB6A-46C3-92E0-88A56CEA5EC9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDE28C00-F330-4B68-A24F-E681F1751ADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDE28C00-F330-4B68-A24F-E681F1751ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDE28C00-F330-4B68-A24F-E681F1751ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDE28C00-F330-4B68-A24F-E681F1751ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9176ED4C-9ACF-484A-A63C-76FC3B900114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9176ED4C-9ACF-484A-A63C-76FC3B900114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9176ED4C-9ACF-484A-A63C-76FC3B900114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9176ED4C-9ACF-484A-A63C-76FC3B900114}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

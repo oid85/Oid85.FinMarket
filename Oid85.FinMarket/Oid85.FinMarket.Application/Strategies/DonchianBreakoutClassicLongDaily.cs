@@ -1,11 +1,10 @@
-﻿using Oid85.FinMarket.Common.MathExtensions;
-using Oid85.FinMarket.Strategies.Indicators;
-using Oid85.FinMarket.Strategies.Indicators.Implementations;
-using Oid85.FinMarket.Strategies.Models;
+﻿using Oid85.FinMarket.Application.Interfaces.Factories;
+using Oid85.FinMarket.Application.Models;
+using Oid85.FinMarket.Common.MathExtensions;
 
-namespace Oid85.FinMarket.Strategies.Algorithms
+namespace Oid85.FinMarket.Application.Strategies
 {
-    public class DonchianBreakoutClassicLongDaily : Strategy
+    public class DonchianBreakoutClassicLongDaily(IIndicatorFactory indicatorFactory) : Strategy
     {
         public override void Execute()
         {
@@ -18,23 +17,23 @@ namespace Oid85.FinMarket.Strategies.Algorithms
             int periodLowExit = Parameters["PeriodExit"];
 
             // Цены для построения канала
-            var priceForChannelHighEntry = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
-            var priceForChannelHighExit = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
-            var priceForChannelLowEntry = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
-            var priceForChannelLowExit = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
+            List<double> priceForChannelHighEntry = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
+            List<double> priceForChannelHighExit = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
+            List<double> priceForChannelLowEntry = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
+            List<double> priceForChannelLowExit = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
 
             // Построение каналов
-            var highLevelEntry = new HighestBand(priceForChannelHighEntry, periodHighEntry).Values;
-            var lowLevelEntry = new LowestBand(priceForChannelHighExit, periodLowEntry).Values;
-            var highLevelExit = new HighestBand(priceForChannelLowEntry, periodHighExit).Values;
-            var lowLevelExit = new LowestBand(priceForChannelLowExit, periodLowExit).Values;
+            List<double> highLevelEntry = indicatorFactory.Highest(priceForChannelHighEntry, periodHighEntry);
+            List<double> lowLevelEntry = indicatorFactory.Lowest(priceForChannelHighExit, periodLowEntry);
+            List<double> highLevelExit = indicatorFactory.Highest(priceForChannelLowEntry, periodHighExit);
+            List<double> lowLevelExit = indicatorFactory.Lowest(priceForChannelLowExit, periodLowExit);
 
             // Сглаживание
             int smoothPeriod = 5;
-            highLevelEntry = new Ema(highLevelEntry, smoothPeriod).Values;
-            lowLevelEntry = new Ema(lowLevelEntry, smoothPeriod).Values;
-            highLevelExit = new Ema(highLevelExit, smoothPeriod).Values;
-            lowLevelExit = new Ema(lowLevelExit, smoothPeriod).Values;
+            highLevelEntry = indicatorFactory.Ema(highLevelEntry, smoothPeriod);
+            lowLevelEntry = indicatorFactory.Ema(lowLevelEntry, smoothPeriod);
+            highLevelExit = indicatorFactory.Ema(highLevelExit, smoothPeriod);
+            lowLevelExit = indicatorFactory.Ema(lowLevelExit, smoothPeriod);
 
             // Сдвиг вправо на одну свечу
             highLevelEntry = highLevelEntry.Shift(1);

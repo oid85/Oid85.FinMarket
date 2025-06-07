@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Strategies.Models;
+﻿namespace Oid85.FinMarket.Application.Models;
 
 public class Trade
 {

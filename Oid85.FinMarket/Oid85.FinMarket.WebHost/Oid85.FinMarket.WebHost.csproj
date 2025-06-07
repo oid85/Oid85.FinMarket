@@ -29,4 +29,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Oid85.FinMarket.Strategies">
+      <HintPath>..\Test.Oid85.FinMarket.Application\bin\Debug\net8.0\Oid85.FinMarket.Strategies.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
