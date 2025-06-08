@@ -76,7 +76,7 @@ public class AlgoEngine(
         foreach (string ticker in _algoConfigResource.Tickers)
         {
             var candles = (await dailyCandleRepository.GetAsync(ticker, dates.From, dates.To))
-                .Select(StrategyMapper.Map).ToList();
+                .Select(AlgoMapper.Map).ToList();
 
             for (int i = 0; i < candles.Count; i++)
                 candles[i].Index = i;
@@ -92,7 +92,7 @@ public class AlgoEngine(
         foreach (string ticker in _algoConfigResource.Tickers)
         {
             var candles = (await hourlyCandleRepository.GetAsync(ticker, dates.From, dates.To))
-                .Select(StrategyMapper.Map).ToList();
+                .Select(AlgoMapper.Map).ToList();
 
             for (int i = 0; i < candles.Count; i++)
                 candles[i].Index = i;            

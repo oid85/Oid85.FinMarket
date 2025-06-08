@@ -7,6 +7,18 @@ namespace Oid85.FinMarket.DataAccess.Entities;
 public class OptimizationResultEntity : AuditableEntity
 {
     /// <summary>
+    /// Начало периода
+    /// </summary>
+    [Column("start_date", TypeName = "date")]
+    public DateOnly StartDate { get; set; }
+    
+    /// <summary>
+    /// Конец периода
+    /// </summary>
+    [Column("end_date", TypeName = "date")]
+    public DateOnly EndDate { get; set; }
+    
+    /// <summary>
     /// Тикер инструмента
     /// </summary>
     [Column("ticker"), MaxLength(20)]
@@ -51,50 +63,14 @@ public class OptimizationResultEntity : AuditableEntity
     /// <summary>
     /// Количество сделок
     /// </summary>
-    [Column("total")]
-    public int Total { get; set; }
+    [Column("number_positions")]
+    public int NumberPositions { get; set; }
     
     /// <summary>
-    /// Количество открытых сделок
+    /// Текущая позиция
     /// </summary>
-    [Column("total_open")]
-    public int TotalOpen { get; set; }
-    
-    /// <summary>
-    /// Количество закрытых сделок
-    /// </summary>
-    [Column("total_closed")]
-    public int TotalClosed { get; set; }    
-    
-    /// <summary>
-    /// Макс. послед. убыточных сделок
-    /// </summary>
-    [Column("streak_won_longest")]
-    public int StreakWonLongest { get; set; }
-    
-    /// <summary>
-    /// Макс. послед. прибыльных сделок
-    /// </summary>
-    [Column("streak_lost_longest")]
-    public int StreakLostLongest { get; set; }    
-    
-    /// <summary>
-    /// Прибыль
-    /// </summary>
-    [Column("pnl_net_total")]
-    public double PnlNetTotal { get; set; } 
-    
-    /// <summary>
-    /// Прибыль средняя
-    /// </summary>
-    [Column("pnl_net_average")]
-    public double PnlNetAverage { get; set; } 
-    
-    /// <summary>
-    /// Максимальная просадка, %
-    /// </summary>
-    [Column("max_drawdown_percent")]
-    public double MaxDrawdownPercent { get; set; }
+    [Column("current_position")]
+    public int CurrentPosition { get; set; }    
     
     /// <summary>
     /// Profit Factor
@@ -109,10 +85,58 @@ public class OptimizationResultEntity : AuditableEntity
     public double RecoveryFactor { get; set; }
     
     /// <summary>
-    /// Коэффициент Шарпа
+    /// Net Profit
     /// </summary>
-    [Column("sharp_ratio")]
-    public double SharpRatio { get; set; }
+    [Column("net_profit")]
+    public double NetProfit { get; set; }
+    
+    /// <summary>
+    /// Average Profit
+    /// </summary>
+    [Column("average_profit")]
+    public double AverageProfit { get; set; }
+    
+    /// <summary>
+    /// Average Profit Percent
+    /// </summary>
+    [Column("average_profit_percent")]
+    public double AverageProfitPercent { get; set; }
+    
+    /// <summary>
+    /// Max Drawdown
+    /// </summary>
+    [Column("max_drawdown")]
+    public double MaxDrawdown { get; set; }
+    
+    /// <summary>
+    /// MaxDrawdownPercent
+    /// </summary>
+    [Column("max_drawdown_percent")]
+    public double MaxDrawdownPercent { get; set; }
+    
+    /// <summary>
+    /// Winning Positions
+    /// </summary>
+    [Column("winning_positions")]
+    public int WinningPositions { get; set; }
+    
+    /// <summary>
+    /// Winning Trades Percent
+    /// </summary>
+    [Column("winning_trades_percent")]
+    public double WinningTradesPercent { get; set; }
+    
+    /// <summary>
+    /// Start Money
+    /// </summary>
+    [Column("start_money")]
+    public double StartMoney { get; set; }
+    
+    /// <summary>
+    /// End Money
+    /// </summary>
+    [Column("end_money")]
+    public double EndMoney { get; set; }
     
     /// <summary>
     /// Доходность всего, %

@@ -14,7 +14,7 @@ public class Position
     public bool IsShort { get; set; }
     public int Quantity { get; set; }
     public double Profit { get; set; }
-    public double ProfitPct { get; set; }
+    public double ProfitPercent { get; set; }
     public double TotalProfit { get; set; }
     public double TotalProfitPct { get; set; }
 

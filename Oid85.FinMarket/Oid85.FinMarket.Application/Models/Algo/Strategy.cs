@@ -123,7 +123,7 @@ public class Strategy
                     EntryPrice = entryPrice,
                     ExitPrice = exitPrice,
                     Profit = profit,
-                    ProfitPct = profitPct,
+                    ProfitPercent = profitPct,
                     EntryDateTime = entryDateTime,
                     ExitDateTime = exitDateTime,
                     IsActive = isActive,
@@ -134,13 +134,13 @@ public class Strategy
             }
 
             positions[0].TotalProfit = positions[0].Profit;
-            positions[0].TotalProfitPct = positions[0].ProfitPct;
+            positions[0].TotalProfitPct = positions[0].ProfitPercent;
 
             // Расчет общей прибыли
             for (int i = 1; i < positions.Count; i++)
             {
                 positions[i].TotalProfit = positions[i - 1].TotalProfit + positions[i].Profit;
-                positions[i].TotalProfitPct = positions[i - 1].TotalProfitPct + positions[i].ProfitPct;
+                positions[i].TotalProfitPct = positions[i - 1].TotalProfitPct + positions[i].ProfitPercent;
             }
 
             return positions;
@@ -321,7 +321,7 @@ public class Strategy
 
     public double AverageProfit => Positions.Select(x => x.Profit).Average();
 
-    public double AveragePercent => Positions.Select(x => x.ProfitPct).Average();
+    public double AverageProfitPercent => Positions.Select(x => x.ProfitPercent).Average();
 
     public double Drawdown => DrawdownCurve.Last().Item2;
 
