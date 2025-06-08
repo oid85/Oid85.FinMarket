@@ -5,7 +5,7 @@ namespace Oid85.FinMarket.External.ResourceStore.Models.Algo;
 /// <summary>
 /// Параметр оптимизации стратегии
 /// </summary>
-public class StrategyParam
+public class StrategyParamResource
 {
     /// <summary>
     /// Наименование параметра

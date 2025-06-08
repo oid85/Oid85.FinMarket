@@ -14,14 +14,14 @@ public class FilterBondsResource
     public List<string> Currencies { get; set; } = new();
     
     [JsonPropertyName("riskLevels")]
-    public RiskLevels RiskLevels { get; set; } = new();
+    public RiskLevelsResource RiskLevelsResource { get; set; } = new();
     
     [JsonPropertyName("yield")]
-    public Range<double> Yield { get; set; } = new();
+    public RangeResource<double> Yield { get; set; } = new();
     
     [JsonPropertyName("yearsToMaturity")]
-    public Range<int> YearsToMaturity { get; set; } = new();
+    public RangeResource<int> YearsToMaturity { get; set; } = new();
     
     [JsonPropertyName("price")]
-    public Range<double> Price { get; set; } = new();
+    public RangeResource<double> Price { get; set; } = new();
 }

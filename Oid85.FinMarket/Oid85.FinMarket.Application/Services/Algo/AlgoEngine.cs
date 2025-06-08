@@ -111,18 +111,18 @@ public class AlgoEngine(
         if (_isOptimization)
         {
             from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.DailyStabilizationPeriodInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.DailyStabilizationPeriodInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
             
-            to = today.AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+            to = today.AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
         }
 
         else
         {
             from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.DailyStabilizationPeriodInDays);
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.DailyStabilizationPeriodInDays);
             
             to = today;
         }
@@ -140,18 +140,18 @@ public class AlgoEngine(
         if (_isOptimization)
         {
             from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.HourlyStabilizationPeriodInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.HourlyStabilizationPeriodInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
             
-            to = today.AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestShiftInDays);
+            to = today.AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
         }
 
         else
         {
             from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfig.HourlyStabilizationPeriodInDays);
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.HourlyStabilizationPeriodInDays);
             
             to = today;
         }

@@ -5,7 +5,7 @@ namespace Oid85.FinMarket.External.ResourceStore.Models.Algo;
 /// <summary>
 /// Настройки управления капиталом
 /// </summary>
-public class MoneyManagement
+public class MoneyManagementResource
 {
     /// <summary>
     /// Выделенный стратегии капитал

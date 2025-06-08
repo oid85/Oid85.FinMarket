@@ -5,7 +5,7 @@ namespace Oid85.FinMarket.External.ResourceStore.Models.Algo;
 /// <summary>
 /// Фильтр результатов оптимизации
 /// </summary>
-public class OptimizationResultFilter
+public class OptimizationResultFilterResource
 {
     /// <summary>
     /// Критерий по фактору прибыли

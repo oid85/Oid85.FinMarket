@@ -5,7 +5,7 @@ namespace Oid85.FinMarket.External.ResourceStore.Models.Algo;
 /// <summary>
 /// Настройки периодов бэктеста и оптимизации
 /// </summary>
-public class PeriodConfig
+public class PeriodConfigResource
 {
     /// <summary>
     /// Период стабилизации в свечах

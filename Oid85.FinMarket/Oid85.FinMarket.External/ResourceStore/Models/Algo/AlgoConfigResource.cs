@@ -11,25 +11,25 @@ public class AlgoConfigResource
     /// Настройки периодов бэктеста и оптимизации
     /// </summary>
     [JsonPropertyName("periodConfig")]
-    public PeriodConfig PeriodConfig { get; set; } = new();    
+    public PeriodConfigResource PeriodConfigResource { get; set; } = new();    
     
     /// <summary>
     /// Настройки управления капиталом
     /// </summary>
     [JsonPropertyName("moneyManagement")]
-    public MoneyManagement MoneyManagement { get; set; } = new();   
+    public MoneyManagementResource MoneyManagementResource { get; set; } = new();   
     
     /// <summary>
     /// Фильтр результатов оптимизации
     /// </summary>
     [JsonPropertyName("optimizationResultFilter")]
-    public OptimizationResultFilter OptimizationResultFilter { get; set; } = new();
+    public OptimizationResultFilterResource OptimizationResultFilterResource { get; set; } = new();
     
     /// <summary>
     /// Фильтр результатов бэктеста
     /// </summary>
     [JsonPropertyName("backtestResultFilter")]
-    public BacktestResultFilter BacktestResultFilter { get; set; } = new();
+    public BacktestResultFilterResource BacktestResultFilterResource { get; set; } = new();
     
     /// <summary>
     /// Список тикеров

@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.External.ResourceStore.Models;
 
-public class RiskLevels
+public class RiskLevelsResource
 {
     [JsonPropertyName("low")]
     public bool Low { get; set; }

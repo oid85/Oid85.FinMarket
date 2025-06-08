@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.External.ResourceStore.Models;
 
-public class Range<T>
+public class RangeResource<T>
 {
     [JsonPropertyName("max")]
     public T? Max { get; set; }

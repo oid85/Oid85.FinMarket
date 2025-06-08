@@ -41,5 +41,5 @@ public class AlgoStrategyResource
     /// Параметры стратегии
     /// </summary>
     [JsonPropertyName("params")]
-    public List<StrategyParam> Params { get; set; } = new();
+    public List<StrategyParamResource> Params { get; set; } = new();
 }

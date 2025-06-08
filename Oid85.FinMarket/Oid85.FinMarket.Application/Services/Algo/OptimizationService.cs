@@ -55,7 +55,7 @@ public class OptimizationService(
                 if (strategy.Candles is [])
                     continue;
 
-                strategy.StartMoney = algoConfigResource.MoneyManagement.Money;
+                strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
                 
                 var parameterSets = GetParameterSets(algoStrategyResource.Params);
 
@@ -78,7 +78,7 @@ public class OptimizationService(
         return true;
     }
 
-    private static List<Dictionary<string, int>> GetParameterSets(List<StrategyParam> strategyParams)
+    private static List<Dictionary<string, int>> GetParameterSets(List<StrategyParamResource> strategyParams)
     {
         var result = new List<Dictionary<string, int>>();
         

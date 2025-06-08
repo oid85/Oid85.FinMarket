@@ -195,10 +195,10 @@ public class TickerListUtilService(
                 x.MaturityDate >= from && 
                 x.MaturityDate <= to)
             .Where(x => 
-                (x.RiskLevel == 0 && filter.RiskLevels.Low) || 
-                (x.RiskLevel == 1 && filter.RiskLevels.Middle) || 
-                (x.RiskLevel == 2 && filter.RiskLevels.High) || 
-                (x.RiskLevel == 3 && filter.RiskLevels.VeryHigh))
+                (x.RiskLevel == 0 && filter.RiskLevelsResource.Low) || 
+                (x.RiskLevel == 1 && filter.RiskLevelsResource.Middle) || 
+                (x.RiskLevel == 2 && filter.RiskLevelsResource.High) || 
+                (x.RiskLevel == 3 && filter.RiskLevelsResource.VeryHigh))
             .Where(x => 
                 x.LastPrice >= filter.Price.Min && 
                 x.LastPrice <= filter.Price.Max)
