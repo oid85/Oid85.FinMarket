@@ -1,8 +1,7 @@
-﻿using Oid85.FinMarket.Application.Models;
-using Oid85.FinMarket.Application.Models.Algo;
-using Oid85.FinMarket.Domain.Models;
+﻿using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Domain.Models.Algo;
 
-namespace Oid85.FinMarket.Application.Mapping;
+namespace Oid85.FinMarket.Domain.Mapping;
 
 public static class AlgoMapper
 {

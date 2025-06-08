@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Application.Models.Algo;
+﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
 public class Strategy
 {
@@ -335,9 +335,9 @@ public class Strategy
 
     public double WinningTradesPercent => (double) WinningPositions / (double) NumberPositions * 100.0;    
     
-    public double StartMoney => EqiutyCurve.Count == 0 ? 0.0 : EqiutyCurve.First().Item2;
+    public double StartMoney { get; set; }
 
-    public double EndMoney => EqiutyCurve.Count == 0 ? 0.0 : EqiutyCurve.Last().Item2;
+    public double EndMoney => EqiutyCurve.Count == 0 ? StartMoney : EqiutyCurve.Last().Item2;
 
     public virtual void Execute()
     {

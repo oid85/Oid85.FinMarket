@@ -11,7 +11,6 @@ using Oid85.FinMarket.Application.Interfaces.Services.Algo;
 using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models;
-using Oid85.FinMarket.Application.Models.Algo;
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Application.Services.Algo;
 using Oid85.FinMarket.Application.Services.AnalyseServices;
@@ -19,6 +18,7 @@ using Oid85.FinMarket.Application.Services.DiagramServices;
 using Oid85.FinMarket.Application.Services.ReportServices;
 using Oid85.FinMarket.Application.Strategies;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Extensions;
 

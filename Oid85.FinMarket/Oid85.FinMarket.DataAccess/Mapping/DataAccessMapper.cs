@@ -1,10 +1,125 @@
 ﻿using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.DataAccess.Mapping;
 
 public static class DataAccessMapper
 {
+    public static OptimizationResultEntity Map(OptimizationResult model) =>
+        new()
+        {
+            StartDate = model.StartDate,
+            EndDate = model.EndDate,
+            Ticker = model.Ticker,
+            Timeframe = model.Timeframe,
+            StrategyId = model.StrategyId,
+            StrategyDescription = model.StrategyDescription,
+            StrategyParams = model.StrategyParams,
+            StrategyParamsHash = model.StrategyParamsHash,
+            NumberPositions = model.NumberPositions,
+            CurrentPosition = model.CurrentPosition,
+            ProfitFactor = model.ProfitFactor,
+            RecoveryFactor = model.RecoveryFactor,
+            NetProfit = model.NetProfit,
+            AverageProfit = model.AverageProfit,
+            AverageProfitPercent = model.AverageProfitPercent,
+            MaxDrawdown = model.MaxDrawdown,
+            MaxDrawdownPercent = model.MaxDrawdownPercent,
+            WinningPositions = model.WinningPositions,
+            WinningTradesPercent = model.WinningTradesPercent,
+            StartMoney = model.StartMoney,
+            EndMoney = model.EndMoney,
+            TotalReturn = model.TotalReturn,
+            AnnualYieldReturn = model.AnnualYieldReturn
+        };
+    
+    public static OptimizationResult Map(OptimizationResultEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            StartDate = entity.StartDate,
+            EndDate = entity.EndDate,
+            Ticker = entity.Ticker,
+            Timeframe = entity.Timeframe,
+            StrategyId = entity.StrategyId,
+            StrategyDescription = entity.StrategyDescription,
+            StrategyParams = entity.StrategyParams,
+            StrategyParamsHash = entity.StrategyParamsHash,
+            NumberPositions = entity.NumberPositions,
+            CurrentPosition = entity.CurrentPosition,
+            ProfitFactor = entity.ProfitFactor,
+            RecoveryFactor = entity.RecoveryFactor,
+            NetProfit = entity.NetProfit,
+            AverageProfit = entity.AverageProfit,
+            AverageProfitPercent = entity.AverageProfitPercent,
+            MaxDrawdown = entity.MaxDrawdown,
+            MaxDrawdownPercent = entity.MaxDrawdownPercent,
+            WinningPositions = entity.WinningPositions,
+            WinningTradesPercent = entity.WinningTradesPercent,
+            StartMoney = entity.StartMoney,
+            EndMoney = entity.EndMoney,
+            TotalReturn = entity.TotalReturn,
+            AnnualYieldReturn = entity.AnnualYieldReturn
+        };    
+    
+    public static BacktestResultEntity Map(BacktestResult model) =>
+        new()
+        {
+            StartDate = model.StartDate,
+            EndDate = model.EndDate,
+            Ticker = model.Ticker,
+            Timeframe = model.Timeframe,
+            StrategyId = model.StrategyId,
+            StrategyDescription = model.StrategyDescription,
+            StrategyParams = model.StrategyParams,
+            StrategyParamsHash = model.StrategyParamsHash,
+            NumberPositions = model.NumberPositions,
+            CurrentPosition = model.CurrentPosition,
+            ProfitFactor = model.ProfitFactor,
+            RecoveryFactor = model.RecoveryFactor,
+            NetProfit = model.NetProfit,
+            AverageProfit = model.AverageProfit,
+            AverageProfitPercent = model.AverageProfitPercent,
+            MaxDrawdown = model.MaxDrawdown,
+            MaxDrawdownPercent = model.MaxDrawdownPercent,
+            WinningPositions = model.WinningPositions,
+            WinningTradesPercent = model.WinningTradesPercent,
+            StartMoney = model.StartMoney,
+            EndMoney = model.EndMoney,
+            TotalReturn = model.TotalReturn,
+            AnnualYieldReturn = model.AnnualYieldReturn
+        };
+    
+    public static BacktestResult Map(BacktestResultEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            StartDate = entity.StartDate,
+            EndDate = entity.EndDate,
+            Ticker = entity.Ticker,
+            Timeframe = entity.Timeframe,
+            StrategyId = entity.StrategyId,
+            StrategyDescription = entity.StrategyDescription,
+            StrategyParams = entity.StrategyParams,
+            StrategyParamsHash = entity.StrategyParamsHash,
+            NumberPositions = entity.NumberPositions,
+            CurrentPosition = entity.CurrentPosition,
+            ProfitFactor = entity.ProfitFactor,
+            RecoveryFactor = entity.RecoveryFactor,
+            NetProfit = entity.NetProfit,
+            AverageProfit = entity.AverageProfit,
+            AverageProfitPercent = entity.AverageProfitPercent,
+            MaxDrawdown = entity.MaxDrawdown,
+            MaxDrawdownPercent = entity.MaxDrawdownPercent,
+            WinningPositions = entity.WinningPositions,
+            WinningTradesPercent = entity.WinningTradesPercent,
+            StartMoney = entity.StartMoney,
+            EndMoney = entity.EndMoney,
+            TotalReturn = entity.TotalReturn,
+            AnnualYieldReturn = entity.AnnualYieldReturn
+        };    
+    
     public static AnalyseResultEntity Map(AnalyseResult model) =>
         new()
         {
