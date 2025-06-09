@@ -35,6 +35,8 @@ public class OptimizationService(
         
         foreach (var (key, strategy) in StrategyDictionary)
         {
+            await optimizationResultRepository.DeleteAsync(key);
+            
             foreach (var ticker in algoConfigResource.Tickers)
             {
                 var algoStrategyResource = algoStrategyResources.Find(x => x.Id == key);
@@ -57,9 +59,6 @@ public class OptimizationService(
 
                 strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
-
-                for (int i = 0; i < strategy.Candles.Count; i++) 
-                    strategy.StopLimits.Add(null);
                 
                 var parameterSets = GetParameterSets(algoStrategyResource.Params);
 
@@ -69,6 +68,11 @@ public class OptimizationService(
                         continue;
                     
                     strategy.Parameters = parameterSet;
+                    
+                    strategy.StopLimits.Clear();
+                    for (int i = 0; i < strategy.Candles.Count; i++) 
+                        strategy.StopLimits.Add(null);
+                    
                     strategy.Execute();
                     
                     var optimizationResult = CreateOptimizationResult(strategy);

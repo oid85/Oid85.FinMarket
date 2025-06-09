@@ -5,4 +5,5 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 public interface IOptimizationResultRepository
 {
     Task AddAsync(List<OptimizationResult> optimizationResults);
+    Task DeleteAsync(Guid strategyId);
 }

@@ -188,60 +188,38 @@ public class Strategy
     
     public double CurrentProfit => Positions.Count == 0 ? 0 : Positions.Last().TotalProfit;
 
-    public void BuyAtPrice(int quantity, double price, int currentCandleIndex) =>
+    public void BuyAtPrice(int quantity, double price, int candleIndex) =>
         Trades.Add(new Trade
         {
-            CandleIndex = currentCandleIndex,
+            CandleIndex = candleIndex,
             Quantity = Math.Abs(quantity),
             Price = price,
-            DateTime = Candles[currentCandleIndex].DateTime
+            DateTime = Candles[candleIndex].DateTime
         });
 
-    public void SellAtPrice(int quantity, double price, int currentCandleIndex) =>
+    public void SellAtPrice(int quantity, double price, int candleIndex) =>
         Trades.Add(new Trade
         {
-            CandleIndex = currentCandleIndex,
+            CandleIndex = candleIndex,
             Quantity = -1 * Math.Abs(quantity),
             Price = price,
-            DateTime = Candles[currentCandleIndex].DateTime
+            DateTime = Candles[candleIndex].DateTime
         });
     
-    public void CloseAtStop(Position? position, double stopPrice, int currentCandleIndex)
+    public void CloseAtStop(Position? position, double stopPrice, int candleIndex)
     {
-        // Если позиции нет, то обнуляем стоп
-        if (position is null)
-        {
-            StopLimits[currentCandleIndex - 1] = null;
-            StopLimits[currentCandleIndex] = null;
-            
-            return;	
-        }
 
-        // Если позиция есть, а стопа еще нет, то выставляем
-        StopLimits[currentCandleIndex] ??= new StopLimit
-        {
-            Quantity = position.Quantity,
-            StopPrice = stopPrice
-        };
-
-        // Если стоп сработал, то отправляем команды
-        if (position.IsLong && Candles[currentCandleIndex].Close <= StopLimits[currentCandleIndex]!.StopPrice)
-            SellAtPrice(StopLimits[currentCandleIndex]!.Quantity, StopLimits[currentCandleIndex]!.StopPrice, currentCandleIndex);
-
-        // Если стоп сработал, то отправляем команды
-        else if (position.IsShort && Candles[currentCandleIndex].Close >= StopLimits[currentCandleIndex]!.StopPrice)
-            BuyAtPrice(StopLimits[currentCandleIndex]!.Quantity, StopLimits[currentCandleIndex]!.StopPrice, currentCandleIndex);
     }    
     
-    public void CloseAtPrice(Position position, double price, int currentCandleIndex)
+    public void CloseAtPrice(Position position, double price, int candleIndex)
     {
         // Отправляем команды, если длинная позиция
         if (position.IsLong)
-            SellAtPrice(position.Quantity, price, currentCandleIndex);
+            SellAtPrice(position.Quantity, price, candleIndex);
 
         // Отправляем команды, если короткая позиция
         else if (position.IsShort)
-            BuyAtPrice(position.Quantity, price, currentCandleIndex);
+            BuyAtPrice(position.Quantity, price, candleIndex);
     }    
     
     public List<Tuple<DateTime, double>> EqiutyCurve

@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 
@@ -18,4 +19,7 @@ public class OptimizationResultRepository(
         await context.OptimizationResultEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
+
+    public async Task DeleteAsync(Guid strategyId) => 
+        await context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
 }
