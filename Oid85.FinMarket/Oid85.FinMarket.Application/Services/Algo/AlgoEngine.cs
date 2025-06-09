@@ -41,6 +41,7 @@ public class AlgoEngine(
         
         await InitDailyCandlesAsync();
         await InitHourlyCandlesAsync();
+        
         InitStrategies();
     }
 
@@ -57,6 +58,7 @@ public class AlgoEngine(
 
         await InitDailyCandlesAsync();
         await InitHourlyCandlesAsync();
+        
         InitStrategies();
     }
 
@@ -77,6 +79,9 @@ public class AlgoEngine(
         {
             var candles = (await dailyCandleRepository.GetAsync(ticker, dates.From, dates.To))
                 .Select(AlgoMapper.Map).ToList();
+            
+            if (candles.Count == 0)
+                continue;
 
             for (int i = 0; i < candles.Count; i++)
                 candles[i].Index = i;
@@ -94,10 +99,13 @@ public class AlgoEngine(
             var candles = (await hourlyCandleRepository.GetAsync(ticker, dates.From, dates.To))
                 .Select(AlgoMapper.Map).ToList();
 
+            if (candles.Count == 0)
+                continue;
+            
             for (int i = 0; i < candles.Count; i++)
                 candles[i].Index = i;            
             
-            DailyCandles.TryAdd(ticker, candles);
+            HourlyCandles.TryAdd(ticker, candles);
         }
     }
     

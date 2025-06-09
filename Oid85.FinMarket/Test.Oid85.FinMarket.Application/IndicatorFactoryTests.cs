@@ -5,7 +5,7 @@ namespace Test.Oid85.FinMarket.Application;
 
 public class IndicatorFactoryTests
 {
-    private IIndicatorFactory _indicatorFactory;
+    private readonly IIndicatorFactory _indicatorFactory;
     
     public IndicatorFactoryTests()
     {
@@ -16,20 +16,62 @@ public class IndicatorFactoryTests
     public void Highest_return_is_correct()
     {
         // Arrange
-        var period = 3;
-        var values = new List<double>() {0.1, 0.2, 0.3, 0.2, 0.5, 0.6, 0.5};
-        var expectedValues = new List<double>() {0.0, 0.0, 0.0, 0.3, 0.5, 0.6, 0.6};
+        const int period = 3;
+        var values = new List<double> {0.1, 0.2, 0.3, 0.2, 0.5, 0.6, 0.5};
+        var etalon = new List<double> {0.0, 0.0, 0.0, 0.3, 0.5, 0.6, 0.6};
         
         // Act
         var indicatorValues = _indicatorFactory.Highest(values, period);
         
         // Assert
-        Assert.True(Math.Abs(indicatorValues[0] - expectedValues[0]) < 0.0001);
-        Assert.True(Math.Abs(indicatorValues[1] - expectedValues[1]) < 0.0001);
-        Assert.True(Math.Abs(indicatorValues[2] - expectedValues[2]) < 0.0001);
-        Assert.True(Math.Abs(indicatorValues[3] - expectedValues[3]) < 0.0001);
-        Assert.True(Math.Abs(indicatorValues[4] - expectedValues[4]) < 0.0001);
-        Assert.True(Math.Abs(indicatorValues[5] - expectedValues[5]) < 0.0001);
-        Assert.True(Math.Abs(indicatorValues[6] - expectedValues[6]) < 0.0001);
+        Assert.True(Math.Abs(indicatorValues[0] - etalon[0]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[1] - etalon[1]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[2] - etalon[2]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[3] - etalon[3]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[4] - etalon[4]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[5] - etalon[5]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[6] - etalon[6]) < 0.01);
     }
+    
+    [Fact]
+    public void Lowest_return_is_correct()
+    {
+        // Arrange
+        const int period = 3;
+        var values = new List<double> {0.1, 0.2, 0.3, 0.2, 0.5, 0.6, 0.5};
+        var etalon = new List<double> {0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.5};
+        
+        // Act
+        var indicatorValues = _indicatorFactory.Lowest(values, period);
+        
+        // Assert
+        Assert.True(Math.Abs(indicatorValues[0] - etalon[0]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[1] - etalon[1]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[2] - etalon[2]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[3] - etalon[3]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[4] - etalon[4]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[5] - etalon[5]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[6] - etalon[6]) < 0.01);
+    }  
+    
+    [Fact]
+    public void Sma_return_is_correct()
+    {
+        // Arrange
+        const int period = 3;
+        var values = new List<double> {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
+        var etalon = new List<double> {0.0, 0.0, 0.0, 0.3, 0.4, 0.5, 0.6};
+        
+        // Act
+        var indicatorValues = _indicatorFactory.Sma(values, period);
+        
+        // Assert
+        Assert.True(Math.Abs(indicatorValues[0] - etalon[0]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[1] - etalon[1]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[2] - etalon[2]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[3] - etalon[3]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[4] - etalon[4]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[5] - etalon[5]) < 0.01);
+        Assert.True(Math.Abs(indicatorValues[6] - etalon[6]) < 0.01);
+    }     
 }

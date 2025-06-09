@@ -23,8 +23,7 @@ public static class ServiceCollectionExtensions
             var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
                 
             options
-                .UseNpgsql(ConvertHelper.Base64Decode(
-                    configuration.GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString)!))
+                .UseNpgsql(configuration.GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString)!)
                 .AddInterceptors(updateInterceptor);
         });
         

@@ -55,7 +55,11 @@ public class OptimizationService(
                 if (strategy.Candles is [])
                     continue;
 
+                strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
+
+                for (int i = 0; i < strategy.Candles.Count; i++) 
+                    strategy.StopLimits.Add(null);
                 
                 var parameterSets = GetParameterSets(algoStrategyResource.Params);
 
