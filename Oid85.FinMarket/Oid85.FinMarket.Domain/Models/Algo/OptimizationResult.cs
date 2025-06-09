@@ -30,7 +30,7 @@ public class OptimizationResult
     /// <summary>
     /// Идентификатор стратегии
     /// </summary>
-    public Guid StrategyId { get; set; }
+    public string StrategyId { get; set; } = string.Empty;
     
     /// <summary>
     /// Описание стратегии

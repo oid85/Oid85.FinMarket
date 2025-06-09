@@ -21,5 +21,5 @@ public class OptimizationResultRepository(
     }
 
     public async Task DeleteAsync(Guid strategyId) => 
-        await context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
+        await context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId.ToString()).ExecuteDeleteAsync();
 }
