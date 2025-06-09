@@ -28,9 +28,9 @@
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.7.3" />
     <PackageVersion Include="Telegram.Bot" Version="22.3.0" />
     <PackageVersion Include="Tinkoff.InvestApi" Version="0.6.14" />
-	<PackageVersion Include="coverlet.collector" Version="6.0.0"/>
-	<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
-	<PackageVersion Include="xunit" Version="2.5.3"/>
-	<PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3"/>	
+	<PackageReference Include="coverlet.collector" Version="6.0.0"/>
+	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+	<PackageReference Include="xunit" Version="2.5.3"/>
+	<PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>	
   </ItemGroup>
 </Project>
