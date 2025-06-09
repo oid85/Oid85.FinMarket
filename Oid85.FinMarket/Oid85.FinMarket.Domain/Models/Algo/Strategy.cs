@@ -206,9 +206,25 @@ public class Strategy
             DateTime = Candles[candleIndex].DateTime
         });
     
-    public void CloseAtStop(Position? position, double stopPrice, int candleIndex)
+    public void CloseAtStop(Position position, double stopPrice, int candleIndex)
     {
-
+		// Если последняя свеча
+		if (candleIndex > StopLimits.Count)
+			return;
+		
+		// Пробуем выйти по стопу
+		if (StopLimits[candleIndex - 1] is not null)		
+		{
+			if (position.IsLong && position.EntryPrice <= StopLimits[candleIndex - 1].StopPrice)			
+				SellAtPrice(position.Quantity, price, candleIndex);	
+			
+			else if (position.IsShort && position.EntryPrice >= StopLimits[candleIndex - 1].StopPrice)			
+				BuyAtPrice(position.Quantity, price, candleIndex);				
+		}
+		
+		// Если не вышли, то переставляем стоп
+		if (LastActivePosition is not null)
+			StopLimits[candleIndex] = new StopLimit() { StopPrice = stopPrice, Quantity = Position.Quantity };
     }    
     
     public void CloseAtPrice(Position position, double price, int candleIndex)
