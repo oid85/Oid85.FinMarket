@@ -42,6 +42,11 @@ public class OptimizationService(
             
             foreach (var ticker in algoConfigResource.Tickers)
             {
+                if (ticker == "GEMC")
+                {
+                    
+                }
+
                 var algoStrategyResource = algoStrategyResources.Find(x => x.Id == key);
                 
                 if (algoStrategyResource is null)
@@ -50,19 +55,23 @@ public class OptimizationService(
                 if (!algoStrategyResource.Enable)
                     continue;
 
+                strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
+                strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
+                strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
+                strategy.Ticker = ticker;                
+                
                 strategy.Candles = algoStrategyResource.Timeframe switch
                 {
-                    "D" => DailyCandles[ticker],
-                    "H" => HourlyCandles[ticker],
+                    "D" => DailyCandles.ContainsKey(ticker) ? DailyCandles[ticker] : [],
+                    "H" => HourlyCandles.ContainsKey(ticker) ? HourlyCandles[ticker] : [],
                     _ => []
                 };
 
                 if (strategy.Candles is [])
                     continue;
-
-                strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-                strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
-                strategy.Ticker = ticker;
+                
+                if (strategy.Candles.Count < strategy.StabilizationPeriod + 1)
+                    continue;
                 
                 var parameterSets = GetParameterSets(algoStrategyResource.Params);
 
@@ -75,19 +84,27 @@ public class OptimizationService(
                     
                     var sw = Stopwatch.StartNew();
                     
-                    strategy.Execute();
+                    try
+                    {
+                        strategy.Execute();
+                    }
+                    
+                    catch (Exception exception)
+                    {
+                        logger.Error($"Ошибка '{key}', '{ticker}', '{exception.Message}'");
+                    }
                     
                     sw.Stop();
                     
-                    logger.Info($"Оптимизация '{key}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
+                    Debug.Print($"Оптимизация '{key}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
                     
-                    var optimizationResult = CreateOptimizationResult(strategy);
-                    optimizationResults.Add(optimizationResult);
+                    //var optimizationResult = CreateOptimizationResult(strategy);
+                    //optimizationResults.Add(optimizationResult);
                 }
             }
         }
 
-        await optimizationResultRepository.AddAsync(optimizationResults);
+        // await optimizationResultRepository.AddAsync(optimizationResults);
         
         return true;
     }
@@ -157,8 +174,8 @@ public class OptimizationService(
             ProfitFactor  = strategy.ProfitFactor,
             RecoveryFactor  = strategy.RecoveryFactor,
             NetProfit  = strategy.NetProfit,
-            AverageProfit  = strategy.AverageProfit,
-            AverageProfitPercent  = strategy.AverageProfitPercent,
+            AverageProfit  = strategy.AverageNetProfit,
+            AverageProfitPercent  = strategy.AverageNetProfitPercent,
             MaxDrawdown  = strategy.MaxDrawdown,
             MaxDrawdownPercent  = strategy.MaxDrawdownPercent,
             WinningPositions  = strategy.WinningPositions,

@@ -17,30 +17,4 @@ public class Position
     public double ProfitPercent { get; set; }
     public double TotalProfit { get; set; }
     public double TotalProfitPct { get; set; }
-
-    public void SetActive()
-    {
-        IsActive = true;
-    }
-    
-    public void SetNotActive()
-    {
-        IsActive = false;
-        IsLong = false;
-        IsShort = false;
-    }
-    
-    public void SetLong()
-    {
-        IsActive = true;
-        IsLong = true;
-        IsShort = false;
-    }
-    
-    public void SetShort()
-    {
-        IsActive = true;
-        IsLong = false;
-        IsShort = true;
-    }
 }

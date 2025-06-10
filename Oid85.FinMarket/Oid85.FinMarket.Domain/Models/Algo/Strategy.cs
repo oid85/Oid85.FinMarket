@@ -1,10 +1,25 @@
-﻿namespace Oid85.FinMarket.Domain.Models.Algo;
+﻿using Tinkoff.InvestApi.V1;
+
+namespace Oid85.FinMarket.Domain.Models.Algo;
 
 public class Strategy
 {
     public Guid StrategyId { get; set; }
+    
+    public double StartMoney { get; set; }
+
+    public double EndMoney { get; set; }
+    
+    public string Ticker { get; set; } = string.Empty;
+    
+    public string Timeframe { get; set; } = string.Empty;
+    
+    public string StrategyDescription { get; set; } = string.Empty;
+    
     public DateOnly StartDate => DateOnly.FromDateTime(Candles.First().DateTime);
+    
     public DateOnly EndDate => DateOnly.FromDateTime(Candles.Last().DateTime);
+    
     public Dictionary<string, int> Parameters { get; set; } = new();
     
     public int StabilizationPeriod { get; set; }
@@ -25,153 +40,23 @@ public class Strategy
     
     public List<StopLimit?> StopLimits { get; set; } = new();
     
-    public List<Trade> Trades { get; set; } = new();
-    
-    public List<Position> Positions
-    {
+    public List<Position> Positions { get; set; } = new();
+
+    public Position? LastActivePosition {
         get
         {
-            var positions = new List<Position>();
+            if (LastPosition is null)
+                return null;
+            
+            if (!LastPosition.IsActive)
+                return null;
 
-            if (Trades.Count == 0)
-                return positions;
-
-            var groupedTrades = new List<List<Trade>>();
-            int currentPosSize = 0;
-
-            for (int i = 0; i < Trades.Count; i++)
-            {
-                // Разбиваем каждую сделку на атомарную (атомарная сделка - сделка объемом 1)
-                var atomarTrades = GetAtomarTrades(Trades[i]);
-
-                for (int j = 0; j < atomarTrades.Count; j++)
-                {
-                    if (currentPosSize == 0)
-                        groupedTrades.Add(new List<Trade>());
-
-                    groupedTrades.Last().Add(atomarTrades[j]);
-                    currentPosSize = groupedTrades.Last().Select(t => t.Quantity).Sum();
-                }
-            }
-
-            // Формируем позиции
-            for (int i = 0; i < groupedTrades.Count; i++)
-            {
-                int entryCandleIndex = groupedTrades[i].First().CandleIndex;
-                int exitCandleIndex = groupedTrades[i].Last().CandleIndex;
-
-                bool isLong = groupedTrades[i].First().Quantity > 0;
-                bool isShort = groupedTrades[i].First().Quantity < 0;
-
-                bool isActive = groupedTrades[i].Select(x => x.Quantity).Sum() != 0;
-
-                List<Trade> buyTrades = groupedTrades[i].Where(x => x.Quantity > 0).OrderBy(x => x.DateTime).ToList();
-                List<Trade> sellTrades = groupedTrades[i].Where(x => x.Quantity < 0).OrderBy(x => x.DateTime).ToList();
-
-                DateTime entryDateTime = DateTime.MinValue;
-                DateTime exitDateTime = DateTime.MinValue;
-                double entryPrice = 0.0;
-                double exitPrice = 0.0;
-                int quantity = 0;
-                double profit = 0.0;
-                double profitPct = 0.0;
-
-                if (isLong)
-                {
-                    entryDateTime = buyTrades.Last().DateTime;
-                    quantity = Math.Abs(buyTrades.Select(trade => trade.Quantity).Sum());
-                    entryPrice = Math.Abs(buyTrades.Sum(trade => trade.Price * trade.Quantity)) / quantity;
-
-                    if (isActive)
-                    {
-                        exitDateTime = DateTime.MinValue;
-                        exitPrice = 0.0;
-                        profit = 0.0;
-                        profitPct = 0.0;
-                    }
-                    else
-                    {
-                        exitDateTime = sellTrades.Last().DateTime;
-                        exitPrice = Math.Abs(sellTrades.Sum(trade => trade.Price * trade.Quantity)) / quantity;
-                        profit = (exitPrice - entryPrice) * quantity;
-                        profitPct = profit / quantity / entryPrice * 100.0;
-                    }
-                }
-                else if (isShort)
-                {
-                    entryDateTime = sellTrades.Last().DateTime;
-                    quantity = Math.Abs(sellTrades.Select(trade => trade.Quantity).Sum());
-                    entryPrice = Math.Abs(sellTrades.Sum(trade => trade.Price * trade.Quantity)) / quantity;
-
-                    if (isActive)
-                    {
-                        exitDateTime = DateTime.MinValue;
-                        exitPrice = 0.0;
-                        profit = 0.0;
-                        profitPct = 0.0;
-                    }
-                    else
-                    {
-                        exitDateTime = buyTrades.Last().DateTime;
-                        exitPrice = Math.Abs(buyTrades.Sum(trade => trade.Price * trade.Quantity)) / quantity;
-                        profit = (entryPrice - exitPrice) * quantity;
-                        profitPct = profit / quantity / exitPrice * 100.0;
-                    }
-                }
-
-                positions.Add(new Position
-                {
-                    EntryCandleIndex = entryCandleIndex,
-                    ExitCandleIndex = exitCandleIndex,
-                    EntryPrice = entryPrice,
-                    ExitPrice = exitPrice,
-                    Profit = profit,
-                    ProfitPercent = profitPct,
-                    EntryDateTime = entryDateTime,
-                    ExitDateTime = exitDateTime,
-                    IsActive = isActive,
-                    IsLong = isLong,
-                    IsShort = isShort,
-                    Quantity = isLong ? quantity : -1 * quantity
-                });
-            }
-
-            positions[0].TotalProfit = positions[0].Profit;
-            positions[0].TotalProfitPct = positions[0].ProfitPercent;
-
-            // Расчет общей прибыли
-            for (int i = 1; i < positions.Count; i++)
-            {
-                positions[i].TotalProfit = positions[i - 1].TotalProfit + positions[i].Profit;
-                positions[i].TotalProfitPct = positions[i - 1].TotalProfitPct + positions[i].ProfitPercent;
-            }
-
-            return positions;
+            return LastPosition;
         }
     }
 
-    private static List<Trade> GetAtomarTrades(Trade trade)
-    {
-        var result = new List<Trade>();
-
-        for (int i = 0; i < Math.Abs(trade.Quantity); i++)
-        {
-            var atomarTrade = new Trade
-            {
-                CandleIndex = trade.CandleIndex,
-                Price = trade.Price,
-                Quantity = trade.Quantity > 0 ? 1 : -1,
-                DateTime = trade.DateTime
-            };
-
-            result.Add(atomarTrade);
-        }
-
-        return result;
-    }
+    public Position? LastPosition => Positions.Count == 0 ? null : Positions.Last();
     
-    public Position? LastActivePosition => Positions.Count == 0 ? null : Positions.Last().IsActive ? Positions.Last() : null;
-
     public int CurrentPosition
     {
         get
@@ -188,11 +73,9 @@ public class Strategy
             return 0;
         }
     }
-    
-    public double CurrentProfit => Positions.Count == 0 ? 0 : Positions.Last().TotalProfit;
 
     public void BuyAtPrice(int quantity, double price, int candleIndex) =>
-        Trades.Add(new Trade
+        AddTrade(new Trade
         {
             CandleIndex = candleIndex,
             Quantity = Math.Abs(quantity),
@@ -201,14 +84,54 @@ public class Strategy
         });
 
     public void SellAtPrice(int quantity, double price, int candleIndex) =>
-        Trades.Add(new Trade
+        AddTrade(new Trade
         {
             CandleIndex = candleIndex,
             Quantity = -1 * Math.Abs(quantity),
             Price = price,
             DateTime = Candles[candleIndex].DateTime
         });
-    
+
+    private void AddTrade(Trade trade)
+    {
+        if (LastActivePosition is null)
+            Positions.Add(new Position
+            {
+                Ticker = Ticker,
+                EntryPrice = trade.Price,
+                EntryDateTime = trade.DateTime,
+                EntryCandleIndex = trade.CandleIndex,
+                IsActive = true,
+                IsLong = trade.Quantity > 0,
+                IsShort = trade.Quantity < 0,
+                Quantity = trade.Quantity
+            });
+
+        else
+        {
+            int count = Positions.Count;
+
+            Positions[count - 1].ExitPrice = trade.Price;
+            Positions[count - 1].ExitDateTime = trade.DateTime;
+            Positions[count - 1].ExitCandleIndex = trade.CandleIndex;
+            Positions[count - 1].IsActive = false;
+            
+            var profit = Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice;
+            Positions[count - 1].Profit = profit;
+            Positions[count - 1].ProfitPercent = profit / EndMoney * 100.0;
+            EndMoney += profit;
+            
+            var totalProfit = Positions.Sum(x => x.Profit);
+            Positions[count - 1].TotalProfit = totalProfit;
+            Positions[count - 1].TotalProfitPct = totalProfit / EndMoney * 100.0;
+
+            EqiutyCurve.TryAdd(Positions[count - 1].ExitDateTime, Positions[count - 1].TotalProfit);
+            
+            var drawdown = Positions.Max(x => x.TotalProfit) - Positions[count - 1].TotalProfit;
+            DrawdownCurve.TryAdd(Positions[count - 1].ExitDateTime, drawdown);
+        }
+    }
+
     public void CloseAtStop(Position position, double stopPrice, int candleIndex)
     {
         if (StopLimits.Count != Candles.Count)
@@ -226,10 +149,10 @@ public class Strategy
 		// Пробуем выйти по стопу
 		if (LastActivePosition is not null && StopLimits[candleIndex - 1] is not null)		
 		{
-			if (position.IsLong && position.EntryPrice <= StopLimits[candleIndex - 1]!.StopPrice)			
+			if (position.IsLong && position.EntryPrice <= StopLimits[candleIndex - 1]!.Value.StopPrice)			
 				SellAtPrice(position.Quantity, stopPrice, candleIndex);	
 			
-			else if (position.IsShort && position.EntryPrice >= StopLimits[candleIndex - 1]!.StopPrice)			
+			else if (position.IsShort && position.EntryPrice >= StopLimits[candleIndex - 1]!.Value.StopPrice)			
 				BuyAtPrice(position.Quantity, stopPrice, candleIndex);				
 		}
 		
@@ -247,104 +170,48 @@ public class Strategy
         // Отправляем команды, если короткая позиция
         else if (position.IsShort)
             BuyAtPrice(position.Quantity, price, candleIndex);
-    }    
+    }
+
+    public Dictionary<DateTime, double> EqiutyCurve { get; set; } = new();
     
-    public List<Tuple<DateTime, double>> EqiutyCurve
-    {
-        get
-        {
-            if (Positions.Count == 0)
-                return [];
-
-            if (Positions.Count == 1 && Positions.First().IsActive)
-                return [];
-            
-            if (Positions.Count == 1 && !Positions.First().IsActive)
-                return [];
-
-            var eqiutyCurve = new List<Tuple<DateTime, double>>();
-
-            eqiutyCurve.Add(new Tuple<DateTime, double>(Positions[0].ExitDateTime, Positions[0].Profit));
-
-            for (int i = 1; i < Positions.Count; i++)
-                if (!Positions[i].IsActive)
-                    eqiutyCurve.Add(new Tuple<DateTime, double>(Positions[i].ExitDateTime, Positions[i - 1].Profit + Positions[i].Profit));
-
-            return eqiutyCurve;
-        }
-    }    
-   
-    public List<Tuple<DateTime, double>> DrawdownCurve
-    {
-        get
-        {
-            if (Positions.Count == 0)
-                return [];
-
-            if (Positions.Count == 1 && Positions.First().IsActive)
-                return [];
-
-            if (Positions.Count == 1 && !Positions.First().IsActive)
-                return [];
-
-            var drawdownCurve = new List<Tuple<DateTime, double>>();
-
-            double currentDrawdown = Positions[0].Profit > 0.0 ? 0.0 : Positions[0].Profit;
-
-            drawdownCurve.Add(new Tuple<DateTime, double>(Positions[0].ExitDateTime, currentDrawdown));
-
-            for (int i = 1; i < Positions.Count; i++)
-                if (!Positions[i].IsActive)
-                {
-                    currentDrawdown = Positions[i - 1].Profit + Positions[i].Profit > 0.0
-                        ? 0.0
-                        : Positions[i - 1].Profit + Positions[i].Profit;
-
-                    drawdownCurve.Add(new Tuple<DateTime, double>(Positions[i].ExitDateTime, currentDrawdown));
-                }
-
-            return drawdownCurve;
-        }
-    }    
+    public Dictionary<DateTime, double> DrawdownCurve  { get; set; } = new();
     
     public double ProfitFactor
     {
         get
         {
-            double grossProfit = Positions.Where(x => x.Profit > 0.0).Sum(x => x.Profit);
-            double grossLoss = Positions.Where(x => x.Profit < 0.0).Sum(x => x.Profit);
+            double profits = Positions.Where(x => x.Profit > 0.0).Sum(x => x.Profit);
+            double losses = Positions.Where(x => x.Profit < 0.0).Sum(x => x.Profit);
 
-            return grossProfit / Math.Abs(grossLoss);
+            if (losses == 0.0)
+                return double.PositiveInfinity;
+            
+            return profits / Math.Abs(losses);
         }
     }
 
-    public double RecoveryFactor => NetProfit / MaxDrawdown;
+    public double RecoveryFactor => MaxDrawdown == 0.0 ? double.PositiveInfinity : NetProfit / MaxDrawdown;
 
-    public double NetProfit => Positions.Last().TotalProfit;
+    public double NetProfit => LastPosition?.TotalProfit ?? 0.0;
+    
+    public double AverageNetProfit => Positions.Select(x => x.Profit).Average();
 
-    public double AverageProfit => Positions.Select(x => x.Profit).Average();
+    public double AverageNetProfitPercent => Positions.Select(x => x.ProfitPercent).Average();
 
-    public double AverageProfitPercent => Positions.Select(x => x.ProfitPercent).Average();
+    public double Drawdown  => LastPosition is null ? 0.0 : Positions.Max(x => x.TotalProfit) - LastPosition.TotalProfit;
 
-    public double Drawdown => DrawdownCurve.Last().Item2;
+    public double MaxDrawdown  => DrawdownCurve.Max(x => x.Value);
 
-    public double MaxDrawdown => DrawdownCurve.Select(d => d.Item2).Min();
-
-    public double MaxDrawdownPercent => Math.Abs(MaxDrawdown) / Math.Abs(NetProfit) * 100.0;
+    public double MaxDrawdownPercent  { get; set; }
 
     public int NumberPositions => Positions.Count;
 
     public int WinningPositions => Positions.Count(x => x.Profit > 0.0);
 
-    public double WinningTradesPercent => (double) WinningPositions / (double) NumberPositions * 100.0;    
+    public double WinningTradesPercent => NumberPositions == 0.0 ? 0.0 : Convert.ToDouble(WinningPositions) / Convert.ToDouble(NumberPositions) * 100.0;    
     
-    public double StartMoney { get; set; }
-
-    public double EndMoney => EqiutyCurve.Count == 0 ? StartMoney : EqiutyCurve.Last().Item2;
-    public string Ticker { get; set; } = string.Empty;
-    public string Timeframe { get; set; } = string.Empty;
-    public string StrategyDescription { get; set; } = string.Empty;
-    public double TotalReturn { get; set; }
+    public double TotalReturn => EndMoney > StartMoney ? (EndMoney - StartMoney) / StartMoney * 100.0 : 0.0;
+    
     public double AnnualYieldReturn { get; set; }
 
     public virtual void Execute()

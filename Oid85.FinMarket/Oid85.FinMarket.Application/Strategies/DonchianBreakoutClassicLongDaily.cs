@@ -36,43 +36,32 @@ namespace Oid85.FinMarket.Application.Strategies
 
             for (int i = StabilizationPeriod; i < Candles.Count - 1; i++)
             {
-                try
+                // Правило входа
+                SignalLong = ClosePrices[i] > highLevelEntry[i];
+
+                // Задаем цену для заявки
+                double orderPrice = Candles[i].Close;
+
+                if (LastActivePosition == null)
                 {
-                    // Правило входа
-                    SignalLong = ClosePrices[i] > highLevelEntry[i];
-
-                    // Задаем цену для заявки
-                    double orderPrice = Candles[i].Close;
-
-                    if (LastActivePosition == null)
-                    {
-                        if (SignalLong)
-                            BuyAtPrice(positionSize, orderPrice, i + 1);
-                    }
-                
-                    else
-                    {
-                        int entryCandleIndex = LastActivePosition.EntryCandleIndex;
-
-                        if (LastActivePosition.IsLong)
-                        {
-                            double startTrailingStop = lowLevelExit[entryCandleIndex];
-                            double curTrailingStop = lowLevelExit[i];
-
-                            trailingStop = i == entryCandleIndex
-                                ? startTrailingStop
-                                : Math.Max(trailingStop, curTrailingStop);
-
-                            // Выход по стопу
-                            CloseAtStop(LastActivePosition, trailingStop, i + 1);
-                        }
-                    }
+                    if (SignalLong)
+                        BuyAtPrice(positionSize, orderPrice, i + 1);
                 }
                 
-                catch (Exception e)
+                else
                 {
-                    Console.WriteLine(e);
-                    throw;
+                    int entryCandleIndex = LastActivePosition.EntryCandleIndex;
+
+                    if (LastActivePosition.IsLong)
+                    {
+                        double startTrailingStop = lowLevelExit[entryCandleIndex];
+                        double curTrailingStop = lowLevelExit[i];
+
+                        trailingStop = i == entryCandleIndex ? startTrailingStop : Math.Max(trailingStop, curTrailingStop);
+
+                        // Выход по стопу
+                        CloseAtStop(LastActivePosition, trailingStop, i + 1);
+                    }
                 }
             }
         }
