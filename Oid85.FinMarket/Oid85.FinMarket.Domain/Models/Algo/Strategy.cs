@@ -211,7 +211,15 @@ public class Strategy
     
     public void CloseAtStop(Position position, double stopPrice, int candleIndex)
     {
- 		// Если последняя свеча
+        if (StopLimits.Count != Candles.Count)
+        {
+            StopLimits.Clear();
+            
+            for (int i = 0; i < Candles.Count; i++) 
+                StopLimits.Add(null);            
+        }
+
+        // Если последняя свеча
 		if (candleIndex > StopLimits.Count - 1)
 			return;
 		

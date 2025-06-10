@@ -73,10 +73,6 @@ public class OptimizationService(
                     
                     strategy.Parameters = parameterSet;
                     
-                    strategy.StopLimits.Clear();
-                    for (int i = 0; i < strategy.Candles.Count; i++) 
-                        strategy.StopLimits.Add(null);
-                    
                     var sw = Stopwatch.StartNew();
                     
                     strategy.Execute();
