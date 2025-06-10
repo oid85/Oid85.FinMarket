@@ -30,7 +30,7 @@ public class BacktestResult
     /// <summary>
     /// Идентификатор стратегии
     /// </summary>
-    public string StrategyId { get; set; } = string.Empty;
+    public Guid StrategyId { get; set; }
     
     /// <summary>
     /// Описание стратегии

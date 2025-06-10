@@ -20,6 +20,6 @@ public class OptimizationResultRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid strategyId) => 
-        await context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId.ToString()).ExecuteDeleteAsync();
+    public Task DeleteAsync(Guid strategyId) => 
+        context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
 }

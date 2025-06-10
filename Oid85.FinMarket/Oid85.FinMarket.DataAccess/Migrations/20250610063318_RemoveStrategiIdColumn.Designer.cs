@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oid85.FinMarket.DataAccess;
@@ -11,9 +12,11 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    partial class FinMarketContextModelSnapshot : ModelSnapshot
+    [Migration("20250610063318_RemoveStrategiIdColumn")]
+    partial class RemoveStrategiIdColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,10 +187,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("strategy_description");
-
-                    b.Property<Guid>("StrategyId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("strategy_id");
 
                     b.Property<string>("StrategyParams")
                         .IsRequired()
@@ -1458,10 +1457,6 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("strategy_description");
-
-                    b.Property<Guid>("StrategyId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("strategy_id");
 
                     b.Property<string>("StrategyParams")
                         .IsRequired()

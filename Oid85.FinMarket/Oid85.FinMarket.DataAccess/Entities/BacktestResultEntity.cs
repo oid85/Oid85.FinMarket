@@ -33,8 +33,8 @@ public class BacktestResultEntity : AuditableEntity
     /// <summary>
     /// Идентификатор стратегии
     /// </summary>
-    [Column("strategy_id"), MaxLength(40)]
-    public string StrategyId { get; set; } = string.Empty;
+    [Column("strategy_id")]
+    public Guid StrategyId { get; set; }
     
     /// <summary>
     /// Описание стратегии

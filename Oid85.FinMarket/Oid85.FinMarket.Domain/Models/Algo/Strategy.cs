@@ -208,23 +208,23 @@ public class Strategy
     
     public void CloseAtStop(Position position, double stopPrice, int candleIndex)
     {
-		// Если последняя свеча
-		if (candleIndex > StopLimits.Count)
+ 		// Если последняя свеча
+		if (candleIndex > StopLimits.Count - 1)
 			return;
 		
 		// Пробуем выйти по стопу
-		if (StopLimits[candleIndex - 1] is not null)		
+		if (LastActivePosition is not null && StopLimits[candleIndex - 1] is not null)		
 		{
-			if (position.IsLong && position.EntryPrice <= StopLimits[candleIndex - 1].StopPrice)			
-				SellAtPrice(position.Quantity, price, candleIndex);	
+			if (position.IsLong && position.EntryPrice <= StopLimits[candleIndex - 1]!.StopPrice)			
+				SellAtPrice(position.Quantity, stopPrice, candleIndex);	
 			
-			else if (position.IsShort && position.EntryPrice >= StopLimits[candleIndex - 1].StopPrice)			
-				BuyAtPrice(position.Quantity, price, candleIndex);				
+			else if (position.IsShort && position.EntryPrice >= StopLimits[candleIndex - 1]!.StopPrice)			
+				BuyAtPrice(position.Quantity, stopPrice, candleIndex);				
 		}
 		
 		// Если не вышли, то переставляем стоп
 		if (LastActivePosition is not null)
-			StopLimits[candleIndex] = new StopLimit() { StopPrice = stopPrice, Quantity = Position.Quantity };
+			StopLimits[candleIndex] = new StopLimit { StopPrice = stopPrice, Quantity = position.Quantity };
     }    
     
     public void CloseAtPrice(Position position, double price, int candleIndex)
