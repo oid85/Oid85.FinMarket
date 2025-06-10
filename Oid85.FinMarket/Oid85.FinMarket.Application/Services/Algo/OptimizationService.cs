@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services.Algo;
@@ -41,8 +42,6 @@ public class OptimizationService(
             
             foreach (var ticker in algoConfigResource.Tickers)
             {
-                logger.Info($"Оптимизация стратегии '{key}', тикер '{ticker}'");
-                
                 var algoStrategyResource = algoStrategyResources.Find(x => x.Id == key);
                 
                 if (algoStrategyResource is null)
@@ -78,7 +77,13 @@ public class OptimizationService(
                     for (int i = 0; i < strategy.Candles.Count; i++) 
                         strategy.StopLimits.Add(null);
                     
+                    var sw = Stopwatch.StartNew();
+                    
                     strategy.Execute();
+                    
+                    sw.Stop();
+                    
+                    logger.Info($"Оптимизация '{key}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
                     
                     var optimizationResult = CreateOptimizationResult(strategy);
                     optimizationResults.Add(optimizationResult);
