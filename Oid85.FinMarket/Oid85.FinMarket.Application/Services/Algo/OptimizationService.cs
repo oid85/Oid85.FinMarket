@@ -1,6 +1,8 @@
-﻿using NLog;
+﻿using System.Text.Json;
+using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services.Algo;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
@@ -14,7 +16,7 @@ public class OptimizationService(
     IResourceStoreService resourceStoreService,
     IOptimizationResultRepository optimizationResultRepository,
     IServiceProvider serviceProvider) 
-    : AlgoEngine(
+    : AlgoService(
         logger,
         dailyCandleRepository,
         hourlyCandleRepository,
@@ -39,6 +41,8 @@ public class OptimizationService(
             
             foreach (var ticker in algoConfigResource.Tickers)
             {
+                logger.Info($"Оптимизация стратегии '{key}', тикер '{ticker}'");
+                
                 var algoStrategyResource = algoStrategyResources.Find(x => x.Id == key);
                 
                 if (algoStrategyResource is null)
@@ -59,6 +63,7 @@ public class OptimizationService(
 
                 strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
+                strategy.Ticker = ticker;
                 
                 var parameterSets = GetParameterSets(algoStrategyResource.Params);
 
@@ -134,7 +139,35 @@ public class OptimizationService(
 
     private static OptimizationResult CreateOptimizationResult(Strategy strategy)
     {
-        var result = new OptimizationResult();
+        var json = JsonSerializer.Serialize(strategy.Parameters);
+        
+        var result = new OptimizationResult
+        {
+            StrategyId = strategy.StrategyId,
+            StartDate = strategy.StartDate,
+            EndDate = strategy.EndDate,
+            Timeframe  = strategy.Timeframe,
+            Ticker  = strategy.Ticker,
+            StrategyDescription  = strategy.StrategyDescription,
+            StrategyParams  = json,
+            StrategyParamsHash = ConvertHelper.Md5Encode(json),
+            NumberPositions  = strategy.NumberPositions,
+            CurrentPosition  = strategy.CurrentPosition,
+            ProfitFactor  = strategy.ProfitFactor,
+            RecoveryFactor  = strategy.RecoveryFactor,
+            NetProfit  = strategy.NetProfit,
+            AverageProfit  = strategy.AverageProfit,
+            AverageProfitPercent  = strategy.AverageProfitPercent,
+            MaxDrawdown  = strategy.MaxDrawdown,
+            MaxDrawdownPercent  = strategy.MaxDrawdownPercent,
+            WinningPositions  = strategy.WinningPositions,
+            WinningTradesPercent  = strategy.WinningTradesPercent,
+            StartMoney  = strategy.StartMoney,
+            EndMoney  = strategy.EndMoney,
+            TotalReturn  = strategy.TotalReturn,
+            AnnualYieldReturn  = strategy.AnnualYieldReturn
+        };
+        
         return result;
     }
 }

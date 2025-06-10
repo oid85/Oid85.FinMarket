@@ -11,7 +11,7 @@ public class BacktestService(
     IHourlyCandleRepository hourlyCandleRepository,
     IResourceStoreService resourceStoreService,
     IServiceProvider serviceProvider) 
-    : AlgoEngine(
+    : AlgoService(
         logger,
         dailyCandleRepository, 
         hourlyCandleRepository,

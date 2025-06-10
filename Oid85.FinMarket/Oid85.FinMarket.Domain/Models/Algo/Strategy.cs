@@ -2,6 +2,9 @@
 
 public class Strategy
 {
+    public Guid StrategyId { get; set; }
+    public DateOnly StartDate => DateOnly.FromDateTime(Candles.First().DateTime);
+    public DateOnly EndDate => DateOnly.FromDateTime(Candles.Last().DateTime);
     public Dictionary<string, int> Parameters { get; set; } = new();
     
     public int StabilizationPeriod { get; set; }
@@ -278,9 +281,7 @@ public class Strategy
 
             var drawdownCurve = new List<Tuple<DateTime, double>>();
 
-            double currentDrawdown = Positions[0].Profit > 0.0
-                ? 0.0
-                : Positions[0].Profit;
+            double currentDrawdown = Positions[0].Profit > 0.0 ? 0.0 : Positions[0].Profit;
 
             drawdownCurve.Add(new Tuple<DateTime, double>(Positions[0].ExitDateTime, currentDrawdown));
 
@@ -332,6 +333,11 @@ public class Strategy
     public double StartMoney { get; set; }
 
     public double EndMoney => EqiutyCurve.Count == 0 ? StartMoney : EqiutyCurve.Last().Item2;
+    public string Ticker { get; set; } = string.Empty;
+    public string Timeframe { get; set; } = string.Empty;
+    public string StrategyDescription { get; set; } = string.Empty;
+    public double TotalReturn { get; set; }
+    public double AnnualYieldReturn { get; set; }
 
     public virtual void Execute()
     {

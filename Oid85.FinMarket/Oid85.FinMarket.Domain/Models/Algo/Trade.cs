@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
-public class Trade
+public record Trade
 {
     public string Ticker { get; set; } = string.Empty;
     public DateTime DateTime { get; set; }

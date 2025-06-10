@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
-public class Candle
+public record Candle
 {
     /// <summary>
     /// Индекс свечи

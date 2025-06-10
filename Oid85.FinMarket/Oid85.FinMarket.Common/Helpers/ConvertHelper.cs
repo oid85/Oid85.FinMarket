@@ -112,11 +112,23 @@ public static class ConvertHelper
     }
     
     /// <summary>
-    /// преобразует формат цвета RGB в шестнадцатеричный цвет.
+    /// Преобразует формат цвета RGB в шестнадцатеричный цвет.
     /// </summary>
     /// <param name="r">значение красного.</param>
     /// <param name="g">значение зеленого.</param>
     /// <param name="b">значение синего.</param>
     public static string RgbToHex(int r, int g, int b) => 
         $"#{r:x2}{g:x2}{b:x2}".ToUpper();
+
+    /// <summary>
+    /// Рассчитать MD5
+    /// </summary>
+    public static string Md5Encode(string json)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var hashBytes = System.Security.Cryptography.MD5.HashData(bytes);
+        var hashHex = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
+
+        return hashHex;
+    }
 }

@@ -15,7 +15,7 @@ public class AlgoController(
     /// <summary>
     /// Выполнить оптимизацию
     /// </summary>
-    [HttpPost("optimization")]
+    [HttpGet("optimization")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
@@ -30,7 +30,7 @@ public class AlgoController(
     /// <summary>
     /// Выполнить бэктест
     /// </summary>
-    [HttpPost("backtest")]
+    [HttpGet("backtest")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]

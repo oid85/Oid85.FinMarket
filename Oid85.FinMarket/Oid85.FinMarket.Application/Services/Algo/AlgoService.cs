@@ -12,7 +12,7 @@ using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Services.Algo;
 
-public class AlgoEngine(
+public class AlgoService(
     ILogger logger,
     IDailyCandleRepository dailyCandleRepository,
     IHourlyCandleRepository hourlyCandleRepository,
@@ -67,6 +67,11 @@ public class AlgoEngine(
         foreach (var algoStrategyResource in _algoStrategyResources)
         {
             var strategy = serviceProvider.GetRequiredKeyedService<Strategy>(algoStrategyResource.Name);
+            
+            strategy.StrategyId = algoStrategyResource.Id;
+            strategy.Timeframe = algoStrategyResource.Timeframe;
+            strategy.StrategyDescription = algoStrategyResource.Description;
+            
             StrategyDictionary.TryAdd(algoStrategyResource.Id, strategy);
         }
     }
