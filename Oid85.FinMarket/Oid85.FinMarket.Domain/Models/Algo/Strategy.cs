@@ -202,7 +202,7 @@ public class Strategy
 
     public double MaxDrawdown  => DrawdownCurve.Max(x => x.Value);
 
-    public double MaxDrawdownPercent  { get; set; }
+    public double MaxDrawdownPercent => MaxDrawdown == 0.0 ? 0.0 : NetProfit / MaxDrawdown * 100.0;
 
     public int NumberPositions => Positions.Count;
 

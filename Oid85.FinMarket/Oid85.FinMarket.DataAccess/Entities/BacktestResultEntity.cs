@@ -97,6 +97,12 @@ public class BacktestResultEntity : AuditableEntity
     public double AverageProfitPercent { get; set; }
     
     /// <summary>
+    /// Drawdown
+    /// </summary>
+    [Column("drawdown")]
+    public double Drawdown { get; set; }
+    
+    /// <summary>
     /// Max Drawdown
     /// </summary>
     [Column("max_drawdown")]

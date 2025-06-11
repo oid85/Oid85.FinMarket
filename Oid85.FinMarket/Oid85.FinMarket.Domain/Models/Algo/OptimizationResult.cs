@@ -83,6 +83,11 @@ public class OptimizationResult
     public double AverageProfitPercent { get; set; }
     
     /// <summary>
+    /// Drawdown
+    /// </summary>
+    public double Drawdown { get; set; }
+    
+    /// <summary>
     /// Max Drawdown
     /// </summary>
     public double MaxDrawdown { get; set; }

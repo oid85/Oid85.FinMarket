@@ -176,6 +176,7 @@ public class OptimizationService(
             NetProfit  = strategy.NetProfit,
             AverageProfit  = strategy.AverageNetProfit,
             AverageProfitPercent  = strategy.AverageNetProfitPercent,
+            Drawdown  = strategy.Drawdown,
             MaxDrawdown  = strategy.MaxDrawdown,
             MaxDrawdownPercent  = strategy.MaxDrawdownPercent,
             WinningPositions  = strategy.WinningPositions,
