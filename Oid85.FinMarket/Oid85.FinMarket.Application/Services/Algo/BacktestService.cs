@@ -27,7 +27,8 @@ public class BacktestService(
         IBacktestService
 {
     private readonly IResourceStoreService _resourceStoreService = resourceStoreService;
-    
+    private readonly ILogger _logger = logger;
+
     public async Task<bool> BacktestAsync()
     {
         await InitBacktestAsync();
@@ -38,6 +39,8 @@ public class BacktestService(
         var optimizationResults = await optimizationResultRepository.GetAsync(algoConfigResource.OptimizationResultFilterResource);
         
         var backtestResults = new List<BacktestResult>();
+        
+        await backtestResultRepository.InvertDeleteAsync(algoStrategyResources.Select(x => x.Id).ToList());
         
         foreach (var (strategyId, strategy) in StrategyDictionary)
         {
@@ -86,7 +89,7 @@ public class BacktestService(
                     
                 catch (Exception exception)
                 {
-                    logger.Error($"Ошибка '{strategyId}', '{strategy.Ticker}', '{exception.Message}'");
+                    _logger.Error($"Ошибка '{strategyId}', '{strategy.Ticker}', '{exception.Message}'");
                 }
                     
                 sw.Stop();

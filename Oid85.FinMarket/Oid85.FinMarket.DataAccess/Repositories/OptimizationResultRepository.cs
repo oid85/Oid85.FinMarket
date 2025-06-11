@@ -34,4 +34,7 @@ public class OptimizationResultRepository(
 
     public Task DeleteAsync(Guid strategyId) => 
         context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
+
+    public Task InvertDeleteAsync(List<Guid> strategyIds) => 
+        context.OptimizationResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
 }

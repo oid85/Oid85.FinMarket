@@ -26,6 +26,7 @@ public class OptimizationService(
         IOptimizationService
 {
     private readonly IResourceStoreService _resourceStoreService = resourceStoreService;
+    private readonly ILogger _logger = logger;
 
     public async Task<bool> OptimizeAsync()
     {
@@ -35,6 +36,8 @@ public class OptimizationService(
         var algoStrategyResources = await _resourceStoreService.GetAlgoStrategiesAsync();
 
         var optimizationResults = new List<OptimizationResult>();
+        
+        await optimizationResultRepository.InvertDeleteAsync(algoStrategyResources.Select(x => x.Id).ToList());
         
         foreach (var (strategyId, strategy) in StrategyDictionary)
         {
@@ -86,7 +89,7 @@ public class OptimizationService(
                     
                     catch (Exception exception)
                     {
-                        logger.Error($"Ошибка '{strategyId}', '{ticker}', '{exception.Message}'");
+                        _logger.Error($"Ошибка '{strategyId}', '{ticker}', '{exception.Message}'");
                     }
                     
                     sw.Stop();

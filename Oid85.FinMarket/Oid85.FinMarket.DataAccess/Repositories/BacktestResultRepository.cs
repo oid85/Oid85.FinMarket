@@ -35,4 +35,7 @@ public class BacktestResultRepository(
 
     public Task DeleteAsync(Guid strategyId) => 
         context.BacktestResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
+    
+    public Task InvertDeleteAsync(List<Guid> strategyIds) => 
+        context.BacktestResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
 }
