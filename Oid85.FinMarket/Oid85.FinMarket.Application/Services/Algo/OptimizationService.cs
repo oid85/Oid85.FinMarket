@@ -42,11 +42,6 @@ public class OptimizationService(
             
             foreach (var ticker in algoConfigResource.Tickers)
             {
-                if (ticker == "GEMC")
-                {
-                    
-                }
-
                 var algoStrategyResource = algoStrategyResources.Find(x => x.Id == key);
                 
                 if (algoStrategyResource is null)
@@ -98,13 +93,13 @@ public class OptimizationService(
                     
                     Debug.Print($"Оптимизация '{key}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
                     
-                    //var optimizationResult = CreateOptimizationResult(strategy);
-                    //optimizationResults.Add(optimizationResult);
+                    var optimizationResult = CreateOptimizationResult(strategy);
+                    optimizationResults.Add(optimizationResult);
                 }
             }
         }
 
-        // await optimizationResultRepository.AddAsync(optimizationResults);
+        await optimizationResultRepository.AddAsync(optimizationResults);
         
         return true;
     }
