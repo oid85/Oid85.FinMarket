@@ -36,13 +36,13 @@ public class OptimizationService(
 
         var optimizationResults = new List<OptimizationResult>();
         
-        foreach (var (key, strategy) in StrategyDictionary)
+        foreach (var (strategyId, strategy) in StrategyDictionary)
         {
-            await optimizationResultRepository.DeleteAsync(key);
+            await optimizationResultRepository.DeleteAsync(strategyId);
             
             foreach (var ticker in algoConfigResource.Tickers)
             {
-                var algoStrategyResource = algoStrategyResources.Find(x => x.Id == key);
+                var algoStrategyResource = algoStrategyResources.Find(x => x.Id == strategyId);
                 
                 if (algoStrategyResource is null)
                     continue;
@@ -86,12 +86,12 @@ public class OptimizationService(
                     
                     catch (Exception exception)
                     {
-                        logger.Error($"Ошибка '{key}', '{ticker}', '{exception.Message}'");
+                        logger.Error($"Ошибка '{strategyId}', '{ticker}', '{exception.Message}'");
                     }
                     
                     sw.Stop();
                     
-                    Debug.Print($"Оптимизация '{key}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
+                    Debug.Print($"Оптимизация '{strategyId}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
                     
                     var optimizationResult = CreateOptimizationResult(strategy);
                     optimizationResults.Add(optimizationResult);
