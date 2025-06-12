@@ -38,6 +38,10 @@ public class Strategy
     
     public bool SignalShort { get; set; }
     
+    public bool SignalCloseLong { get; set; }
+    
+    public bool SignalCloseShort { get; set; }
+    
     public List<StopLimit?> StopLimits { get; set; } = new();
     
     public List<Position> Positions { get; set; } = new();

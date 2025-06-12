@@ -7,5 +7,5 @@ public interface IIndicatorFactory
     List<double> Highest(List<double> values, int period);
     List<double> Lowest(List<double> values, int period);
     List<double> Sma(List<double> values, int period);
-    List<double?> Supertrend(List<Candle> candles, int period, double multiplier);
+    List<double> Supertrend(List<Candle> candles, int period, double multiplier);
 }
