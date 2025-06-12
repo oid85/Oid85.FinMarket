@@ -32,6 +32,9 @@ namespace Oid85.FinMarket.Application.Strategies
             highLevel = highLevel.Shift(1);
             lowLevel = lowLevel.Shift(1);
 
+            // Средняя линия канала
+            List<double> middleLine = highLevel.Add(lowLevel)!.DivConst(2.0);
+            
             // Переменные для обслуживания позиции
             double trailingStop = 0.0;
 
@@ -55,8 +58,8 @@ namespace Oid85.FinMarket.Application.Strategies
 
                     if (LastActivePosition.IsLong)
                     {
-                        double startTrailingStop = (highLevel[entryCandleIndex] + lowLevel[entryCandleIndex]) / 2.0;
-                        double curTrailingStop = (highLevel[i] + lowLevel[i]) / 2.0;
+                        double startTrailingStop = middleLine[entryCandleIndex];
+                        double curTrailingStop = middleLine[i];
 
                         trailingStop = i == entryCandleIndex ? startTrailingStop : Math.Max(trailingStop, curTrailingStop);
 
