@@ -1,6 +1,4 @@
-﻿using Tinkoff.InvestApi.V1;
-
-namespace Oid85.FinMarket.Domain.Models.Algo;
+﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
 public class Strategy
 {
@@ -46,9 +44,9 @@ public class Strategy
     
     public List<Position> Positions { get; set; } = new();
 
-    public double PercentSize { get; set; }
+    public double PercentOfMoney { get; set; }
     
-    public int GetPositionSize(double orderPrice) => Convert.ToInt32(Math.Floor(EndMoney / (100.0 / PercentSize) / orderPrice));
+    public int GetPositionSize(double orderPrice) => Convert.ToInt32(Math.Floor(EndMoney / (100.0 / PercentOfMoney) / orderPrice));
 
     public Position? LastActivePosition {
         get

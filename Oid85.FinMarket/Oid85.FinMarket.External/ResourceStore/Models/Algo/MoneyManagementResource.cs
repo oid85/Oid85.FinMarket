@@ -16,6 +16,6 @@ public class MoneyManagementResource
     /// <summary>
     /// Процент от капитала для входа в сделку
     /// </summary>
-    [JsonPropertyName("percentSize")]
-    public double PercentSize { get; set; }
+    [JsonPropertyName("percentOfMoney")]
+    public double PercentOfMoney { get; set; }
 }
