@@ -6,6 +6,20 @@ namespace Oid85.FinMarket.DataAccess.Mapping;
 
 public static class DataAccessMapper
 {
+        public static StrategySignalEntity Map(StrategySignal model) =>
+        new()
+        {
+            Ticker = model.Ticker,
+            Position = model.Position
+        };
+    
+    public static StrategySignal Map(StrategySignalEntity entity) =>
+        new()
+        {
+            Ticker = entity.Ticker,
+            Position = entity.Position
+        }; 
+    
     public static OptimizationResultEntity Map(OptimizationResult model) =>
         new()
         {

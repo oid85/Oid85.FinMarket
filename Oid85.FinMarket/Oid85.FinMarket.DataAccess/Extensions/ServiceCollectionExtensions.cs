@@ -47,6 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFeerGreedRepository, FeerGreedRepository>();
         services.AddTransient<IBacktestResultRepository, BacktestResultRepository>();
         services.AddTransient<IOptimizationResultRepository, OptimizationResultRepository>();
+        services.AddTransient<IStrategySignalRepository, StrategySignalRepository>();
     }
     
     public static async Task ApplyMigrations(this IHost host)

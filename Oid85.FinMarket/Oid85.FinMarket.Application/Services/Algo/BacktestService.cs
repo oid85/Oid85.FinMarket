@@ -17,6 +17,7 @@ public class BacktestService(
     IResourceStoreService resourceStoreService,
     IOptimizationResultRepository optimizationResultRepository,
     IBacktestResultRepository backtestResultRepository,
+    IStrategySignalRepository strategySignalRepository,
     IServiceProvider serviceProvider) 
     : AlgoService(
         logger,
@@ -102,10 +103,37 @@ public class BacktestService(
         }
 
         await backtestResultRepository.AddAsync(backtestResults);
-
+        
+        await CalculateStrategySignals();
+        
         return true;
     }
-    
+
+    private async Task CalculateStrategySignals()
+    {
+        var algoConfigResource = await _resourceStoreService.GetAlgoConfigAsync();
+        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+        
+        var tickersInStrategiSignals = (await strategySignalRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
+        var tickersInBacktestResults = backtestResults.Select(x => x.Ticker).Distinct().ToList();
+
+        foreach (var ticker in tickersInStrategiSignals)
+        {
+            if (!tickersInBacktestResults.Contains(ticker))
+                await strategySignalRepository.UpdatePositionAsync([ticker], 0);
+        }
+
+        foreach (var ticker in tickersInBacktestResults)
+        {
+            if (!tickersInStrategiSignals.Contains(ticker))
+                await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, Position = 0 });
+                
+            var position = backtestResults.Where(x => x.Ticker == ticker).Sum(x => x.CurrentPosition);
+            await strategySignalRepository.UpdatePositionAsync([ticker], position);
+        }
+    }
+
+
     private static BacktestResult CreateBacktestResult(Strategy strategy)
     {
         var json = JsonSerializer.Serialize(strategy.Parameters);
