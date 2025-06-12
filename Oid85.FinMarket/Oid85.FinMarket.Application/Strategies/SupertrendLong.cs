@@ -10,7 +10,7 @@ namespace Oid85.FinMarket.Application.Strategies
     {
         public override void Execute()
         {
-            // Определяем параметра
+            // Получаем параметры
             int period = Parameters["Period"];
             double multiplier = Parameters["Multiplier"] / 10.0;
             

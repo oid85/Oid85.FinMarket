@@ -10,7 +10,7 @@ namespace Oid85.FinMarket.Application.Strategies
     {
         public override void Execute()
         {
-            // Определяем периоды каналов
+            // Получаем параметры
             int periodHighEntry = Parameters["PeriodEntry"];
             int periodLowExit = Parameters["PeriodExit"];
 
