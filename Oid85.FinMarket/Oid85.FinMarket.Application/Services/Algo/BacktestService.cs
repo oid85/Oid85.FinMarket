@@ -39,13 +39,13 @@ public class BacktestService(
 
         var optimizationResults = await optimizationResultRepository.GetAsync(algoConfigResource.OptimizationResultFilterResource);
         
-        var backtestResults = new List<BacktestResult>();
-        
         await backtestResultRepository.InvertDeleteAsync(algoStrategyResources.Select(x => x.Id).ToList());
         
         foreach (var (strategyId, strategy) in StrategyDictionary)
         {
             await backtestResultRepository.DeleteAsync(strategyId);
+         
+            var backtestResults = new List<BacktestResult>();
             
             foreach (var optimizationResult in optimizationResults.Where(x => x.StrategyId == strategyId))
             {
@@ -64,8 +64,8 @@ public class BacktestService(
                 
                 strategy.Candles = algoStrategyResource.Timeframe switch
                 {
-                    "D" => DailyCandles.ContainsKey(strategy.Ticker) ? DailyCandles[strategy.Ticker] : [],
-                    "H" => HourlyCandles.ContainsKey(strategy.Ticker) ? HourlyCandles[strategy.Ticker] : [],
+                    "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
+                    "H" => HourlyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
                     _ => []
                 };
 
@@ -101,9 +101,9 @@ public class BacktestService(
                 var backtestResult = CreateBacktestResult(strategy);
                 backtestResults.Add(backtestResult);
             }
+            
+            await backtestResultRepository.AddAsync(backtestResults);
         }
-
-        await backtestResultRepository.AddAsync(backtestResults);
         
         await CalculateStrategySignals();
         

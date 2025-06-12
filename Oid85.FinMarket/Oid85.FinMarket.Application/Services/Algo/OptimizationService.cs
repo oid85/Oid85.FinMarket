@@ -34,13 +34,13 @@ public class OptimizationService(
         
         var algoConfigResource = await _resourceStoreService.GetAlgoConfigAsync();
         var algoStrategyResources = await _resourceStoreService.GetAlgoStrategiesAsync();
-
-        var optimizationResults = new List<OptimizationResult>();
         
         await optimizationResultRepository.InvertDeleteAsync(algoStrategyResources.Select(x => x.Id).ToList());
         
         foreach (var (strategyId, strategy) in StrategyDictionary)
         {
+            var optimizationResults = new List<OptimizationResult>();
+            
             await optimizationResultRepository.DeleteAsync(strategyId);
             
             var tickerList = algoStrategyResources.Find(x => x.Id == strategyId)!.TickerList;
@@ -64,8 +64,8 @@ public class OptimizationService(
                 
                 strategy.Candles = algoStrategyResource.Timeframe switch
                 {
-                    "D" => DailyCandles.ContainsKey(ticker) ? DailyCandles[ticker] : [],
-                    "H" => HourlyCandles.ContainsKey(ticker) ? HourlyCandles[ticker] : [],
+                    "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
+                    "H" => HourlyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
                     _ => []
                 };
 
@@ -104,9 +104,9 @@ public class OptimizationService(
                     optimizationResults.Add(optimizationResult);
                 }
             }
+            
+            await optimizationResultRepository.AddAsync(optimizationResults);
         }
-
-        await optimizationResultRepository.AddAsync(optimizationResults);
         
         return true;
     }
