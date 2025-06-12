@@ -46,6 +46,10 @@ public class Strategy
     
     public List<Position> Positions { get; set; } = new();
 
+    public double PercentSize { get; set; }
+    
+    public int GetPositionSize(double orderPrice) => Convert.ToInt32(Math.Floor(EndMoney / (100.0 / PercentSize) / orderPrice));
+
     public Position? LastActivePosition {
         get
         {

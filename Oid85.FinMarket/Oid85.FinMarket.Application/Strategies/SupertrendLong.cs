@@ -10,8 +10,6 @@ namespace Oid85.FinMarket.Application.Strategies
     {
         public override void Execute()
         {
-            int positionSize = 1;
-            
             // Определяем параметра
             int period = Parameters["Period"];
             double multiplier = Parameters["Multiplier"] / 10.0;
@@ -33,6 +31,9 @@ namespace Oid85.FinMarket.Application.Strategies
                 // Задаем цену для заявки
                 double orderPrice = Candles[i].Close;
 
+                // Расчет размера позиции
+                int positionSize = GetPositionSize(orderPrice);
+                
                 if (LastActivePosition == null)
                 {
                     if (SignalLong)

@@ -59,6 +59,7 @@ public class OptimizationService(
                 strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
+                strategy.PercentSize = algoConfigResource.MoneyManagementResource.PercentSize;
                 strategy.Ticker = ticker;                
                 
                 strategy.Candles = algoStrategyResource.Timeframe switch
