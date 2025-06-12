@@ -4,32 +4,33 @@ using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Strategies
 {
-    public class DonchianBreakoutClassicLongDaily(IIndicatorFactory indicatorFactory) : Strategy
+    public class DonchianBreakoutMiddleLong(
+        IIndicatorFactory indicatorFactory) 
+        : Strategy
     {
         public override void Execute()
         {
             int positionSize = 1;
             
             // Определяем периоды каналов
-            int periodHighEntry = Parameters["PeriodEntry"];
-            int periodLowExit = Parameters["PeriodExit"];
+            int period = Parameters["Period"];
 
             // Цены для построения канала
-            List<double> priceForChannelHighEntry = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
-            List<double> priceForChannelLowExit = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
+            List<double> priceForChannelHigh = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
+            List<double> priceForChannelLow = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
 
             // Построение каналов
-            List<double> highLevelEntry = indicatorFactory.Highest(priceForChannelHighEntry, periodHighEntry);
-            List<double> lowLevelExit = indicatorFactory.Lowest(priceForChannelLowExit, periodLowExit);
+            List<double> highLevel = indicatorFactory.Highest(priceForChannelHigh, period);
+            List<double> lowLevel = indicatorFactory.Lowest(priceForChannelLow, period);
 
             // Сглаживание
             int smoothPeriod = 5;
-            highLevelEntry = indicatorFactory.Sma(highLevelEntry, smoothPeriod);
-            lowLevelExit = indicatorFactory.Sma(lowLevelExit, smoothPeriod);
+            highLevel = indicatorFactory.Sma(highLevel, smoothPeriod);
+            lowLevel = indicatorFactory.Sma(lowLevel, smoothPeriod);
 
             // Сдвиг вправо на одну свечу
-            highLevelEntry = highLevelEntry.Shift(1);
-            lowLevelExit = lowLevelExit.Shift(1);
+            highLevel = highLevel.Shift(1);
+            lowLevel = lowLevel.Shift(1);
 
             // Переменные для обслуживания позиции
             double trailingStop = 0.0;
@@ -37,7 +38,7 @@ namespace Oid85.FinMarket.Application.Strategies
             for (int i = StabilizationPeriod; i < Candles.Count - 1; i++)
             {
                 // Правило входа
-                SignalLong = ClosePrices[i] > highLevelEntry[i];
+                SignalLong = ClosePrices[i] > highLevel[i];
 
                 // Задаем цену для заявки
                 double orderPrice = Candles[i].Close;
@@ -54,8 +55,8 @@ namespace Oid85.FinMarket.Application.Strategies
 
                     if (LastActivePosition.IsLong)
                     {
-                        double startTrailingStop = lowLevelExit[entryCandleIndex];
-                        double curTrailingStop = lowLevelExit[i];
+                        double startTrailingStop = (highLevel[entryCandleIndex] + lowLevel[entryCandleIndex]) / 2.0;
+                        double curTrailingStop = (highLevel[i] + lowLevel[i]) / 2.0;
 
                         trailingStop = i == entryCandleIndex ? startTrailingStop : Math.Max(trailingStop, curTrailingStop);
 

@@ -70,7 +70,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDiagramDataFactory, DiagramDataFactory>();
         services.AddTransient<IIndicatorFactory, IndicatorFactory>();
         
-        services.AddKeyedTransient<Strategy, DonchianBreakoutClassicLongDaily>("DonchianBreakoutClassicLongDaily");
+        services.AddKeyedTransient<Strategy, DonchianBreakoutClassicLong>("DonchianBreakoutClassicLong");
+        services.AddKeyedTransient<Strategy, DonchianBreakoutMiddleLong>("DonchianBreakoutMiddleLong");
     }
     
     public static async Task RegisterHangfireJobs(
