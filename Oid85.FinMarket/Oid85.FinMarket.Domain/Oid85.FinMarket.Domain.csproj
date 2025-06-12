@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="NLog.Targets.Seq" />
+    <PackageReference Include="Skender.Stock.Indicators" />
   </ItemGroup>
 
   <ItemGroup>

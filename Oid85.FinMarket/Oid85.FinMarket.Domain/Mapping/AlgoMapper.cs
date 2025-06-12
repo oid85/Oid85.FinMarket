@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.Algo;
+using Skender.Stock.Indicators;
 
 namespace Oid85.FinMarket.Domain.Mapping;
 
@@ -25,5 +26,15 @@ public static class AlgoMapper
             Low = model.Low,
             Volume = model.Volume,
             DateTime = new DateTime(model.Date, model.Time)
+        };     
+    
+    public static Quote Map(Candle model) =>
+        new()
+        {
+            Open = Convert.ToDecimal(model.Open),
+            Close = Convert.ToDecimal(model.Close),
+            High = Convert.ToDecimal(model.High),
+            Low = Convert.ToDecimal(model.Low),
+            Date = model.DateTime
         };     
 }
