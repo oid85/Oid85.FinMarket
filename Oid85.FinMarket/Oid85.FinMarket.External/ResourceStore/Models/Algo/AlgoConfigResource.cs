@@ -30,10 +30,4 @@ public class AlgoConfigResource
     /// </summary>
     [JsonPropertyName("backtestResultFilter")]
     public BacktestResultFilterResource BacktestResultFilterResource { get; set; } = new();
-    
-    /// <summary>
-    /// Список тикеров
-    /// </summary>
-    [JsonPropertyName("tickers")]
-    public List<string> Tickers { get; set; } = new();    
 }

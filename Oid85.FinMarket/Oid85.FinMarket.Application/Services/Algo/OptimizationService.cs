@@ -43,7 +43,10 @@ public class OptimizationService(
         {
             await optimizationResultRepository.DeleteAsync(strategyId);
             
-            foreach (var ticker in algoConfigResource.Tickers)
+            var tickerList = algoStrategyResources.Find(x => x.Id == strategyId)!.TickerList;
+            var tickers = (await _resourceStoreService.GetTickerListAsync(tickerList)).Tickers;
+            
+            foreach (var ticker in tickers)
             {
                 var algoStrategyResource = algoStrategyResources.Find(x => x.Id == strategyId);
                 

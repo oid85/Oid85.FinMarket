@@ -80,7 +80,9 @@ public class AlgoService(
     {
         var dates = GetDailyDates();
 
-        foreach (string ticker in _algoConfigResource.Tickers)
+        var tickers = await GetAllTickers();
+        
+        foreach (string ticker in tickers)
         {
             var candles = (await dailyCandleRepository.GetAsync(ticker, dates.From, dates.To))
                 .Select(AlgoMapper.Map).ToList();
@@ -99,7 +101,9 @@ public class AlgoService(
     {
         var dates = GetHourlyDates();
         
-        foreach (string ticker in _algoConfigResource.Tickers)
+        var tickers = await GetAllTickers();
+        
+        foreach (string ticker in tickers)
         {
             var candles = (await hourlyCandleRepository.GetAsync(ticker, dates.From, dates.To))
                 .Select(AlgoMapper.Map).ToList();
@@ -113,7 +117,22 @@ public class AlgoService(
             HourlyCandles.TryAdd(ticker, candles);
         }
     }
-    
+
+    private async Task<List<string>> GetAllTickers()
+    {
+        var tickers = new List<string>();
+
+        foreach (var algoStrategyResource in _algoStrategyResources)
+        {
+            var tickersInTickerList = (await resourceStoreService.GetTickerListAsync(algoStrategyResource.TickerList)).Tickers;
+
+            foreach (var ticker in tickersInTickerList.Where(ticker => !tickers.Contains(ticker))) 
+                tickers.Add(ticker);
+        }
+        
+        return tickers;
+    }
+
     private (DateOnly From, DateOnly To) GetDailyDates()
     {
         DateOnly from;

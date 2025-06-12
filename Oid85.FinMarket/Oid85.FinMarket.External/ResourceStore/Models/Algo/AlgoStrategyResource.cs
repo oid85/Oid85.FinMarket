@@ -38,6 +38,12 @@ public class AlgoStrategyResource
     public string Timeframe { get; set; } = string.Empty;    
     
     /// <summary>
+    /// Список тикеров
+    /// </summary>
+    [JsonPropertyName("tickerList")]
+    public string TickerList { get; set; } = string.Empty; 
+    
+    /// <summary>
     /// Параметры стратегии
     /// </summary>
     [JsonPropertyName("params")]
