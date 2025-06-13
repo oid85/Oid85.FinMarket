@@ -122,7 +122,7 @@ public class Strategy
             Positions[count - 1].ExitCandleIndex = trade.CandleIndex;
             Positions[count - 1].IsActive = false;
             
-            var profit = Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice;
+            var profit = Positions[count - 1].Quantity * (Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice);
             Positions[count - 1].Profit = profit;
             Positions[count - 1].ProfitPercent = profit / EndMoney * 100.0;
             EndMoney += profit;
