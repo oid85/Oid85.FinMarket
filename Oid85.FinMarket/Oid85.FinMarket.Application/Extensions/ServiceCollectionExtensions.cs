@@ -43,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFuturesReportService, FuturesReportService>();
         services.AddTransient<ICurrenciesReportService, CurrenciesReportService>();
         services.AddTransient<IBondsReportService, BondsReportService>();
+        services.AddTransient<IAlgoReportService, AlgoReportService>();
         
         services.AddTransient<ISharesDiagramService, SharesDiagramService>();
         services.AddTransient<IBondsDiagramService, BondsDiagramService>();

@@ -15,4 +15,6 @@ public interface IReportDataFactory
     Task<ReportData> CreateActiveMarketEventsReportDataAsync(List<Guid> instrumentIds);
     Task<ReportData> CreateAssetReportEventsReportDataAsync(List<Guid> instrumentIds);
     Task<ReportData> CreateFearGreedIndexReportDataAsync(DateOnly from, DateOnly to);
+    Task<ReportData> CreateStrategySignalsReportDataAsync();
+    Task<ReportData> CreateBacktestResultsReportDataAsync();
 }

@@ -23,6 +23,8 @@ public class ReportDataFactory(
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
     IAssetReportEventRepository assetReportEventRepository,
+    IStrategySignalRepository strategySignalRepository,
+    IBacktestResultRepository backtestResultRepository,
     ColorHelper colorHelper,
     ISpreadRepository spreadRepository,
     IMarketEventRepository marketEventRepository,
@@ -783,6 +785,22 @@ public class ReportDataFactory(
             reportData.Data.Add(data);
         }
             
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateStrategySignalsReportDataAsync()
+    {
+        var reportData = CreateNewReportDataWithHeaders(
+            ["Тикер", "Позиция"]);
+        
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateBacktestResultsReportDataAsync()
+    {
+        var reportData = CreateNewReportDataWithHeaders(
+            ["Тикер", "Позиция"]);
+        
         return reportData;
     }
 }

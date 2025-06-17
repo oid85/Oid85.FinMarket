@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Services.Algo;
+using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
+using Oid85.FinMarket.Application.Models.Reports;
+using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
+using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
@@ -9,7 +13,8 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [ApiController]
 public class AlgoController(
     IBacktestService backtestService,
-    IOptimizationService optimizationService) 
+    IOptimizationService optimizationService,
+    IAlgoReportService reportService)
     : FinMarketBaseController
 {
     /// <summary>
@@ -26,7 +31,7 @@ public class AlgoController(
             {
                 Result = result
             });
-    
+
     /// <summary>
     /// Выполнить бэктест
     /// </summary>
@@ -40,5 +45,51 @@ public class AlgoController(
             result => new BaseResponse<bool>
             {
                 Result = result
+            });
+
+    /// <summary>
+    /// Получить результаты бэктеста
+    /// </summary>
+    [HttpPost("backtest-results")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetBacktestResultsAsync() =>
+        GetResponseAsync(
+            reportService.GetBacktestResultsAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
+
+    /// <summary>
+    /// Получить бэктест по id
+    /// </summary>
+    [HttpPost("backtest-result")]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResult>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResult>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResult>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetBacktestResultByIdAsync(
+        [FromBody] IdRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetBacktestResultByIdAsync(request),
+            result => new BaseResponse<BacktestResult>
+            {
+                Result = result
             });    
+    
+    /// <summary>
+    /// Получить сигналы стратегий
+    /// </summary>
+    [HttpPost("strategy-signals")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetStrategySignalsAsync() =>
+        GetResponseAsync(
+            reportService.GetStrategySignalsAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });
 }
