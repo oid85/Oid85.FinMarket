@@ -61,9 +61,9 @@ namespace Oid85.FinMarket.Application.Strategies
                         double curTrailingStop = lowLevelExit[i];
 
                         trailingStop = i == entryCandleIndex ? startTrailingStop : Math.Max(trailingStop, curTrailingStop);
-
-                        // Выход по стопу
-                        CloseAtStop(LastActivePosition, trailingStop, i + 1);
+                        
+                        if (Candles[i].Close <= trailingStop)
+                            SellAtPrice(positionSize, Candles[i].Close, i + 1);
                     }
                 }
             }

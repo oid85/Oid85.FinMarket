@@ -46,7 +46,18 @@ public class Strategy
 
     public double PercentOfMoney { get; set; }
     
-    public int GetPositionSize(double orderPrice) => Convert.ToInt32(Math.Floor(EndMoney / (100.0 / PercentOfMoney) / orderPrice));
+    public int GetPositionSize(double orderPrice)
+    {
+        double money = EndMoney / (100.0 / PercentOfMoney);
+        
+        if (money <= orderPrice)
+            return 0;
+        
+        int positionSize = (int) Math.Round(money / orderPrice);
+        
+        
+        return positionSize;
+    }
 
     public Position? LastActivePosition {
         get
@@ -100,6 +111,9 @@ public class Strategy
 
     private void AddTrade(Trade trade)
     {
+        if (trade.Quantity == 0)
+            return;
+        
         if (LastActivePosition is null)
             Positions.Add(new Position
             {
@@ -155,10 +169,10 @@ public class Strategy
 		// Пробуем выйти по стопу
 		if (LastActivePosition is not null && StopLimits[candleIndex - 1] is not null)		
 		{
-			if (position.IsLong && position.EntryPrice <= StopLimits[candleIndex - 1]!.Value.StopPrice)			
+			if (position.IsLong && Candles[candleIndex - 1].Close <= StopLimits[candleIndex - 1]!.Value.StopPrice)			
 				SellAtPrice(position.Quantity, stopPrice, candleIndex);	
 			
-			else if (position.IsShort && position.EntryPrice >= StopLimits[candleIndex - 1]!.Value.StopPrice)			
+			else if (position.IsShort && Candles[candleIndex - 1].Close >= StopLimits[candleIndex - 1]!.Value.StopPrice)			
 				BuyAtPrice(position.Quantity, stopPrice, candleIndex);				
 		}
 		

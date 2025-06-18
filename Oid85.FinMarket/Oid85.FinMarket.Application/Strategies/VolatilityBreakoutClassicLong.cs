@@ -18,7 +18,7 @@ namespace Oid85.FinMarket.Application.Strategies
             List<double> price = OpenPrices.Add(ClosePrices)!.DivConst(2.0);
             List<double> atr = indicatorFactory.Atr(Candles, period);
             List<double> highLevel = price.Add(atr.MultConst(multiplier))!; // up = price + atr * multiplier;
-            List<double> lowLevel = price.Div(atr.MultConst(multiplier))!; // up = price - atr * multiplier;
+            List<double> lowLevel = price.Sub(atr.MultConst(multiplier))!; // up = price - atr * multiplier;
 
             highLevel = indicatorFactory.Highest(highLevel, period);
             lowLevel = indicatorFactory.Lowest(lowLevel, period);
@@ -59,7 +59,9 @@ namespace Oid85.FinMarket.Application.Strategies
                     {
                         int entryBar = LastActivePosition.EntryCandleIndex;
                         currentTrailing = i == entryBar ? startTrailing : Math.Max(currentTrailing, lowLevel[i]);
-                        CloseAtStop(LastActivePosition, currentTrailing, i + 1);
+                        
+                        if (Candles[i].Close <= currentTrailing)
+                            SellAtPrice(positionSize, Candles[i].Close, i + 1);
                     }
                 }
             }

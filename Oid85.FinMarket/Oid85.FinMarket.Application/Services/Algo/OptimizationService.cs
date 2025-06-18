@@ -39,23 +39,22 @@ public class OptimizationService(
         
         foreach (var (strategyId, strategy) in StrategyDictionary)
         {
-            var optimizationResults = new List<OptimizationResult>();
-            
             await optimizationResultRepository.DeleteAsync(strategyId);
             
-            var tickerList = algoStrategyResources.Find(x => x.Id == strategyId)!.TickerList;
-            var tickers = (await _resourceStoreService.GetTickerListAsync(tickerList)).Tickers;
+            var algoStrategyResource = algoStrategyResources.Find(x => x.Id == strategyId);
+            
+            if (algoStrategyResource is null)
+                continue;
+                
+            if (!algoStrategyResource.Enable)
+                continue;
+            
+            var optimizationResults = new List<OptimizationResult>();
+            
+            var tickers = (await _resourceStoreService.GetTickerListAsync(algoStrategyResource.TickerList)).Tickers;
             
             foreach (var ticker in tickers)
             {
-                var algoStrategyResource = algoStrategyResources.Find(x => x.Id == strategyId);
-                
-                if (algoStrategyResource is null)
-                    continue;
-                
-                if (!algoStrategyResource.Enable)
-                    continue;
-
                 strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
@@ -93,12 +92,12 @@ public class OptimizationService(
                     
                     catch (Exception exception)
                     {
-                        _logger.Error($"Ошибка '{strategyId}', '{ticker}', '{exception.Message}'");
+                        _logger.Error($"Ошибка '{algoStrategyResource.Name}', '{strategyId}', '{ticker}', '{exception.Message}'");
                     }
                     
                     sw.Stop();
                     
-                    Debug.Print($"Оптимизация '{strategyId}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
+                    Debug.Print($"Оптимизация '{algoStrategyResource.Name}', '{strategyId}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
                     
                     var optimizationResult = CreateOptimizationResult(strategy);
                     optimizationResults.Add(optimizationResult);

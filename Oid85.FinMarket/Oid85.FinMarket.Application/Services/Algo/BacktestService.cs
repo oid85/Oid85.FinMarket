@@ -44,19 +44,19 @@ public class BacktestService(
         foreach (var (strategyId, strategy) in StrategyDictionary)
         {
             await backtestResultRepository.DeleteAsync(strategyId);
-         
+            
+            var algoStrategyResource = algoStrategyResources.Find(x => x.Id == strategyId);
+                
+            if (algoStrategyResource is null)
+                continue;
+                
+            if (!algoStrategyResource.Enable)
+                continue;
+            
             var backtestResults = new List<BacktestResult>();
             
             foreach (var optimizationResult in optimizationResults.Where(x => x.StrategyId == strategyId))
             {
-                var algoStrategyResource = algoStrategyResources.Find(x => x.Id == strategyId);
-                
-                if (algoStrategyResource is null)
-                    continue;
-                
-                if (!algoStrategyResource.Enable)
-                    continue;
-                
                 strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
