@@ -82,12 +82,20 @@ public class OptimizationService(
                         continue;
                     
                     strategy.Parameters = parameterSet;
+                    strategy.StopLimits.Clear();
+                    strategy.Positions.Clear();
+                    strategy.EqiutyCurve.Clear();
+                    strategy.DrawdownCurve.Clear();
+                    strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
                     
                     var sw = Stopwatch.StartNew();
                     
                     try
                     {
                         strategy.Execute();
+                        
+                        var optimizationResult = CreateOptimizationResult(strategy);
+                        optimizationResults.Add(optimizationResult);
                     }
                     
                     catch (Exception exception)
@@ -98,9 +106,6 @@ public class OptimizationService(
                     sw.Stop();
                     
                     Debug.Print($"Оптимизация '{algoStrategyResource.Name}', '{strategyId}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
-                    
-                    var optimizationResult = CreateOptimizationResult(strategy);
-                    optimizationResults.Add(optimizationResult);
                 }
             }
             

@@ -81,25 +81,30 @@ public class BacktestService(
                     continue;
                 
                 strategy.Parameters = parameterSet;
-                    
+                strategy.StopLimits.Clear();
+                strategy.Positions.Clear();
+                strategy.EqiutyCurve.Clear();
+                strategy.DrawdownCurve.Clear();
+                strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
+                
                 var sw = Stopwatch.StartNew();
                     
                 try
                 {
                     strategy.Execute();
+                    
+                    var backtestResult = CreateBacktestResult(strategy);
+                    backtestResults.Add(backtestResult);
                 }
                     
                 catch (Exception exception)
                 {
-                    _logger.Error($"Ошибка '{strategyId}', '{strategy.Ticker}', '{exception.Message}'");
+                    _logger.Error($"Ошибка '{algoStrategyResource.Name}', '{strategyId}', '{strategy.Ticker}', '{exception.Message}'");
                 }
                     
                 sw.Stop();
                     
-                Debug.Print($"Бэктест '{strategyId}', '{strategy.Ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
-                
-                var backtestResult = CreateBacktestResult(strategy);
-                backtestResults.Add(backtestResult);
+                Debug.Print($"Бэктест '{algoStrategyResource.Name}', '{strategyId}', '{strategy.Ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
             }
             
             await backtestResultRepository.AddAsync(backtestResults);

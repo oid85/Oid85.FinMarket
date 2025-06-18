@@ -210,23 +210,23 @@ public class Strategy
         }
     }
 
-    public double RecoveryFactor => MaxDrawdown == 0.0 ? double.PositiveInfinity : NetProfit / MaxDrawdown;
+    public double RecoveryFactor => MaxDrawdown == 0.0 ? 0.0 : NetProfit / MaxDrawdown;
 
     public double NetProfit => LastPosition?.TotalProfit ?? 0.0;
     
-    public double AverageNetProfit => Positions.Select(x => x.Profit).Average();
+    public double AverageNetProfit => Positions.Count == 0 ? 0.0 : Positions.Select(x => x.Profit).Average();
 
-    public double AverageNetProfitPercent => Positions.Select(x => x.ProfitPercent).Average();
+    public double AverageNetProfitPercent => Positions.Count == 0 ? 0.0 : Positions.Select(x => x.ProfitPercent).Average();
 
     public double Drawdown  => LastPosition is null ? 0.0 : Positions.Max(x => x.TotalProfit) - LastPosition.TotalProfit;
 
-    public double MaxDrawdown  => DrawdownCurve.Max(x => x.Value);
+    public double MaxDrawdown  => DrawdownCurve.Count == 0 ? 0.0 : DrawdownCurve.Max(x => x.Value);
 
     public double MaxDrawdownPercent => MaxDrawdown == 0.0 ? 0.0 : NetProfit / MaxDrawdown * 100.0;
 
     public int NumberPositions => Positions.Count;
 
-    public int WinningPositions => Positions.Count(x => x.Profit > 0.0);
+    public int WinningPositions => Positions.Count == 0 ? 0 : Positions.Count(x => x.Profit > 0.0);
 
     public double WinningTradesPercent => NumberPositions == 0.0 ? 0.0 : Convert.ToDouble(WinningPositions) / Convert.ToDouble(NumberPositions) * 100.0;    
     
