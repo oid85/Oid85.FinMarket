@@ -156,6 +156,7 @@ public class BacktestService(
             StrategyParamsHash = ConvertHelper.Md5Encode(json),
             NumberPositions  = strategy.NumberPositions,
             CurrentPosition  = strategy.CurrentPosition,
+            CurrentPositionCost  = strategy.CurrentPositionCost,
             ProfitFactor  = strategy.ProfitFactor,
             RecoveryFactor  = strategy.RecoveryFactor,
             NetProfit  = strategy.NetProfit,

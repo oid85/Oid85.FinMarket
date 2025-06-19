@@ -67,6 +67,12 @@ public class BacktestResultEntity : AuditableEntity
     public int CurrentPosition { get; set; }    
     
     /// <summary>
+    /// Текущая позиция (стоимость)
+    /// </summary>
+    [Column("current_position_cost")]
+    public double CurrentPositionCost { get; set; } 
+    
+    /// <summary>
     /// Profit Factor
     /// </summary>
     [Column("profit_factor")]

@@ -91,6 +91,8 @@ public class Strategy
         }
     }
 
+    public double CurrentPositionCost => LastPosition?.Cost ?? 0;
+    
     public void BuyAtPrice(int quantity, double price, int candleIndex) =>
         AddTrade(new Trade
         {
@@ -124,7 +126,8 @@ public class Strategy
                 IsActive = true,
                 IsLong = trade.Quantity > 0,
                 IsShort = trade.Quantity < 0,
-                Quantity = trade.Quantity
+                Quantity = trade.Quantity,
+                Cost = trade.Quantity * trade.Price
             });
 
         else
@@ -135,7 +138,8 @@ public class Strategy
             Positions[count - 1].ExitDateTime = trade.DateTime;
             Positions[count - 1].ExitCandleIndex = trade.CandleIndex;
             Positions[count - 1].IsActive = false;
-            
+            Positions[count - 1].Cost = trade.Quantity * trade.Price;
+                
             var profit = Positions[count - 1].Quantity * (Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice);
             Positions[count - 1].Profit = profit;
             Positions[count - 1].ProfitPercent = profit / EndMoney * 100.0;

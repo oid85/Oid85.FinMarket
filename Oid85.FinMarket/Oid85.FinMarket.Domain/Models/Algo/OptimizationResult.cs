@@ -58,6 +58,11 @@ public class OptimizationResult
     public int CurrentPosition { get; set; }    
     
     /// <summary>
+    /// Текущая позиция (стоимость)
+    /// </summary>
+    public double CurrentPositionCost { get; set; }   
+    
+    /// <summary>
     /// Profit Factor
     /// </summary>
     public double ProfitFactor { get; set; }

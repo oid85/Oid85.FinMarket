@@ -13,6 +13,7 @@ public class Position
     public bool IsLong { get; set; }
     public bool IsShort { get; set; }
     public int Quantity { get; set; }
+    public double Cost { get; set; }
     public double Profit { get; set; }
     public double ProfitPercent { get; set; }
     public double TotalProfit { get; set; }
