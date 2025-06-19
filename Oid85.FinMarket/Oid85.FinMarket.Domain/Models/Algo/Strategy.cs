@@ -210,7 +210,7 @@ public class Strategy
         }
     }
 
-    public double RecoveryFactor => MaxDrawdown == 0.0 ? 0.0 : NetProfit / MaxDrawdown;
+    public double RecoveryFactor => MaxDrawdown == 0.0 ? double.PositiveInfinity : NetProfit / MaxDrawdown;
 
     public double NetProfit => LastPosition?.TotalProfit ?? 0.0;
     
