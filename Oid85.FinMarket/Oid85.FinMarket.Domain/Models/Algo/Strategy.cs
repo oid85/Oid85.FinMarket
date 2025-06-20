@@ -143,15 +143,29 @@ public class Strategy
             var profit = Positions[count - 1].Quantity * (Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice);
             Positions[count - 1].Profit = profit;
             Positions[count - 1].ProfitPercent = profit / EndMoney * 100.0;
-            EndMoney += profit;
             
             var totalProfit = Positions.Sum(x => x.Profit);
             Positions[count - 1].TotalProfit = totalProfit;
             Positions[count - 1].TotalProfitPct = totalProfit / EndMoney * 100.0;
-
+            
+            EndMoney += profit;
+            
             EqiutyCurve.TryAdd(Positions[count - 1].ExitDateTime, Positions[count - 1].TotalProfit);
             
-            var drawdown = Positions.Max(x => x.TotalProfit) - Positions[count - 1].TotalProfit;
+            double drawdown;
+            
+            if (count < 2)
+                drawdown = 0.0;
+
+            else
+            {
+                var maxTotalProfit = Positions.Take(count - 1).Max(x => x.TotalProfit);
+
+                drawdown = Positions[count - 1].TotalProfit >= maxTotalProfit
+                    ? 0.0
+                    : maxTotalProfit - Positions[count - 1].TotalProfit;
+            }
+            
             DrawdownCurve.TryAdd(Positions[count - 1].ExitDateTime, drawdown);
         }
     }
