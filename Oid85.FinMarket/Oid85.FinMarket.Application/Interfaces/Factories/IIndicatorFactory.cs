@@ -12,4 +12,5 @@ public interface IIndicatorFactory
     List<double> Hma(List<Candle> candles, int period);
     List<double> Ema(List<Candle> candles, int period);
     List<double> Adx(List<Candle> candles, int period);
+    List<double> UltimateSmoother (List<double> values, int period);
 }

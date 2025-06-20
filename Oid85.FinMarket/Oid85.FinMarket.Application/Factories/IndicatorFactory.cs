@@ -55,4 +55,29 @@ public class IndicatorFactory : IIndicatorFactory
             .Select(x => x.Adx)
             .Select(x => x.HasValue ? Convert.ToDouble(x.Value) : 0.0)
             .ToList();
+
+    public List<double> UltimateSmoother(List<double> values, int period)
+    {
+        // Ultimate Smoother function based on John Ehlers' formula
+        double coeff = Math.Sqrt(2.0);
+        double step = 2.0 * Math.PI / period;
+        double a1 = Math.Exp(-1.0 * coeff * Math.PI / period);
+        double b1 = 2.0 * a1 * Math.Cos(coeff * step / period);
+        double c2 = b1;
+        double c3 = -1.0 * a1 * a1;
+        double c1 = (1 + c2 - c3) / 4.0;
+        
+        var us = new List<double>();
+
+        for (int i = 0; i < values.Count; i++)
+            us.Add(i < 3
+                ? values[i]
+                : (1 - c1) * values[i] + 
+                  (2 * c1 - c2) * values[i - 1] - 
+                  (c1 + c3) * values[i - 2] + 
+                  c2 * us[i - 1] + 
+                  c3 * us[i - 2]);
+
+        return us;
+    }
 }
