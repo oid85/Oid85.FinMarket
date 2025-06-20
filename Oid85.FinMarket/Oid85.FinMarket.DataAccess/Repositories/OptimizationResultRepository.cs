@@ -32,6 +32,26 @@ public class OptimizationResultRepository(
         .Select(DataAccessMapper.Map)
         .ToList();
 
+    public async Task<List<OptimizationResult>> GetGoodAsync()
+    {
+        var queryableEntities = context.OptimizationResultEntities.AsQueryable();
+        
+        // Фильтрация по ProfitFactor
+        queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= 2.0);
+        
+        // Фильтрация по RecoveryFactor
+        queryableEntities = queryableEntities.Where(x => x.RecoveryFactor >= 2.0);
+        
+        // Фильтрация по MaxDrawdownPercent
+        queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent <= 20.0);
+        
+        var entities = await queryableEntities.AsNoTracking().ToListAsync();
+        
+        var models = entities.Select(DataAccessMapper.Map).ToList();
+
+        return models;
+    }
+
     public Task DeleteAsync(Guid strategyId) => 
         context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
 
