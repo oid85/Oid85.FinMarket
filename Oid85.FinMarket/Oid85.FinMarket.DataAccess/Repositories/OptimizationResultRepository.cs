@@ -36,13 +36,13 @@ public class OptimizationResultRepository(
     {
         var queryableEntities = context.OptimizationResultEntities.AsQueryable();
         
-        queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= 2.0);
-        queryableEntities = queryableEntities.Where(x => x.RecoveryFactor >= 2.0);
-        queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent <= 20.0);
-        queryableEntities = queryableEntities.Where(x => x.AnnualYieldReturn >= 30.0);
-        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent >= 60.0);
-        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent <= 90.0);
-        
+        queryableEntities = queryableEntities.Where(x => x.ProfitFactor > 2.0);
+        queryableEntities = queryableEntities.Where(x => x.RecoveryFactor > 2.0);
+        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent > 60.0);
+        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent < 90.0);
+		queryableEntities = queryableEntities.Where(x => x.AnnualYieldReturn > 20.0);
+        queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent < 20.0);
+               
         var entities = await queryableEntities.AsNoTracking().ToListAsync();
         
         var models = entities.Select(DataAccessMapper.Map).ToList();
