@@ -224,9 +224,9 @@ public class Strategy
 
     public double Drawdown  => LastPosition is null ? 0.0 : Positions.Max(x => x.TotalProfit) - LastPosition.TotalProfit;
 
-    public double MaxDrawdown  => DrawdownCurve.Count == 0 ? 0.0 : DrawdownCurve.Max(x => x.Value);
+    public double MaxDrawdown  => DrawdownCurve.Count == 0 ? 0.0 : Math.Abs(DrawdownCurve.Max(x => x.Value));
 
-    public double MaxDrawdownPercent => MaxDrawdown == 0.0 ? 0.0 : NetProfit / MaxDrawdown * 100.0;
+    public double MaxDrawdownPercent => EqiutyCurve.Count == 0 ? 0.0 : Math.Abs(MaxDrawdown / EqiutyCurve.Max(x => x.Value) * 100.0);
 
     public int NumberPositions => Positions.Count;
 
