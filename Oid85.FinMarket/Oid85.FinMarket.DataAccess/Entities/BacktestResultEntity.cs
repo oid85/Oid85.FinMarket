@@ -43,6 +43,12 @@ public class BacktestResultEntity : AuditableEntity
     public string StrategyDescription { get; set; } = string.Empty;
     
     /// <summary>
+    /// Наименование стратегии
+    /// </summary>
+    [Column("strategy_name"), MaxLength(1000)]
+    public string StrategyName { get; set; } = string.Empty;
+    
+    /// <summary>
     /// Параметры стратегии
     /// </summary>
     [Column("strategy_params"), MaxLength(1000)]

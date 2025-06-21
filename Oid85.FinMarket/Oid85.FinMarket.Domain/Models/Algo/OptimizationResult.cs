@@ -38,6 +38,11 @@ public class OptimizationResult
     public string StrategyDescription { get; set; } = string.Empty;
     
     /// <summary>
+    /// Наименование стратегии
+    /// </summary>
+    public string StrategyName { get; set; } = string.Empty;    
+    
+    /// <summary>
     /// Параметры стратегии
     /// </summary>
     public string StrategyParams { get; set; } = string.Empty;

@@ -71,6 +71,7 @@ public class AlgoService(
             strategy.StrategyId = algoStrategyResource.Id;
             strategy.Timeframe = algoStrategyResource.Timeframe;
             strategy.StrategyDescription = algoStrategyResource.Description;
+            strategy.StrategyName = algoStrategyResource.Name;
             
             StrategyDictionary.TryAdd(algoStrategyResource.Id, strategy);
         }

@@ -13,6 +13,7 @@ public class Strategy
     public string Timeframe { get; set; } = string.Empty;
     
     public string StrategyDescription { get; set; } = string.Empty;
+    public string StrategyName { get; set; } = string.Empty;
     
     public DateOnly StartDate => DateOnly.FromDateTime(Candles.First().DateTime);
     

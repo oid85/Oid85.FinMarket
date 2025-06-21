@@ -173,6 +173,7 @@ public class OptimizationService(
             Timeframe  = strategy.Timeframe,
             Ticker  = strategy.Ticker,
             StrategyDescription  = strategy.StrategyDescription,
+            StrategyName  = strategy.StrategyName,
             StrategyParams  = json,
             StrategyParamsHash = ConvertHelper.Md5Encode(json),
             NumberPositions  = strategy.NumberPositions,
