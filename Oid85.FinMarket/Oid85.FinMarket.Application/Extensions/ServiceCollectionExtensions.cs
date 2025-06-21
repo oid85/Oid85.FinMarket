@@ -76,8 +76,8 @@ public static class ServiceCollectionExtensions
         services.AddKeyedTransient<Strategy, SupertrendLong>("SupertrendLong");
         services.AddKeyedTransient<Strategy, VolatilityBreakoutClassicLong>("VolatilityBreakoutClassicLong");
         services.AddKeyedTransient<Strategy, VolatilityBreakoutMiddleLong>("VolatilityBreakoutMiddleLong");
-        services.AddKeyedTransient<Strategy, UltimateSmootherInclination>("UltimateSmootherInclination");
-        services.AddKeyedTransient<Strategy, HmaInclination>("HmaInclination");
+        services.AddKeyedTransient<Strategy, UltimateSmootherInclinationLong>("UltimateSmootherInclinationLong");
+        services.AddKeyedTransient<Strategy, HmaInclinationLong>("HmaInclinationLong");
     }
     
     public static async Task RegisterHangfireJobs(
