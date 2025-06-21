@@ -76,6 +76,7 @@ public static class ServiceCollectionExtensions
         services.AddKeyedTransient<Strategy, SupertrendLong>("SupertrendLong");
         services.AddKeyedTransient<Strategy, VolatilityBreakoutClassicLong>("VolatilityBreakoutClassicLong");
         services.AddKeyedTransient<Strategy, VolatilityBreakoutMiddleLong>("VolatilityBreakoutMiddleLong");
+        services.AddKeyedTransient<Strategy, UltimateSmoother>("UltimateSmoother");
     }
     
     public static async Task RegisterHangfireJobs(
