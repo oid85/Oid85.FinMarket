@@ -80,4 +80,21 @@ public class IndicatorFactory : IIndicatorFactory
 
         return us;
     }
+
+    public (List<double> UpperBand, List<double> LowerBand) BollingerBands(List<Candle> candles, int period, double stdDev)
+    {
+        var quotes = candles.Select(AlgoMapper.Map);
+        var bollingerBandsResults = quotes.GetBollingerBands(period, stdDev);
+        
+        var upperBand = new List<double>();
+        var lowerBand = new List<double>();
+
+        foreach (var bollingerBandsResult in bollingerBandsResults)
+        {
+            upperBand.Add(bollingerBandsResult.UpperBand ?? 0.0);
+            lowerBand.Add(bollingerBandsResult.LowerBand ?? 0.0);
+        }
+
+        return (upperBand, lowerBand);
+    }
 }
