@@ -78,6 +78,8 @@ public static class ServiceCollectionExtensions
         services.AddKeyedTransient<Strategy, VolatilityBreakoutMiddleLong>("VolatilityBreakoutMiddleLong");
         services.AddKeyedTransient<Strategy, UltimateSmootherInclinationLong>("UltimateSmootherInclinationLong");
         services.AddKeyedTransient<Strategy, HmaInclinationLong>("HmaInclinationLong");
+        services.AddKeyedTransient<Strategy, BollingerBandsClassicLong>("BollingerBandsClassicLong");
+        services.AddKeyedTransient<Strategy, BollingerBandsMiddleLong>("BollingerBandsMiddleLong");
     }
     
     public static async Task RegisterHangfireJobs(
