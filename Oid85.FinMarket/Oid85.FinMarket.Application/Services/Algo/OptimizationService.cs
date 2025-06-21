@@ -76,6 +76,8 @@ public class OptimizationService(
                 
                 var parameterSets = GetParameterSets(algoStrategyResource.Params);
 
+                var sw = Stopwatch.StartNew();
+                
                 foreach (var parameterSet in parameterSets)
                 {
                     if (parameterSet.Count == 0) 
@@ -87,8 +89,6 @@ public class OptimizationService(
                     strategy.EqiutyCurve.Clear();
                     strategy.DrawdownCurve.Clear();
                     strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-                    
-                    var sw = Stopwatch.StartNew();
                     
                     try
                     {
@@ -102,11 +102,11 @@ public class OptimizationService(
                     {
                         _logger.Error($"Ошибка '{algoStrategyResource.Name}', '{strategyId}', '{ticker}', '{exception.Message}'");
                     }
-                    
-                    sw.Stop();
-                    
-                    Debug.Print($"Оптимизация '{algoStrategyResource.Name}', '{strategyId}', '{ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
                 }
+                
+                sw.Stop();
+                    
+                Debug.Print($"Оптимизация '{algoStrategyResource.Name}', '{strategyId}', '{ticker}' {sw.Elapsed.TotalMilliseconds:N2} ms");
             }
             
             await optimizationResultRepository.AddAsync(optimizationResults);
