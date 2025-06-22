@@ -1,4 +1,5 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Factories;
+using Oid85.FinMarket.Common.MathExtensions;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Skender.Stock.Indicators;
@@ -95,6 +96,37 @@ public class IndicatorFactory : IIndicatorFactory
             lowerBand.Add(bollingerBandsResult.LowerBand ?? 0.0);
         }
 
+        return (upperBand, lowerBand);
+    }
+
+    public (List<double> UpperBand, List<double> LowerBand) BollingerBands(List<Candle> candles, int periodAdx, int periodPc)
+    {
+        List<double> price = candles.Select(x => (x.High + x.Low + x.Close + x.Close) / 4.0).ToList();
+        List<double> adx = Adx(candles, periodAdx);
+        List<double> upperBand = new List<double>().InitValues(candles.Count);
+        List<double> lowerBand = new List<double>().InitValues(candles.Count);
+
+        int startIndex = new List<int> {periodAdx, periodPc}.Max() + 1;
+        
+        for (int i = startIndex; i < candles.Count; i++)
+        {
+            int n = (int) Math.Floor(periodPc * ((100.0 - adx[i]) / 100.0));
+
+            double max = price[i];
+            double min = price[i];
+
+            for (int j = i - n; j < i; j++) 
+                if (price[j] > max) 
+                    max = price[j];
+            
+            for (int j = i - n; j < i; j++) 
+                if (price[j] < min) 
+                    min = price[j];
+
+            upperBand[i] = max;
+            lowerBand[i] = min;
+        }
+        
         return (upperBand, lowerBand);
     }
 }

@@ -14,4 +14,5 @@ public interface IIndicatorFactory
     List<double> Adx(List<Candle> candles, int period);
     List<double> UltimateSmoother (List<double> values, int period);
     (List<double> UpperBand, List<double> LowerBand) BollingerBands (List<Candle> candles, int period, double stdDev);
+    (List<double> UpperBand, List<double> LowerBand) BollingerBands (List<Candle> candles, int periodAdx, int periodPc);
 }
