@@ -10,14 +10,14 @@ public static class DataAccessMapper
         new()
         {
             Ticker = model.Ticker,
-            Position = model.Position
+            CountSignals = model.CountSignals
         };
     
     public static StrategySignal Map(StrategySignalEntity entity) =>
         new()
         {
             Ticker = entity.Ticker,
-            Position = entity.Position
+            CountSignals = entity.CountSignals
         }; 
     
     public static OptimizationResultEntity Map(OptimizationResult model) =>

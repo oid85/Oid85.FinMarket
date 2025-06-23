@@ -8,7 +8,7 @@ public class StrategySignal
     public string Ticker { get; set; } = string.Empty; 
     
     /// <summary>
-    /// Позиция
+    /// Количество сигналов
     /// </summary>
-    public int Position { get; set; }
+    public int CountSignals { get; set; }
 }

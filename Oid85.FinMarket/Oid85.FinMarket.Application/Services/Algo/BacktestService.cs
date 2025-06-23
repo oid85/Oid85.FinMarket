@@ -132,10 +132,12 @@ public class BacktestService(
         foreach (var ticker in tickersInBacktestResults)
         {
             if (!tickersInStrategiSignals.Contains(ticker))
-                await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, Position = 0 });
+                await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0 });
                 
-            var position = backtestResults.Where(x => x.Ticker == ticker).Sum(x => x.CurrentPosition);
-            await strategySignalRepository.UpdatePositionAsync([ticker], position);
+            var countLongSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition > 0);
+            var countShortSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition < 0);
+            
+            await strategySignalRepository.UpdatePositionAsync([ticker], countLongSignals - countShortSignals);
         }
     }
 

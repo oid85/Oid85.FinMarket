@@ -99,7 +99,7 @@ public class IndicatorFactory : IIndicatorFactory
         return (upperBand, lowerBand);
     }
 
-    public (List<double> UpperBand, List<double> LowerBand) BollingerBands(List<Candle> candles, int periodAdx, int periodPc)
+    public (List<double> UpperBand, List<double> LowerBand) AdaptivePriceChannelAdx(List<Candle> candles, int periodAdx, int periodPc)
     {
         List<double> price = candles.Select(x => (x.High + x.Low + x.Close + x.Close) / 4.0).ToList();
         List<double> adx = Adx(candles, periodAdx);
@@ -111,20 +111,9 @@ public class IndicatorFactory : IIndicatorFactory
         for (int i = startIndex; i < candles.Count; i++)
         {
             int n = (int) Math.Floor(periodPc * ((100.0 - adx[i]) / 100.0));
-
-            double max = price[i];
-            double min = price[i];
-
-            for (int j = i - n; j < i; j++) 
-                if (price[j] > max) 
-                    max = price[j];
             
-            for (int j = i - n; j < i; j++) 
-                if (price[j] < min) 
-                    min = price[j];
-
-            upperBand[i] = max;
-            lowerBand[i] = min;
+            upperBand[i] = price.Take(i + 1).TakeLast(n).Max();
+            lowerBand[i] = price.Take(i + 1).TakeLast(n).Min();
         }
         
         return (upperBand, lowerBand);

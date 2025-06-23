@@ -13,8 +13,8 @@ public class StrategySignalEntity : AuditableEntity
     public string Ticker { get; set; } = string.Empty; 
     
     /// <summary>
-    /// Позиция
+    /// Количество сигналов
     /// </summary>
-    [Column("position")]
-    public int Position { get; set; }
+    [Column("count_signals")]
+    public int CountSignals { get; set; }
 }
