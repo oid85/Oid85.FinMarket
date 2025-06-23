@@ -149,4 +149,163 @@ public class IndicatorFactory : IIndicatorFactory
         
         return dcef;
     }
+
+    public List<double> AdaptiveParabolic(List<Candle> candles, int period)
+    {
+        int oldBar = 0;
+        bool lng = false;
+        bool shrt = false;
+        bool revers = false;
+
+        double tr = 0.0;
+        double atr = 0.0;
+        double hmax = 0.0;
+        double lmin = 0.0;
+        double oldAtr = 0.0;
+        double af = 0.0;
+
+        var psar = new List<double>().InitValues(candles.Count);
+
+        var highPrices = candles.Select(x => x.High).ToList();
+        var lowPrices = candles.Select(x => x.Low).ToList();
+        
+        for (int i = 0; i < candles.Count; i++)
+        {
+            if (i < period)
+	            psar[i] = 0.0;
+            
+            else
+            {
+	            if (i == period)
+	            {
+	                psar[i] = lowPrices[i];
+	                lng = true;
+		            hmax = highPrices[i];
+	                tr = 0.0;
+
+                    for (int j = (i - period); j < i - 1; j++) 
+	                    tr += highPrices[j] - lowPrices[j];
+
+                    oldAtr = tr / period;
+	                revers = true;
+	            }
+	            
+	            else
+	            {
+		            if (i != oldBar)
+		            {
+		                tr = 0.0;
+
+                        for (int j = i - period; j < i - 1; j++) 
+	                        tr += highPrices[j] - lowPrices[j];
+
+                        atr = tr / period;
+		                af = atr / (oldAtr + atr);
+		                af /= 10.0;
+		                oldAtr = atr;
+
+			            if (lng)
+			            {
+				            if (hmax < highPrices[i - 1]) 
+					            hmax = highPrices[i - 1];
+
+			                psar[i] = psar[i - 1] + af * (hmax - psar[i - 1]);
+			            }
+
+			            if (shrt)
+			            {
+				            if (lmin > lowPrices[i - 1]) 
+					            lmin = lowPrices[i - 1];
+
+			                psar[i] = psar[i - 1] + af * (lmin - psar[i - 1]);
+			            }
+
+		                revers = true;
+		            }
+
+		            if (lng && lowPrices[i] < psar[i] && revers)
+		            {
+		                psar[i] = hmax;
+		                shrt = true;
+		                lng = false;
+		                lmin = lowPrices[i];
+		                revers = false;
+		            }
+
+		            if (shrt && highPrices[i] > psar[i] && revers)
+		            {
+		                psar[i] = lmin;
+		                lng = true;
+		                shrt = false;
+		                hmax = highPrices[i];
+		                revers = false;
+		            }
+	            }
+
+                oldBar = i;
+            }
+        }
+
+        return psar;
+    }
+
+    public List<double> Nrtr(List<Candle> candles, int period, double multiplier)
+    {
+	    var nrtr = new List<double>().InitValues(candles.Count);
+
+	    double reverse = 0;
+	    int trend = 0;
+
+	    var currentK = candles[0].Close;
+	    var highPrice = candles[0].High;
+	    var lowPrice = candles[0].Low;
+
+	    for (int i = 0; i < candles.Count; i++)
+	    {
+		    double price = candles[i].Close;
+
+		    double prevK = currentK;
+
+		    currentK = (prevK + (price - prevK) / period) * multiplier;
+
+		    int newTrend = 0;
+
+		    if (trend >= 0)
+		    {
+			    if (price > highPrice)
+				    highPrice = price;
+
+			    reverse = highPrice - currentK;
+
+			    if (price <= reverse)
+			    {
+				    newTrend = -1;
+				    lowPrice = price;
+				    reverse = lowPrice + currentK;
+			    }
+		    }
+		    
+		    if (trend <= 0)
+		    {
+			    if (price < lowPrice)
+				    lowPrice = price;
+
+			    reverse = lowPrice + currentK;
+
+			    if (price >= reverse)
+			    {
+				    newTrend = +1;
+				    highPrice = price;
+				    reverse = highPrice - currentK;
+			    }
+		    }
+
+		    if (newTrend != 0)
+			    trend = newTrend;
+
+		    nrtr[i] = reverse;
+	    }
+
+	    return nrtr;
+    }
 }
