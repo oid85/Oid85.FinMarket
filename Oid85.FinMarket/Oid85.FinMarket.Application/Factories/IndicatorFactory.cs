@@ -118,4 +118,35 @@ public class IndicatorFactory : IIndicatorFactory
         
         return (upperBand, lowerBand);
     }
+
+    public List<double> EhlersNonlinearFilter(List<Candle> candles)
+    {
+        List<double> price = candles.Select(x => (x.High + x.Low + x.Close + x.Close) / 4.0).ToList();
+        List<double> coef = new List<double>().InitValues(candles.Count);
+        List<double> dcef = new List<double>().InitValues(candles.Count);
+
+        const int coefLookback = 5;
+        for (int i = coefLookback; i < candles.Count; i++)
+            coef[i] = Math.Pow(price[i] - price[i - 1], 2) +
+                      Math.Pow(price[i] - price[i - 2], 2) +
+                      Math.Pow(price[i] - price[i - 3], 2) +
+                      Math.Pow(price[i] - price[i - 4], 2) +
+                      Math.Pow(price[i] - price[i - 5], 2);
+        
+        double sumCoef = 0.0;
+        double sumCoefPrice = 0.0;
+
+        for (int i = coefLookback; i < candles.Count; i++)
+        {
+            for (int j = 0; j < coefLookback; j++)
+            {
+                sumCoef += coef[i - j];
+                sumCoefPrice += coef[i - j] * price[i - j];
+            }
+
+            dcef[i] = sumCoefPrice / sumCoef;
+        }
+        
+        return dcef;
+    }
 }
