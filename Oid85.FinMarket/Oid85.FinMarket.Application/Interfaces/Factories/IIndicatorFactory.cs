@@ -18,4 +18,5 @@ public interface IIndicatorFactory
     List<double> EhlersNonlinearFilter(List<Candle> candles);
     List<double> AdaptiveParabolic(List<Candle> candles, int period);
     List<double> Nrtr(List<Candle> candles, int period, double multiplier);
+    List<double> Hurst(List<Candle> candles, int period);
 }

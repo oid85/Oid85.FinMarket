@@ -308,4 +308,34 @@ public class IndicatorFactory : IIndicatorFactory
 
 	    return nrtr;
     }
+
+    public List<double> Hurst(List<Candle> candles, int period)
+    {
+	    /*
+		H = log(R/S) / log(n/2)
+		Где: 
+		R - размах выборки, то есть разница между максимальным и минимальным значениями временного ряда в данной выборке.
+		S - стандартное отклонение выборки.
+		n - количество точек в выборке.
+	    */
+	    
+	    var hurst = new List<double>().InitValues(candles.Count);
+
+	    var closePrices = candles.Select(x => x.Close).ToList();
+	    
+	    for (int i = period; i < candles.Count; i++)
+	    {
+		    var values = new List<double>();
+
+		    for (int j = i - period; j < i; j++)
+			    values.Add(closePrices[j]);
+
+		    double stdDev = values.StdDev(); // Стандартное отклонение
+		    double range = values.Range();   // Размах
+		    
+		    hurst[i] = Math.Log10(range / stdDev) / Math.Log10(period / 2.0);
+	    }
+
+	    return hurst;
+    }
 }

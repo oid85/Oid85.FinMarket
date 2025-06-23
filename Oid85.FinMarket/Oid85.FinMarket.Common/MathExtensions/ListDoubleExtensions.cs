@@ -123,5 +123,33 @@
         /// <returns></returns>
         public static List<double> Pow(this List<double> list, double pow) => 
             list.Select(t => System.Math.Pow(t, pow)).ToList();
+        
+        /// <summary>
+        /// Дисперсия
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static double Variance(this List<double> list)
+        {
+            double average = list.Average();
+            double sum = list.Sum(t => (t - average) * (t - average));
+            return sum / (list.Count - 1);
+        }
+        
+        /// <summary>
+        /// Стандартное отклонение
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static double StdDev(this List<double> list) => 
+            Math.Sqrt(list.Variance());
+        
+        /// <summary>
+        /// Размах
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static double Range(this List<double> list) => 
+            list.Max() - list.Min();
     }
 }
