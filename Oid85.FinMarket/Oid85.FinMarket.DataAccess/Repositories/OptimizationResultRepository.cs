@@ -21,28 +21,17 @@ public class OptimizationResultRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<OptimizationResult>> GetAsync(OptimizationResultFilterResource filter) =>
-        (await context.OptimizationResultEntities
-            .Where(x => 
-                x.ProfitFactor >= filter.ProfitFactor &&
-                x.RecoveryFactor >= filter.RecoveryFactor &&
-                x.MaxDrawdownPercent <= filter.MaxDrawdownPercent)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-
-    public async Task<List<OptimizationResult>> GetGoodAsync()
+    public async Task<List<OptimizationResult>> GetAsync(OptimizationResultFilterResource filter)
     {
         var queryableEntities = context.OptimizationResultEntities.AsQueryable();
         
-        queryableEntities = queryableEntities.Where(x => x.ProfitFactor > 2.0);
-        queryableEntities = queryableEntities.Where(x => x.RecoveryFactor > 2.0);
-        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent > 60.0);
-        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent < 90.0);
-		queryableEntities = queryableEntities.Where(x => x.AnnualYieldReturn > 20.0);
-        queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent < 20.0);
-               
+        queryableEntities = queryableEntities.Where(x => x.ProfitFactor > filter.MinProfitFactor);
+        queryableEntities = queryableEntities.Where(x => x.RecoveryFactor > filter.MinRecoveryFactor);
+        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent > filter.MinWinningTradesPercent);
+        queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent < filter.MaxWinningTradesPercent);
+        queryableEntities = queryableEntities.Where(x => x.AnnualYieldReturn > filter.MinAnnualYieldReturn);
+        queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent < filter.MaxDrawdownPercent);
+        
         var entities = await queryableEntities.AsNoTracking().ToListAsync();
         
         var models = entities.Select(DataAccessMapper.Map).ToList();

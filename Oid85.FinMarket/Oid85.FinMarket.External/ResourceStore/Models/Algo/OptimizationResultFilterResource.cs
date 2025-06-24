@@ -8,16 +8,34 @@ namespace Oid85.FinMarket.External.ResourceStore.Models.Algo;
 public class OptimizationResultFilterResource
 {
     /// <summary>
-    /// Критерий по фактору прибыли
+    /// Минимальный критерий по фактору прибыли
     /// </summary>
-    [JsonPropertyName("profitFactor")]
-    public double ProfitFactor { get; set; }
+    [JsonPropertyName("minProfitFactor")]
+    public double MinProfitFactor { get; set; }
     
     /// <summary>
-    ///  Критерий по фактору восстановления
+    ///  Минимальный критерий по фактору восстановления
     /// </summary>
-    [JsonPropertyName("recoveryFactor")]
-    public double RecoveryFactor { get; set; }
+    [JsonPropertyName("minRecoveryFactor")]
+    public double MinRecoveryFactor { get; set; }
+    
+    /// <summary>
+    /// Минимальный критерий по проценту выигрышных сделок, %
+    /// </summary>
+    [JsonPropertyName("minWinningTradesPercent")]
+    public double MinWinningTradesPercent { get; set; }
+    
+    /// <summary>
+    /// Максимальный критерий по проценту выигрышных сделок, %
+    /// </summary>
+    [JsonPropertyName("maxWinningTradesPercent")]
+    public double MaxWinningTradesPercent { get; set; }
+    
+    /// <summary>
+    /// Минимальный критерий по годовой прибыли, %
+    /// </summary>
+    [JsonPropertyName("minAnnualYieldReturn")]
+    public double MinAnnualYieldReturn { get; set; }
     
     /// <summary>
     /// Критерий по максимальной просадке, %

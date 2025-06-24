@@ -7,7 +7,6 @@ public interface IOptimizationResultRepository
 {
     Task AddAsync(List<OptimizationResult> optimizationResults);
     Task<List<OptimizationResult>> GetAsync(OptimizationResultFilterResource filter);
-    Task<List<OptimizationResult>> GetGoodAsync();
     Task DeleteAsync(Guid strategyId);
     Task InvertDeleteAsync(List<Guid> strategyIds);
 }
