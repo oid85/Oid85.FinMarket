@@ -810,11 +810,11 @@ public class ReportDataFactory(
             
             reportData.Data.Add(
             [
-                GetString(count.ToString()),
+                GetNumber(count),
                 GetTicker(strategySignal.Ticker),
                 GetString(strategySignal.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentName)),
-                GetString(strategySignal.CountSignals.ToString())
+                GetNumber(strategySignal.CountSignals)
             ]);            
         }
         
@@ -825,9 +825,9 @@ public class ReportDataFactory(
     {
         var reportData = CreateNewReportDataWithHeaders(
             [
-                "№", "Стратегия", "Тикер", "TF", "Параметры", "PF", "RF", 
+                "№", "Стратегия", "Тикер", "Тикер", "TF", "Параметры", "PF", "RF", 
                 "Макс. пр., %", "Ср. профит, %", "Дох. год., %", "Позиций, шт", 
-                "Приб. позиций, %", "Тек. позиция, шт"]);
+                "Приб. позиций, %", "Тек. позиция, шт", "Тек. позиция, руб"]);
         
         reportData.Title = "Результаты бэктеста";
         
@@ -842,8 +842,9 @@ public class ReportDataFactory(
             
             reportData.Data.Add(
             [
-                GetString(count.ToString()),
+                GetNumber(count),
                 GetString(backtestResult.StrategyName),
+                GetTicker(backtestResult.Ticker),
                 GetString(backtestResult.Ticker),
                 GetString(backtestResult.Timeframe),
                 GetString(backtestResult.StrategyParams),
@@ -852,9 +853,10 @@ public class ReportDataFactory(
                 GetNumber(backtestResult.MaxDrawdownPercent),
                 GetNumber(backtestResult.AverageProfitPercent),
                 GetNumber(backtestResult.AnnualYieldReturn),
-                GetString(backtestResult.NumberPositions.ToString()),
+                GetNumber(backtestResult.NumberPositions),
                 GetNumber(backtestResult.WinningTradesPercent),
-                GetString(backtestResult.CurrentPosition.ToString())
+                GetNumber(backtestResult.CurrentPosition),
+                GetNumber(backtestResult.CurrentPositionCost)
             ]);            
         }
         
