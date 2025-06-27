@@ -1,5 +1,6 @@
 ﻿using NLog;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.Algo;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -13,7 +14,8 @@ public class JobService(
     IFeerGreedIndexService feerGreedIndexService,
     ISectorIndexService sectorIndexService,
     IMarketEventService marketEventService,
-    ISendService sendService) 
+    ISendService sendService,
+    IBacktestService backtestService) 
     : IJobService
 {
     /// <inheritdoc />
@@ -26,6 +28,7 @@ public class JobService(
         await LoadDividendInfosAsync();
         await LoadDailyCandlesAsync();
         await LoadHourlyCandlesAsync();
+        await BacktestAsync();
         await LoadForecastsAsync();
         await AnalyseAsync();
         await CalculateSectorIndexDailyCandlesAsync();
@@ -175,6 +178,21 @@ public class JobService(
             logger.Info(exception, "Ошибка при выполнении метода 'LoadHourlyCandlesAsync'");
         }
     }    
+    
+    private async Task BacktestAsync()
+    {
+        try
+        {
+            await backtestService.BacktestAsync();
+            
+            logger.Info("Метод 'BacktestAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'BacktestAsync'");
+        }
+    }     
     
     private async Task CalculateSectorIndexDailyCandlesAsync()
     {

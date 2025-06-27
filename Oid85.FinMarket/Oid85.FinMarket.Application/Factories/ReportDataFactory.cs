@@ -819,7 +819,7 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateBacktestResultsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "Стратегия", "Тикер", "Таймфрейм"]);
+            ["№", "Стратегия", "Тикер", "Таймфрейм", "Параметры", "ProfitFactor", "RecoveryFactor", "MaxDrawdownPercent", "AnnualYieldReturn"]);
         
         reportData.Title = "Результаты бэктеста";
         
@@ -828,7 +828,7 @@ public class ReportDataFactory(
 
         int count = 0;
         
-        foreach (var backtestResult in backtestResults)
+        foreach (var backtestResult in backtestResults.OrderByDescending(x => x.AnnualYieldReturn))
         {
             count++;
             
@@ -837,7 +837,12 @@ public class ReportDataFactory(
                 GetString(count.ToString()),
                 GetString(backtestResult.StrategyName),
                 GetString(backtestResult.Ticker),
-                GetString(backtestResult.Timeframe)
+                GetString(backtestResult.Timeframe),
+                GetString(backtestResult.StrategyParams),
+                GetNumber(backtestResult.ProfitFactor),
+                GetNumber(backtestResult.RecoveryFactor),
+                GetNumber(backtestResult.MaxDrawdownPercent),
+                GetNumber(backtestResult.AnnualYieldReturn)
             ]);            
         }
         
