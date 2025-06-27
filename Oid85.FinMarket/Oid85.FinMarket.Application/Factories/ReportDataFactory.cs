@@ -794,6 +794,8 @@ public class ReportDataFactory(
     {
         var reportData = CreateNewReportDataWithHeaders(
             ["Тикер", "Сигналы"]);
+
+        reportData.Title = "Сигналы";
         
         var strategySignals = await strategySignalRepository.GetAllAsync();
         
@@ -813,6 +815,8 @@ public class ReportDataFactory(
     {
         var reportData = CreateNewReportDataWithHeaders(
             ["Стратегия", "Тикер", "Таймфрейм"]);
+        
+        reportData.Title = "Результаты бэктеста";
         
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
