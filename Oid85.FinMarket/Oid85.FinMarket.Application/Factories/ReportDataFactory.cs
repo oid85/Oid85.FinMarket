@@ -793,16 +793,21 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Сигналы"]);
+            ["№", "Тикер", "Сигналы"]);
 
         reportData.Title = "Сигналы";
         
         var strategySignals = await strategySignalRepository.GetAllAsync();
+
+        int count = 0;
         
-        foreach (var strategySignal in strategySignals)
+        foreach (var strategySignal in strategySignals.OrderByDescending(x => x.CountSignals))
         {
+            count++;
+            
             reportData.Data.Add(
             [
+                GetString(count.ToString()),
                 GetString(strategySignal.Ticker),
                 GetString(strategySignal.CountSignals.ToString())
             ]);            
@@ -814,17 +819,22 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateBacktestResultsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["Стратегия", "Тикер", "Таймфрейм"]);
+            ["№", "Стратегия", "Тикер", "Таймфрейм"]);
         
         reportData.Title = "Результаты бэктеста";
         
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
 
+        int count = 0;
+        
         foreach (var backtestResult in backtestResults)
         {
+            count++;
+            
             reportData.Data.Add(
             [
+                GetString(count.ToString()),
                 GetString(backtestResult.StrategyName),
                 GetString(backtestResult.Ticker),
                 GetString(backtestResult.Timeframe)
