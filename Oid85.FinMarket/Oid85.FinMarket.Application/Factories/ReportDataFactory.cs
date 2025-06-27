@@ -793,7 +793,7 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "Тикер", "Сигналы"]);
+            ["№", "Тикер", "Тикер", "Наименование", "Сигналы"]);
 
         reportData.Title = "Сигналы";
         
@@ -805,10 +805,15 @@ public class ReportDataFactory(
         {
             count++;
             
+            var instrument = await instrumentRepository.GetAsync(strategySignal.Ticker);
+            string instrumentName = instrument?.Name ?? string.Empty;           
+            
             reportData.Data.Add(
             [
                 GetString(count.ToString()),
+                GetTicker(strategySignal.Ticker),
                 GetString(strategySignal.Ticker),
+                GetString(normalizeService.NormalizeInstrumentName(instrumentName)),
                 GetString(strategySignal.CountSignals.ToString())
             ]);            
         }
@@ -819,7 +824,10 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateBacktestResultsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "Стратегия", "Тикер", "Таймфрейм", "Параметры", "ProfitFactor", "RecoveryFactor", "MaxDrawdownPercent", "AnnualYieldReturn"]);
+            [
+                "№", "Стратегия", "Тикер", "TF", "Параметры", "PF", "RF", 
+                "Макс. пр., %", "Ср. профит, %", "Дох. год., %", "Позиций, шт", 
+                "Приб. позиций, %", "Тек. позиция, шт"]);
         
         reportData.Title = "Результаты бэктеста";
         
@@ -842,7 +850,11 @@ public class ReportDataFactory(
                 GetNumber(backtestResult.ProfitFactor),
                 GetNumber(backtestResult.RecoveryFactor),
                 GetNumber(backtestResult.MaxDrawdownPercent),
-                GetNumber(backtestResult.AnnualYieldReturn)
+                GetNumber(backtestResult.AverageProfitPercent),
+                GetNumber(backtestResult.AnnualYieldReturn),
+                GetString(backtestResult.NumberPositions.ToString()),
+                GetNumber(backtestResult.WinningTradesPercent),
+                GetString(backtestResult.CurrentPosition.ToString())
             ]);            
         }
         
