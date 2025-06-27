@@ -7,6 +7,7 @@ using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Factories;
 
@@ -25,6 +26,7 @@ public class ReportDataFactory(
     IAssetReportEventRepository assetReportEventRepository,
     IStrategySignalRepository strategySignalRepository,
     IBacktestResultRepository backtestResultRepository,
+    IResourceStoreService resourceStoreService,
     ColorHelper colorHelper,
     ISpreadRepository spreadRepository,
     IMarketEventRepository marketEventRepository,
@@ -791,7 +793,18 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Позиция"]);
+            ["Тикер", "Сигналы"]);
+        
+        var strategySignals = await strategySignalRepository.GetAllAsync();
+        
+        foreach (var strategySignal in strategySignals)
+        {
+            reportData.Data.Add(
+            [
+                GetString(strategySignal.Ticker),
+                GetString(strategySignal.CountSignals.ToString())
+            ]);            
+        }
         
         return reportData;
     }
@@ -799,7 +812,20 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateBacktestResultsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["Тикер", "Позиция"]);
+            ["Стратегия", "Тикер", "Таймфрейм"]);
+        
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+
+        foreach (var backtestResult in backtestResults)
+        {
+            reportData.Data.Add(
+            [
+                GetString(backtestResult.StrategyName),
+                GetString(backtestResult.Ticker),
+                GetString(backtestResult.Timeframe)
+            ]);            
+        }
         
         return reportData;
     }

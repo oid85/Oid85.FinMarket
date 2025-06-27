@@ -92,7 +92,7 @@ public class Strategy
         }
     }
 
-    public double CurrentPositionCost => LastPosition?.Cost ?? 0;
+    public double CurrentPositionCost => LastActivePosition?.Cost ?? 0;
     
     public void BuyAtPrice(int quantity, double price, int candleIndex) =>
         AddTrade(new Trade

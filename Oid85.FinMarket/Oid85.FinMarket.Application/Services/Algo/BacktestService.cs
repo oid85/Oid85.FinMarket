@@ -61,6 +61,7 @@ public class BacktestService(
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.PercentOfMoney = algoConfigResource.MoneyManagementResource.PercentOfMoney;
+                strategy.Ticker = optimizationResult.Ticker;
                 
                 strategy.Candles = algoStrategyResource.Timeframe switch
                 {
