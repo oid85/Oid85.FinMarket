@@ -39,11 +39,6 @@ public interface IResourceStoreService
     Task<List<string>> GetIndexMoexTickersAsync();
     
     /// <summary>
-    /// Получить мультипликатор
-    /// </summary>
-    Task<List<MultiplicatorResource>> GetMultiplicatorsLtmAsync();
-    
-    /// <summary>
     /// Получить ценовые уровни
     /// </summary>
     Task<List<PriceLevelResource>> GetPriceLevelsAsync(string ticker);

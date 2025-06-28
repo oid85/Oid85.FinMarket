@@ -46,29 +46,7 @@ public class ResourceStoreService(
         await ReadAsync<List<string>>(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
             "tickerLists", "imoex.json")) ?? [];
-
-    /// <inheritdoc />
-    public async Task<List<MultiplicatorResource>> GetMultiplicatorsLtmAsync()
-    {
-        string directoryPath = Path.Combine(
-            configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-            "multiplicators");
-
-        var filePathes = Directory.GetFiles(directoryPath);
-
-        var resources = new List<MultiplicatorResource>();
-
-        foreach (var filePath in filePathes)
-        {
-            var resource = await ReadAsync<MultiplicatorResource>(filePath);
-            
-            if (resource is not null) 
-                resources.Add(resource);
-        }
-
-        return resources;
-    }
-
+    
     /// <inheritdoc />
     public async Task<List<PriceLevelResource>> GetPriceLevelsAsync(string ticker) =>
         await ReadAsync<List<PriceLevelResource>>(
