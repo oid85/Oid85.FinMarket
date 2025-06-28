@@ -116,6 +116,11 @@ public class BacktestService(
         return true;
     }
 
+    public async Task<BacktestResult?> BacktestAsync(Guid backtestResultId)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task CalculateStrategySignals()
     {
         var algoConfigResource = await _resourceStoreService.GetAlgoConfigAsync();
@@ -141,7 +146,6 @@ public class BacktestService(
             await strategySignalRepository.UpdatePositionAsync([ticker], countLongSignals - countShortSignals);
         }
     }
-
 
     private static BacktestResult CreateBacktestResult(Strategy strategy)
     {

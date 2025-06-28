@@ -7,7 +7,7 @@ public interface IBacktestResultRepository
 {
     Task AddAsync(List<BacktestResult> backtestResults);
     Task<List<BacktestResult>> GetAsync(BacktestResultFilterResource filter);
-    Task<BacktestResult?> GetAsync(Guid id);
+    Task<BacktestResult?> GetAsync(Guid backtestResultId);
     Task DeleteAsync(Guid strategyId);
     Task InvertDeleteAsync(List<Guid> strategyIds);
 }

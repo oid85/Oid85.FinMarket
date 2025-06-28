@@ -40,12 +40,12 @@ public class BacktestResultRepository(
         return models;
     }
 
-    public async Task<BacktestResult?> GetAsync(Guid id)
+    public async Task<BacktestResult?> GetAsync(Guid backtestResultId)
     {
         var entity = await context.BacktestResultEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == backtestResultId);
         
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
