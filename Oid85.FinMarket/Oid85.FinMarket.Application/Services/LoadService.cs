@@ -67,7 +67,7 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetDailyCandlesAsync(
-                    instrument.InstrumentId, lastCandle.Date, DateOnly.FromDateTime(DateTime.Today));
+                    instrument.InstrumentId, lastCandle.Date, DateOnly.FromDateTime(DateTime.Today).AddDays(1));
                 await dailyCandleRepository.AddOrUpdateAsync(candles);
             }
         }
@@ -102,7 +102,7 @@ public class LoadService(
             else
             {
                 var candles = await tinkoffService.GetHourlyCandlesAsync(
-                    instrument.InstrumentId, lastCandle.Date, DateOnly.FromDateTime(DateTime.Today));
+                    instrument.InstrumentId, lastCandle.Date, DateOnly.FromDateTime(DateTime.Today).AddDays(1));
                 await hourlyCandleRepository.AddOrUpdateAsync(candles);
             }
         }
