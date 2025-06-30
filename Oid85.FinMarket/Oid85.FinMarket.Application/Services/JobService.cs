@@ -10,7 +10,6 @@ public class JobService(
     ILoadService loadService,
     IAnalyseService analyseService,
     ISpreadService spreadService,
-    IMultiplicatorService multiplicatorService,
     IFeerGreedIndexService feerGreedIndexService,
     ISectorIndexService sectorIndexService,
     IMarketEventService marketEventService,
@@ -34,7 +33,6 @@ public class JobService(
         await CalculateSectorIndexDailyCandlesAsync();
         await AnalyseSectorsAsync();
         await ProcessSpreadPairsAsync();
-        await ProcessMultiplicatorsAsync();
         await ProcessFeerGreedAsync();
         await CheckDailyMarketEventsAsync();
         await SendNotificationsAsync();
@@ -284,22 +282,7 @@ public class JobService(
             logger.Info(exception, "Ошибка при выполнении метода 'ProcessSpreadPairsAsync'");
         }
     }
-
-    private async Task ProcessMultiplicatorsAsync()
-    {
-        try
-        {
-            await multiplicatorService.ProcessMultiplicatorsAsync();
-            
-            logger.Info("Метод 'ProcessMultiplicatorsAsync' выполнен успешно");
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Info(exception, "Ошибка при выполнении метода 'ProcessMultiplicatorsAsync'");
-        }
-    }
-
+    
     private async Task ProcessFeerGreedAsync()
     {
         try
