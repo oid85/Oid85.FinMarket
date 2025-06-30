@@ -28,7 +28,8 @@ public class StrategySignalRepository(
             await context.StrategySignalEntities
                 .Where(x => tickers.Contains(x.Ticker))
                 .ExecuteUpdateAsync(x => x
-                    .SetProperty(entity => entity.CountSignals, countSignals));
+                    .SetProperty(entity => entity.CountSignals, countSignals)
+                    .SetProperty(entity => entity.UpdatedAt, DateTime.UtcNow));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
