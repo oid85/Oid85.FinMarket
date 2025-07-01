@@ -118,7 +118,81 @@ public class BacktestService(
 
     public async Task<BacktestResult?> BacktestAsync(Guid backtestResultId)
     {
-        throw new NotImplementedException();
+        await InitBacktestAsync();
+        
+        var algoConfigResource = await _resourceStoreService.GetAlgoConfigAsync();
+        var algoStrategyResources = await _resourceStoreService.GetAlgoStrategiesAsync();
+
+        var backtestResult = await backtestResultRepository.GetAsync(backtestResultId);
+        
+        if (backtestResult is null)
+            return null;
+        
+        var algoStrategyResource = algoStrategyResources.Find(x => x.Id == backtestResult.StrategyId);
+                
+        if (algoStrategyResource is null)
+            return null;
+                
+        if (!algoStrategyResource.Enable)
+            return null;
+
+        var strategy = StrategyDictionary[backtestResult.StrategyId];
+        
+        strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
+        strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
+        strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
+        strategy.PercentOfMoney = algoConfigResource.MoneyManagementResource.PercentOfMoney;
+        strategy.Ticker = backtestResult.Ticker;
+        strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
+        strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
+        strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
+        strategy.PercentOfMoney = algoConfigResource.MoneyManagementResource.PercentOfMoney;
+        strategy.Ticker = backtestResult.Ticker;
+        
+        strategy.Candles = algoStrategyResource.Timeframe switch
+        {
+            "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
+            "H" => HourlyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
+            _ => []
+        };
+        
+        if (strategy.Candles is [])
+            return null;
+                
+        if (strategy.Candles.Count < strategy.StabilizationPeriod + 1)
+            return null;
+                
+        var parameterSet = JsonSerializer.Deserialize<Dictionary<string, int>>(backtestResult.StrategyParams);
+                
+        if (parameterSet is null)
+            return null;
+        
+        strategy.Parameters = parameterSet;
+        strategy.StopLimits.Clear();
+        strategy.Positions.Clear();
+        strategy.EqiutyCurve.Clear();
+        strategy.DrawdownCurve.Clear();
+        strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
+        
+        var sw = Stopwatch.StartNew();
+                    
+        try
+        {
+            strategy.Execute();
+                    
+            backtestResult = CreateBacktestResult(strategy);
+        }
+                    
+        catch (Exception exception)
+        {
+            _logger.Error($"Ошибка '{algoStrategyResource.Name}', '{backtestResult.StrategyId}', '{strategy.Ticker}', '{exception.Message}'");
+        }
+                    
+        sw.Stop();
+                    
+        Debug.Print($"Бэктест '{algoStrategyResource.Name}', '{backtestResult.StrategyId}', '{strategy.Ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
+
+        return backtestResult;
     }
 
     private async Task CalculateStrategySignals()
