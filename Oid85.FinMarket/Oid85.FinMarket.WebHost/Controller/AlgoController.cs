@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Services.Algo;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
+using Oid85.FinMarket.Application.Models.BacktestResults;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
@@ -66,14 +67,14 @@ public class AlgoController(
     /// Получить бэктест по id
     /// </summary>
     [HttpPost("backtest-result")]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResult>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResult>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResult>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetBacktestResultByIdAsync(
         [FromBody] IdRequest request) =>
         GetResponseAsync(
             () => reportService.GetBacktestResultByIdAsync(request),
-            result => new BaseResponse<BacktestResult>
+            result => new BaseResponse<BacktestResultData>
             {
                 Result = result
             });    
