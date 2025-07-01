@@ -116,12 +116,12 @@ public class BacktestService(
         return true;
     }
 
-    public async Task<BacktestResult?> BacktestAsync(Guid backtestResultId)
+    public async Task<(BacktestResult? backtestResult, Strategy? strategy)> BacktestAsync(Guid backtestResultId)
     {
         var backtestResult = await backtestResultRepository.GetAsync(backtestResultId);
         
         if (backtestResult is null)
-            return null;
+            return (null, null);
         
         await InitBacktestAsync(backtestResult.Ticker, backtestResult.StrategyId);
         
@@ -131,10 +131,10 @@ public class BacktestService(
         var algoStrategyResource = algoStrategyResources.Find(x => x.Id == backtestResult.StrategyId);
                 
         if (algoStrategyResource is null)
-            return null;
+            return (null, null);
                 
         if (!algoStrategyResource.Enable)
-            return null;
+            return (null, null);
 
         var strategy = StrategyDictionary[backtestResult.StrategyId];
         
@@ -157,15 +157,15 @@ public class BacktestService(
         };
         
         if (strategy.Candles is [])
-            return null;
+            return (null, null);
                 
         if (strategy.Candles.Count < strategy.StabilizationPeriod + 1)
-            return null;
+            return (null, null);
                 
         var parameterSet = JsonSerializer.Deserialize<Dictionary<string, int>>(backtestResult.StrategyParams);
                 
         if (parameterSet is null)
-            return null;
+            return (null, null);
         
         strategy.Parameters = parameterSet;
         strategy.StopLimits.Clear();
@@ -192,7 +192,7 @@ public class BacktestService(
                     
         Debug.Print($"Бэктест '{algoStrategyResource.Name}', '{backtestResult.StrategyId}', '{strategy.Ticker}', '{JsonSerializer.Serialize(parameterSet)}' {sw.Elapsed.TotalMilliseconds:N2} ms");
 
-        return backtestResult;
+        return (backtestResult, strategy);
     }
 
     private async Task CalculateStrategySignals()

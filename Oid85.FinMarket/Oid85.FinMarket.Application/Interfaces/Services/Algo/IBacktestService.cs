@@ -5,5 +5,5 @@ namespace Oid85.FinMarket.Application.Interfaces.Services.Algo;
 public interface IBacktestService
 {
     Task<bool> BacktestAsync();
-    Task<BacktestResult?> BacktestAsync(Guid backtestResultId);
+    Task<(BacktestResult? backtestResult, Strategy? strategy)> BacktestAsync(Guid backtestResultId);
 }
