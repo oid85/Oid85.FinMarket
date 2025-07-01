@@ -118,15 +118,15 @@ public class BacktestService(
 
     public async Task<BacktestResult?> BacktestAsync(Guid backtestResultId)
     {
-        await InitBacktestAsync();
-        
-        var algoConfigResource = await _resourceStoreService.GetAlgoConfigAsync();
-        var algoStrategyResources = await _resourceStoreService.GetAlgoStrategiesAsync();
-
         var backtestResult = await backtestResultRepository.GetAsync(backtestResultId);
         
         if (backtestResult is null)
             return null;
+        
+        await InitBacktestAsync(backtestResult.Ticker, backtestResult.StrategyId);
+        
+        var algoConfigResource = await _resourceStoreService.GetAlgoConfigAsync();
+        var algoStrategyResources = await _resourceStoreService.GetAlgoStrategiesAsync();
         
         var algoStrategyResource = algoStrategyResources.Find(x => x.Id == backtestResult.StrategyId);
                 

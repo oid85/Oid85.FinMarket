@@ -31,7 +31,7 @@ public class AlgoService(
     /// <summary>
     /// Инициализация AlgoEngine для бэктеста
     /// </summary>
-    public async Task InitBacktestAsync()
+    public async Task InitBacktestAsync(string? ticker = null, Guid? strategyId = null)
     {
         _isOptimization = false;
         
@@ -39,10 +39,10 @@ public class AlgoService(
         _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         _algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
         
-        await InitDailyCandlesAsync();
-        await InitHourlyCandlesAsync();
+        await InitDailyCandlesAsync(ticker);
+        await InitHourlyCandlesAsync(ticker);
         
-        InitStrategies();
+        InitStrategies(strategyId);
     }
 
     /// <summary>
@@ -62,30 +62,34 @@ public class AlgoService(
         InitStrategies();
     }
 
-    private void InitStrategies()
+    private void InitStrategies(Guid? strategyId = null)
     {
-        foreach (var algoStrategyResource in _algoStrategyResources)
+        var algoStrategyResources = strategyId is null 
+            ? _algoStrategyResources 
+            : _algoStrategyResources.Where(x => x.Id == strategyId);
+        
+        foreach (var algoStrategyResource in algoStrategyResources)
         {
             var strategy = serviceProvider.GetRequiredKeyedService<Strategy>(algoStrategyResource.Name);
-            
+                
             strategy.StrategyId = algoStrategyResource.Id;
             strategy.Timeframe = algoStrategyResource.Timeframe;
             strategy.StrategyDescription = algoStrategyResource.Description;
             strategy.StrategyName = algoStrategyResource.Name;
-            
+                
             StrategyDictionary.TryAdd(algoStrategyResource.Id, strategy);
         }
     }
 
-    private async Task InitDailyCandlesAsync()
+    private async Task InitDailyCandlesAsync(string? ticker = null)
     {
         var dates = GetDailyDates();
 
-        var tickers = await GetAllTickers();
+        var tickers = ticker is null ? await GetAllTickers() : [ticker];
         
-        foreach (string ticker in tickers)
+        foreach (string instrumentTicker in tickers)
         {
-            var candles = (await dailyCandleRepository.GetAsync(ticker, dates.From, dates.To))
+            var candles = (await dailyCandleRepository.GetAsync(instrumentTicker, dates.From, dates.To))
                 .Select(AlgoMapper.Map).ToList();
             
             if (candles.Count == 0)
@@ -94,19 +98,19 @@ public class AlgoService(
             for (int i = 0; i < candles.Count; i++)
                 candles[i].Index = i;
             
-            DailyCandles.TryAdd(ticker, candles);
+            DailyCandles.TryAdd(instrumentTicker, candles);
         }
     }
 
-    private async Task InitHourlyCandlesAsync()
+    private async Task InitHourlyCandlesAsync(string? ticker = null)
     {
         var dates = GetHourlyDates();
         
-        var tickers = await GetAllTickers();
+        var tickers = ticker is null ? await GetAllTickers() : [ticker];
         
-        foreach (string ticker in tickers)
+        foreach (string instrumentTicker in tickers)
         {
-            var candles = (await hourlyCandleRepository.GetAsync(ticker, dates.From, dates.To))
+            var candles = (await hourlyCandleRepository.GetAsync(instrumentTicker, dates.From, dates.To))
                 .Select(AlgoMapper.Map).ToList();
 
             if (candles.Count == 0)
@@ -115,7 +119,7 @@ public class AlgoService(
             for (int i = 0; i < candles.Count; i++)
                 candles[i].Index = i;            
             
-            HourlyCandles.TryAdd(ticker, candles);
+            HourlyCandles.TryAdd(instrumentTicker, candles);
         }
     }
 
