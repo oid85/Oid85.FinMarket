@@ -8,6 +8,7 @@ namespace Oid85.FinMarket.Application.Services;
 public class JobService(
     ILogger logger,
     ILoadService loadService,
+    IImportService importService,
     IAnalyseService analyseService,
     ISpreadService spreadService,
     IFeerGreedIndexService feerGreedIndexService,
@@ -27,6 +28,7 @@ public class JobService(
         await LoadDividendInfosAsync();
         await LoadDailyCandlesAsync();
         await LoadHourlyCandlesAsync();
+        await ImportAsync();
         await BacktestAsync();
         await LoadForecastsAsync();
         await AnalyseAsync();
@@ -174,6 +176,21 @@ public class JobService(
         catch (Exception exception)
         {
             logger.Info(exception, "Ошибка при выполнении метода 'LoadHourlyCandlesAsync'");
+        }
+    }    
+    
+    private async Task ImportAsync()
+    {
+        try
+        {
+            await importService.ImportMultiplicatorsAsync();
+            
+            logger.Info("Метод 'ImportAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'ImportAsync'");
         }
     }    
     

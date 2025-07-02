@@ -162,4 +162,9 @@ public interface IResourceStoreService
     /// Получить список стратегий Алго
     /// </summary>
     Task<List<AlgoStrategyResource>> GetAlgoStrategiesAsync();
+    
+    /// <summary>
+    /// Получить csv
+    /// </summary>
+    Task<List<string[]>> GetCsvAsync(string path);    
 }

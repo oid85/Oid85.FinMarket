@@ -197,6 +197,13 @@ public class ResourceStoreService(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "algo", "strategies.json")) ?? [];
 
+    public async Task<List<string[]>> GetCsvAsync(string path) => 
+        !File.Exists(path) 
+            ? [] 
+            : (await File.ReadAllLinesAsync(path))
+                .Select(line => line.Split(';'))
+                .ToList();
+
     private async Task<T?> ReadAsync<T>(string path)
     {
         if (!File.Exists(path))

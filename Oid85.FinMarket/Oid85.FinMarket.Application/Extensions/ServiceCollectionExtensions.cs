@@ -52,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IIndexesDiagramService, IndexesDiagramService>();
         
         services.AddTransient<ILoadService, LoadService>();
+        services.AddTransient<IImportService, ImportService>();
         services.AddTransient<IAnalyseService, AnalyseService>();
         services.AddTransient<ISendService, SendService>();
         services.AddTransient<IJobService, JobService>();
