@@ -11,4 +11,9 @@ public class StrategySignal
     /// Количество сигналов
     /// </summary>
     public int CountSignals { get; set; }
+
+    /// <summary>
+    /// Размер позиции
+    /// </summary>
+    public double PositionCost { get; set; }
 }

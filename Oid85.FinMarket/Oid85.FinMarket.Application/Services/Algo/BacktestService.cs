@@ -111,7 +111,7 @@ public class BacktestService(
             await backtestResultRepository.AddAsync(backtestResults);
         }
         
-        await CalculateStrategySignals();
+        await CalculateStrategySignalsAsync();
         
         return true;
     }
@@ -195,7 +195,7 @@ public class BacktestService(
         return (backtestResult, strategy);
     }
 
-    private async Task CalculateStrategySignals()
+    public async Task<bool> CalculateStrategySignalsAsync()
     {
         var algoConfigResource = await _resourceStoreService.GetAlgoConfigAsync();
         var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
@@ -206,7 +206,7 @@ public class BacktestService(
         foreach (var ticker in tickersInStrategiSignals)
         {
             if (!tickersInBacktestResults.Contains(ticker))
-                await strategySignalRepository.UpdatePositionAsync([ticker], 0);
+                await strategySignalRepository.UpdatePositionAsync([ticker], 0, 0.0);
         }
 
         foreach (var ticker in tickersInBacktestResults)
@@ -217,8 +217,13 @@ public class BacktestService(
             var countLongSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition > 0);
             var countShortSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition < 0);
             
-            await strategySignalRepository.UpdatePositionAsync([ticker], countLongSignals - countShortSignals);
+            await strategySignalRepository.UpdatePositionAsync(
+                [ticker], 
+                countLongSignals - countShortSignals,
+                (countLongSignals - countShortSignals) * algoConfigResource.MoneyManagementResource.UnitSize);
         }
+
+        return true;
     }
 
     private static BacktestResult CreateBacktestResult(Strategy strategy)

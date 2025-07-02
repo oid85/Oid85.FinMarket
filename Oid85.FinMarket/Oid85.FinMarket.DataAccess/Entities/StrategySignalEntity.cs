@@ -17,4 +17,10 @@ public class StrategySignalEntity : AuditableEntity
     /// </summary>
     [Column("count_signals")]
     public int CountSignals { get; set; }
+    
+    /// <summary>
+    /// Размер позиции
+    /// </summary>
+    [Column("position_cost")]
+    public double PositionCost { get; set; }    
 }

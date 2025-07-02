@@ -18,4 +18,10 @@ public class MoneyManagementResource
     /// </summary>
     [JsonPropertyName("percentOfMoney")]
     public double PercentOfMoney { get; set; }
+    
+    /// <summary>
+    /// Размер юнита, руб
+    /// </summary>
+    [JsonPropertyName("unitSize")]
+    public double UnitSize { get; set; }
 }

@@ -49,6 +49,21 @@ public class AlgoController(
             });
 
     /// <summary>
+    /// Рассчитать сигналы
+    /// </summary>
+    [HttpGet("calculate-strategy-signals")]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> CalculateStrategySignalsAsync() =>
+        GetResponseAsync(
+            backtestService.CalculateStrategySignalsAsync,
+            result => new BaseResponse<bool>
+            {
+                Result = result
+            });    
+    
+    /// <summary>
     /// Получить результаты бэктеста
     /// </summary>
     [HttpPost("backtest-results")]
