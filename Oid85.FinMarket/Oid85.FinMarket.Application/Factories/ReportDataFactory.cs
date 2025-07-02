@@ -151,6 +151,9 @@ public class ReportDataFactory(
     private static ReportParameter GetAssetReportEvent(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.AssetReportEvent, value, color);   
     
+    private static ReportParameter GetBacktestResultByIdButton(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.BacktestResultByIdButton, value, color);    
+    
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
     {
@@ -827,7 +830,7 @@ public class ReportDataFactory(
             [
                 "№", "Стратегия", "Тикер", "Тикер", "TF", "Параметры", "PF", "RF", 
                 "Макс. пр., %", "Ср. профит, %", "Дох. год., %", "Позиций, шт", 
-                "Приб. позиций, %", "Тек. позиция, шт", "Тек. позиция, руб"]);
+                "Приб. позиций, %", "Тек. позиция, шт", "Тек. позиция, руб", ""]);
         
         reportData.Title = "Результаты бэктеста";
         
@@ -856,7 +859,8 @@ public class ReportDataFactory(
                 GetNumber(backtestResult.NumberPositions),
                 GetNumber(backtestResult.WinningTradesPercent),
                 GetNumber(backtestResult.CurrentPosition),
-                GetNumber(backtestResult.CurrentPositionCost)
+                GetNumber(backtestResult.CurrentPositionCost),
+                GetBacktestResultByIdButton(backtestResult.Id.ToString())
             ]);            
         }
         
