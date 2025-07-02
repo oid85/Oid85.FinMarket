@@ -4,12 +4,12 @@ using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.BacktestResults;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
-using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Services.ReportServices;
 
 public class AlgoReportService(
     IReportDataFactory reportDataFactory,
+    IDiagramDataFactory diagramDataFactory,
     IBacktestService backtestService) 
     : IAlgoReportService
 {
@@ -23,7 +23,12 @@ public class AlgoReportService(
     {
         var result = await backtestService.BacktestAsync(request.Id);
 
-        var backtestResultData = new BacktestResultData();
+        var backtestResultData = new BacktestResultData
+        {
+            Report = await reportDataFactory.CreateBacktestResultReportDataAsync(request.Id),
+            Diagram = await diagramDataFactory.CreateBacktestResultDiagramDataAsync(result.strategy!)
+        };
+
         return backtestResultData;
     }
 }

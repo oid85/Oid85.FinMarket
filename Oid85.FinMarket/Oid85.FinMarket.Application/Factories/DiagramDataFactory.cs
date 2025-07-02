@@ -4,6 +4,7 @@ using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Factories;
 
@@ -73,5 +74,30 @@ public class DiagramDataFactory(
                 });
         
         return bubbleDiagramData;
+    }
+
+    public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(Strategy strategy)
+    {
+        var diagramData = new BacktestResultDiagramData { Title = $"{strategy.StrategyName}"};
+
+        for (int i = 0; i < strategy.Candles.Count; i++)
+        {
+            diagramData.Data.Series.Add(new BacktestResultDataPoint
+            {
+                Date = strategy.Candles[i].DateTime.ToString("dd.MM.yyyy"),
+                Price = strategy.Candles[i].Close
+            });
+        }
+
+        for (int i = 0; i < strategy.Positions.Count; i++)
+        {
+            if (strategy.Positions[i].IsLong)
+                diagramData.Data.Series[strategy.Positions[i].EntryCandleIndex].BuyPrice = strategy.Positions[i].EntryPrice;
+            
+            else if (strategy.Positions[i].IsShort)
+                diagramData.Data.Series[strategy.Positions[i].EntryCandleIndex].SellPrice = strategy.Positions[i].EntryPrice;
+        }
+        
+        return diagramData;
     }
 }

@@ -17,4 +17,5 @@ public interface IReportDataFactory
     Task<ReportData> CreateFearGreedIndexReportDataAsync(DateOnly from, DateOnly to);
     Task<ReportData> CreateStrategySignalsReportDataAsync();
     Task<ReportData> CreateBacktestResultsReportDataAsync();
+    Task<ReportData> CreateBacktestResultReportDataAsync(Guid backtestResultId);
 }

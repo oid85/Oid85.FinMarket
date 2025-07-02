@@ -862,4 +862,41 @@ public class ReportDataFactory(
         
         return reportData;
     }
+
+    public async Task<ReportData> CreateBacktestResultReportDataAsync(Guid backtestResultId)
+    {
+        var reportData = CreateNewReportDataWithHeaders(
+        [
+            "№", "Стратегия", "Тикер", "Тикер", "TF", "Параметры", "PF", "RF", 
+            "Макс. пр., %", "Ср. профит, %", "Дох. год., %", "Позиций, шт", 
+            "Приб. позиций, %", "Тек. позиция, шт", "Тек. позиция, руб"]);
+        
+        reportData.Title = "Результаты бэктеста";
+        
+        var backtestResult = await backtestResultRepository.GetAsync(backtestResultId);
+        
+        if (backtestResult is null)
+            return reportData;
+        
+        reportData.Data.Add(
+        [
+            GetNumber(1),
+            GetString(backtestResult.StrategyName),
+            GetTicker(backtestResult.Ticker),
+            GetString(backtestResult.Ticker),
+            GetString(backtestResult.Timeframe),
+            GetString(backtestResult.StrategyParams),
+            GetNumber(backtestResult.ProfitFactor),
+            GetNumber(backtestResult.RecoveryFactor),
+            GetNumber(backtestResult.MaxDrawdownPercent),
+            GetNumber(backtestResult.AverageProfitPercent),
+            GetNumber(backtestResult.AnnualYieldReturn),
+            GetNumber(backtestResult.NumberPositions),
+            GetNumber(backtestResult.WinningTradesPercent),
+            GetNumber(backtestResult.CurrentPosition),
+            GetNumber(backtestResult.CurrentPositionCost)
+        ]); 
+        
+        return reportData;
+    }
 }
