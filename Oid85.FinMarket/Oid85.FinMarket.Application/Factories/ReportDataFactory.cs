@@ -836,7 +836,7 @@ public class ReportDataFactory(
 
         int count = 0;
         
-        foreach (var backtestResult in backtestResults.OrderByDescending(x => x.AnnualYieldReturn))
+        foreach (var backtestResult in backtestResults.OrderByDescending(x => x.AnnualYieldReturn).Take(100))
         {
             count++;
             
