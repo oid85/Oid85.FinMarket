@@ -9,11 +9,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class ShareRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IShareRepository
 {
     public async Task AddAsync(List<Share> shares)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (shares is [])
             return;
 
@@ -30,6 +32,7 @@ public class ShareRepository(
 
     public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -50,18 +53,24 @@ public class ShareRepository(
         }
     }
     
-    public async Task<List<Share>> GetAsync(List<string> tickers) =>
-        (await context.ShareEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => tickers.Contains(x.Ticker))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Share>> GetAsync(List<string> tickers)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.ShareEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => tickers.Contains(x.Ticker))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
     public async Task<Share?> GetAsync(string ticker)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.ShareEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
@@ -72,6 +81,8 @@ public class ShareRepository(
 
     public async Task<Share?> GetAsync(Guid instrumentId)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.ShareEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
@@ -80,13 +91,17 @@ public class ShareRepository(
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
-    public async Task<List<Share>> GetAsync(List<Guid> instrumentIds) =>
-        (await context.ShareEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => instrumentIds.Contains(x.InstrumentId))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Share>> GetAsync(List<Guid> instrumentIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.ShareEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => instrumentIds.Contains(x.InstrumentId))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

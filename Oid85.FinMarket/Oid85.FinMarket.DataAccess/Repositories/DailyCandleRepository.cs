@@ -7,11 +7,13 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class DailyCandleRepository(
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IDailyCandleRepository
 {
     public async Task AddOrUpdateAsync(List<DailyCandle> candles)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var completedCandles = candles
             .Where(x => x.IsComplete).ToList();
         
@@ -33,6 +35,8 @@ public class DailyCandleRepository(
     
     public async Task<DailyCandle?> GetLastAsync(Guid instrumentId)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .OrderByDescending(x => x.Date)
@@ -51,6 +55,8 @@ public class DailyCandleRepository(
 
     private async Task<List<DailyCandle>> GetLastYearsAsync(Guid instrumentId, int years)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1 * years));
         var to = DateOnly.FromDateTime(DateTime.Today);
         
@@ -68,6 +74,8 @@ public class DailyCandleRepository(
 
     public async Task<DailyCandle?> GetAsync(Guid instrumentId, DateOnly date)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => x.Date == date)
@@ -79,6 +87,8 @@ public class DailyCandleRepository(
 
     public async Task<List<DailyCandle>> GetAsync(Guid instrumentId, DateOnly from, DateOnly to)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entities = await context.DailyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .Where(x => 
@@ -93,6 +103,8 @@ public class DailyCandleRepository(
 
     public async Task<List<DailyCandle>> GetAsync(string ticker, DateOnly from, DateOnly to)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var instrumentEntity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 

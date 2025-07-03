@@ -9,12 +9,14 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class MultiplicatorRepository(
     ILogger logger,
-    FinMarketContext context,
+    IDbContextFactory<FinMarketContext> contextFactory,
     IInstrumentRepository instrumentRepository) 
     : IMultiplicatorRepository
 {
     public async Task AddOrUpdateAsync(List<Multiplicator> multiplicators)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (multiplicators is [])
             return;
 
@@ -35,6 +37,7 @@ public class MultiplicatorRepository(
 
     private async Task UpdateStaticFieldsAsync(Multiplicator multiplicator)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -76,6 +79,7 @@ public class MultiplicatorRepository(
 
     public async Task UpdateCalculateFieldsAsync(Multiplicator multiplicator)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -101,17 +105,23 @@ public class MultiplicatorRepository(
         }
     }
 
-    public async Task<List<Multiplicator>> GetAllAsync() =>
-        (await context.MultiplicatorEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.TickerAo)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Multiplicator>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.MultiplicatorEntities
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.TickerAo)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
     public async Task<Multiplicator?> GetAsync(string ticker)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.MultiplicatorEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
@@ -124,6 +134,8 @@ public class MultiplicatorRepository(
 
     public async Task<List<Multiplicator>> GetAsync(List<Guid> instrumentIds)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var tickers = (await instrumentRepository.GetAsync(instrumentIds))
             .Select(x => x.Ticker).ToList();
         

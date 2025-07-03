@@ -6,11 +6,13 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class InstrumentRepository(
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IInstrumentRepository
 {
     public async Task AddOrUpdateAsync(List<Instrument> tickers)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (tickers is [])
             return;
         
@@ -37,24 +39,33 @@ public class InstrumentRepository(
     
     public async Task<Instrument?> GetAsync(Guid instrumentId)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.InstrumentId == instrumentId);
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
-    public async Task<List<Instrument>> GetAsync(List<Guid> instrumentIds) =>
-        (await context.InstrumentEntities
-            .Where(x => instrumentIds.Contains(x.InstrumentId))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-    
+    public async Task<List<Instrument>> GetAsync(List<Guid> instrumentIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.InstrumentEntities
+                .Where(x => instrumentIds.Contains(x.InstrumentId))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
+
     public async Task<Instrument?> GetAsync(string ticker)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
+        
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 }

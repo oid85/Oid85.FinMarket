@@ -7,11 +7,13 @@ using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class OptimizationResultRepository(
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IOptimizationResultRepository
 {
     public async Task AddAsync(List<OptimizationResult> optimizationResults)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (optimizationResults is [])
             return;
 
@@ -23,6 +25,8 @@ public class OptimizationResultRepository(
 
     public async Task<List<OptimizationResult>> GetAsync(OptimizationResultFilterResource filter)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var queryableEntities = context.OptimizationResultEntities.AsQueryable();
         
         queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= filter.MinProfitFactor);
@@ -39,9 +43,15 @@ public class OptimizationResultRepository(
         return models;
     }
 
-    public Task DeleteAsync(Guid strategyId) => 
-        context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
+    public async Task DeleteAsync(Guid strategyId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await context.OptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
+    }
 
-    public Task InvertDeleteAsync(List<Guid> strategyIds) => 
-        context.OptimizationResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
+    public async Task InvertDeleteAsync(List<Guid> strategyIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await context.OptimizationResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
+    }
 }

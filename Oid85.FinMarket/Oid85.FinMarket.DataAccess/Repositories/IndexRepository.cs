@@ -9,11 +9,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class IndexRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IIndexRepository
 {
     public async Task AddAsync(List<FinIndex> indexes)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (indexes is [])
             return;
 
@@ -31,6 +33,7 @@ public class IndexRepository(
 
     public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -51,13 +54,17 @@ public class IndexRepository(
         }
     }
     
-    public async Task<List<FinIndex>> GetAsync(List<string> tickers) =>
-        (await context.IndicativeEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => tickers.Contains(x.Ticker))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<FinIndex>> GetAsync(List<string> tickers)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.IndicativeEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => tickers.Contains(x.Ticker))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

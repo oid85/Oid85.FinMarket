@@ -7,11 +7,13 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class DividendInfoRepository(
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IDividendInfoRepository
 {
     public async Task AddOrUpdateAsync(List<DividendInfo> dividendInfos)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (dividendInfos is [])
             return;
 
@@ -29,20 +31,28 @@ public class DividendInfoRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<DividendInfo>> GetAllAsync() =>
-        (await context.DividendInfoEntities
-            .OrderBy(x => x.DividendPrc)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<DividendInfo>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.DividendInfoEntities
+                .OrderBy(x => x.DividendPrc)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
-    public async Task<List<DividendInfo>> GetAsync(List<Guid> instrumentIds) =>
-        (await context.DividendInfoEntities
-            .Where(x => instrumentIds.Contains(x.InstrumentId))
-            .OrderBy(x => x.DividendPrc)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<DividendInfo>> GetAsync(List<Guid> instrumentIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.DividendInfoEntities
+                .Where(x => instrumentIds.Contains(x.InstrumentId))
+                .OrderBy(x => x.DividendPrc)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

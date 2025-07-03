@@ -7,11 +7,13 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class ForecastTargetRepository(
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IForecastTargetRepository
 {
     public async Task AddAsync(List<ForecastTarget> forecastTargets)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (forecastTargets is [])
             return;
 
@@ -29,23 +31,30 @@ public class ForecastTargetRepository(
         await context.SaveChangesAsync();
     }
     
-    public async Task<List<ForecastTarget>> GetAllAsync() =>
-        (await context.ForecastTargetEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<ForecastTarget>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.ForecastTargetEntities
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
-    public async Task<List<ForecastTarget>> GetAsync(List<Guid> instrumentIds) =>
-        (await context.ForecastTargetEntities
-            .Where(x => instrumentIds.Contains(x.InstrumentId))
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
-
+    public async Task<List<ForecastTarget>> GetAsync(List<Guid> instrumentIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.ForecastTargetEntities
+                .Where(x => instrumentIds.Contains(x.InstrumentId))
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

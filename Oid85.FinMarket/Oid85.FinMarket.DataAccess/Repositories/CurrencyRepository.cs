@@ -9,11 +9,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class CurrencyRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : ICurrencyRepository
 {
     public async Task AddAsync(List<Currency> currencies)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (currencies is [])
             return;
 
@@ -30,6 +32,7 @@ public class CurrencyRepository(
 
     public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -50,13 +53,17 @@ public class CurrencyRepository(
         }
     }
     
-    public async Task<List<Currency>> GetAsync(List<string> tickers) =>
-        (await context.CurrencyEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => tickers.Contains(x.Ticker))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Currency>> GetAsync(List<string> tickers)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.CurrencyEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => tickers.Contains(x.Ticker))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

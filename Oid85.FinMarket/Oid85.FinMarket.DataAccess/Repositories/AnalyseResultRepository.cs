@@ -7,11 +7,13 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class AnalyseResultRepository(
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IAnalyseResultRepository
 {
     public async Task AddAsync(List<AnalyseResult> results)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (results is [])
             return;
 
@@ -30,18 +32,22 @@ public class AnalyseResultRepository(
     }
     
     public async Task<List<AnalyseResult>> GetAsync(
-        List<Guid> instrumentIds, DateOnly from, DateOnly to) =>
-        (await context.AnalyseResultEntities
+        List<Guid> instrumentIds, DateOnly from, DateOnly to)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.AnalyseResultEntities
             .Where(x => instrumentIds.Contains(x.InstrumentId))
             .Where(x => x.Date >= from && x.Date <= to)
             .OrderBy(x => x.Date)
             .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+            .ToListAsync()).Select(DataAccessMapper.Map).ToList();
+    }
 
     public async Task<List<AnalyseResult>> GetTwoLastAsync(Guid instrumentId, string analyseType)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entities = await context.AnalyseResultEntities
             .Where(x => 
                 x.InstrumentId == instrumentId

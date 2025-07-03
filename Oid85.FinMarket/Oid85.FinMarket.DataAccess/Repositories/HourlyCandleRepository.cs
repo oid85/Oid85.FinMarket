@@ -7,11 +7,13 @@ using Oid85.FinMarket.Domain.Models;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class HourlyCandleRepository(
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IHourlyCandleRepository
 {
     public async Task AddOrUpdateAsync(List<HourlyCandle> candles)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var completedCandles = candles
             .Where(x => x.IsComplete).ToList();
         
@@ -34,6 +36,8 @@ public class HourlyCandleRepository(
 
     public async Task<HourlyCandle?> GetLastAsync(Guid instrumentId)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.HourlyCandleEntities
             .Where(x => x.InstrumentId == instrumentId)
             .OrderByDescending(x => x.Date)
@@ -46,6 +50,8 @@ public class HourlyCandleRepository(
 
     public async Task<List<HourlyCandle>> GetAsync(string ticker, DateOnly from, DateOnly to)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var instrumentEntity = await context.InstrumentEntities
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
 

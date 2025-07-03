@@ -9,11 +9,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class FeerGreedRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IFeerGreedRepository
 {
     public async Task AddAsync(List<FearGreedIndex> indexes)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (indexes is [])
             return;
 
@@ -32,6 +34,7 @@ public class FeerGreedRepository(
 
     public async Task UpdateFieldsAsync(FearGreedIndex index)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -58,6 +61,8 @@ public class FeerGreedRepository(
     
     public async Task<List<FearGreedIndex>> GetAsync(DateOnly from, DateOnly to)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entities = await context.FearGreedIndexEntities
             .Where(x => 
                 x.Date >= from &&

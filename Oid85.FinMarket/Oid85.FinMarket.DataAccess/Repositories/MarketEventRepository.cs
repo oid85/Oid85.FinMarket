@@ -8,11 +8,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class MarketEventRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IMarketEventRepository
 {
     public async Task AddIfNotExistsAsync(MarketEvent marketEvent)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (await context.MarketEventEntities
                 .AnyAsync(x =>
                     x.InstrumentId == marketEvent.InstrumentId &&
@@ -35,17 +37,22 @@ public class MarketEventRepository(
     public Task MarkAsNoSentAsync(MarketEvent marketEvent) =>
         SetSentNotificationFlagAsync(marketEvent, false);
     
-    public async Task<List<MarketEvent>> GetActivatedAsync() =>
-        (await context.MarketEventEntities
-            .Where(x => x.IsActive)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<MarketEvent>> GetActivatedAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.MarketEventEntities
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
     private async Task SetSentNotificationFlagAsync(MarketEvent marketEvent, bool value)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -68,6 +75,7 @@ public class MarketEventRepository(
 
     private async Task SetIsActiveFlagTrueAsync(MarketEvent marketEvent)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -95,6 +103,7 @@ public class MarketEventRepository(
     
     private async Task SetIsActiveFlagFalseAsync(MarketEvent marketEvent)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try

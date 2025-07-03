@@ -29,11 +29,6 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<AssetReportEventEntity> AssetReportEventEntities { get; set; }
     public DbSet<FearGreedIndexEntity> FearGreedIndexEntities { get; set; }
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder)
-    {
-        optionBuilder.UseSnakeCaseNamingConvention();
-    }
-    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

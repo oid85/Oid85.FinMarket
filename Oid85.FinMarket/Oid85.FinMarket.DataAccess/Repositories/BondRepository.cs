@@ -8,11 +8,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class BondRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IBondRepository
 {
     public async Task AddAsync(List<Bond> bonds)
     {        
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (bonds is [])
             return;
 
@@ -29,6 +31,7 @@ public class BondRepository(
 
     public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -49,32 +52,43 @@ public class BondRepository(
         }
     }
 
-    public async Task<List<Bond>> GetAllAsync() =>
-        (await context.BondEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Bond>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.BondEntities
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
-    public async Task<List<Bond>> GetAsync(List<Guid> instrumentIds) =>
-        (await context.BondEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => instrumentIds.Contains(x.InstrumentId))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Bond>> GetAsync(List<Guid> instrumentIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.BondEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => instrumentIds.Contains(x.InstrumentId))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
-    public async Task<List<Bond>> GetAsync(List<string> tickers) =>
-        (await context.BondEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => tickers.Contains(x.Ticker))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Bond>> GetAsync(List<string> tickers)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return (await context.BondEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => tickers.Contains(x.Ticker))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

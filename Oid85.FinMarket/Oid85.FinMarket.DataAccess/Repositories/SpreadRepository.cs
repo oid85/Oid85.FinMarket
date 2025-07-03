@@ -9,11 +9,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class SpreadRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : ISpreadRepository
 {
     public async Task AddAsync(List<Spread> spreads)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (spreads is [])
             return;
 
@@ -32,6 +34,7 @@ public class SpreadRepository(
 
     public async Task UpdateSpreadAsync(Spread spread)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -63,6 +66,7 @@ public class SpreadRepository(
 
     public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -90,33 +94,45 @@ public class SpreadRepository(
         }
     }
 
-    public Task SetAsDeletedAsync(Spread spread) =>
-        context.SpreadEntities
-            .Where(x => 
-                x.FirstInstrumentId == spread.FirstInstrumentId && 
+    public async Task SetAsDeletedAsync(Spread spread)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        await context.SpreadEntities
+            .Where(x =>
+                x.FirstInstrumentId == spread.FirstInstrumentId &&
                 x.SecondInstrumentId == spread.SecondInstrumentId)
             .ExecuteUpdateAsync(x => x
-                    .SetProperty(entity => entity.IsDeleted, true)
-                    .SetProperty(entity => entity.DeletedAt, DateTime.UtcNow));
+                .SetProperty(entity => entity.IsDeleted, true)
+                .SetProperty(entity => entity.DeletedAt, DateTime.UtcNow));
+    }
 
-    public async Task<List<Spread>> GetAllAsync() =>
-        (await context.SpreadEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.FirstInstrumentTicker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Spread>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.SpreadEntities
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.FirstInstrumentTicker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
-    public async Task<List<Spread>> GetAsync(List<Guid> instrumentIds) =>
-        (await context.SpreadEntities
-            .Where(x => 
-                instrumentIds.Contains(x.FirstInstrumentId) ||
-                instrumentIds.Contains(x.SecondInstrumentId))
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.FirstInstrumentTicker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Spread>> GetAsync(List<Guid> instrumentIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.SpreadEntities
+                .Where(x =>
+                    instrumentIds.Contains(x.FirstInstrumentId) ||
+                    instrumentIds.Contains(x.SecondInstrumentId))
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.FirstInstrumentTicker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

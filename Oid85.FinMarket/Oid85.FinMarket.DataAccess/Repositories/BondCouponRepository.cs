@@ -9,11 +9,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class BondCouponRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IBondCouponRepository
 {
     public async Task AddAsync(List<BondCoupon> bondCoupons)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (bondCoupons is [])
             return;
 
@@ -34,6 +36,8 @@ public class BondCouponRepository(
  
     private async Task UpdateFieldsAsync(BondCoupon bondCoupon)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -56,12 +60,16 @@ public class BondCouponRepository(
         }
     }
     
-    public async Task<List<BondCoupon>> GetAsync(List<Guid> instrumentIds) =>
-        (await context.BondCouponEntities
-            .Where(x => 
-                instrumentIds.Contains(x.InstrumentId))
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<BondCoupon>> GetAsync(List<Guid> instrumentIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.BondCouponEntities
+                .Where(x =>
+                    instrumentIds.Contains(x.InstrumentId))
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

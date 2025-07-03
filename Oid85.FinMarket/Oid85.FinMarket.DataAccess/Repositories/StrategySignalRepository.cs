@@ -8,11 +8,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class StrategySignalRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IStrategySignalRepository
 {
     public async Task AddAsync(StrategySignal strategySignal)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (!await context.StrategySignalEntities.AnyAsync(x => x.Ticker == strategySignal.Ticker))
             await context.StrategySignalEntities.AddAsync(DataAccessMapper.Map(strategySignal));
         
@@ -21,6 +23,7 @@ public class StrategySignalRepository(
 
     public async Task UpdatePositionAsync(List<string> tickers, int countSignals, double positionCost)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -43,12 +46,15 @@ public class StrategySignalRepository(
         }
     }
 
-    public async Task<List<StrategySignal>> GetAllAsync() =>
-        (await context.StrategySignalEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<StrategySignal>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return (await context.StrategySignalEntities
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 }

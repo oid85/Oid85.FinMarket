@@ -9,11 +9,13 @@ namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class FutureRepository(
     ILogger logger,
-    FinMarketContext context) 
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IFutureRepository
 {
     public async Task AddAsync(List<Future> futures)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (futures is [])
             return;
 
@@ -30,6 +32,7 @@ public class FutureRepository(
     
     public async Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
@@ -50,27 +53,37 @@ public class FutureRepository(
         }
     }
 
-    public async Task<List<Future>> GetAllAsync() =>
-        (await context.FutureEntities
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Future>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.FutureEntities
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
-    public async Task<List<Future>> GetAsync(List<string> tickers) =>
-        (await context.FutureEntities
-            .Where(x => !x.IsDeleted)
-            .Where(x => tickers.Contains(x.Ticker))
-            .OrderBy(x => x.Ticker)
-            .AsNoTracking()
-            .ToListAsync())
-        .Select(DataAccessMapper.Map)
-        .ToList();
+    public async Task<List<Future>> GetAsync(List<string> tickers)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        return (await context.FutureEntities
+                .Where(x => !x.IsDeleted)
+                .Where(x => tickers.Contains(x.Ticker))
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
 
     public async Task<Future?> GetAsync(string ticker)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.FutureEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()

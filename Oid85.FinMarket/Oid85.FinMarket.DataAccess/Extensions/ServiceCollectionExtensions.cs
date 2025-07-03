@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<UpdateAuditableEntitiesInterceptor>();
                 
-        services.AddDbContext<FinMarketContext>((serviceProvider, options) =>
+        services.AddDbContextPool<FinMarketContext>((serviceProvider, options) =>
         {
             var updateInterceptor = serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
                 
@@ -25,6 +25,11 @@ public static class ServiceCollectionExtensions
                 .UseNpgsql(configuration.GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString)!)
                 .AddInterceptors(updateInterceptor);
         });
+
+        services.AddPooledDbContextFactory<FinMarketContext>(options =>
+            options
+                .UseNpgsql(configuration.GetValue<string>(KnownSettingsKeys.PostgresFinMarketConnectionString)!)
+                .EnableServiceProviderCaching(false), poolSize: 32);
         
         services.AddTransient<IShareRepository, ShareRepository>();
         services.AddTransient<IFutureRepository, FutureRepository>();

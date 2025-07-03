@@ -7,11 +7,13 @@ using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
 public class BacktestResultRepository(
-    FinMarketContext context)  
+    IDbContextFactory<FinMarketContext> contextFactory)
     : IBacktestResultRepository
 {
     public async Task AddAsync(List<BacktestResult> backtestResults)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         if (backtestResults is [])
             return;
 
@@ -23,6 +25,8 @@ public class BacktestResultRepository(
 
     public async Task<List<BacktestResult>> GetAsync(BacktestResultFilterResource filter)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var queryableEntities = context.BacktestResultEntities.AsQueryable();
         
         queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= filter.MinProfitFactor);
@@ -41,6 +45,8 @@ public class BacktestResultRepository(
 
     public async Task<BacktestResult?> GetAsync(Guid backtestResultId)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         var entity = await context.BacktestResultEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
@@ -49,9 +55,15 @@ public class BacktestResultRepository(
         return entity is null ? null : DataAccessMapper.Map(entity);
     }
 
-    public Task DeleteAsync(Guid strategyId) => 
-        context.BacktestResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
-    
-    public Task InvertDeleteAsync(List<Guid> strategyIds) => 
-        context.BacktestResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
+    public async Task DeleteAsync(Guid strategyId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await context.BacktestResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
+    }
+
+    public async Task InvertDeleteAsync(List<Guid> strategyIds)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await context.BacktestResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
+    }
 }
