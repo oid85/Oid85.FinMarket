@@ -806,7 +806,7 @@ public class ReportDataFactory(
         
         reportData.Data.Add(
         [
-            GetNumber(count),
+            GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),

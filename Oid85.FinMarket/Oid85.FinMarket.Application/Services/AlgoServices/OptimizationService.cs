@@ -8,7 +8,7 @@ using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
-namespace Oid85.FinMarket.Application.Services.Algo;
+namespace Oid85.FinMarket.Application.Services.AlgoServices;
 
 public class OptimizationService(
     ILogger logger,

@@ -1,16 +1,13 @@
 ﻿using System.Collections.Concurrent;
-using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Serialization;
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.Application.Models;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
-namespace Oid85.FinMarket.Application.Services.Algo;
+namespace Oid85.FinMarket.Application.Services.AlgoServices;
 
 public class AlgoService(
     ILogger logger,

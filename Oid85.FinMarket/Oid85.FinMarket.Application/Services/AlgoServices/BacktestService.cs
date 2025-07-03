@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services.Algo;
@@ -8,7 +7,7 @@ using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
 
-namespace Oid85.FinMarket.Application.Services.Algo;
+namespace Oid85.FinMarket.Application.Services.AlgoServices;
 
 public class BacktestService(
     ILogger logger,
@@ -214,13 +213,12 @@ public class BacktestService(
             if (!tickersInStrategiSignals.Contains(ticker))
                 await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0 });
                 
-            var countLongSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition > 0);
-            var countShortSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition < 0);
+            int countLongSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition > 0);
+            int countShortSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition < 0);
+            int countSignals = countLongSignals - countShortSignals;
+            double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
             
-            await strategySignalRepository.UpdatePositionAsync(
-                [ticker], 
-                countLongSignals - countShortSignals,
-                (countLongSignals - countShortSignals) * algoConfigResource.MoneyManagementResource.UnitSize);
+            await strategySignalRepository.UpdatePositionAsync([ticker], countSignals, positionCost);
         }
 
         return true;

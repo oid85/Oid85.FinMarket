@@ -5,7 +5,6 @@ using Oid85.FinMarket.Application.Models.BacktestResults;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
-using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
