@@ -55,11 +55,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("result_string");
 
-                    b.HasKey("Id")
-                        .HasName("pk_analyse_results");
+                    b.HasKey("Id");
 
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_analyse_results_instrument_id");
+                    b.HasIndex("InstrumentId");
 
                     b.ToTable("analyse_results", "storage");
                 });
@@ -94,11 +92,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("type");
 
-                    b.HasKey("Id")
-                        .HasName("pk_asset_report_events");
+                    b.HasKey("Id");
 
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_asset_report_events_instrument_id");
+                    b.HasIndex("InstrumentId");
 
                     b.ToTable("asset_report_events", "public");
                 });
@@ -243,8 +239,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("winning_trades_percent");
 
-                    b.HasKey("Id")
-                        .HasName("pk_backtest_results");
+                    b.HasKey("Id");
 
                     b.ToTable("backtest_results", "storage");
                 });
@@ -307,8 +302,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_bond_coupons");
+                    b.HasKey("Id");
 
                     b.ToTable("bond_coupons", "public");
                 });
@@ -397,8 +391,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_bonds");
+                    b.HasKey("Id");
 
                     b.ToTable("bonds", "public");
                 });
@@ -471,8 +464,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_currencies");
+                    b.HasKey("Id");
 
                     b.ToTable("currencies", "public");
                 });
@@ -517,11 +509,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("volume");
 
-                    b.HasKey("Id")
-                        .HasName("pk_daily_candles");
+                    b.HasKey("Id");
 
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_daily_candles_instrument_id");
+                    b.HasIndex("InstrumentId");
 
                     b.ToTable("daily_candles", "storage");
                 });
@@ -576,8 +566,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_dividend_infos");
+                    b.HasKey("Id");
 
                     b.ToTable("dividend_infos", "public");
                 });
@@ -614,8 +603,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("value");
 
-                    b.HasKey("Id")
-                        .HasName("pk_fear_greed_index");
+                    b.HasKey("Id");
 
                     b.ToTable("fear_greed_index", "storage");
                 });
@@ -694,8 +682,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_fin_indexes");
+                    b.HasKey("Id");
 
                     b.ToTable("fin_indexes", "public");
                 });
@@ -774,8 +761,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_forecast_consensuses");
+                    b.HasKey("Id");
 
                     b.ToTable("forecast_consensuses", "public");
                 });
@@ -862,8 +848,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_forecast_targets");
+                    b.HasKey("Id");
 
                     b.ToTable("forecast_targets", "public");
                 });
@@ -968,8 +953,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_futures");
+                    b.HasKey("Id");
 
                     b.ToTable("futures", "public");
                 });
@@ -1022,11 +1006,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("volume");
 
-                    b.HasKey("Id")
-                        .HasName("pk_hourly_candles");
+                    b.HasKey("Id");
 
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_hourly_candles_instrument_id");
+                    b.HasIndex("InstrumentId");
 
                     b.ToTable("hourly_candles", "storage");
                 });
@@ -1067,8 +1049,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("type");
 
-                    b.HasKey("Id")
-                        .HasName("pk_instruments");
+                    b.HasKey("Id");
 
                     b.ToTable("instruments", "public");
 
@@ -1251,8 +1232,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_market_events");
+                    b.HasKey("Id");
 
                     b.ToTable("market_events", "storage");
                 });
@@ -1385,8 +1365,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_multiplicators");
+                    b.HasKey("Id");
 
                     b.ToTable("multiplicators", "public");
                 });
@@ -1531,8 +1510,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("winning_trades_percent");
 
-                    b.HasKey("Id")
-                        .HasName("pk_optimization_results");
+                    b.HasKey("Id");
 
                     b.ToTable("optimization_results", "storage");
                 });
@@ -1599,8 +1577,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_shares");
+                    b.HasKey("Id");
 
                     b.ToTable("shares", "public");
                 });
@@ -1703,8 +1680,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_spreads");
+                    b.HasKey("Id");
 
                     b.ToTable("spreads", "storage");
                 });
@@ -1733,9 +1709,17 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
+                    b.Property<double>("LastPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("last_price");
+
                     b.Property<double>("PositionCost")
                         .HasColumnType("double precision")
                         .HasColumnName("position_cost");
+
+                    b.Property<int>("PositionSize")
+                        .HasColumnType("integer")
+                        .HasColumnName("position_size");
 
                     b.Property<string>("Ticker")
                         .IsRequired()
@@ -1747,8 +1731,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_strategy_signals");
+                    b.HasKey("Id");
 
                     b.ToTable("strategy_signals", "storage");
                 });

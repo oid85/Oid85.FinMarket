@@ -11,7 +11,9 @@ public static class DataAccessMapper
         {
             Ticker = model.Ticker,
             CountSignals = model.CountSignals,
-            PositionCost = model.PositionCost
+            PositionCost = model.PositionCost,
+            PositionSize = model.PositionSize,
+            LastPrice = model.LastPrice
         };
     
     public static StrategySignal Map(StrategySignalEntity entity) =>
@@ -19,7 +21,9 @@ public static class DataAccessMapper
         {
             Ticker = entity.Ticker,
             CountSignals = entity.CountSignals,
-            PositionCost = entity.PositionCost
+            PositionCost = entity.PositionCost,
+            PositionSize = entity.PositionSize,
+            LastPrice = entity.LastPrice
         }; 
     
     public static OptimizationResultEntity Map(OptimizationResult model) =>

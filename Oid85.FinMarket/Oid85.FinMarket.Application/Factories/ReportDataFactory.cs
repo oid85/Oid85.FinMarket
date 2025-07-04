@@ -796,7 +796,7 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "Тикер", "Тикер", "Наименование", "Сигналы", "Стоимость"]);
+            ["№", "Тикер", "Тикер", "Наименование", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция, руб"]);
 
         reportData.Title = "Сигналы";
         
@@ -811,6 +811,8 @@ public class ReportDataFactory(
             GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),            
             GetNumber(strategySignals.Sum(x => x.PositionCost))
         ]); 
         
@@ -828,6 +830,8 @@ public class ReportDataFactory(
                 GetString(strategySignal.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentName)),
                 GetNumber(strategySignal.CountSignals),
+                GetNumber(strategySignal.LastPrice),
+                GetNumber(strategySignal.PositionSize),
                 GetNumber(strategySignal.PositionCost)
             ]);            
         }

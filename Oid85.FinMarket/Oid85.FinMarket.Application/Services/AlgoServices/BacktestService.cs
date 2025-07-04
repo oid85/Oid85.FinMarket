@@ -17,6 +17,7 @@ public class BacktestService(
     IOptimizationResultRepository optimizationResultRepository,
     IBacktestResultRepository backtestResultRepository,
     IStrategySignalRepository strategySignalRepository,
+    IShareRepository shareRepository,
     IServiceProvider serviceProvider) 
     : AlgoService(
         logger,
@@ -205,7 +206,7 @@ public class BacktestService(
         foreach (var ticker in tickersInStrategiSignals)
         {
             if (!tickersInBacktestResults.Contains(ticker))
-                await strategySignalRepository.UpdatePositionAsync([ticker], 0, 0.0);
+                await strategySignalRepository.UpdatePositionAsync(ticker, 0, 0.0, 0, 0.0);
         }
 
         foreach (var ticker in tickersInBacktestResults)
@@ -217,8 +218,10 @@ public class BacktestService(
             int countShortSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition < 0);
             int countSignals = countLongSignals - countShortSignals;
             double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
+            double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
+            int positionSize = Convert.ToInt32(positionCost / lastPrice);
             
-            await strategySignalRepository.UpdatePositionAsync([ticker], countSignals, positionCost);
+            await strategySignalRepository.UpdatePositionAsync(ticker, countSignals, positionCost, positionSize, lastPrice);
         }
 
         return true;

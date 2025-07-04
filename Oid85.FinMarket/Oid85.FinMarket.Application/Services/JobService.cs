@@ -15,6 +15,7 @@ public class JobService(
     ISectorIndexService sectorIndexService,
     IMarketEventService marketEventService,
     ISendService sendService,
+    IOptimizationService optimizationService,
     IBacktestService backtestService) 
     : IJobService
 {
@@ -27,8 +28,9 @@ public class JobService(
         await LoadBondCouponsAsync();
         await LoadDividendInfosAsync();
         await LoadDailyCandlesAsync();
-        await LoadHourlyCandlesAsync();
+        // await LoadHourlyCandlesAsync();
         await ImportAsync();
+        await OptimizeAsync();
         await BacktestAsync();
         await LoadForecastsAsync();
         await AnalyseAsync();
@@ -193,6 +195,21 @@ public class JobService(
             logger.Info(exception, "Ошибка при выполнении метода 'ImportAsync'");
         }
     }    
+    
+    private async Task OptimizeAsync()
+    {
+        try
+        {
+            await optimizationService.OptimizeAsync();
+            
+            logger.Info("Метод 'OptimizeAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'OptimizeAsync'");
+        }
+    }  
     
     private async Task BacktestAsync()
     {

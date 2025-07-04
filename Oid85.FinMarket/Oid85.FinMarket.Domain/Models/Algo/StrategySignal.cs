@@ -16,4 +16,14 @@ public class StrategySignal
     /// Размер позиции
     /// </summary>
     public double PositionCost { get; set; }
+    
+    /// <summary>
+    /// Размер позиции, шт
+    /// </summary>
+    public int PositionSize { get; set; } 
+    
+    /// <summary>
+    /// Цена инструмента
+    /// </summary>
+    public double LastPrice { get; set; } 
 }

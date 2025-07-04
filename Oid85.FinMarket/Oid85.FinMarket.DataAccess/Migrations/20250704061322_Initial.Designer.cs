@@ -12,7 +12,7 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    [Migration("20250423150647_Initial")]
+    [Migration("20250704061322_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -58,11 +58,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("result_string");
 
-                    b.HasKey("Id")
-                        .HasName("pk_analyse_results");
+                    b.HasKey("Id");
 
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_analyse_results_instrument_id");
+                    b.HasIndex("InstrumentId");
 
                     b.ToTable("analyse_results", "storage");
                 });
@@ -97,13 +95,156 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("type");
 
-                    b.HasKey("Id")
-                        .HasName("pk_asset_report_events");
+                    b.HasKey("Id");
 
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_asset_report_events_instrument_id");
+                    b.HasIndex("InstrumentId");
 
                     b.ToTable("asset_report_events", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.BacktestResultEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<double>("AnnualYieldReturn")
+                        .HasColumnType("double precision")
+                        .HasColumnName("annual_yield_return");
+
+                    b.Property<double>("AverageProfit")
+                        .HasColumnType("double precision")
+                        .HasColumnName("average_profit");
+
+                    b.Property<double>("AverageProfitPercent")
+                        .HasColumnType("double precision")
+                        .HasColumnName("average_profit_percent");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrentPosition")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_position");
+
+                    b.Property<double>("CurrentPositionCost")
+                        .HasColumnType("double precision")
+                        .HasColumnName("current_position_cost");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<double>("Drawdown")
+                        .HasColumnType("double precision")
+                        .HasColumnName("drawdown");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("end_date");
+
+                    b.Property<double>("EndMoney")
+                        .HasColumnType("double precision")
+                        .HasColumnName("end_money");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<double>("MaxDrawdown")
+                        .HasColumnType("double precision")
+                        .HasColumnName("max_drawdown");
+
+                    b.Property<double>("MaxDrawdownPercent")
+                        .HasColumnType("double precision")
+                        .HasColumnName("max_drawdown_percent");
+
+                    b.Property<double>("NetProfit")
+                        .HasColumnType("double precision")
+                        .HasColumnName("net_profit");
+
+                    b.Property<int>("NumberPositions")
+                        .HasColumnType("integer")
+                        .HasColumnName("number_positions");
+
+                    b.Property<double>("ProfitFactor")
+                        .HasColumnType("double precision")
+                        .HasColumnName("profit_factor");
+
+                    b.Property<double>("RecoveryFactor")
+                        .HasColumnType("double precision")
+                        .HasColumnName("recovery_factor");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("start_date");
+
+                    b.Property<double>("StartMoney")
+                        .HasColumnType("double precision")
+                        .HasColumnName("start_money");
+
+                    b.Property<string>("StrategyDescription")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("strategy_description");
+
+                    b.Property<Guid>("StrategyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("strategy_id");
+
+                    b.Property<string>("StrategyName")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("strategy_name");
+
+                    b.Property<string>("StrategyParams")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("jsonb")
+                        .HasColumnName("strategy_params");
+
+                    b.Property<string>("StrategyParamsHash")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("strategy_params_hash");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker");
+
+                    b.Property<string>("Timeframe")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("timeframe");
+
+                    b.Property<double>("TotalReturn")
+                        .HasColumnType("double precision")
+                        .HasColumnName("total_return");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("WinningPositions")
+                        .HasColumnType("integer")
+                        .HasColumnName("winning_positions");
+
+                    b.Property<double>("WinningTradesPercent")
+                        .HasColumnType("double precision")
+                        .HasColumnName("winning_trades_percent");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("backtest_results", "storage");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.BondCouponEntity", b =>
@@ -164,8 +305,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_bond_coupons");
+                    b.HasKey("Id");
 
                     b.ToTable("bond_coupons", "public");
                 });
@@ -254,59 +394,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_bonds");
+                    b.HasKey("Id");
 
                     b.ToTable("bonds", "public");
-                });
-
-            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.CandleEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<double>("Close")
-                        .HasColumnType("double precision")
-                        .HasColumnName("close");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date")
-                        .HasColumnName("date");
-
-                    b.Property<double>("High")
-                        .HasColumnType("double precision")
-                        .HasColumnName("high");
-
-                    b.Property<Guid>("InstrumentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("instrument_id");
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_complete");
-
-                    b.Property<double>("Low")
-                        .HasColumnType("double precision")
-                        .HasColumnName("low");
-
-                    b.Property<double>("Open")
-                        .HasColumnType("double precision")
-                        .HasColumnName("open");
-
-                    b.Property<long>("Volume")
-                        .HasColumnType("bigint")
-                        .HasColumnName("volume");
-
-                    b.HasKey("Id")
-                        .HasName("pk_daily_candles");
-
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_daily_candles_instrument_id");
-
-                    b.ToTable("daily_candles", "storage");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.CurrencyEntity", b =>
@@ -377,10 +467,56 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_currencies");
+                    b.HasKey("Id");
 
                     b.ToTable("currencies", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.DailyCandleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<double>("Close")
+                        .HasColumnType("double precision")
+                        .HasColumnName("close");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<double>("High")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high");
+
+                    b.Property<Guid>("InstrumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_complete");
+
+                    b.Property<double>("Low")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low");
+
+                    b.Property<double>("Open")
+                        .HasColumnType("double precision")
+                        .HasColumnName("open");
+
+                    b.Property<long>("Volume")
+                        .HasColumnType("bigint")
+                        .HasColumnName("volume");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstrumentId");
+
+                    b.ToTable("daily_candles", "storage");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.DividendInfoEntity", b =>
@@ -433,8 +569,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_dividend_infos");
+                    b.HasKey("Id");
 
                     b.ToTable("dividend_infos", "public");
                 });
@@ -471,8 +606,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("value");
 
-                    b.HasKey("Id")
-                        .HasName("pk_fear_greed_index");
+                    b.HasKey("Id");
 
                     b.ToTable("fear_greed_index", "storage");
                 });
@@ -551,67 +685,9 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_fin_indexes");
+                    b.HasKey("Id");
 
                     b.ToTable("fin_indexes", "public");
-                });
-
-            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.FiveMinuteCandleEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<double>("Close")
-                        .HasColumnType("double precision")
-                        .HasColumnName("close");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date")
-                        .HasColumnName("date");
-
-                    b.Property<long>("DateTimeTicks")
-                        .HasColumnType("bigint")
-                        .HasColumnName("datetime");
-
-                    b.Property<double>("High")
-                        .HasColumnType("double precision")
-                        .HasColumnName("high");
-
-                    b.Property<Guid>("InstrumentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("instrument_id");
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_complete");
-
-                    b.Property<double>("Low")
-                        .HasColumnType("double precision")
-                        .HasColumnName("low");
-
-                    b.Property<double>("Open")
-                        .HasColumnType("double precision")
-                        .HasColumnName("open");
-
-                    b.Property<TimeOnly>("Time")
-                        .HasColumnType("time")
-                        .HasColumnName("time");
-
-                    b.Property<long>("Volume")
-                        .HasColumnType("bigint")
-                        .HasColumnName("volume");
-
-                    b.HasKey("Id")
-                        .HasName("pk_five_minute_candles");
-
-                    b.HasIndex("InstrumentId")
-                        .HasDatabaseName("ix_five_minute_candles_instrument_id");
-
-                    b.ToTable("five_minute_candles", "storage");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.ForecastConsensusEntity", b =>
@@ -688,8 +764,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_forecast_consensuses");
+                    b.HasKey("Id");
 
                     b.ToTable("forecast_consensuses", "public");
                 });
@@ -776,8 +851,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_forecast_targets");
+                    b.HasKey("Id");
 
                     b.ToTable("forecast_targets", "public");
                 });
@@ -882,10 +956,64 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_futures");
+                    b.HasKey("Id");
 
                     b.ToTable("futures", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.HourlyCandleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<double>("Close")
+                        .HasColumnType("double precision")
+                        .HasColumnName("close");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<long>("DateTimeTicks")
+                        .HasColumnType("bigint")
+                        .HasColumnName("datetime");
+
+                    b.Property<double>("High")
+                        .HasColumnType("double precision")
+                        .HasColumnName("high");
+
+                    b.Property<Guid>("InstrumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_complete");
+
+                    b.Property<double>("Low")
+                        .HasColumnType("double precision")
+                        .HasColumnName("low");
+
+                    b.Property<double>("Open")
+                        .HasColumnType("double precision")
+                        .HasColumnName("open");
+
+                    b.Property<TimeOnly>("Time")
+                        .HasColumnType("time")
+                        .HasColumnName("time");
+
+                    b.Property<long>("Volume")
+                        .HasColumnType("bigint")
+                        .HasColumnName("volume");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstrumentId");
+
+                    b.ToTable("hourly_candles", "storage");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.InstrumentEntity", b =>
@@ -924,10 +1052,119 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("character varying(20)")
                         .HasColumnName("type");
 
-                    b.HasKey("Id")
-                        .HasName("pk_instruments");
+                    b.HasKey("Id");
 
                     b.ToTable("instruments", "public");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("05804fbf-35a1-481c-bbf2-4acfc3996da3"),
+                            InstrumentId = new Guid("6503b433-233c-4d99-bea6-017e7dcad033"),
+                            Name = "Oil and Gas Sector Index",
+                            Sector = "",
+                            Ticker = "OGSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("3a20bcb8-6be5-4510-b91a-f3096918686c"),
+                            InstrumentId = new Guid("8a923a18-1dda-46a8-b163-15491d62314a"),
+                            Name = "Banks Sector Index",
+                            Sector = "",
+                            Ticker = "BSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("abe702e9-0271-4622-9f52-4de2da88ebfc"),
+                            InstrumentId = new Guid("299bc8a4-db16-4fef-8adb-f9cfe138f0eb"),
+                            Name = "Energ Sector Index",
+                            Sector = "",
+                            Ticker = "ESI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("271bb1d1-4476-4638-bae8-0cac6f7179ad"),
+                            InstrumentId = new Guid("8a9ca1af-e4fb-4138-9695-0fccec865480"),
+                            Name = "Finance Sector Index",
+                            Sector = "",
+                            Ticker = "FSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("d05f0a65-9d0c-42dc-8dd1-130ba5bfeb3e"),
+                            InstrumentId = new Guid("b916084e-dcee-440f-ac44-6240913753f6"),
+                            Name = "Housing And Utilities Sector Index",
+                            Sector = "",
+                            Ticker = "HUSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("d2615eb5-c224-4e7d-9bb7-8bfa4e1351ea"),
+                            InstrumentId = new Guid("8b18fbbf-5d4e-4578-8586-1a104ad1dcb1"),
+                            Name = "IronAndSteelIndustry Sector Index",
+                            Sector = "",
+                            Ticker = "ISISI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("712e7169-5953-46a0-829e-400b9015a56d"),
+                            InstrumentId = new Guid("42ef3680-1ea0-42e3-b587-a0abe1a23dc7"),
+                            Name = "IT Sector Index",
+                            Sector = "",
+                            Ticker = "ITSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("c3db74d9-048b-4fe7-9abe-3d67a1b4010f"),
+                            InstrumentId = new Guid("2faf88b4-037f-40fc-ade1-5b72452d9c15"),
+                            Name = "Mining Sector Index",
+                            Sector = "",
+                            Ticker = "MSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("97094d1f-8426-44fc-a25d-a556ec9c3a97"),
+                            InstrumentId = new Guid("da5ae557-fb6c-4cc2-886d-4bc4aedce12a"),
+                            Name = "Non Ferrous Metallurgy Sector Index",
+                            Sector = "",
+                            Ticker = "NFMSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("e0683c7c-68b0-4d9a-a3b4-8f94086df49f"),
+                            InstrumentId = new Guid("6d35ac04-9c84-4c4d-b2fa-7aae12b2fcdd"),
+                            Name = "Retail Sector Index",
+                            Sector = "",
+                            Ticker = "RSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("d9edc8e2-df33-484d-b509-74b55c44396d"),
+                            InstrumentId = new Guid("f039936b-5183-46d1-a262-feff6b83a377"),
+                            Name = "Telecom Sector Index",
+                            Sector = "",
+                            Ticker = "TSI",
+                            Type = "Index"
+                        },
+                        new
+                        {
+                            Id = new Guid("e5d093cd-e00d-4603-9c81-c33aa0a1bbc6"),
+                            InstrumentId = new Guid("b0d7ac17-6042-48ab-ad79-076bf950e451"),
+                            Name = "Transport Sector Index",
+                            Sector = "",
+                            Ticker = "TRSI",
+                            Type = "Index"
+                        });
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.MarketEventEntity", b =>
@@ -998,8 +1235,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_market_events");
+                    b.HasKey("Id");
 
                     b.ToTable("market_events", "storage");
                 });
@@ -1132,10 +1368,154 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_multiplicators");
+                    b.HasKey("Id");
 
                     b.ToTable("multiplicators", "public");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.OptimizationResultEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<double>("AnnualYieldReturn")
+                        .HasColumnType("double precision")
+                        .HasColumnName("annual_yield_return");
+
+                    b.Property<double>("AverageProfit")
+                        .HasColumnType("double precision")
+                        .HasColumnName("average_profit");
+
+                    b.Property<double>("AverageProfitPercent")
+                        .HasColumnType("double precision")
+                        .HasColumnName("average_profit_percent");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrentPosition")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_position");
+
+                    b.Property<double>("CurrentPositionCost")
+                        .HasColumnType("double precision")
+                        .HasColumnName("current_position_cost");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<double>("Drawdown")
+                        .HasColumnType("double precision")
+                        .HasColumnName("drawdown");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date")
+                        .HasColumnName("end_date");
+
+                    b.Property<double>("EndMoney")
+                        .HasColumnType("double precision")
+                        .HasColumnName("end_money");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<double>("MaxDrawdown")
+                        .HasColumnType("double precision")
+                        .HasColumnName("max_drawdown");
+
+                    b.Property<double>("MaxDrawdownPercent")
+                        .HasColumnType("double precision")
+                        .HasColumnName("max_drawdown_percent");
+
+                    b.Property<double>("NetProfit")
+                        .HasColumnType("double precision")
+                        .HasColumnName("net_profit");
+
+                    b.Property<int>("NumberPositions")
+                        .HasColumnType("integer")
+                        .HasColumnName("number_positions");
+
+                    b.Property<double>("ProfitFactor")
+                        .HasColumnType("double precision")
+                        .HasColumnName("profit_factor");
+
+                    b.Property<double>("RecoveryFactor")
+                        .HasColumnType("double precision")
+                        .HasColumnName("recovery_factor");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("start_date");
+
+                    b.Property<double>("StartMoney")
+                        .HasColumnType("double precision")
+                        .HasColumnName("start_money");
+
+                    b.Property<string>("StrategyDescription")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("strategy_description");
+
+                    b.Property<Guid>("StrategyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("strategy_id");
+
+                    b.Property<string>("StrategyName")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("strategy_name");
+
+                    b.Property<string>("StrategyParams")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("jsonb")
+                        .HasColumnName("strategy_params");
+
+                    b.Property<string>("StrategyParamsHash")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("strategy_params_hash");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker");
+
+                    b.Property<string>("Timeframe")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("timeframe");
+
+                    b.Property<double>("TotalReturn")
+                        .HasColumnType("double precision")
+                        .HasColumnName("total_return");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("WinningPositions")
+                        .HasColumnType("integer")
+                        .HasColumnName("winning_positions");
+
+                    b.Property<double>("WinningTradesPercent")
+                        .HasColumnType("double precision")
+                        .HasColumnName("winning_trades_percent");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("optimization_results", "storage");
                 });
 
             modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.ShareEntity", b =>
@@ -1200,8 +1580,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_shares");
+                    b.HasKey("Id");
 
                     b.ToTable("shares", "public");
                 });
@@ -1304,10 +1683,60 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.HasKey("Id")
-                        .HasName("pk_spreads");
+                    b.HasKey("Id");
 
                     b.ToTable("spreads", "storage");
+                });
+
+            modelBuilder.Entity("Oid85.FinMarket.DataAccess.Entities.StrategySignalEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<int>("CountSignals")
+                        .HasColumnType("integer")
+                        .HasColumnName("count_signals");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<double>("LastPrice")
+                        .HasColumnType("double precision")
+                        .HasColumnName("last_price");
+
+                    b.Property<double>("PositionCost")
+                        .HasColumnType("double precision")
+                        .HasColumnName("position_cost");
+
+                    b.Property<int>("PositionSize")
+                        .HasColumnType("integer")
+                        .HasColumnName("position_size");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("ticker");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("strategy_signals", "storage");
                 });
 #pragma warning restore 612, 618
         }

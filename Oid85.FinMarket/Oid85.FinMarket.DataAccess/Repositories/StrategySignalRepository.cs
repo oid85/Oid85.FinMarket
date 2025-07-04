@@ -21,7 +21,7 @@ public class StrategySignalRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdatePositionAsync(List<string> tickers, int countSignals, double positionCost)
+    public async Task UpdatePositionAsync(string ticker, int countSignals, double positionCost, int positionSize, double lastPrice)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
@@ -29,10 +29,12 @@ public class StrategySignalRepository(
         try
         {
             await context.StrategySignalEntities
-                .Where(x => tickers.Contains(x.Ticker))
+                .Where(x => x.Ticker == ticker)
                 .ExecuteUpdateAsync(x => x
                     .SetProperty(entity => entity.CountSignals, countSignals)
                     .SetProperty(entity => entity.PositionCost, positionCost)
+                    .SetProperty(entity => entity.PositionSize, positionSize)
+                    .SetProperty(entity => entity.LastPrice, lastPrice)
                     .SetProperty(entity => entity.UpdatedAt, DateTime.UtcNow));
             
             await context.SaveChangesAsync();
