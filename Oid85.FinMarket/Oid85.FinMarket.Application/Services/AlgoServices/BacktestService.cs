@@ -217,6 +217,7 @@ public class BacktestService(
             int countLongSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition > 0);
             int countShortSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition < 0);
             int countSignals = countLongSignals - countShortSignals;
+            
             double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
             double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
             int positionSize = Convert.ToInt32(positionCost / lastPrice);
