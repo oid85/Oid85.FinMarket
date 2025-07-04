@@ -213,16 +213,32 @@ public class BacktestService(
         {
             if (!tickersInStrategiSignals.Contains(ticker))
                 await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0 });
-                
-            int countLongSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition > 0);
-            int countShortSignals = backtestResults.Where(x => x.Ticker == ticker).Count(x => x.CurrentPosition < 0);
-            int countSignals = countLongSignals - countShortSignals;
+
+            int countSignals = 0;
+            double positionSize = 0.0;
+            
+            foreach (var backtestResult in backtestResults.Where(x => x.Ticker == ticker))
+            {
+                if (backtestResult.CurrentPosition > 0)
+                {
+                    countSignals++;
+                    double positionPrice = Math.Abs(backtestResult.CurrentPositionCost / backtestResult.CurrentPosition);
+                    positionSize += algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
+                }
+
+                else if (backtestResult.CurrentPosition > 0)
+                {
+                    countSignals--;
+                    double positionPrice = Math.Abs(backtestResult.CurrentPositionCost / backtestResult.CurrentPosition);
+                    positionSize -= algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
+                }
+            }
             
             double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
             double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
-            int positionSize = Convert.ToInt32(positionCost / lastPrice);
             
-            await strategySignalRepository.UpdatePositionAsync(ticker, countSignals, positionCost, positionSize, lastPrice);
+            await strategySignalRepository.UpdatePositionAsync(
+                ticker, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
         }
 
         return true;
