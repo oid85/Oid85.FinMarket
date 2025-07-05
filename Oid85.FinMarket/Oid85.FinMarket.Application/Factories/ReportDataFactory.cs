@@ -796,7 +796,7 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "Тикер", "Тикер", "Наименование", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция, руб"]);
+            ["№", "", "Тикер", "Наименование", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция (юнит), руб"]);
 
         reportData.Title = "Сигналы";
         
