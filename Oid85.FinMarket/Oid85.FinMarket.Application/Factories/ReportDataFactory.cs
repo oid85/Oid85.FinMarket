@@ -843,7 +843,7 @@ public class ReportDataFactory(
     {
         var reportData = CreateNewReportDataWithHeaders(
             [
-                "№", "Стратегия", "Тикер", "Тикер", "TF", "Параметры", "PF", "RF", 
+                "№", "Стратегия", "", "Тикер", "TF", "Параметры", "PF", "RF", 
                 "Макс. пр., %", "Ср. профит, %", "Дох. год., %", "Позиций, шт", 
                 "Приб. позиций, %", "Тек. позиция, шт", "Тек. позиция, руб", ""]);
         
@@ -854,7 +854,7 @@ public class ReportDataFactory(
 
         int count = 0;
         
-        foreach (var backtestResult in backtestResults.OrderByDescending(x => x.AnnualYieldReturn).Take(100))
+        foreach (var backtestResult in backtestResults.Where(x => x.CurrentPosition != 0).OrderByDescending(x => x.AnnualYieldReturn))
         {
             count++;
             

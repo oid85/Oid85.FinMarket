@@ -139,7 +139,6 @@ public class Strategy
             Positions[count - 1].ExitDateTime = trade.DateTime;
             Positions[count - 1].ExitCandleIndex = trade.CandleIndex;
             Positions[count - 1].IsActive = false;
-            Positions[count - 1].Cost = trade.Quantity * trade.Price;
                 
             var profit = Positions[count - 1].Quantity * (Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice);
             Positions[count - 1].Profit = profit;
