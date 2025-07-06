@@ -25,8 +25,8 @@ public class AlgoReportService(
 
         var backtestResultData = new BacktestResultData
         {
-            Report = await reportDataFactory.CreateBacktestResultReportDataAsync(request.Id),
-            Diagram = await diagramDataFactory.CreateBacktestResultDiagramDataAsync(result.strategy!)
+            ReportData = await reportDataFactory.CreateBacktestResultReportDataAsync(request.Id),
+            DiagramData = await diagramDataFactory.CreateBacktestResultDiagramDataAsync(result.strategy!)
         };
 
         return backtestResultData;
