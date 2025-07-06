@@ -80,7 +80,7 @@ public class AlgoController(
     /// <summary>
     /// Получить бэктест по id
     /// </summary>
-    [HttpPost("backtest-result")]
+    [HttpPost("backtest-result-by-id")]
     [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status500InternalServerError)]
