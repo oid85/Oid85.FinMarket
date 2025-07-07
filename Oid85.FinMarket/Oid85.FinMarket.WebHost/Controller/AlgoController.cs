@@ -94,6 +94,22 @@ public class AlgoController(
             });    
     
     /// <summary>
+    /// Получить бэктест по тикеру
+    /// </summary>
+    [HttpPost("backtest-result-by-ticker")]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetBacktestResultByTickerAsync(
+        [FromBody] TickerRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetBacktestResultByTickerAsync(request),
+            result => new BaseResponse<BacktestResultData>
+            {
+                Result = result
+            });     
+    
+    /// <summary>
     /// Получить сигналы стратегий
     /// </summary>
     [HttpPost("strategy-signals")]

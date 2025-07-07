@@ -9,4 +9,5 @@ public interface IAlgoReportService
     Task<ReportData> GetStrategySignalsAsync();
     Task<ReportData> GetBacktestResultsAsync();
     Task<BacktestResultData> GetBacktestResultByIdAsync(IdRequest request);
+    Task<BacktestResultData> GetBacktestResultByTickerAsync(TickerRequest request);
 }

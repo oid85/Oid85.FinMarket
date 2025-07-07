@@ -154,6 +154,9 @@ public class ReportDataFactory(
     private static ReportParameter GetBacktestResultByIdButton(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.BacktestResultByIdButton, value, color);    
     
+    private static ReportParameter GetBacktestResultByTickerButton(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.BacktestResultByTickerButton, value, color);    
+    
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
     {
@@ -796,7 +799,7 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "", "Тикер", "Наименование", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция (юнит), руб"]);
+            ["№", "", "Тикер", "Наименование", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция (юнит), руб", ""]);
 
         reportData.Title = "Сигналы";
         
@@ -832,7 +835,8 @@ public class ReportDataFactory(
                 GetNumber(strategySignal.CountSignals),
                 GetNumber(strategySignal.LastPrice),
                 GetNumber(strategySignal.PositionSize),
-                GetNumber(strategySignal.PositionCost)
+                GetNumber(strategySignal.PositionCost),
+                GetBacktestResultByTickerButton(strategySignal.Ticker)
             ]);            
         }
         

@@ -211,34 +211,41 @@ public class BacktestService(
 
         foreach (var ticker in tickersInBacktestResults)
         {
-            if (!tickersInStrategiSignals.Contains(ticker))
-                await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0 });
-
-            int countSignals = 0;
-            double positionSize = 0.0;
-            
-            foreach (var backtestResult in backtestResults.Where(x => x.Ticker == ticker))
+            try
             {
-                if (backtestResult.CurrentPosition > 0)
-                {
-                    countSignals++;
-                    double positionPrice = Math.Abs(backtestResult.CurrentPositionCost / backtestResult.CurrentPosition);
-                    positionSize += algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
-                }
+                if (!tickersInStrategiSignals.Contains(ticker))
+                    await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0, LastPrice = 0.0, PositionCost = 0.0, PositionSize = 0});
 
-                else if (backtestResult.CurrentPosition > 0)
+                double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
+                
+                int countSignals = 0;
+                double positionSize = 0.0;
+            
+                foreach (var backtestResult in backtestResults.Where(x => x.Ticker == ticker))
                 {
-                    countSignals--;
-                    double positionPrice = Math.Abs(backtestResult.CurrentPositionCost / backtestResult.CurrentPosition);
-                    positionSize -= algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
+                    if (backtestResult.CurrentPosition > 0)
+                    {
+                        countSignals++;
+                        positionSize += algoConfigResource.MoneyManagementResource.UnitSize / lastPrice;
+                    }
+
+                    else if (backtestResult.CurrentPosition < 0)
+                    {
+                        countSignals--;
+                        positionSize -= algoConfigResource.MoneyManagementResource.UnitSize / lastPrice;
+                    }
                 }
+            
+                double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
+
+                await strategySignalRepository.UpdatePositionAsync(
+                    ticker, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
             }
             
-            double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
-            double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
-            
-            await strategySignalRepository.UpdatePositionAsync(
-                ticker, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
+            catch (Exception exception)
+            {
+                _logger.Error($"Ошибка CalculateStrategySignalsAsync '{ticker}', '{exception.Message}'");
+            }
         }
 
         return true;

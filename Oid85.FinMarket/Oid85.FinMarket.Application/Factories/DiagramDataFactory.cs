@@ -102,4 +102,45 @@ public class DiagramDataFactory(
         
         return diagramData;
     }
+
+    public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies)
+    {
+        var diagramData = new BacktestResultDiagramData { Title = $"{strategies[0].StrategyName}"};
+        
+        for (int i = 0; i < strategies[0].Candles.Count; i++)
+        {
+            diagramData.Data.Series.Add(new BacktestResultDataPoint
+            {
+                Date = strategies[0].Candles[i].DateTime.ToString("dd.MM.yyyy"),
+                Price = strategies[0].Candles[i].Close
+            });
+        }
+        
+        for (int i = 0; i < strategies[0].Positions.Count; i++)
+        {
+            if (strategies[0].Positions[i].IsLong)
+            {
+                diagramData.Data.Series[strategies[0].Positions[i].EntryCandleIndex].BuyPrice = strategies[0].Positions[i].EntryPrice;
+                
+                if (!strategies[0].Positions[i].IsActive)
+                    diagramData.Data.Series[strategies[0].Positions[i].ExitCandleIndex].SellPrice = strategies[0].Positions[i].ExitPrice;
+            }
+        }
+
+        for (int i = 1; i < strategies.Count; i++)
+        {
+            for (int j = 0; j < strategies[i].Positions.Count; j++)
+            {
+                if (strategies[i].Positions[j].IsLong)
+                {
+                    diagramData.Data.Series[strategies[i].Positions[j].EntryCandleIndex].BuyPrice = strategies[i].Positions[j].EntryPrice;
+                
+                    if (!strategies[i].Positions[j].IsActive)
+                        diagramData.Data.Series[strategies[i].Positions[j].ExitCandleIndex].SellPrice = strategies[i].Positions[j].ExitPrice;
+                }                
+            }
+        }
+        
+        return diagramData;
+    }
 }

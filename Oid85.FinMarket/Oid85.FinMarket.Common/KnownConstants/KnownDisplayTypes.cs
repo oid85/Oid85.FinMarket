@@ -13,4 +13,5 @@ public static class KnownDisplayTypes
     public const string AnalyseResult = "AnalyseResult";
     public const string AssetReportEvent = "AssetReportEvent";
     public const string BacktestResultByIdButton = "BacktestResultByIdButton";
+    public const string BacktestResultByTickerButton = "BacktestResultByTickerButton";
 }
