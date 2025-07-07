@@ -92,10 +92,12 @@ public class DiagramDataFactory(
         for (int i = 0; i < strategy.Positions.Count; i++)
         {
             if (strategy.Positions[i].IsLong)
+            {
                 diagramData.Data.Series[strategy.Positions[i].EntryCandleIndex].BuyPrice = strategy.Positions[i].EntryPrice;
-            
-            else if (strategy.Positions[i].IsShort)
-                diagramData.Data.Series[strategy.Positions[i].EntryCandleIndex].SellPrice = strategy.Positions[i].EntryPrice;
+                
+                if (!strategy.Positions[i].IsActive)
+                    diagramData.Data.Series[strategy.Positions[i].ExitCandleIndex].SellPrice = strategy.Positions[i].ExitPrice;
+            }
         }
         
         return diagramData;
