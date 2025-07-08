@@ -14,11 +14,14 @@ namespace Oid85.FinMarket.Application.Strategies
             int period = Parameters["Period"];
             double multiplier = Parameters["Multiplier"] / 10.0;
             
+            // Фильтр
+            var filterEma = indicatorFactory.Ema(Candles, period);
+            
             // Построение каналов волатильности
             List<double> price = OpenPrices.Add(ClosePrices)!.DivConst(2.0);
             List<double> atr = indicatorFactory.Atr(Candles, period);
             List<double> highLevel = price.Add(atr.MultConst(multiplier))!; // up = price + atr * multiplier;
-            List<double> lowLevel = price.Sub(atr.MultConst(multiplier))!; // up = price - atr * multiplier;
+            List<double> lowLevel = price.Sub(atr.MultConst(multiplier))!;  // up = price - atr * multiplier;
 
             highLevel = indicatorFactory.Highest(highLevel, period);
             lowLevel = indicatorFactory.Lowest(lowLevel, period);
@@ -41,15 +44,16 @@ namespace Oid85.FinMarket.Application.Strategies
             for (int i = StabilizationPeriod; i < Candles.Count - 1; i++)
             {
                 SignalLong = Candles[i].Close > highLevel[i];
-
+                FilterLong = Candles[i].Close > filterEma[i];
+                
                 double orderPrice = Candles[i].Close;
                 
                 // Расчет размера позиции
                 int positionSize = GetPositionSize(orderPrice);
                 
-                if (LastActivePosition == null)
+                if (LastActivePosition is null)
                 {
-                    if (SignalLong)
+                    if (SignalLong && FilterLong)
                     {
                         startTrailing = middleLine[i];
                         BuyAtPrice(positionSize, orderPrice, i + 1);

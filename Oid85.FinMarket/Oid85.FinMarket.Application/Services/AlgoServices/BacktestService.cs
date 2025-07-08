@@ -214,9 +214,15 @@ public class BacktestService(
             try
             {
                 if (!tickersInStrategiSignals.Contains(ticker))
-                    await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0, LastPrice = 0.0, PositionCost = 0.0, PositionSize = 0});
-
-                double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
+                    await strategySignalRepository.AddAsync(
+                        new StrategySignal
+                        {
+                            Ticker = ticker, 
+                            CountSignals = 0, 
+                            LastPrice = 0.0, 
+                            PositionCost = 0.0, 
+                            PositionSize = 0
+                        });
                 
                 int countSignals = 0;
                 double positionSize = 0.0;
@@ -226,18 +232,21 @@ public class BacktestService(
                     if (backtestResult.CurrentPosition > 0)
                     {
                         countSignals++;
-                        positionSize += algoConfigResource.MoneyManagementResource.UnitSize / lastPrice;
+                        double positionPrice = backtestResult.CurrentPositionCost / backtestResult.CurrentPosition;
+                        positionSize += algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
                     }
 
                     else if (backtestResult.CurrentPosition < 0)
                     {
                         countSignals--;
-                        positionSize -= algoConfigResource.MoneyManagementResource.UnitSize / lastPrice;
+                        double positionPrice = backtestResult.CurrentPositionCost / backtestResult.CurrentPosition;
+                        positionSize -= algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
                     }
                 }
             
                 double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
-
+                double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
+                
                 await strategySignalRepository.UpdatePositionAsync(
                     ticker, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
             }

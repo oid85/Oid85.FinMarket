@@ -13,6 +13,7 @@ public class Strategy
     public string Timeframe { get; set; } = string.Empty;
     
     public string StrategyDescription { get; set; } = string.Empty;
+    
     public string StrategyName { get; set; } = string.Empty;
     
     public DateOnly StartDate => DateOnly.FromDateTime(Candles.First().DateTime);
@@ -36,6 +37,10 @@ public class Strategy
     public bool SignalLong { get; set; }
     
     public bool SignalShort { get; set; }
+
+    public bool FilterLong { get; set; } = true;
+
+    public bool FilterShort { get; set; } = true;
     
     public bool SignalCloseLong { get; set; }
     

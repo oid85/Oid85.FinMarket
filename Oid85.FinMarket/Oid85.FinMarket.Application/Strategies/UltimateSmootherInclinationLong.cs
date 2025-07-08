@@ -35,9 +35,9 @@ namespace Oid85.FinMarket.Application.Strategies
                 // Расчет размера позиции
                 int positionSize = GetPositionSize(orderPrice);
                 
-                if (LastActivePosition == null)
+                if (LastActivePosition is null)
                 {
-                    if (SignalLong)
+                    if (SignalLong && FilterLong)
                         BuyAtPrice(positionSize, orderPrice, i + 1);
                 }
                 

@@ -15,6 +15,9 @@ namespace Oid85.FinMarket.Application.Strategies
             int periodLowExit = Parameters["PeriodExit"];
             double stdDev = Parameters["StdDev"] / 10.0;
 
+            // Фильтр
+            var filterEma = indicatorFactory.Ema(Candles, periodHighEntry);
+            
             // Построение каналов
             var bollingerBandsEntry = indicatorFactory.BollingerBands(Candles, periodHighEntry, stdDev);
             var bollingerBandsExit = indicatorFactory.BollingerBands(Candles, periodLowExit, stdDev);
@@ -32,16 +35,17 @@ namespace Oid85.FinMarket.Application.Strategies
             {
                 // Правило входа
                 SignalLong = ClosePrices[i] > highLevelEntry[i];
-
+                FilterLong = Candles[i].Close > filterEma[i];
+                
                 // Задаем цену для заявки
                 double orderPrice = Candles[i].Close;
 
                 // Расчет размера позиции
                 int positionSize = GetPositionSize(orderPrice);
                 
-                if (LastActivePosition == null)
+                if (LastActivePosition is null)
                 {
-                    if (SignalLong)
+                    if (SignalLong && FilterLong)
                         BuyAtPrice(positionSize, orderPrice, i + 1);
                 }
                 

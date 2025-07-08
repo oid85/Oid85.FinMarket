@@ -13,6 +13,9 @@ namespace Oid85.FinMarket.Application.Strategies
             // Получаем параметры
             int period = Parameters["Period"];
 
+            // Фильтр
+            var filterEma = indicatorFactory.Ema(Candles, period);
+            
             // Цены для построения канала
             List<double> priceForChannelHigh = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
             List<double> priceForChannelLow = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
@@ -40,16 +43,17 @@ namespace Oid85.FinMarket.Application.Strategies
             {
                 // Правило входа
                 SignalLong = ClosePrices[i] > highLevel[i];
-
+                FilterLong = Candles[i].Close > filterEma[i];
+                
                 // Задаем цену для заявки
                 double orderPrice = Candles[i].Close;
                 
                 // Расчет размера позиции
                 int positionSize = GetPositionSize(orderPrice);
                 
-                if (LastActivePosition == null)
+                if (LastActivePosition is null)
                 {
-                    if (SignalLong)
+                    if (SignalLong && FilterLong)
                         BuyAtPrice(positionSize, orderPrice, i + 1);
                 }
                 
