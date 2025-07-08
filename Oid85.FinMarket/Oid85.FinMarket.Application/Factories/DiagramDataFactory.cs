@@ -115,7 +115,9 @@ public class DiagramDataFactory(
                 Price = strategies[0].Candles[i].Close
             });
         }
-        
+
+        #region BuyPrice, SellPrice
+
         for (int i = 0; i < strategies[0].Positions.Count; i++)
         {
             if (strategies[0].Positions[i].IsLong)
@@ -140,6 +142,10 @@ public class DiagramDataFactory(
                 }                
             }
         }
+
+        #endregion
+        
+
         
         return diagramData;
     }
