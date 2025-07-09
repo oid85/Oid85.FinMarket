@@ -145,7 +145,11 @@ public class DiagramDataFactory(
 
         #endregion
         
-
+        #region EquityCurve
+        #endregion
+        
+        #region DrawdownCurve
+        #endregion
         
         return diagramData;
     }
