@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oid85.FinMarket.DataAccess"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Oid85.FinMarket.Application", "Test.Oid85.FinMarket.Application\Test.Oid85.FinMarket.Application.csproj", "{9176ED4C-9ACF-484A-A63C-76FC3B900114}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Oid85.FinMarket.Common", "Test.Oid85.FinMarket.Common\Test.Oid85.FinMarket.Common.csproj", "{7E86CC9E-5378-4C56-85FA-F51E559A9404}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{9176ED4C-9ACF-484A-A63C-76FC3B900114}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9176ED4C-9ACF-484A-A63C-76FC3B900114}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9176ED4C-9ACF-484A-A63C-76FC3B900114}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E86CC9E-5378-4C56-85FA-F51E559A9404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E86CC9E-5378-4C56-85FA-F51E559A9404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E86CC9E-5378-4C56-85FA-F51E559A9404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E86CC9E-5378-4C56-85FA-F51E559A9404}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

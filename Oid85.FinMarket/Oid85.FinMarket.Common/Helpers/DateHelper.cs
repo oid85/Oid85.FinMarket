@@ -26,18 +26,4 @@ public static class DateHelper
 
         return dates;
     }
-
-    public static List<DateTime> GetFiveMinutesDateTimes(DateTime from, DateTime to)
-    {
-        var curDateTime = from;
-        var dates = new List<DateTime>();
-
-        while (curDateTime <= to)
-        {
-            dates.Add(curDateTime);
-            curDateTime = curDateTime.AddMinutes(5);
-        }
-
-        return dates;
-    }
 }

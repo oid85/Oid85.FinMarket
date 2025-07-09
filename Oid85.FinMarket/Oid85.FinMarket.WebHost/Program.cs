@@ -28,7 +28,9 @@ public class Program
         builder.Services.ConfigureExternalServices(builder.Configuration);
         builder.Services.ConfigureFinMarketDataAccess(builder.Configuration);
         builder.Services.ConfigureHangfire();
-            
+
+        builder.Services.AddSingleton<ChannelMessageQueue>();
+        
         builder.Services.AddWindowsService(options =>
         {
             options.ServiceName = "Oid85.FinMarket";
