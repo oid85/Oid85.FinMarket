@@ -107,29 +107,18 @@ public class DiagramDataFactory(
     {
         var diagramData = new BacktestResultDiagramData { Title = $"{strategies[0].StrategyName}"};
         
+        // Close
         for (int i = 0; i < strategies[0].Candles.Count; i++)
         {
             diagramData.Data.Series.Add(new BacktestResultDataPoint
             {
-                Date = strategies[0].Candles[i].DateTime.ToString("dd.MM.yyyy"),
+                Date = strategies[0].Candles[i].DateTime.ToString(KnownDateTimeFormats.DateISO),
                 Price = strategies[0].Candles[i].Close
             });
         }
 
-        #region BuyPrice, SellPrice
-
-        for (int i = 0; i < strategies[0].Positions.Count; i++)
-        {
-            if (strategies[0].Positions[i].IsLong)
-            {
-                diagramData.Data.Series[strategies[0].Positions[i].EntryCandleIndex].BuyPrice = strategies[0].Positions[i].EntryPrice;
-                
-                if (!strategies[0].Positions[i].IsActive)
-                    diagramData.Data.Series[strategies[0].Positions[i].ExitCandleIndex].SellPrice = strategies[0].Positions[i].ExitPrice;
-            }
-        }
-
-        for (int i = 1; i < strategies.Count; i++)
+        // BuyPrice, SellPrice
+        for (int i = 0; i < strategies.Count; i++)
         {
             for (int j = 0; j < strategies[i].Positions.Count; j++)
             {
@@ -143,13 +132,21 @@ public class DiagramDataFactory(
             }
         }
 
-        #endregion
-        
-        #region EquityCurve
-        #endregion
-        
-        #region DrawdownCurve
-        #endregion
+        var from = strategies[0].Candles.First().DateTime;
+        var to = strategies[0].Candles.Last().DateTime;
+
+        for (int i = 0; i < strategies.Count; i++)
+        {
+            var equity = strategies[i].EqiutyCurve.Expand(from, to);
+            var drawdown = strategies[i].DrawdownCurve.Expand(from, to);
+
+            for (int j = 0; j < diagramData.Data.Series.Count; j++)
+            {
+                var date = Convert.ToDateTime(diagramData.Data.Series[j].Date);
+                diagramData.Data.Series[j].Equity += equity[date];
+                diagramData.Data.Series[j].Drawdown += drawdown[date];
+            }
+        }
         
         return diagramData;
     }

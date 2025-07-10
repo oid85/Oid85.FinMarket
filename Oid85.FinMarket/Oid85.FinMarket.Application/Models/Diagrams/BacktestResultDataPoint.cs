@@ -8,8 +8,8 @@ public class BacktestResultDataPoint
     public double? Indicator2 { get; set; } = null;
     public double? Indicator3 { get; set; } = null;
     public double? Price { get; set; } = null;
-    public double? Equity { get; set; } = null;
-    public double? Drawdown { get; set; } = null;
+    public double Equity { get; set; } = 0.0;
+    public double Drawdown { get; set; } = 0.0;
     public double? BuyPrice { get; set; } = null;
     public double? SellPrice { get; set; } = null;
 }
