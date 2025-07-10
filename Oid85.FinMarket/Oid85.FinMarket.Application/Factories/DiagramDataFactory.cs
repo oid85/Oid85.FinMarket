@@ -132,6 +132,7 @@ public class DiagramDataFactory(
             }
         }
 
+        // Equity, Drawdown
         var from = strategies[0].Candles.First().DateTime;
         var to = strategies[0].Candles.Last().DateTime;
 
