@@ -105,7 +105,7 @@ public class DiagramDataFactory(
 
     public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies)
     {
-        var diagramData = new BacktestResultDiagramData { Title = $"{strategies[0].StrategyName}"};
+        var diagramData = new BacktestResultDiagramData();
         
         // Close
         for (int i = 0; i < strategies[0].Candles.Count; i++)
@@ -145,9 +145,11 @@ public class DiagramDataFactory(
             {
                 var date = Convert.ToDateTime(diagramData.Data.Series[j].Date);
                 diagramData.Data.Series[j].Equity += equity[date];
-                diagramData.Data.Series[j].Drawdown += drawdown[date];
+                diagramData.Data.Series[j].Drawdown += -1 * drawdown[date];
             }
         }
+
+        diagramData.Data.Series = diagramData.Data.Series.Where(x => Convert.ToDateTime(x.Date) >= DateTime.Today.AddYears(-1)).ToList();
         
         return diagramData;
     }

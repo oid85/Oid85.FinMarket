@@ -34,6 +34,8 @@ public class AlgoReportService(
             DiagramData = await diagramDataFactory.CreateBacktestResultDiagramDataAsync(result.strategy!)
         };
 
+        backtestResultData.DiagramData.Title = $"{result.backtestResult!.StrategyName}";
+        
         return backtestResultData;
     }
 
@@ -55,6 +57,8 @@ public class AlgoReportService(
             DiagramData = await diagramDataFactory.CreateBacktestResultDiagramDataAsync(strategies)
         };
 
+        backtestResultData.DiagramData.Title = $"{request.Ticker}";
+        
         return backtestResultData;
     }
 }
