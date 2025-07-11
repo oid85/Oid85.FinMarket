@@ -858,7 +858,7 @@ public class ReportDataFactory(
 
         int count = 0;
         
-        foreach (var backtestResult in backtestResults.Where(x => x.CurrentPosition != 0).OrderByDescending(x => x.Ticker))
+        foreach (var backtestResult in backtestResults.Where(x => x.CurrentPosition != 0).OrderBy(x => x.Ticker))
         {
             count++;
             
