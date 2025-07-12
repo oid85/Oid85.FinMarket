@@ -1,6 +1,5 @@
 ﻿using NLog;
 using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Application.Interfaces.Services.Algo;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -15,8 +14,7 @@ public class JobService(
     ISectorIndexService sectorIndexService,
     IMarketEventService marketEventService,
     ISendService sendService,
-    IOptimizationService optimizationService,
-    IBacktestService backtestService) 
+    IAlgoService algoService) 
     : IJobService
 {
     /// <inheritdoc />
@@ -200,7 +198,7 @@ public class JobService(
     {
         try
         {
-            await optimizationService.OptimizeAsync();
+            await algoService.OptimizeAsync();
             
             logger.Info("Метод 'OptimizeAsync' выполнен успешно");
         }
@@ -215,7 +213,7 @@ public class JobService(
     {
         try
         {
-            await backtestService.BacktestAsync();
+            await algoService.BacktestAsync();
             
             logger.Info("Метод 'BacktestAsync' выполнен успешно");
         }

@@ -1,6 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.Application.Interfaces.Services.Algo;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.BacktestResults;
 using Oid85.FinMarket.Application.Models.Reports;
@@ -13,7 +13,7 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 public class AlgoReportService(
     IReportDataFactory reportDataFactory,
     IDiagramDataFactory diagramDataFactory,
-    IBacktestService backtestService,
+    IAlgoService algoService,
     IBacktestResultRepository backtestResultRepository,
     IResourceStoreService resourceStoreService) 
     : IAlgoReportService
@@ -26,7 +26,7 @@ public class AlgoReportService(
 
     public async Task<BacktestResultData> GetBacktestResultByIdAsync(IdRequest request)
     {
-        var result = await backtestService.BacktestAsync(request.Id);
+        var result = await algoService.BacktestAsync(request.Id);
 
         var backtestResultData = new BacktestResultData
         {
@@ -34,7 +34,7 @@ public class AlgoReportService(
             DiagramData = await diagramDataFactory.CreateBacktestResultDiagramDataAsync(result.strategy!)
         };
 
-        backtestResultData.DiagramData.Title = $"{result.backtestResult!.StrategyName}";
+        backtestResultData.DiagramData.Title = $"{result.backtestResult!.Ticker} {result.backtestResult!.StrategyName}";
         
         return backtestResultData;
     }
@@ -48,7 +48,7 @@ public class AlgoReportService(
         
         foreach (var backtestResult in backtestResults.Where(x => x.Ticker == request.Ticker))
         {
-            var result = await backtestService.BacktestAsync(backtestResult.Id);
+            var result = await algoService.BacktestAsync(backtestResult.Id);
             strategies.Add(result.strategy!);
         }
 

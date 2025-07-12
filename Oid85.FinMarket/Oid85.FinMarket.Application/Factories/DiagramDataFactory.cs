@@ -148,8 +148,6 @@ public class DiagramDataFactory(
                 diagramData.Data.Series[j].Drawdown += -1 * drawdown[date];
             }
         }
-
-        diagramData.Data.Series = diagramData.Data.Series.Where(x => Convert.ToDateTime(x.Date) >= DateTime.Today.AddYears(-1)).ToList();
         
         return diagramData;
     }

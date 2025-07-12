@@ -1,10 +1,11 @@
 ﻿using Oid85.FinMarket.Domain.Models.Algo;
 
-namespace Oid85.FinMarket.Application.Interfaces.Services.Algo;
+namespace Oid85.FinMarket.Application.Interfaces.Services;
 
-public interface IBacktestService
+public interface IAlgoService
 {
     Task<bool> BacktestAsync();
-    Task<bool> CalculateStrategySignalsAsync();
     Task<(BacktestResult? backtestResult, Strategy? strategy)> BacktestAsync(Guid backtestResultId);
+    Task<bool> CalculateStrategySignalsAsync();
+    Task<bool> OptimizeAsync();
 }

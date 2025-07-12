@@ -7,11 +7,9 @@ using Oid85.FinMarket.Application.Factories;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Application.Interfaces.Services.Algo;
 using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Services;
-using Oid85.FinMarket.Application.Services.AlgoServices;
 using Oid85.FinMarket.Application.Services.AnalyseServices;
 using Oid85.FinMarket.Application.Services.DiagramServices;
 using Oid85.FinMarket.Application.Services.ReportServices;
@@ -62,8 +60,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFeerGreedIndexService, FeerGreedIndexService>();
         services.AddTransient<ISectorIndexService, SectorIndexService>();
         
-        services.AddTransient<IBacktestService, BacktestService>();
-        services.AddTransient<IOptimizationService, OptimizationService>();
+        services.AddTransient<IAlgoService, AlgoService>();
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();

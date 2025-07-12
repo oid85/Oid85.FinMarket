@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Oid85.FinMarket.Application.Interfaces.Services.Algo;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.BacktestResults;
 using Oid85.FinMarket.Application.Models.Reports;
@@ -12,8 +12,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/algo")]
 [ApiController]
 public class AlgoController(
-    IBacktestService backtestService,
-    IOptimizationService optimizationService,
+    IAlgoService algoService,
     IAlgoReportService reportService)
     : FinMarketBaseController
 {
@@ -26,7 +25,7 @@ public class AlgoController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> RunOptimizationAsync() =>
         GetResponseAsync(
-            optimizationService.OptimizeAsync,
+            algoService.OptimizeAsync,
             result => new BaseResponse<bool>
             {
                 Result = result
@@ -41,7 +40,7 @@ public class AlgoController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> RunBacktestAsync() =>
         GetResponseAsync(
-            backtestService.BacktestAsync,
+            algoService.BacktestAsync,
             result => new BaseResponse<bool>
             {
                 Result = result
@@ -56,7 +55,7 @@ public class AlgoController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> CalculateStrategySignalsAsync() =>
         GetResponseAsync(
-            backtestService.CalculateStrategySignalsAsync,
+            algoService.CalculateStrategySignalsAsync,
             result => new BaseResponse<bool>
             {
                 Result = result
