@@ -7,7 +7,8 @@ namespace Oid85.FinMarket.DataAccess.Configurations;
 
 internal class InstrumentEntityConfiguration : EntityConfigurationBase<InstrumentEntity>
 {
-    private readonly InstrumentEntity[] _customInstruments = {
+    private readonly InstrumentEntity[] _customInstruments =
+    [
         new()
         {
             Id = Guid.Parse("05804fbf-35a1-481c-bbf2-4acfc3996da3"),
@@ -115,7 +116,7 @@ internal class InstrumentEntityConfiguration : EntityConfigurationBase<Instrumen
             Ticker = "TRSI",
             Type = "Index"
         }
-    };
+    ];
 
     public override void Configure(EntityTypeBuilder<InstrumentEntity> builder)
     {

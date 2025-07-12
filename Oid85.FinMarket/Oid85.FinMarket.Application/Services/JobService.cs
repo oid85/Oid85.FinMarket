@@ -229,6 +229,17 @@ public class JobService(
         try
         {
             await sectorIndexService.CalculateOilAndGasSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateBanksSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateEnergSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateFinanceSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateHousingAndUtilitiesSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateIronAndSteelIndustrySectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateItSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateMiningSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateNonFerrousMetallurgySectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateRetailSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateTelecomSectorIndexDailyCandlesAsync();
+            await sectorIndexService.CalculateTransportSectorIndexDailyCandlesAsync();
             
             logger.Info("Метод 'CalculateSectorIndexDailyCandlesAsync' выполнен успешно");
         }
