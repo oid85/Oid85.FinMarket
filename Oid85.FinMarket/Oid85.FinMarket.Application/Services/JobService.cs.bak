@@ -26,6 +26,7 @@ public class JobService(
         await LoadBondCouponsAsync();
         await LoadDividendInfosAsync();
         await LoadDailyCandlesAsync();
+        // await LoadHourlyCandlesAsync();
         await ImportAsync();
         await OptimizeAsync();
         await BacktestAsync();

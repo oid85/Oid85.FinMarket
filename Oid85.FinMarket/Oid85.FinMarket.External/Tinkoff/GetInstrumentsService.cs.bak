@@ -17,7 +17,7 @@ public class GetInstrumentsService(
     ILogger logger,
     InvestApiClient client)
 {
-    private const int DelayInMilliseconds = 1000;
+    private const int DelayInMilliseconds = 100;
     
     public async Task<List<Share>> GetSharesAsync()
     {

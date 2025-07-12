@@ -4,44 +4,45 @@ using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
+using Bond = Oid85.FinMarket.Domain.Models.Bond;
 
 namespace Oid85.FinMarket.External.Tinkoff;
 
-public class GetAssetReportEventsService(
+public class GetBondCouponsService(
     ILogger logger,
     InvestApiClient client)
 {
-    private const int DelayInMilliseconds = 1000;
+    private const int DelayInMilliseconds = 100;
     
-    public async Task<List<AssetReportEvent>> GetAssetReportEventsAsync(List<Guid> instrumentIds)
+    public async Task<List<BondCoupon>> GetBondCouponsAsync(List<Bond> bonds)
     {
         await Task.Delay(DelayInMilliseconds);
             
-        var assetReportEvents = new List<AssetReportEvent>();
+        var bondCoupons = new List<BondCoupon>();
             
-        foreach (var instrumentId in instrumentIds)
+        foreach (var bond in bonds)
         {
             await Task.Delay(DelayInMilliseconds);
 
-            var request = CreateGetAssetReportEventsRequest(instrumentId);
-            var response = await SendGetAssetReportEventsRequest(request);
+            var request = CreateGetBondCouponsRequest(bond.InstrumentId);
+            var response = await SendGetBondCouponsRequest(request);
 
             if (response is null)
                 continue;
 
             if (response.Events is not null)
-                foreach (var report in response.Events)
-                    if (report is not null)
+                foreach (var coupon in response.Events)
+                    if (coupon is not null)
                     {
-                        var assetReportEvent = TinkoffMapper.Map(report);
-                        assetReportEvents.Add(assetReportEvent);   
+                        var bondCoupon = TinkoffMapper.Map(coupon, bond);
+                        bondCoupons.Add(bondCoupon);   
                     }
         }
 
-        return assetReportEvents;
+        return bondCoupons;
     }
     
-    private static GetAssetReportsRequest CreateGetAssetReportEventsRequest(Guid instrumentId) =>
+    private static GetBondCouponsRequest CreateGetBondCouponsRequest(Guid instrumentId) =>
         new()
         {
             InstrumentId = instrumentId.ToString(),
@@ -49,11 +50,11 @@ public class GetAssetReportEventsService(
             To = ConvertHelper.DateTimeToTimestamp(DateTime.Today.AddYears(1))
         };
     
-    private async Task<GetAssetReportsResponse?> SendGetAssetReportEventsRequest(GetAssetReportsRequest request)
+    private async Task<GetBondCouponsResponse?> SendGetBondCouponsRequest(GetBondCouponsRequest request)
     {
         try
         {
-            return await client.Instruments.GetAssetReportsAsync(request);
+            return await client.Instruments.GetBondCouponsAsync(request);
         }
         
         catch (Exception exception)
