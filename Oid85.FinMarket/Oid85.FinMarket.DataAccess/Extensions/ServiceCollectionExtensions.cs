@@ -43,7 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IHourlyCandleRepository, HourlyCandleRepository>();
         services.AddTransient<IInstrumentRepository, InstrumentRepository>();
         services.AddTransient<ISpreadRepository, SpreadRepository>();
-        services.AddTransient<IMultiplicatorRepository, MultiplicatorRepository>();
+        services.AddTransient<IShareMultiplicatorRepository, ShareMultiplicatorRepository>();
         services.AddTransient<IForecastTargetRepository, ForecastTargetRepository>();
         services.AddTransient<IForecastConsensusRepository, ForecastConsensusRepository>();
         services.AddTransient<IMarketEventRepository, MarketEventRepository>();

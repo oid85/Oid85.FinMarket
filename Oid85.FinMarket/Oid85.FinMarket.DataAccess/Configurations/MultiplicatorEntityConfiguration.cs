@@ -5,9 +5,9 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class MultiplicatorEntityConfiguration : EntityConfigurationBase<MultiplicatorEntity>
+internal class MultiplicatorEntityConfiguration : EntityConfigurationBase<ShareMultiplicatorEntity>
 {
-    public override void Configure(EntityTypeBuilder<MultiplicatorEntity> builder)
+    public override void Configure(EntityTypeBuilder<ShareMultiplicatorEntity> builder)
     {
         base.Configure(builder);
         

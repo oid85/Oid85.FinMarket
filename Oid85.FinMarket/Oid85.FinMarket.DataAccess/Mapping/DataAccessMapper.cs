@@ -567,63 +567,23 @@ public static class DataAccessMapper
             SentNotification = entity.SentNotification
         };
     
-    public static MultiplicatorEntity Map(Multiplicator model) =>
+    public static ShareMultiplicatorEntity Map(ShareMultiplicator model) =>
         new()
         {
-            TickerAo = model.TickerAo,
-            TickerAp = model.TickerAp,
-            TotalSharesAo = model.TotalSharesAo,
-            TotalSharesAp = model.TotalSharesAp,
-            Beta = model.Beta,
-            Revenue = model.Revenue,
-            OperatingIncome = model.OperatingIncome,
-            Pe = model.Pe,
-            Pb = model.Pb,
-            Pbv = model.Pbv,
+            Name = model.Name,
+            MarketCap = model.MarketCap,
             Ev = model.Ev,
-            Roe = model.Roe,
-            Roa = model.Roa,
-            NetInterestMargin = model.NetInterestMargin,
-            TotalDebt = model.TotalDebt,
-            NetDebt = model.NetDebt,
-            MarketCapitalization = model.MarketCapitalization,
-            NetIncome = model.NetIncome,
-            Ebitda = model.Ebitda,
-            Eps = model.Eps,
-            FreeCashFlow = model.FreeCashFlow,
-            EvToEbitda = model.EvToEbitda,
-            TotalDebtToEbitda = model.TotalDebtToEbitda,
-            NetDebtToEbitda = model.NetDebtToEbitda
+            Revenue = model.Revenue
         };
     
-    public static Multiplicator Map(MultiplicatorEntity entity) =>
+    public static ShareMultiplicator Map(ShareMultiplicatorEntity entity) =>
         new()
         {
             Id = entity.Id,
-            TickerAo = entity.TickerAo,
-            TickerAp = entity.TickerAp,
-            TotalSharesAo = entity.TotalSharesAo,
-            TotalSharesAp = entity.TotalSharesAp,
-            Beta = entity.Beta,
-            Revenue = entity.Revenue,
-            OperatingIncome = entity.OperatingIncome,
-            Pe = entity.Pe,
-            Pb = entity.Pb,
-            Pbv = entity.Pbv,
+            Name = entity.Name,
+            MarketCap = entity.MarketCap,
             Ev = entity.Ev,
-            Roe = entity.Roe,
-            Roa = entity.Roa,
-            NetInterestMargin = entity.NetInterestMargin,
-            TotalDebt = entity.TotalDebt,
-            NetDebt = entity.NetDebt,
-            MarketCapitalization = entity.MarketCapitalization,
-            NetIncome = entity.NetIncome,
-            Ebitda = entity.Ebitda,
-            Eps = entity.Eps,
-            FreeCashFlow = entity.FreeCashFlow,
-            EvToEbitda = entity.EvToEbitda,
-            TotalDebtToEbitda = entity.TotalDebtToEbitda,
-            NetDebtToEbitda = entity.NetDebtToEbitda
+            Revenue = entity.Revenue
         };
     
     public static ShareEntity Map(Share model) =>

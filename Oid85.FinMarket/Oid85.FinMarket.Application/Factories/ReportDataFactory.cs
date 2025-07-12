@@ -20,7 +20,7 @@ public class ReportDataFactory(
     IBondRepository bondRepository,
     IShareRepository shareRepository,
     IDailyCandleRepository dailyCandleRepository,
-    IMultiplicatorRepository multiplicatorRepository,
+    IShareMultiplicatorRepository shareMultiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
     IAssetReportEventRepository assetReportEventRepository,
@@ -313,35 +313,14 @@ public class ReportDataFactory(
                 "Тикер", 
                 "Сектор", 
                 "Эмитент", 
-                "Ао",
-                "Ап",
-                "Выручка", 
-                "Чист. приб.",
-                "Опер. приб.",
-                "MCap", 
-                "EBITDA", 
-                "EV",
-                "BV",
-                "TotalDebt",
-                "NetDebt",
-                "P/E", 
-                "P/B",
-                "P/BV", 
-                "EPS", 
-                "ROE", 
-                "ROA", 
-                "NIM", 
-                "FCF", 
-                "EV/EBITDA", 
-                "TotalDebt/EBITDA", 
-                "NetDebt/EBITDA"
+                "MCap"
             ]);
 
         reportData.Title = "Мультипликаторы";
         
         foreach (var share in shares)
         {
-            var multiplicator = await multiplicatorRepository.GetAsync(share.Ticker);
+            var multiplicator = await shareMultiplicatorRepository.GetAsync(share.Ticker);
             
             if (multiplicator is null)
                 continue;
@@ -351,28 +330,7 @@ public class ReportDataFactory(
                 GetTicker(share.Ticker),
                 GetSector(share.Sector),
                 GetString(normalizeService.NormalizeInstrumentName(share.Name)),
-                GetNumber(multiplicator.TotalSharesAo),
-                GetNumber(multiplicator.TotalSharesAp),
-                GetNumber(multiplicator.Revenue),
-                GetNumber(multiplicator.NetIncome),
-                GetNumber(multiplicator.OperatingIncome),
-                GetNumber(multiplicator.MarketCapitalization),
-                GetNumber(multiplicator.Ebitda),
-                GetNumber(multiplicator.Ev),
-                GetNumber(multiplicator.Bv),
-                GetNumber(multiplicator.TotalDebt),
-                GetNumber(multiplicator.NetDebt),
-                GetNumber(multiplicator.Pe, await colorHelper.GetColorPeAsync(multiplicator.Pe)),
-                GetNumber(multiplicator.Pb),
-                GetNumber(multiplicator.Pbv),
-                GetNumber(multiplicator.Eps),
-                GetNumber(multiplicator.Roe),
-                GetNumber(multiplicator.Roa),
-                GetNumber(multiplicator.NetInterestMargin),
-                GetNumber(multiplicator.FreeCashFlow),
-                GetNumber(multiplicator.EvToEbitda, await colorHelper.GetColorEvToEbitda(multiplicator.EvToEbitda)),
-                GetNumber(multiplicator.TotalDebtToEbitda, await colorHelper.GetColorTotalDebtToEbitda(multiplicator.NetDebtToEbitda)),
-                GetNumber(multiplicator.NetDebtToEbitda, await colorHelper.GetColorNetDebtToEbitda(multiplicator.NetDebtToEbitda))
+                GetNumber(multiplicator.MarketCap)
             ];
             
             reportData.Data.Add(data);

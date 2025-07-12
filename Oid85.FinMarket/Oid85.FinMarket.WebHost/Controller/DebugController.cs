@@ -9,16 +9,16 @@ namespace Oid85.FinMarket.WebHost.Controller;
 
 [Route("api/debug")]
 [ApiController]
-public class DebugController(IAnalyseService analyseService) 
+public class DebugController(IImportService service) 
     : FinMarketBaseController
 {
     [HttpGet("debug")]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Debug1()
+    public async Task<IActionResult> Debug()
     {
-        await analyseService.DailyAnalyseFuturesAsync();
+        await service.ImportMultiplicatorsAsync();
             
         return Ok();
     }

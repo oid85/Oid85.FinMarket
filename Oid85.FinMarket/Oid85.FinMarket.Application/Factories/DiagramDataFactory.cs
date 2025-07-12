@@ -11,7 +11,7 @@ namespace Oid85.FinMarket.Application.Factories;
 public class DiagramDataFactory(
     IInstrumentRepository instrumentRepository,
     IDailyCandleRepository dailyCandleRepository,
-    IMultiplicatorRepository multiplicatorRepository) 
+    IShareMultiplicatorRepository shareMultiplicatorRepository) 
     : IDiagramDataFactory
 {
     private async Task<Dictionary<Guid, List<DailyCandle>>> CreateDailyDataDictionaryAsync(
@@ -60,18 +60,8 @@ public class DiagramDataFactory(
     
     public async Task<BubbleDiagramData> CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(List<Guid> instrumentIds)
     {
-        var multiplicators = await multiplicatorRepository.GetAsync(instrumentIds);
+        var multiplicators = await shareMultiplicatorRepository.GetAsync(instrumentIds);
         var bubbleDiagramData = new BubbleDiagramData { Title = "MCap, P/E, NetDebt/EBITDA" };
-
-        foreach (var multiplicator in multiplicators)
-            bubbleDiagramData.Series.Add(
-                new()
-                {
-                    Name = multiplicator.TickerAo,
-                    X = multiplicator.MarketCapitalization,
-                    Y = multiplicator.Pe,
-                    R = multiplicator.NetDebtToEbitda
-                });
         
         return bubbleDiagramData;
     }
