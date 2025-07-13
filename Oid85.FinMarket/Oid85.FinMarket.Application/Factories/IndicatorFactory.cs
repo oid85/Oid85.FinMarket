@@ -106,14 +106,20 @@ public class IndicatorFactory : IIndicatorFactory
         List<double> upperBand = new List<double>().InitValues(candles.Count);
         List<double> lowerBand = new List<double>().InitValues(candles.Count);
 
-        int startIndex = new List<int> {periodAdx, periodPc}.Max() + 1;
+        int startIndex = new List<int> { periodAdx, periodPc }.Max() + 1;
         
         for (int i = startIndex; i < candles.Count; i++)
         {
-            int n = (int) Math.Floor(periodPc * ((100.0 - adx[i]) / 100.0));
-            
-            upperBand[i] = price.Take(i + 1).TakeLast(n).Max();
-            lowerBand[i] = price.Take(i + 1).TakeLast(n).Min();
+	        int n = (int) Math.Floor(periodPc * ((100.0 - adx[i]) / 100.0));
+
+	        double max = price[i];
+	        double min = price[i];
+
+	        for (int j = i - n; j < i; j++) if (price[j] > max) max = price[j];
+	        for (int j = i - n; j < i; j++) if (price[j] < min) min = price[j];
+
+	        upperBand[i] = max;
+	        lowerBand[i] = min;
         }
         
         return (upperBand, lowerBand);
