@@ -56,9 +56,6 @@ public class AlgoService(
                 
             if (algoStrategyResource is null)
                 continue;
-                
-            if (!algoStrategyResource.Enable)
-                continue;
             
             var backtestResults = new List<BacktestResult>();
             
@@ -135,9 +132,6 @@ public class AlgoService(
             var algoStrategyResource = algoStrategyResources.Find(x => x.Id == backtestResult.StrategyId);
 
             if (algoStrategyResource is null)
-                return (null, null);
-
-            if (!algoStrategyResource.Enable)
                 return (null, null);
 
             var strategy = StrategyDictionary[backtestResult.StrategyId];
@@ -278,10 +272,7 @@ public class AlgoService(
             
             if (algoStrategyResource is null)
                 continue;
-                
-            if (!algoStrategyResource.Enable)
-                continue;
-            
+
             var optimizationResults = new List<OptimizationResult>();
             
             var tickers = (await resourceStoreService.GetTickerListAsync(algoStrategyResource.TickerList)).Tickers;
