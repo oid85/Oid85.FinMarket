@@ -14,7 +14,7 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<CurrencyEntity> CurrencyEntities { get; set; }
     public DbSet<DividendInfoEntity> DividendInfoEntities { get; set; }
     public DbSet<BondCouponEntity> BondCouponEntities { get; set; }
-    public DbSet<ShareMultiplicatorEntity> MultiplicatorEntities { get; set; }
+    public DbSet<ShareMultiplicatorEntity> ShareMultiplicatorEntities { get; set; }
     public DbSet<DailyCandleEntity> DailyCandleEntities { get; set; }
     public DbSet<HourlyCandleEntity> HourlyCandleEntities { get; set; }
     public DbSet<AnalyseResultEntity> AnalyseResultEntities { get; set; }

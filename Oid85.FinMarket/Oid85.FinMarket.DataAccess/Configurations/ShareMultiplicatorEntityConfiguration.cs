@@ -5,12 +5,12 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class MultiplicatorEntityConfiguration : EntityConfigurationBase<ShareMultiplicatorEntity>
+internal class ShareMultiplicatorEntityConfiguration : EntityConfigurationBase<ShareMultiplicatorEntity>
 {
     public override void Configure(EntityTypeBuilder<ShareMultiplicatorEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("multiplicators", KnownDatabaseSchemas.Default);
+        builder.ToTable("share_multiplicators", KnownDatabaseSchemas.Default);
     }
 }

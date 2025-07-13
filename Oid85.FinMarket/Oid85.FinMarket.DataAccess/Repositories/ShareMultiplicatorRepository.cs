@@ -23,13 +23,13 @@ public class ShareMultiplicatorRepository(
         var entities = new List<ShareMultiplicatorEntity>();
         
         foreach (var multiplicator in multiplicators)
-            if (!await context.MultiplicatorEntities
+            if (!await context.ShareMultiplicatorEntities
                     .AnyAsync(x => x.Ticker == multiplicator.Ticker))
                 entities.Add(DataAccessMapper.Map(multiplicator));
             else
                 await UpdateFieldsAsync(multiplicator);
 
-        await context.MultiplicatorEntities.AddRangeAsync(entities);
+        await context.ShareMultiplicatorEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
@@ -40,11 +40,24 @@ public class ShareMultiplicatorRepository(
         
         try
         {
-            await context.MultiplicatorEntities
+            await context.ShareMultiplicatorEntities
                 .Where(x => 
                     x.Ticker == shareMultiplicator.Ticker)
                 .ExecuteUpdateAsync(x => x
-                        .SetProperty(entity => entity.MarketCap, shareMultiplicator.MarketCap));
+                        .SetProperty(entity => entity.Name, shareMultiplicator.Name)
+                        .SetProperty(entity => entity.MarketCap, shareMultiplicator.MarketCap)
+                        .SetProperty(entity => entity.Ev, shareMultiplicator.Ev)
+                        .SetProperty(entity => entity.Revenue, shareMultiplicator.Revenue)
+                        .SetProperty(entity => entity.NetIncome, shareMultiplicator.NetIncome)
+                        .SetProperty(entity => entity.DdAo, shareMultiplicator.DdAo)
+                        .SetProperty(entity => entity.DdAp, shareMultiplicator.DdAp)
+                        .SetProperty(entity => entity.DdNetIncome, shareMultiplicator.DdNetIncome)
+                        .SetProperty(entity => entity.Pe, shareMultiplicator.Pe)
+                        .SetProperty(entity => entity.Ps, shareMultiplicator.Ps)
+                        .SetProperty(entity => entity.Pb, shareMultiplicator.Pb)
+                        .SetProperty(entity => entity.EvEbitda, shareMultiplicator.EvEbitda)
+                        .SetProperty(entity => entity.EbitdaMargin, shareMultiplicator.EbitdaMargin)
+                        .SetProperty(entity => entity.NetDebtEbitda, shareMultiplicator.NetDebtEbitda));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -61,7 +74,7 @@ public class ShareMultiplicatorRepository(
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
-        return (await context.MultiplicatorEntities
+        return (await context.ShareMultiplicatorEntities
                 .Where(x => !x.IsDeleted)
                 .OrderBy(x => x.Ticker)
                 .AsNoTracking()
@@ -74,7 +87,7 @@ public class ShareMultiplicatorRepository(
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
-        var entity = await context.MultiplicatorEntities
+        var entity = await context.ShareMultiplicatorEntities
             .Where(x => !x.IsDeleted)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Ticker == ticker);
@@ -89,7 +102,7 @@ public class ShareMultiplicatorRepository(
         var tickers = (await instrumentRepository.GetAsync(instrumentIds))
             .Select(x => x.Ticker).ToList();
         
-        return (await context.MultiplicatorEntities
+        return (await context.ShareMultiplicatorEntities
                 .Where(x => !x.IsDeleted)
                 .Where(x => tickers.Contains(x.Ticker))
                 .OrderBy(x => x.Ticker)
@@ -97,6 +110,5 @@ public class ShareMultiplicatorRepository(
                 .ToListAsync())
             .Select(DataAccessMapper.Map)
             .ToList();
-        
     }
 }

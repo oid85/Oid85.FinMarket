@@ -571,9 +571,20 @@ public static class DataAccessMapper
         new()
         {
             Name = model.Name,
+            Ticker = model.Ticker,
             MarketCap = model.MarketCap,
             Ev = model.Ev,
-            Revenue = model.Revenue
+            Revenue = model.Revenue,
+            NetIncome = model.NetIncome,
+            DdAo = model.DdAo,
+            DdAp = model.DdAp,
+            DdNetIncome = model.DdNetIncome,
+            Pe = model.Pe,
+            Ps = model.Ps,
+            Pb = model.Pb,
+            EvEbitda = model.EvEbitda,
+            EbitdaMargin = model.EbitdaMargin,
+            NetDebtEbitda = model.NetDebtEbitda
         };
     
     public static ShareMultiplicator Map(ShareMultiplicatorEntity entity) =>
@@ -581,9 +592,20 @@ public static class DataAccessMapper
         {
             Id = entity.Id,
             Name = entity.Name,
+            Ticker = entity.Ticker,
             MarketCap = entity.MarketCap,
             Ev = entity.Ev,
-            Revenue = entity.Revenue
+            Revenue = entity.Revenue,
+            NetIncome = entity.NetIncome,
+            DdAo = entity.DdAo,
+            DdAp = entity.DdAp,
+            DdNetIncome = entity.DdNetIncome,
+            Pe = entity.Pe,
+            Ps = entity.Ps,
+            Pb = entity.Pb,
+            EvEbitda = entity.EvEbitda,
+            EbitdaMargin = entity.EbitdaMargin,
+            NetDebtEbitda = entity.NetDebtEbitda
         };
     
     public static ShareEntity Map(Share model) =>

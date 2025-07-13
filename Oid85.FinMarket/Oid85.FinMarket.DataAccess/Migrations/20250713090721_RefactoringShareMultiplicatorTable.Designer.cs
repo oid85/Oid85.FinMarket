@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oid85.FinMarket.DataAccess;
@@ -11,9 +12,11 @@ using Oid85.FinMarket.DataAccess;
 namespace Oid85.FinMarket.DataAccess.Migrations
 {
     [DbContext(typeof(FinMarketContext))]
-    partial class FinMarketContextModelSnapshot : ModelSnapshot
+    [Migration("20250713090721_RefactoringShareMultiplicatorTable")]
+    partial class RefactoringShareMultiplicatorTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -691,7 +694,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                         {
                             Id = new Guid("9125d7a7-cdd1-4e5d-949f-c34cfb09b984"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7895),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4836),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -702,13 +705,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Oil and Gas Sector Index",
                             Ticker = "OGSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7897)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4838)
                         },
                         new
                         {
                             Id = new Guid("a70dd4da-cb55-47f2-ac00-fefd08bc30db"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7963),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4904),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -719,13 +722,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Banks Sector Index",
                             Ticker = "BSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7963)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4905)
                         },
                         new
                         {
                             Id = new Guid("ed81ffb7-166c-4109-aa1f-11ff2021d214"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7967),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4909),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -736,13 +739,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Energ Sector Index",
                             Ticker = "ESI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7967)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4909)
                         },
                         new
                         {
                             Id = new Guid("923ada63-22f4-429f-b50f-3ac61b2cb457"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7970),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4912),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -753,13 +756,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Finance Sector Index",
                             Ticker = "FSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(7970)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4912)
                         },
                         new
                         {
                             Id = new Guid("2eb79a47-add7-40cb-8db6-3ffb43d4bee3"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8023),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4915),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -770,13 +773,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Housing And Utilities Sector Index",
                             Ticker = "HUSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8023)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4915)
                         },
                         new
                         {
                             Id = new Guid("7002e1b6-3709-4b79-9598-0b87d50bdd52"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8028),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4917),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -787,13 +790,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "IronAndSteelIndustry Sector Index",
                             Ticker = "ISISI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8028)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4918)
                         },
                         new
                         {
                             Id = new Guid("521aacd7-aa21-4b10-903b-ba2cfd97e2f1"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8030),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4920),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -804,13 +807,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "IT Sector Index",
                             Ticker = "ITSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8031)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4920)
                         },
                         new
                         {
                             Id = new Guid("20d22fe7-8870-4579-af1e-6dc4e6c06f9e"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8033),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4923),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -821,13 +824,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Mining Sector Index",
                             Ticker = "MSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8033)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4923)
                         },
                         new
                         {
                             Id = new Guid("9a76fcdf-7e10-48c0-aa08-2b8a4bf2e519"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8036),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4925),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -838,13 +841,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Non Ferrous Metallurgy Sector Index",
                             Ticker = "NFMSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8036)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4926)
                         },
                         new
                         {
                             Id = new Guid("8e237dbb-d8df-4599-ad6e-4635cb891ef5"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8039),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4928),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -855,13 +858,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Retail Sector Index",
                             Ticker = "RSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8039)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4928)
                         },
                         new
                         {
                             Id = new Guid("2b063b20-da30-407b-8a5a-1de917d6e889"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8041),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4930),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -872,13 +875,13 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Telecom Sector Index",
                             Ticker = "TSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8042)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4931)
                         },
                         new
                         {
                             Id = new Guid("4c968e87-2c9e-43b2-a896-09798c74b082"),
                             ClassCode = "",
-                            CreatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8044),
+                            CreatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4933),
                             Currency = "",
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Exchange = "",
@@ -889,7 +892,7 @@ namespace Oid85.FinMarket.DataAccess.Migrations
                             LastPrice = 0.0,
                             Name = "Transport Sector Index",
                             Ticker = "TRSI",
-                            UpdatedAt = new DateTime(2025, 7, 13, 10, 17, 9, 214, DateTimeKind.Utc).AddTicks(8044)
+                            UpdatedAt = new DateTime(2025, 7, 13, 9, 7, 20, 667, DateTimeKind.Utc).AddTicks(4933)
                         });
                 });
 
@@ -1705,8 +1708,8 @@ namespace Oid85.FinMarket.DataAccess.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("name");
 
                     b.Property<double>("NetDebtEbitda")

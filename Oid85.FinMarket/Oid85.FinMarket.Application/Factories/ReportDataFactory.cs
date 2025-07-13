@@ -313,7 +313,19 @@ public class ReportDataFactory(
                 "Тикер", 
                 "Сектор", 
                 "Эмитент", 
-                "MCap"
+                "Капит-ция",
+                "EV",
+                "Выручка",
+                "ЧП",
+                "ДД АО, %",
+                "ДД АП, %",
+                "ДД/ЧП",
+                "P/E",
+                "P/S",
+                "P/B",
+                "EV/EBITDA",
+                "EBITDA margin",
+                "NetDebt/EBITDA"
             ]);
 
         reportData.Title = "Мультипликаторы";
@@ -330,7 +342,19 @@ public class ReportDataFactory(
                 GetTicker(share.Ticker),
                 GetSector(share.Sector),
                 GetString(normalizeService.NormalizeInstrumentName(share.Name)),
-                GetNumber(multiplicator.MarketCap)
+                GetNumber(multiplicator.MarketCap),
+                GetNumber(multiplicator.Ev),
+                GetNumber(multiplicator.Revenue),
+                GetNumber(multiplicator.NetIncome),
+                GetNumber(multiplicator.DdAo),
+                GetNumber(multiplicator.DdAp),
+                GetNumber(multiplicator.DdNetIncome),
+                GetNumber(multiplicator.Pe),
+                GetNumber(multiplicator.Ps),
+                GetNumber(multiplicator.Pb),
+                GetNumber(multiplicator.EvEbitda),
+                GetNumber(multiplicator.EbitdaMargin),
+                GetNumber(multiplicator.NetDebtEbitda)
             ];
             
             reportData.Data.Add(data);
