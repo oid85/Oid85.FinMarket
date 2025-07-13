@@ -24,4 +24,16 @@ public class MoneyManagementResource
     /// </summary>
     [JsonPropertyName("unitSize")]
     public double UnitSize { get; set; }
+    
+    /// <summary>
+    /// Плечо для акций
+    /// </summary>
+    [JsonPropertyName("shareLeverage")]
+    public double ShareLeverage { get; set; }
+    
+    /// <summary>
+    /// Плечо для фьючерсов
+    /// </summary>
+    [JsonPropertyName("futureLeverage")]
+    public double FutureLeverage { get; set; }
 }
