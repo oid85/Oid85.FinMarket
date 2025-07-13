@@ -4,7 +4,7 @@ using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Strategies
 {
-    public class DonchianBreakoutClassicLong(
+    public class BollingerBandsClassicShort(
         IIndicatorFactory indicatorFactory) 
         : Strategy
     {
@@ -13,34 +13,29 @@ namespace Oid85.FinMarket.Application.Strategies
             // Получаем параметры
             int periodEntry = Parameters["PeriodEntry"];
             int periodExit = Parameters["PeriodExit"];
+            double stdDev = Parameters["StdDev"] / 10.0;
 
             // Фильтр
             var filterEma = indicatorFactory.Ema(Candles, periodEntry);
             
-            // Цены для построения канала
-            List<double> price = HighPrices.Add(LowPrices)!.Add(ClosePrices)!.Add(ClosePrices)!.DivConst(4.0);
-
             // Построение каналов
-            List<double> highLevel = indicatorFactory.Highest(price, periodEntry);
-            List<double> lowLevel = indicatorFactory.Lowest(price, periodExit);
-
-            // Сглаживание
-            int smoothPeriod = 5;
-            highLevel = indicatorFactory.Sma(highLevel, smoothPeriod);
-            lowLevel = indicatorFactory.Sma(lowLevel, smoothPeriod);
+            var bollingerBandsEntry = indicatorFactory.BollingerBands(Candles, periodEntry, stdDev);
+            var bollingerBandsExit = indicatorFactory.BollingerBands(Candles, periodExit, stdDev);
+            List<double> highLevel = bollingerBandsExit.UpperBand;
+            List<double> lowLevel = bollingerBandsEntry.LowerBand;
 
             // Сдвиг вправо на одну свечу
-            highLevel = highLevel.Shift(1);
             lowLevel = lowLevel.Shift(1);
-
+            highLevel = highLevel.Shift(1);
+            
             // Переменные для обслуживания позиции
             double trailingStop = 0.0;
 
             for (int i = StabilizationPeriod; i < Candles.Count - 1; i++)
             {
                 // Правило входа
-                SignalLong = ClosePrices[i] > highLevel[i];
-                FilterLong = Candles[i].Close > filterEma[i];
+                SignalShort = ClosePrices[i] < lowLevel[i];
+                FilterShort = Candles[i].Close < filterEma[i];
                 
                 // Задаем цену для заявки
                 double orderPrice = Candles[i].Close;
@@ -50,23 +45,23 @@ namespace Oid85.FinMarket.Application.Strategies
                 
                 if (LastActivePosition is null)
                 {
-                    if (SignalLong && FilterLong)
-                        BuyAtPrice(positionSize, orderPrice, i + 1);
+                    if (SignalShort && FilterShort)
+                        SellAtPrice(positionSize, orderPrice, i + 1);
                 }
                 
                 else
                 {
                     int entryCandleIndex = LastActivePosition.EntryCandleIndex;
 
-                    if (LastActivePosition.IsLong)
+                    if (LastActivePosition.IsShort)
                     {
-                        double startTrailingStop = lowLevel[entryCandleIndex];
-                        double curTrailingStop = lowLevel[i];
+                        double startTrailingStop = highLevel[entryCandleIndex];
+                        double curTrailingStop = highLevel[i];
 
-                        trailingStop = i == entryCandleIndex ? startTrailingStop : Math.Max(trailingStop, curTrailingStop);
+                        trailingStop = i == entryCandleIndex ? startTrailingStop : Math.Min(trailingStop, curTrailingStop);
                         
-                        if (Candles[i].Close <= trailingStop)
-                            SellAtPrice(positionSize, Candles[i].Close, i + 1);
+                        if (Candles[i].Close >= trailingStop)
+                            BuyAtPrice(positionSize, Candles[i].Close, i + 1);
                     }
                 }
             }

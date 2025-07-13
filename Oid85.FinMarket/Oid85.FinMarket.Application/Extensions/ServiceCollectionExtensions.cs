@@ -68,16 +68,27 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IIndicatorFactory, IndicatorFactory>();
         
         services.AddKeyedTransient<Strategy, DonchianBreakoutClassicLong>("DonchianBreakoutClassicLong");
+        services.AddKeyedTransient<Strategy, DonchianBreakoutClassicShort>("DonchianBreakoutClassicShort");
         services.AddKeyedTransient<Strategy, DonchianBreakoutMiddleLong>("DonchianBreakoutMiddleLong");
+        services.AddKeyedTransient<Strategy, DonchianBreakoutMiddleShort>("DonchianBreakoutMiddleShort");
         services.AddKeyedTransient<Strategy, SupertrendLong>("SupertrendLong");
+        services.AddKeyedTransient<Strategy, SupertrendShort>("SupertrendShort");
         services.AddKeyedTransient<Strategy, VolatilityBreakoutClassicLong>("VolatilityBreakoutClassicLong");
+        services.AddKeyedTransient<Strategy, VolatilityBreakoutClassicShort>("VolatilityBreakoutClassicShort");
         services.AddKeyedTransient<Strategy, VolatilityBreakoutMiddleLong>("VolatilityBreakoutMiddleLong");
+        services.AddKeyedTransient<Strategy, VolatilityBreakoutMiddleShort>("VolatilityBreakoutMiddleShort");
         services.AddKeyedTransient<Strategy, UltimateSmootherInclinationLong>("UltimateSmootherInclinationLong");
+        services.AddKeyedTransient<Strategy, UltimateSmootherInclinationShort>("UltimateSmootherInclinationShort");
         services.AddKeyedTransient<Strategy, HmaInclinationLong>("HmaInclinationLong");
+        services.AddKeyedTransient<Strategy, HmaInclinationShort>("HmaInclinationShort");
         services.AddKeyedTransient<Strategy, BollingerBandsClassicLong>("BollingerBandsClassicLong");
+        services.AddKeyedTransient<Strategy, BollingerBandsClassicShort>("BollingerBandsClassicShort");
         services.AddKeyedTransient<Strategy, BollingerBandsMiddleLong>("BollingerBandsMiddleLong");
+        services.AddKeyedTransient<Strategy, BollingerBandsMiddleShort>("BollingerBandsMiddleShort");
         services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxClassicLong>("AdaptivePriceChannelAdxClassicLong");
+        services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxClassicShort>("AdaptivePriceChannelAdxClassicShort");
         services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxMiddleLong>("AdaptivePriceChannelAdxMiddleLong");
+        services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxMiddleShort>("AdaptivePriceChannelAdxMiddleShort");
     }
     
     public static async Task RegisterHangfireJobs(
