@@ -101,17 +101,12 @@ public interface IResourceStoreService
     /// <summary>
     /// Получить цветовую палитру для EV / EBITDA
     /// </summary>
-    Task<List<RangeColorResource>> GetColorPaletteEvToEbitdaAsync();
+    Task<List<RangeColorResource>> GetColorPaletteEvEbitdaAsync();
     
     /// <summary>
     /// Получить цветовую палитру для NetDebt / EBITDA
     /// </summary>
-    Task<List<RangeColorResource>> GetColorPaletteNetDebtToEbitdaAsync();
-    
-    /// <summary>
-    /// Получить цветовую палитру для TotalDebt / EBITDA
-    /// </summary>
-    Task<List<RangeColorResource>> GetColorPaletteTotalDebtToEbitdaAsync();
+    Task<List<RangeColorResource>> GetColorPaletteNetDebtEbitdaAsync();
     
     /// <summary>
     /// Получить цветовую палитру для SpreadPricePosition

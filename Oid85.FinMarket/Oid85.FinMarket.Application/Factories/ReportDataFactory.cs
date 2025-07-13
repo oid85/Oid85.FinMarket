@@ -349,12 +349,12 @@ public class ReportDataFactory(
                 GetNumber(multiplicator.DdAo),
                 GetNumber(multiplicator.DdAp),
                 GetNumber(multiplicator.DdNetIncome),
-                GetNumber(multiplicator.Pe),
+                GetNumber(multiplicator.Pe, await colorHelper.GetColorPeAsync(multiplicator.Pe)),
                 GetNumber(multiplicator.Ps),
                 GetNumber(multiplicator.Pb),
-                GetNumber(multiplicator.EvEbitda),
+                GetNumber(multiplicator.EvEbitda, await colorHelper.GetColorEvEbitda(multiplicator.EvEbitda)),
                 GetNumber(multiplicator.EbitdaMargin),
-                GetNumber(multiplicator.NetDebtEbitda)
+                GetNumber(multiplicator.NetDebtEbitda, await colorHelper.GetColorNetDebtEbitda(multiplicator.NetDebtEbitda))
             ];
             
             reportData.Data.Add(data);
