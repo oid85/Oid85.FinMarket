@@ -46,4 +46,7 @@ public static class KnownTickerLists
     public const string CurrenciesWatchlist = "currencies/watchlist";
     
     public const string IndexesWatchlist = "indexes/watchlist";
+    
+    public const string AlgoShares = "algo/shares";
+    public const string AlgoFutures = "algo/futures";
 }

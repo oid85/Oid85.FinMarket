@@ -6,6 +6,7 @@ using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.Helpers;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
@@ -22,7 +23,9 @@ public class AlgoService(
     IOptimizationResultRepository optimizationResultRepository,
     IStrategySignalRepository strategySignalRepository,
     IShareRepository shareRepository,
-    IServiceProvider serviceProvider)
+    IFutureRepository futureRepository,
+    IServiceProvider serviceProvider,
+    ITickerListUtilService tickerListUtilService)
     : IAlgoService
 {
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
@@ -205,15 +208,7 @@ public class AlgoService(
             try
             {
                 if (!tickersInStrategiSignals.Contains(ticker))
-                    await strategySignalRepository.AddAsync(
-                        new StrategySignal
-                        {
-                            Ticker = ticker, 
-                            CountSignals = 0, 
-                            LastPrice = 0.0, 
-                            PositionCost = 0.0, 
-                            PositionSize = 0
-                        });
+                    await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0, LastPrice = 0.0, PositionCost = 0.0, PositionSize = 0 });
                 
                 int countSignals = 0;
                 double positionSize = 0.0;
@@ -236,10 +231,26 @@ public class AlgoService(
                 }
             
                 double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
-                double lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
                 
-                await strategySignalRepository.UpdatePositionAsync(
-                    ticker, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
+                // Применяем плечо и получаем последнюю цену
+                var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
+                var futuresTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
+
+                double lastPrice = 0.0;
+                
+                if (sharesTickers.Contains(ticker))
+                {
+                    positionSize *= algoConfigResource.MoneyManagementResource.ShareLeverage;
+                    lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
+                }
+
+                if (futuresTickers.Contains(ticker))
+                {
+                    positionSize *= algoConfigResource.MoneyManagementResource.FutureLeverage;
+                    lastPrice = (await futureRepository.GetAsync(ticker))!.LastPrice;
+                }
+
+                await strategySignalRepository.UpdatePositionAsync(ticker, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
             }
             
             catch (Exception exception)
