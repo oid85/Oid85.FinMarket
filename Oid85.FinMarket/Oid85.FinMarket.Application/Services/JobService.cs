@@ -28,7 +28,6 @@ public class JobService(
         await LoadDailyCandlesAsync();
         await ImportAsync();
         await OptimizeAsync();
-        await BacktestAsync();
         await LoadForecastsAsync();
         await AnalyseAsync();
         await CalculateSectorIndexDailyCandlesAsync();
