@@ -11,6 +11,6 @@ internal class SpreadEntityConfiguration : EntityConfigurationBase<SpreadEntity>
     {
         base.Configure(builder);
         
-        builder.ToTable("spreads", KnownDatabaseSchemas.Storage);
+        builder.ToTable("spreads", KnownDatabaseSchemas.Default);
     }
 }

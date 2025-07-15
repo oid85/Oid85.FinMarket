@@ -234,7 +234,7 @@ public class AlgoService(
                 
                 // Применяем плечо и получаем последнюю цену
                 var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
-                var futuresTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
+                var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
 
                 double lastPrice = 0.0;
                 

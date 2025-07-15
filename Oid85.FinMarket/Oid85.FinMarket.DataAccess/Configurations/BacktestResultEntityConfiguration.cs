@@ -11,7 +11,7 @@ internal class BacktestResultEntityConfiguration : EntityConfigurationBase<Backt
     {
         base.Configure(builder);
         
-        builder.ToTable("backtest_results", KnownDatabaseSchemas.Storage);
+        builder.ToTable("backtest_results", KnownDatabaseSchemas.Default);
         
         builder
             .Property(x => x.StrategyParams)

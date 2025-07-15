@@ -11,7 +11,7 @@ internal class OptimizationResultEntityConfiguration : EntityConfigurationBase<O
     {
         base.Configure(builder);
         
-        builder.ToTable("optimization_results", KnownDatabaseSchemas.Storage);
+        builder.ToTable("optimization_results", KnownDatabaseSchemas.Default);
         
         builder
             .Property(x => x.StrategyParams)

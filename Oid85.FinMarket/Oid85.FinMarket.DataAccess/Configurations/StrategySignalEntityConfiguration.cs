@@ -11,6 +11,6 @@ internal class StrategySignalEntityConfiguration : EntityConfigurationBase<Strat
     {
         base.Configure(builder);
         
-        builder.ToTable("strategy_signals", KnownDatabaseSchemas.Storage);
+        builder.ToTable("strategy_signals", KnownDatabaseSchemas.Default);
     }
 }

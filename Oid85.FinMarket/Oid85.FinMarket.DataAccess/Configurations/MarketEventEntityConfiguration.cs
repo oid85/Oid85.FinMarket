@@ -11,6 +11,6 @@ internal class MarketEventEntityConfiguration : EntityConfigurationBase<MarketEv
     {
         base.Configure(builder);
         
-        builder.ToTable("market_events", KnownDatabaseSchemas.Storage);
+        builder.ToTable("market_events", KnownDatabaseSchemas.Default);
     }
 }

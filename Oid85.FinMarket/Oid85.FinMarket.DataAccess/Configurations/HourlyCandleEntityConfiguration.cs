@@ -11,7 +11,7 @@ internal class HourlyCandleEntityConfiguration : EntityConfigurationBase<HourlyC
     {
         base.Configure(builder);
         
-        builder.ToTable("hourly_candles", KnownDatabaseSchemas.Storage);
+        builder.ToTable("hourly_candles", KnownDatabaseSchemas.Default);
         builder.HasIndex(x => x.InstrumentId);
     }
 }

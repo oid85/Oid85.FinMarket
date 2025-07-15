@@ -11,6 +11,6 @@ internal class FearGreedIndexEntityConfiguration : EntityConfigurationBase<FearG
     {
         base.Configure(builder);
         
-        builder.ToTable("fear_greed_index", KnownDatabaseSchemas.Storage);
+        builder.ToTable("fear_greed_index", KnownDatabaseSchemas.Default);
     }
 }
