@@ -228,20 +228,36 @@ public class SharesController(
             });
     
     /// <summary>
-    /// Отчет Мультипликаторы
+    /// Отчет Мультипликаторы (акции)
     /// </summary>
-    [HttpPost("report/multiplicator-analyse")]
+    [HttpPost("report/share-multiplicator-analyse")]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetMultiplicatorAnalyseAsync(
+    public Task<IActionResult> GetShareMultiplicatorAnalyseAsync(
         [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            () => reportService.GetMultiplicatorAnalyseAsync(request),
+            () => reportService.GetShareMultiplicatorAnalyseAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Отчет Мультипликаторы (банки)
+    /// </summary>
+    [HttpPost("report/bank-multiplicator-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetBankMultiplicatorAnalyseAsync(
+        [FromBody] TickerListRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetBankMultiplicatorAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });    
     
     /// <summary>
     /// Отчет Прогнозы

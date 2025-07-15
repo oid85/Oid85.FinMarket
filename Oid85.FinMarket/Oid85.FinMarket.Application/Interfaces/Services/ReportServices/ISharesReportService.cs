@@ -59,10 +59,15 @@ public interface ISharesReportService
     Task<ReportData> GetDividendAnalyseAsync(TickerListRequest request);
     
     /// <summary>
-    /// Отчет Мультипликаторы
+    /// Отчет Мультипликаторы (акции)
     /// </summary>
-    Task<ReportData> GetMultiplicatorAnalyseAsync(TickerListRequest request);
+    Task<ReportData> GetShareMultiplicatorAnalyseAsync(TickerListRequest request);
 
+    /// <summary>
+    /// Отчет Мультипликаторы (банки)
+    /// </summary>
+    Task<ReportData> GetBankMultiplicatorAnalyseAsync(TickerListRequest request);    
+    
     /// <summary>
     /// Отчет Прогнозы
     /// </summary>

@@ -90,10 +90,15 @@ public class SharesReportService(
             await GetInstrumentIds(request.TickerList));
     
     /// <inheritdoc />
-    public async Task<ReportData> GetMultiplicatorAnalyseAsync(TickerListRequest request) =>
-        await reportDataFactory.CreateMultiplicatorReportDataAsync(
+    public async Task<ReportData> GetShareMultiplicatorAnalyseAsync(TickerListRequest request) =>
+        await reportDataFactory.CreateShareMultiplicatorReportDataAsync(
             await GetInstrumentIds(request.TickerList));
 
+    /// <inheritdoc />
+    public async Task<ReportData> GetBankMultiplicatorAnalyseAsync(TickerListRequest request) =>
+        await reportDataFactory.CreateBankMultiplicatorReportDataAsync(
+            await GetInstrumentIds(request.TickerList));    
+    
     /// <inheritdoc />
     public async Task<ReportData> GetForecastTargetAnalyseAsync(TickerListRequest request) =>
         await reportDataFactory.CreateForecastTargetReportDataAsync(

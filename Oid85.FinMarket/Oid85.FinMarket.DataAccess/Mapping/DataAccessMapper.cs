@@ -608,6 +608,43 @@ public static class DataAccessMapper
             NetDebtEbitda = entity.NetDebtEbitda
         };
     
+    public static BankMultiplicatorEntity Map(BankMultiplicator model) =>
+        new()
+        {
+            Name = model.Name,
+            Ticker = model.Ticker,
+            MarketCap = model.MarketCap,
+            NetOperatingIncome = model.NetOperatingIncome,
+            NetIncome = model.NetIncome,
+            DdAo = model.DdAo,
+            DdAp = model.DdAp,
+            DdNetIncome = model.DdNetIncome,
+            Pe = model.Pe,
+            Pb = model.Pb,
+            NetInterestMargin = model.NetInterestMargin,
+            Roe = model.Roe,
+            Roa = model.Roa
+        };
+    
+    public static BankMultiplicator Map(BankMultiplicatorEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Ticker = entity.Ticker,
+            MarketCap = entity.MarketCap,
+            NetOperatingIncome = entity.NetOperatingIncome,
+            NetIncome = entity.NetIncome,
+            DdAo = entity.DdAo,
+            DdAp = entity.DdAp,
+            DdNetIncome = entity.DdNetIncome,
+            Pe = entity.Pe,
+            Pb = entity.Pb,
+            NetInterestMargin = entity.NetInterestMargin,
+            Roe = entity.Roe,
+            Roa = entity.Roa
+        };    
+    
     public static ShareEntity Map(Share model) =>
         new()
         {

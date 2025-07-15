@@ -7,7 +7,8 @@ public interface IReportDataFactory
     Task<ReportData> CreateReportDataAsync(List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to);
     Task<ReportData> CreateAggregatedReportDataAsync(List<Guid> instrumentIds, List<string> analyseTypes, DateOnly from, DateOnly to);
     Task<ReportData> CreateDividendInfoReportDataAsync(List<Guid> instrumentIds);
-    Task<ReportData> CreateMultiplicatorReportDataAsync(List<Guid> instrumentIds);
+    Task<ReportData> CreateShareMultiplicatorReportDataAsync(List<Guid> instrumentIds);
+    Task<ReportData> CreateBankMultiplicatorReportDataAsync(List<Guid> getInstrumentIds);
     Task<ReportData> CreateForecastTargetReportDataAsync(List<Guid> instrumentIds);
     Task<ReportData> CreateForecastConsensusReportDataAsync(List<Guid> instrumentIds);
     Task<ReportData> CreateBondCouponReportDataAsync(List<Guid> instrumentIds);

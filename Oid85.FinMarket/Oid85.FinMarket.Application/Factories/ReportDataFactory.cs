@@ -21,6 +21,7 @@ public class ReportDataFactory(
     IShareRepository shareRepository,
     IDailyCandleRepository dailyCandleRepository,
     IShareMultiplicatorRepository shareMultiplicatorRepository,
+    IBankMultiplicatorRepository bankMultiplicatorRepository,
     IForecastTargetRepository forecastTargetRepository,
     IForecastConsensusRepository forecastConsensusRepository,
     IAssetReportEventRepository assetReportEventRepository,
@@ -303,7 +304,7 @@ public class ReportDataFactory(
         return reportData;
     }
 
-    public async Task<ReportData> CreateMultiplicatorReportDataAsync(List<Guid> instrumentIds)
+    public async Task<ReportData> CreateShareMultiplicatorReportDataAsync(List<Guid> instrumentIds)
     {
         var shares = (await shareRepository.GetAsync(instrumentIds))
             .OrderBy(x => x.Sector);
@@ -317,8 +318,8 @@ public class ReportDataFactory(
                 "EV",
                 "Выручка",
                 "ЧП",
-                "ДД АО, %",
-                "ДД АП, %",
+                "ДД АО",
+                "ДД АП",
                 "ДД/ЧП",
                 "P/E",
                 "P/S",
@@ -363,6 +364,62 @@ public class ReportDataFactory(
         return reportData;
     }
 
+    public async Task<ReportData> CreateBankMultiplicatorReportDataAsync(List<Guid> instrumentIds)
+    {
+        var shares = (await shareRepository.GetAsync(instrumentIds))
+            .OrderBy(x => x.Sector);
+
+        var reportData = CreateNewReportDataWithHeaders(
+            [
+                "Тикер", 
+                "Сектор", 
+                "Эмитент", 
+                "Капит-ция",
+                "Чист.опер.доход",
+                "ЧП",
+                "ДД АО",
+                "ДД АП",
+                "ДД/ЧП",
+                "P/E",
+                "P/B",
+                "Чист.проц.маржа",
+                "ROE",
+                "ROA"
+            ]);
+
+        reportData.Title = "Мультипликаторы";
+        
+        foreach (var share in shares)
+        {
+            var multiplicator = await bankMultiplicatorRepository.GetAsync(share.Ticker);
+            
+            if (multiplicator is null)
+                continue;
+
+            List<ReportParameter> data =
+            [
+                GetTicker(share.Ticker),
+                GetSector(share.Sector),
+                GetString(normalizeService.NormalizeInstrumentName(share.Name)),
+                GetNumber(multiplicator.MarketCap),
+                GetNumber(multiplicator.NetOperatingIncome),
+                GetNumber(multiplicator.NetIncome),
+                GetNumber(multiplicator.DdAo),
+                GetNumber(multiplicator.DdAp),
+                GetNumber(multiplicator.DdNetIncome),
+                GetNumber(multiplicator.Pe, await colorHelper.GetColorPeAsync(multiplicator.Pe)),
+                GetNumber(multiplicator.Pb),
+                GetNumber(multiplicator.NetInterestMargin),
+                GetNumber(multiplicator.Roe),
+                GetNumber(multiplicator.Roa)
+            ];
+            
+            reportData.Data.Add(data);
+        }
+        
+        return reportData;
+    }    
+    
     public async Task<ReportData> CreateForecastTargetReportDataAsync(List<Guid> instrumentIds)
     {
         var forecastTargets = (await forecastTargetRepository.GetAsync(instrumentIds))

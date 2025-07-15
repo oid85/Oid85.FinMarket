@@ -9,7 +9,8 @@ namespace Oid85.FinMarket.Application.Services;
 
 public class ImportService(
     IResourceStoreService resourceStoreService,
-    IShareMultiplicatorRepository shareMultiplicatorRepository) 
+    IShareMultiplicatorRepository shareMultiplicatorRepository,
+    IBankMultiplicatorRepository bankMultiplicatorRepository) 
     : IImportService
 {
     public async Task ImportMultiplicatorsAsync()
@@ -65,25 +66,63 @@ public class ImportService(
         }
         
         await shareMultiplicatorRepository.AddOrUpdateAsync(multiplicators);
-        
-        return;
-
-        double GetDouble(string str)
-        {
-            string sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-            str = str
-                .Replace(" ", "")
-                .Replace("%", "")
-                .Replace(".", sep)
-                .Replace(",", sep)
-                .Trim();
-            
-            return string.IsNullOrEmpty(str) ? 0.0 : double.Parse(str);
-        }
     }
     
     private async Task ImportBanksMultiplicatorsAsync()
     {
-        var data = await resourceStoreService.GetCsvAsync(KnownCsvPathes.BanksMultiplicators);
+        const int nameIndex = 1;
+        const int tickerIndex = 2;
+        const int marketCapIndex = 5;
+        const int netOperatingIncomeIndex = 6;
+        const int netIncomeIndex = 7;
+        const int ddAoIndex = 8;
+        const int ddApIndex = 9;
+        const int ddNetIncomeIndex = 10;
+        const int peIndex = 11;
+        const int pbIndex = 12;
+        const int netInterestMarginIndex = 13;
+        const int roeIndex = 14;
+        const int roaIndex = 15;
+        
+        var data = await resourceStoreService.GetCsvAsync(KnownCsvPathes.BankMultiplicators);
+
+        var multiplicators = new List<BankMultiplicator>();
+        
+        for (int i = 1; i < data.Count; i++)
+        {
+            var multiplicator = new BankMultiplicator
+            {
+                Name = data[i][nameIndex].Trim().ToUpper(),
+                Ticker = data[i][tickerIndex].Trim().ToUpper(),
+                MarketCap = GetDouble(data[i][marketCapIndex]),
+                NetOperatingIncome = GetDouble(data[i][netOperatingIncomeIndex]),
+                NetIncome = GetDouble(data[i][netIncomeIndex]),
+                DdAo = GetDouble(data[i][ddAoIndex]),
+                DdAp = GetDouble(data[i][ddApIndex]),
+                DdNetIncome = GetDouble(data[i][ddNetIncomeIndex]),
+                Pe = GetDouble(data[i][peIndex]),
+                Pb = GetDouble(data[i][pbIndex]),
+                NetInterestMargin = GetDouble(data[i][netInterestMarginIndex]),
+                Roe = GetDouble(data[i][roeIndex]),
+                Roa = GetDouble(data[i][roaIndex])
+            };
+            
+            multiplicators.Add(multiplicator);
+        }
+        
+        await bankMultiplicatorRepository.AddOrUpdateAsync(multiplicators);
+    }
+    
+    private double GetDouble(string str)
+    {
+        string sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+        str = str
+            .Replace(" ", "")
+            .Replace("%", "")
+            .Replace(".", sep)
+            .Replace(",", sep)
+            .Trim();
+            
+        return string.IsNullOrEmpty(str) ? 0.0 : double.Parse(str);
     }
 }
