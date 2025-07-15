@@ -192,6 +192,8 @@ public class AlgoService(
     public async Task<bool> CalculateStrategySignalsAsync()
     {
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        var algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
+        
         var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
         
         var tickersInStrategiSignals = (await strategySignalRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
@@ -215,6 +217,11 @@ public class AlgoService(
             
                 foreach (var backtestResult in backtestResults.Where(x => x.Ticker == ticker))
                 {
+                    var enable = algoStrategyResources.Find(x => x.Id == backtestResult.StrategyId)!.Enable;
+                    
+                    if (!enable)
+                        continue;
+                    
                     if (backtestResult.CurrentPosition > 0)
                     {
                         countSignals++;
