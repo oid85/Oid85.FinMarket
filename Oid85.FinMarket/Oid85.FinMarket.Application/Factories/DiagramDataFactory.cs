@@ -141,4 +141,37 @@ public class DiagramDataFactory(
         
         return diagramData;
     }
+
+    public async Task<BacktestResultDiagramData> CreateBacktestResultWithoutPriceDiagramDataAsync(List<Strategy> strategies)
+    {
+        var diagramData = new BacktestResultDiagramData();
+        
+        // Date
+        for (int i = 0; i < strategies[0].Candles.Count; i++)
+        {
+            diagramData.Data.Series.Add(new BacktestResultDataPoint
+            {
+                Date = strategies[0].Candles[i].DateTime.ToString(KnownDateTimeFormats.DateISO)
+            });
+        }
+
+        // Equity, Drawdown
+        var from = strategies[0].Candles.First().DateTime;
+        var to = strategies[0].Candles.Last().DateTime;
+
+        for (int i = 0; i < strategies.Count; i++)
+        {
+            var equity = strategies[i].EqiutyCurve.Expand(from, to);
+            var drawdown = strategies[i].DrawdownCurve.Expand(from, to);
+
+            for (int j = 0; j < diagramData.Data.Series.Count; j++)
+            {
+                var date = Convert.ToDateTime(diagramData.Data.Series[j].Date);
+                diagramData.Data.Series[j].Equity += equity[date];
+                diagramData.Data.Series[j].Drawdown += -1 * drawdown[date];
+            }
+        }
+        
+        return diagramData;
+    }
 }

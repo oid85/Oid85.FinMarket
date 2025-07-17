@@ -109,6 +109,21 @@ public class AlgoController(
             });     
     
     /// <summary>
+    /// Получить бэктест портфеля
+    /// </summary>
+    [HttpPost("backtest-result-portfolio")]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetBacktestResultPortfolioAsync() =>
+        GetResponseAsync(
+            () => reportService.GetBacktestResultPortfolioAsync(),
+            result => new BaseResponse<BacktestResultData>
+            {
+                Result = result
+            });     
+    
+    /// <summary>
     /// Получить сигналы стратегий
     /// </summary>
     [HttpPost("strategy-signals")]

@@ -9,4 +9,5 @@ public interface IDiagramDataFactory
     Task<BubbleDiagramData> CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(List<Guid> instrumentIds);
     Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(Strategy strategy);
     Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies);
+    Task<BacktestResultDiagramData> CreateBacktestResultWithoutPriceDiagramDataAsync(List<Strategy> strategies);
 }

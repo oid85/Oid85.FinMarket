@@ -61,4 +61,27 @@ public class AlgoReportService(
         
         return backtestResultData;
     }
+
+    public async Task<BacktestResultData> GetBacktestResultPortfolioAsync()
+    {
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+
+        var strategies = new List<Strategy>();
+        
+        foreach (var backtestResult in backtestResults)
+        {
+            var result = await algoService.BacktestAsync(backtestResult.Id);
+            strategies.Add(result.strategy!);
+        }
+
+        var backtestResultData = new BacktestResultData
+        {
+            DiagramData = await diagramDataFactory.CreateBacktestResultWithoutPriceDiagramDataAsync(strategies)
+        };
+
+        backtestResultData.DiagramData.Title = "Портфель";
+        
+        return backtestResultData;
+    }
 }
