@@ -356,9 +356,9 @@ public class SharesController(
             });
     
     /// <summary>
-    /// Диаграмма Мультипликаторы MCap, P/E, NetDebt/EBITDA
+    /// Диаграмма Мультипликаторы (акции) MCap, P/E, NetDebt/EBITDA
     /// </summary>
-    [HttpPost("diagram/multiplicators-mcap-pe-netdebtebitda")]
+    [HttpPost("diagram/share-multiplicators-mcap-pe-netdebtebitda")]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status500InternalServerError)]
