@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<YieldLtmAnalyseService>();
         services.AddTransient<AtrAnalyseService>();
         services.AddTransient<DonchianAnalyseService>();
+        services.AddTransient<HurstAnalyseService>();
         
         services.AddTransient<ColorHelper>();
         

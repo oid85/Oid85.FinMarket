@@ -11,4 +11,5 @@ public static class KnownAnalyseTypes
     public const string Aggregated = "Aggregated";
     public const string Atr = "Atr";
     public const string Donchian = "Donchian";
+    public const string Hurst = "Hurst";
 }

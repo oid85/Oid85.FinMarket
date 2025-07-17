@@ -13,7 +13,8 @@ public class AnalyseService(
     SupertrendAnalyseService supertrendAnalyseService,
     YieldLtmAnalyseService yieldLtmAnalyseService,
     AtrAnalyseService atrAnalyseService,
-    DonchianAnalyseService donchianAnalyseService)
+    DonchianAnalyseService donchianAnalyseService,
+    HurstAnalyseService hurstAnalyseService)
     : IAnalyseService
 {
     /// <inheritdoc />
@@ -32,6 +33,7 @@ public class AnalyseService(
             await drawdownFromMaximumAnalyseService.DrawdownFromMaximumAnalyseAsync(instrument.InstrumentId);
             await atrAnalyseService.AtrAnalyseAsync(instrument.InstrumentId);
             await donchianAnalyseService.DonchianAnalyseAsync(instrument.InstrumentId);
+            await hurstAnalyseService.HurstAnalyseAsync(instrument.InstrumentId);
         }
 
         return true;
