@@ -180,6 +180,22 @@ public class SharesController(
             });    
     
     /// <summary>
+    /// Отчет Hurst
+    /// </summary>
+    [HttpPost("report/hurst-analyse")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetHurstAnalyseAsync(
+        [FromBody] DateRangeRequest request) =>
+        GetResponseAsync(
+            () => reportService.GetHurstAnalyseAsync(request),
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });      
+    
+    /// <summary>
     /// Отчет Доходность LTM
     /// </summary>
     [HttpPost("report/yield-ltm-analyse")]

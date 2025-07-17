@@ -44,6 +44,11 @@ public interface ISharesReportService
     Task<ReportData> GetDonchianAnalyseAsync(DateRangeRequest request);
     
     /// <summary>
+    /// Отчет Анализ Hurst
+    /// </summary>
+    Task<ReportData> GetHurstAnalyseAsync(DateRangeRequest request);    
+    
+    /// <summary>
     /// Отчет Доходность LTM
     /// </summary>
     Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request);

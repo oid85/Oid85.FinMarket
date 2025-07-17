@@ -202,6 +202,9 @@ public class ReportDataFactory(
                     else if (analyseType is KnownAnalyseTypes.Atr)
                         data.Add(GetNumber(analyseResult.ResultNumber, color));                    
                     
+                    else if (analyseType is KnownAnalyseTypes.Hurst)
+                        data.Add(GetNumber(analyseResult.ResultNumber, color));                     
+                    
                     else
                         data.Add(GetAnalyseResult(string.Empty, color));
                 }

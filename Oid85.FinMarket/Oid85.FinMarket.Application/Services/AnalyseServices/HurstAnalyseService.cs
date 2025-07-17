@@ -44,18 +44,14 @@ public class HurstAnalyseService(
             var results = new List<AnalyseResult>();
 
             for (int i = 0; i < hurstResults.Count; i++)
-            {
-                var (resultString, resultNumber) = GetResult(hurstResults[i]);
-                
                 results.Add(new AnalyseResult
                 {
                     Date = DateOnly.FromDateTime(candles[i].DateTime),
                     InstrumentId = instrumentId,
-                    ResultString = resultString,
-                    ResultNumber = resultNumber,
+                    ResultString = hurstResults[i].ToString("N2"),
+                    ResultNumber = hurstResults[i],
                     AnalyseType = KnownAnalyseTypes.Hurst
                 });
-            }
 
             await analyseResultRepository.AddAsync(results);
         }
@@ -65,7 +61,4 @@ public class HurstAnalyseService(
             logger.Error(exception, "Ошибка при выполнении метода. {instrumentId}", instrumentId);
         }
     }
-
-    private static (string, double) GetResult(double result) =>
-        (result.ToString("N2"), result);
 }

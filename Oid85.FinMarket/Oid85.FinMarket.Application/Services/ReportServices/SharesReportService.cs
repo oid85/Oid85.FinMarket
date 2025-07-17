@@ -68,8 +68,15 @@ public class SharesReportService(
         await reportDataFactory.CreateReportDataAsync(
             await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.Donchian, 
-            request.From, request.To);       
-    
+            request.From, request.To);
+
+    /// <inheritdoc />
+    public async Task<ReportData> GetHurstAnalyseAsync(DateRangeRequest request) =>
+        await reportDataFactory.CreateReportDataAsync(
+            await GetInstrumentIds(request.TickerList), 
+            KnownAnalyseTypes.Hurst, 
+            request.From, request.To);
+
     /// <inheritdoc />
     public async Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request) =>
         await reportDataFactory.CreateReportDataAsync(

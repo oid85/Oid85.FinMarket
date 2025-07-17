@@ -30,6 +30,9 @@ public class ColorHelper(
             case KnownAnalyseTypes.Atr:
                 return GreenYellowRedScale(analyseResult.ResultNumber);
             
+            case KnownAnalyseTypes.Hurst:
+                return GreenYellowRedScale(analyseResult.ResultNumber);
+            
             case KnownAnalyseTypes.YieldLtm:
                 return GreenScale(analyseResult.ResultNumber);
             
