@@ -26,8 +26,7 @@ public class JobService(
         await LoadBondCouponsAsync();
         await LoadDividendInfosAsync();
         await LoadDailyCandlesAsync();
-        await ImportAsync();
-        await OptimizeAsync();
+        await ImportAsync();        
         await LoadForecastsAsync();
         await AnalyseAsync();
         await CalculateSectorIndexDailyCandlesAsync();
@@ -36,6 +35,8 @@ public class JobService(
         await ProcessFeerGreedAsync();
         await CheckDailyMarketEventsAsync();
         await SendNotificationsAsync();
+        await OptimizeAsync();
+        await BacktestAsync();
     }
 
     /// <inheritdoc />
