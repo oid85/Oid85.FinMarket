@@ -633,8 +633,7 @@ public class ReportDataFactory(
                 "Тикер", "Сектор", "Наименование", 
                 "ST Up", "ST Down", "Vol Up", "Candle White", "Candle Black",
                 "RSI O/B In", "RSI O/B Out", "RSI O/S In", "RSI O/S Out",
-                "Cross", "Spread 1%", "Spread 2%", "Spread 3%",
-                "Forecast", "IntDay Impulse"
+                "Cross", "Forecast", "IntDay Impulse"
             ]);
         
         reportData.Title = "Активные рыночные события";
@@ -661,9 +660,6 @@ public class ReportDataFactory(
                 await GetMarketEventReportParameter(KnownMarketEventTypes.RsiOverSoldInput),
                 await GetMarketEventReportParameter(KnownMarketEventTypes.RsiOverSoldOutput),
                 await GetMarketEventReportParameter(KnownMarketEventTypes.CrossPriceLevel),
-                await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent1),
-                await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent2),
-                await GetMarketEventReportParameter(KnownMarketEventTypes.SpreadGreaterPercent3),
                 await GetMarketEventReportParameter(KnownMarketEventTypes.ForecastReleased)
             ]);
             
