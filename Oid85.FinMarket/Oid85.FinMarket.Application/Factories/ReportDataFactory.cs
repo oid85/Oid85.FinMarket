@@ -29,7 +29,6 @@ public class ReportDataFactory(
     IBacktestResultRepository backtestResultRepository,
     IResourceStoreService resourceStoreService,
     ColorHelper colorHelper,
-    ISpreadRepository spreadRepository,
     IMarketEventRepository marketEventRepository,
     IFeerGreedRepository feerGreedRepository,
     INormalizeService normalizeService) 
@@ -619,36 +618,6 @@ public class ReportDataFactory(
             reportData.Data.Add(data);
         }
             
-        return reportData;
-    }
-
-    public async Task<ReportData> CreateSpreadReportDataAsync(List<Guid> instrumentIds)
-    {
-        var spreads = await spreadRepository.GetAsync(instrumentIds);
-            
-        var reportData = CreateNewReportDataWithHeaders(
-            [string.Empty, string.Empty, "Тикер", "Тикер", "Цена", "Цена", "Спред", "Спред, %", "Конт./Бэкв."]);
-        
-        reportData.Title = "Спреды";
-
-        foreach (var spread in spreads)
-        {
-            string color = await colorHelper.GetColorSpreadPricePosition(spread.SpreadPricePosition);
-            
-            reportData.Data.Add(
-            [
-                GetString(spread.FirstInstrumentRole),
-                GetString(spread.SecondInstrumentRole),
-                GetTicker(spread.FirstInstrumentTicker),
-                GetTicker(spread.SecondInstrumentTicker),
-                GetRuble(spread.FirstInstrumentPrice),
-                GetRuble(spread.SecondInstrumentPrice),
-                GetRuble(spread.PriceDifference),
-                GetPercent(spread.PriceDifferencePrc),
-                GetString(spread.SpreadPricePosition, color)
-            ]);
-        }
-        
         return reportData;
     }
     

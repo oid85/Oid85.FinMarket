@@ -9,7 +9,6 @@ public class JobService(
     ILoadService loadService,
     IImportService importService,
     IAnalyseService analyseService,
-    ISpreadService spreadService,
     IFeerGreedIndexService feerGreedIndexService,
     ISectorIndexService sectorIndexService,
     IMarketEventService marketEventService,
@@ -31,7 +30,6 @@ public class JobService(
         await AnalyseAsync();
         await CalculateSectorIndexDailyCandlesAsync();
         await AnalyseSectorsAsync();
-        await ProcessSpreadPairsAsync();
         await ProcessFeerGreedAsync();
         await CheckDailyMarketEventsAsync();
         await SendNotificationsAsync();
@@ -85,7 +83,6 @@ public class JobService(
             await loadService.LoadFutureLastPricesAsync();
             await loadService.LoadCurrencyLastPricesAsync();
             await loadService.LoadIndexLastPricesAsync();
-            await loadService.LoadSpreadLastPricesAsync();
             
             logger.Info("Метод 'LoadLastPricesAsync' выполнен успешно");
         }
@@ -308,21 +305,6 @@ public class JobService(
         }
     }    
     
-    private async Task ProcessSpreadPairsAsync()
-    {
-        try
-        {
-            await spreadService.ProcessSpreadPairsAsync();
-            
-            logger.Info("Метод 'ProcessSpreadPairsAsync' выполнен успешно");
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Info(exception, "Ошибка при выполнении метода 'ProcessSpreadPairsAsync'");
-        }
-    }
-    
     private async Task ProcessFeerGreedAsync()
     {
         try
@@ -352,9 +334,6 @@ public class JobService(
             await marketEventService.CheckRsiOverOverSoldInputMarketEventAsync();
             await marketEventService.CheckRsiOverOverSoldOutputMarketEventAsync();
             await marketEventService.CheckCrossPriceLevelMarketEventAsync();
-            await marketEventService.CheckSpreadGreaterPercent1MarketEventAsync();
-            await marketEventService.CheckSpreadGreaterPercent2MarketEventAsync();
-            await marketEventService.CheckSpreadGreaterPercent3MarketEventAsync();
             await marketEventService.CheckForecastReleasedMarketEventAsync();
             
             logger.Info("Метод 'CheckMarketEventsAsync' выполнен успешно");

@@ -15,7 +15,6 @@ public class MarketEventService(
     IAnalyseResultRepository analyseResultRepository,
     IDailyCandleRepository dailyCandleRepository,
     IInstrumentRepository instrumentRepository,
-    ISpreadRepository spreadRepository,
     IResourceStoreService resourceStoreService,
     IForecastConsensusRepository forecastConsensusRepository) 
     : IMarketEventService
@@ -379,111 +378,6 @@ public class MarketEventService(
             
                     await SaveMarketEventAsync(marketEvent);
                 }
-            }
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-        }
-    }
-
-    /// <inheritdoc />
-    public async Task CheckSpreadGreaterPercent1MarketEventAsync()
-    {
-        try
-        {
-            var spreads = (await spreadRepository.GetAllAsync()).ToList();
-        
-            foreach (var spread in spreads)
-            {
-                var marketEvent = await CreateMarketEvent(
-                    spread.FirstInstrumentId, 
-                    KnownMarketEventTypes.SpreadGreaterPercent1,
-                    $"Спред '{spread.FirstInstrumentTicker}' / '{spread.SecondInstrumentTicker}' превышает 1 %");
-            
-                if (spread is
-                    {
-                        FirstInstrumentPrice: > 0, 
-                        SecondInstrumentPrice: > 0, 
-                        PriceDifference: > 0
-                    })
-                    marketEvent.IsActive = (spread.PriceDifference / spread.FirstInstrumentPrice) > 0.01;
-            
-                else
-                    marketEvent.IsActive = false;
-            
-                await SaveMarketEventAsync(marketEvent);
-            }
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-        }
-    }
-
-    /// <inheritdoc />
-    public async Task CheckSpreadGreaterPercent2MarketEventAsync()
-    {
-        try
-        {
-            var spreads = (await spreadRepository.GetAllAsync()).ToList();
-        
-            foreach (var spread in spreads)
-            {
-                var marketEvent = await CreateMarketEvent(
-                    spread.FirstInstrumentId, 
-                    KnownMarketEventTypes.SpreadGreaterPercent2,
-                    $"Спред '{spread.FirstInstrumentTicker}' / '{spread.SecondInstrumentTicker}' превышает 2 %");
-            
-                if (spread is
-                    {
-                        FirstInstrumentPrice: > 0, 
-                        SecondInstrumentPrice: > 0, 
-                        PriceDifference: > 0
-                    })
-                    marketEvent.IsActive = (spread.PriceDifference / spread.FirstInstrumentPrice) > 0.02;
-            
-                else
-                    marketEvent.IsActive = false;
-            
-                await SaveMarketEventAsync(marketEvent);
-            }
-        }
-        
-        catch (Exception exception)
-        {
-            logger.Error(exception);
-        }
-    }
-
-    /// <inheritdoc />
-    public async Task CheckSpreadGreaterPercent3MarketEventAsync()
-    {
-        try
-        {
-            var spreads = (await spreadRepository.GetAllAsync()).ToList();
-        
-            foreach (var spread in spreads)
-            {
-                var marketEvent = await CreateMarketEvent(
-                    spread.FirstInstrumentId, 
-                    KnownMarketEventTypes.SpreadGreaterPercent3,
-                    $"Спред '{spread.FirstInstrumentTicker}' / '{spread.SecondInstrumentTicker}' превышает 3 %");
-                
-                if (spread is
-                    {
-                        FirstInstrumentPrice: > 0, 
-                        SecondInstrumentPrice: > 0, 
-                        PriceDifference: > 0
-                    })
-                    marketEvent.IsActive = (spread.PriceDifference / spread.FirstInstrumentPrice) > 0.03;
-            
-                else
-                    marketEvent.IsActive = false;
-            
-                await SaveMarketEventAsync(marketEvent);
             }
         }
         

@@ -23,7 +23,6 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<StrategySignalEntity> StrategySignalEntities { get; set; }
     public DbSet<BacktestResultEntity> BacktestResultEntities { get; set; }
     public DbSet<InstrumentEntity> InstrumentEntities { get; set; }
-    public DbSet<SpreadEntity> SpreadEntities { get; set; }
     public DbSet<ForecastTargetEntity> ForecastTargetEntities { get; set; }
     public DbSet<ForecastConsensusEntity> ForecastConsensusEntities { get; set; }
     public DbSet<MarketEventEntity> MarketEventEntities { get; set; }

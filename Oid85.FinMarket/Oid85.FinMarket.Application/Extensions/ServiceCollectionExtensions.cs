@@ -54,7 +54,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAnalyseService, AnalyseService>();
         services.AddTransient<ISendService, SendService>();
         services.AddTransient<IJobService, JobService>();
-        services.AddTransient<ISpreadService, SpreadService>();
         services.AddTransient<IMarketEventService, MarketEventService>();
         services.AddTransient<ITickerListUtilService, TickerListUtilService>();
         services.AddTransient<INormalizeService, NormalizeService>();

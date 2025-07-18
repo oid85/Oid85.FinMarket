@@ -49,11 +49,6 @@ public interface IFuturesReportService
     Task<ReportData> GetYieldLtmAnalyseAsync(DateRangeRequest request);
     
     /// <summary>
-    /// Отчет Анализ спреда
-    /// </summary>
-    Task<ReportData> GetSpreadAnalyseAsync(TickerListRequest request);
-    
-    /// <summary>
     /// Отчет Рыночные события
     /// </summary>
     Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request);

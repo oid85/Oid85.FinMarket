@@ -669,50 +669,7 @@ public static class DataAccessMapper
             Name = entity.Name,
             Sector = entity.Sector
         };
-    
-    public static SpreadEntity Map(Spread model) =>
-        new()
-        {
-            DateTime = model.DateTime,
-            FirstInstrumentId = model.FirstInstrumentId,
-            FirstInstrumentTicker = model.FirstInstrumentTicker,
-            FirstInstrumentRole = model.FirstInstrumentRole,
-            FirstInstrumentPrice = model.FirstInstrumentPrice,
-            SecondInstrumentId = model.SecondInstrumentId,
-            SecondInstrumentTicker = model.SecondInstrumentTicker,
-            SecondInstrumentRole = model.SecondInstrumentRole,
-            SecondInstrumentPrice = model.SecondInstrumentPrice,
-            Multiplier = model.Multiplier,
-            PriceDifference = model.PriceDifference,
-            PriceDifferencePrc = model.PriceDifferencePrc,
-            PriceDifferenceAverage = model.PriceDifferenceAverage,
-            PriceDifferenceAveragePrc = model.PriceDifferenceAveragePrc,
-            Funding = model.Funding,
-            SpreadPricePosition = model.SpreadPricePosition
-        };
-    
-    public static Spread Map(SpreadEntity entity) =>
-        new()
-        {
-            Id = entity.Id,
-            DateTime = entity.DateTime,
-            FirstInstrumentId = entity.FirstInstrumentId,
-            FirstInstrumentTicker = entity.FirstInstrumentTicker,
-            FirstInstrumentRole = entity.FirstInstrumentRole,
-            FirstInstrumentPrice = entity.FirstInstrumentPrice,
-            SecondInstrumentId = entity.SecondInstrumentId,
-            SecondInstrumentTicker = entity.SecondInstrumentTicker,
-            SecondInstrumentRole = entity.SecondInstrumentRole,
-            SecondInstrumentPrice = entity.SecondInstrumentPrice,
-            Multiplier = entity.Multiplier,
-            PriceDifference = entity.PriceDifference,
-            PriceDifferencePrc = entity.PriceDifferencePrc,
-            PriceDifferenceAverage = entity.PriceDifferenceAverage,
-            PriceDifferenceAveragePrc = entity.PriceDifferenceAveragePrc,
-            Funding = entity.Funding,
-            SpreadPricePosition = entity.SpreadPricePosition
-        };
-    
+
     public static AssetReportEventEntity Map(AssetReportEvent model) =>
         new()
         {

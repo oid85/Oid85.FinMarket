@@ -18,8 +18,6 @@ public interface ILoadService
     Task LoadFutureLastPricesAsync();
     Task LoadFutureDailyCandlesAsync();
     
-    Task LoadSpreadLastPricesAsync();
-    
     Task LoadBondsAsync();
     Task LoadBondCouponsAsync();
     Task LoadBondLastPricesAsync();

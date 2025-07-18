@@ -76,10 +76,6 @@ public class FuturesReportService(
             await GetInstrumentIds(request.TickerList), 
             KnownAnalyseTypes.YieldLtm, 
             request.From, request.To);
-
-    public async Task<ReportData> GetSpreadAnalyseAsync(TickerListRequest request) =>
-        await reportDataFactory.CreateSpreadReportDataAsync(
-            await GetInstrumentIds(request.TickerList));
     
     /// <inheritdoc />
     public async Task<ReportData> GetActiveMarketEventsAnalyseAsync(TickerListRequest request) => 

@@ -11,7 +11,6 @@ public class LoadService(
     ITinkoffService tinkoffService,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
-    ISpreadRepository spreadRepository,
     IBondRepository bondRepository,
     IIndexRepository indexRepository,
     ICurrencyRepository currencyRepository,
@@ -174,22 +173,6 @@ public class LoadService(
             }
         }
     }
-
-    public async Task LoadSpreadLastPricesAsync()
-    {
-        var spreads = await spreadRepository.GetAllAsync();
-        var firstInstrumentIds = spreads.Select(x => x.FirstInstrumentId).Distinct().ToList();
-        var secondInstrumentIds = spreads.Select(x => x.SecondInstrumentId).Distinct().ToList();
-        var firstLastPrices = await tinkoffService.GetPricesAsync(firstInstrumentIds);
-        var secondLastPrices = await tinkoffService.GetPricesAsync(secondInstrumentIds);
-
-        for (int i = 0; i < firstLastPrices.Count; i++) 
-            await spreadRepository.UpdateLastPricesAsync(firstInstrumentIds[i], firstLastPrices[i]);
-            
-        for (int i = 0; i < secondLastPrices.Count; i++) 
-            await spreadRepository.UpdateLastPricesAsync(secondInstrumentIds[i], secondLastPrices[i]);            
-    }
-
 
     public async Task LoadIndexesAsync()
     {
