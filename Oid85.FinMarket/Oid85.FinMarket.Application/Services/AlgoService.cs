@@ -98,6 +98,10 @@ public class AlgoService(
                     strategy.DrawdownCurve.Clear();
                     strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
 
+                    strategy.GraphPoints.Clear();
+                    for (int i = 0; i < strategy.Candles.Count; i++)
+                        strategy.GraphPoints.Add(new GraphPoint());
+                    
                     strategy.Execute();
 
                     var backtestResult = CreateBacktestResult(strategy);
@@ -175,6 +179,10 @@ public class AlgoService(
             strategy.DrawdownCurve.Clear();
             strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
 
+            strategy.GraphPoints.Clear();
+            for (int i = 0; i < strategy.Candles.Count; i++)
+                strategy.GraphPoints.Add(new GraphPoint());
+            
             strategy.Execute();
 
             backtestResult = CreateBacktestResult(strategy);
@@ -332,6 +340,10 @@ public class AlgoService(
                         strategy.DrawdownCurve.Clear();
                         strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
 
+                        strategy.GraphPoints.Clear();
+                        for (int i = 0; i < strategy.Candles.Count; i++)
+                            strategy.GraphPoints.Add(new GraphPoint());
+                        
                         strategy.Execute();
 
                         var optimizationResult = CreateOptimizationResult(strategy);

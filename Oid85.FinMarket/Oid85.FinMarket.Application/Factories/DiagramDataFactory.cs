@@ -70,15 +70,20 @@ public class DiagramDataFactory(
     {
         var diagramData = new BacktestResultDiagramData { Title = $"{strategy.StrategyName}"};
 
+        // Price, Filter, Indicator, ChannelBands
         for (int i = 0; i < strategy.Candles.Count; i++)
         {
             diagramData.Data.Series.Add(new BacktestResultDataPoint
             {
                 Date = strategy.Candles[i].DateTime.ToString("dd.MM.yyyy"),
-                Price = strategy.Candles[i].Close
+                Price = strategy.Candles[i].Close,
+                Filter = strategy.GraphPoints[i].Filter,
+                Indicator = strategy.GraphPoints[i].Indicator,
+                ChannelBands = strategy.GraphPoints[i].ChannelBands,
             });
         }
 
+        // BuyPrice, SellPrice
         for (int i = 0; i < strategy.Positions.Count; i++)
         {
             if (strategy.Positions[i].IsLong)
@@ -90,6 +95,20 @@ public class DiagramDataFactory(
             }
         }
         
+        // Equity, Drawdown
+        var from = strategy.Candles.First().DateTime;
+        var to = strategy.Candles.Last().DateTime;
+        
+        var equity = strategy.EqiutyCurve.Expand(from, to);
+        var drawdown = strategy.DrawdownCurve.Expand(from, to);
+        
+        for (int i = 0; i < diagramData.Data.Series.Count; i++)
+        {
+            var date = Convert.ToDateTime(diagramData.Data.Series[i].Date);
+            diagramData.Data.Series[i].Equity = equity[date];
+            diagramData.Data.Series[i].Drawdown = -1 * drawdown[date];
+        }
+        
         return diagramData;
     }
 
@@ -97,7 +116,7 @@ public class DiagramDataFactory(
     {
         var diagramData = new BacktestResultDiagramData();
         
-        // Close
+        // Price
         for (int i = 0; i < strategies[0].Candles.Count; i++)
         {
             diagramData.Data.Series.Add(new BacktestResultDataPoint

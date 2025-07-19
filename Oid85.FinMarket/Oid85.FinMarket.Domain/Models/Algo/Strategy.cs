@@ -33,6 +33,8 @@ public class Strategy
     public List<double> HighPrices => Candles.Select(x => x.High).ToList();
     
     public List<double> LowPrices => Candles.Select(x => x.Low).ToList();
+
+    public List<GraphPoint> GraphPoints { get; set; } = [];
     
     public bool SignalLong { get; set; }
     
@@ -271,7 +273,7 @@ public class Strategy
     public double TotalReturn => EndMoney > StartMoney ? (EndMoney - StartMoney) / StartMoney * 100.0 : 0.0;
     
     public double AnnualYieldReturn => EndMoney > StartMoney ? TotalReturn / ((EndDate.DayNumber - StartDate.DayNumber) / 365.0): 0.0;
-
+    
     public virtual void Execute()
     {
 

@@ -46,6 +46,9 @@ namespace Oid85.FinMarket.Application.Strategies
                     if (SignalCloseLong)
                         SellAtPrice(positionSize, orderPrice, i + 1);
                 }
+                
+                // Отрисовка индикаторов
+                GraphPoints[i].Indicator = ultimateSmoother[i];
             }
         }
     }

@@ -66,6 +66,11 @@ namespace Oid85.FinMarket.Application.Strategies
                             BuyAtPrice(positionSize, Candles[i].Close, i + 1);
                     }
                 }
+                
+                // Отрисовка индикаторов
+                GraphPoints[i].Filter = filterEma[i];
+                GraphPoints[i].ChannelBands[0] = highLevel[i];
+                GraphPoints[i].ChannelBands[1] = lowLevel[i];
             }
         }
     }
