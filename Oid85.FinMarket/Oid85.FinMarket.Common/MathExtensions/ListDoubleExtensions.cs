@@ -151,5 +151,33 @@
         /// <returns></returns>
         public static double Range(this List<double> list) => 
             list.Max() - list.Min();
+        
+        /// <summary>
+        /// Корреляция по формуле Пирсона
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public static double Correlation(this List<double> list, List<double> values)
+        {
+            if (list.Count != values.Count)
+                return 0;
+
+            double averageX = list.Average();
+            double averageY = values.Average();
+
+            double sum = 0.0;
+            double sumX2 = 0.0;
+            double sumY2 = 0.0;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                sum += (list[i] - averageX) * (values[i] - averageY);
+                sumX2 += (list[i] - averageX) * (list[i] - averageX);
+                sumY2 += (values[i] - averageY) * (values[i] - averageY);
+            }
+
+            return sum / (Math.Sqrt(sumX2 * sumY2));
+        }        
     }
 }
