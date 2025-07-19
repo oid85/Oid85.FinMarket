@@ -61,6 +61,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISectorIndexService, SectorIndexService>();
         
         services.AddTransient<IAlgoService, AlgoService>();
+        services.AddTransient<IStatisticalArbitrationService, StatisticalArbitrationService>();
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();
