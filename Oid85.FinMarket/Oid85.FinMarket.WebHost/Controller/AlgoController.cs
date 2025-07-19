@@ -68,9 +68,9 @@ public class AlgoController(
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetBacktestResultsAsync() =>
+    public Task<IActionResult> GetBacktestResultsAsync([FromBody] TickerStrategyRequest request) =>
         GetResponseAsync(
-            reportService.GetBacktestResultsAsync,
+            () => reportService.GetBacktestResultsAsync(request),
             result => new BaseResponse<ReportData>
             {
                 Result = result

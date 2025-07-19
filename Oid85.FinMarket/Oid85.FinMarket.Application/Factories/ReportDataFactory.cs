@@ -850,7 +850,7 @@ public class ReportDataFactory(
         return reportData;
     }
 
-    public async Task<ReportData> CreateBacktestResultsReportDataAsync()
+    public async Task<ReportData> CreateBacktestResultsReportDataAsync(string ticker, string strategyName)
     {
         var reportData = CreateNewReportDataWithHeaders(
             [
@@ -861,11 +861,15 @@ public class ReportDataFactory(
         reportData.Title = "Результаты бэктеста";
         
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+        var backtestResults = (await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource))
+            .Where(x => x.Ticker == ticker)
+            .Where(x => x.StrategyName == strategyName)
+            .OrderByDescending(x => x.AnnualYieldReturn)
+            .ToList();
 
         int count = 0;
         
-        foreach (var backtestResult in backtestResults.Where(x => x.CurrentPosition != 0).OrderBy(x => x.Ticker))
+        foreach (var backtestResult in backtestResults)
         {
             count++;
             

@@ -21,8 +21,8 @@ public class AlgoReportService(
     public Task<ReportData> GetStrategySignalsAsync() =>
         reportDataFactory.CreateStrategySignalsReportDataAsync();
     
-    public Task<ReportData> GetBacktestResultsAsync() =>
-        reportDataFactory.CreateBacktestResultsReportDataAsync();
+    public Task<ReportData> GetBacktestResultsAsync(TickerStrategyRequest request) =>
+        reportDataFactory.CreateBacktestResultsReportDataAsync(request.Ticker, request.StrategyName);
 
     public async Task<BacktestResultData> GetBacktestResultByIdAsync(IdRequest request)
     {
