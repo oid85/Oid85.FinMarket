@@ -39,7 +39,7 @@ public class TickerListUtilService(
             ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsMining)).Tickers,
             ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsNonFerrousMetallurgy)).Tickers,
             ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsOilAndGas)).Tickers,
-            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsrRetail)).Tickers,
+            ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsRetail)).Tickers,
             ..(await resourceStoreService.GetTickerListAsync(KnownTickerLists.SharesSectorsTelecom)).Tickers
         ];
 

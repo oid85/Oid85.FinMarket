@@ -60,7 +60,7 @@ public class SectorIndexService(
     public Task CalculateRetailSectorIndexDailyCandlesAsync() =>
         CalculateSectorIndexDailyCandlesAsync(
             KnownInstrumentIds.RetailSectorIndex, 
-            KnownTickerLists.SharesSectorsrRetail);
+            KnownTickerLists.SharesSectorsRetail);
 
     public Task CalculateTelecomSectorIndexDailyCandlesAsync() =>
         CalculateSectorIndexDailyCandlesAsync(
