@@ -378,12 +378,28 @@ public class SharesController(
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status500InternalServerError)]
-    public Task<IActionResult> GetMultiplicatorsMCapPeNetDebtEbitdaAsync(
+    public Task<IActionResult> GetShareMultiplicatorsMCapPeNetDebtEbitdaAsync(
         [FromBody] TickerListRequest request) =>
         GetResponseAsync(
-            () => diagramService.GetMultiplicatorsMCapPeNetDebtEbitdaAsync(request),
+            () => diagramService.GetShareMultiplicatorsMCapPeNetDebtEbitdaAsync(request),
             result => new BaseResponse<BubbleDiagramData>
             {
                 Result = result
-            });     
+            });    
+    
+    /// <summary>
+    /// Диаграмма Мультипликаторы (банки) MCap, P/E, P/B
+    /// </summary>
+    [HttpPost("diagram/bank-multiplicators-mcap-pe-pb")]
+    [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<BubbleDiagramData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetBankMultiplicatorsMCapPePbAsync(
+        [FromBody] TickerListRequest request) =>
+        GetResponseAsync(
+            () => diagramService.GetBankMultiplicatorsMCapPePbAsync(request),
+            result => new BaseResponse<BubbleDiagramData>
+            {
+                Result = result
+            });       
 }

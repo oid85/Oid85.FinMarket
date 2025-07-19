@@ -21,7 +21,11 @@ public class SharesDiagramService(
             request.From, 
             request.To);
 
-    public async Task<BubbleDiagramData> GetMultiplicatorsMCapPeNetDebtEbitdaAsync(TickerListRequest request) =>
-        await diagramDataFactory.CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(
+    public async Task<BubbleDiagramData> GetShareMultiplicatorsMCapPeNetDebtEbitdaAsync(TickerListRequest request) =>
+        await diagramDataFactory.CreateShareMultiplicatorsMCapPeNetDebtEbitdaAsync(
+            await GetInstrumentIds(request.TickerList));
+
+    public async Task<BubbleDiagramData> GetBankMultiplicatorsMCapPePbAsync(TickerListRequest request) =>
+        await diagramDataFactory.CreateBankMultiplicatorsMCapPePbAsync(
             await GetInstrumentIds(request.TickerList));
 }

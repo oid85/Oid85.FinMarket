@@ -11,7 +11,8 @@ namespace Oid85.FinMarket.Application.Factories;
 public class DiagramDataFactory(
     IInstrumentRepository instrumentRepository,
     IDailyCandleRepository dailyCandleRepository,
-    IShareMultiplicatorRepository shareMultiplicatorRepository) 
+    IShareMultiplicatorRepository shareMultiplicatorRepository,
+    IBankMultiplicatorRepository bankMultiplicatorRepository) 
     : IDiagramDataFactory
 {
     private async Task<Dictionary<Guid, List<DailyCandle>>> CreateDailyDataDictionaryAsync(
@@ -58,12 +59,20 @@ public class DiagramDataFactory(
         return simpleDiagramData;
     }
     
-    public async Task<BubbleDiagramData> CreateMultiplicatorsMCapPeNetDebtEbitdaAsync(List<Guid> instrumentIds)
+    public async Task<BubbleDiagramData> CreateShareMultiplicatorsMCapPeNetDebtEbitdaAsync(List<Guid> instrumentIds)
     {
         var multiplicators = await shareMultiplicatorRepository.GetAsync(instrumentIds);
-        var bubbleDiagramData = new BubbleDiagramData { Title = "MCap, P/E, NetDebt/EBITDA" };
+        var diagramData = new BubbleDiagramData { Title = "MCap, P/E, NetDebt/EBITDA" };
         
-        return bubbleDiagramData;
+        return diagramData;
+    }
+
+    public async Task<BubbleDiagramData> CreateBankMultiplicatorsMCapPePbAsync(List<Guid> instrumentIds)
+    {
+        var multiplicators = await bankMultiplicatorRepository.GetAsync(instrumentIds);
+        var diagramData = new BubbleDiagramData { Title = "MCap, P/E, P/B" };
+        
+        return diagramData;
     }
 
     public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(Strategy strategy)
