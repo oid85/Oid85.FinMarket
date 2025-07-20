@@ -15,11 +15,14 @@ public class CorrelationRepository(
     public async Task AddAsync(Correlation correlation)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        
-        if (!await context.CorrelationEntities.AnyAsync(x => 
-                x.Ticker1 == correlation.Ticker1 && 
+
+        if (!await context.CorrelationEntities.AnyAsync(x =>
+                x.Ticker1 == correlation.Ticker1 &&
                 x.Ticker2 == correlation.Ticker2))
             await context.CorrelationEntities.AddAsync(DataAccessMapper.Map(correlation));
+
+        else
+            await UpdateAsync(correlation.Ticker1, correlation.Ticker2, correlation.Value); 
         
         await context.SaveChangesAsync();
     }

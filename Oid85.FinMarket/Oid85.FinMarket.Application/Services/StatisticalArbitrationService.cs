@@ -43,9 +43,10 @@ public class StatisticalArbitrationService(
             {
                 try
                 {
-                    var normValues1 = GetNormValues(candles[tickers[i]].Select(x => x.Close).ToList());
-                    var normValues2 = GetNormValues(candles[tickers[j]].Select(x => x.Close).ToList());
-                    double correlation = normValues1.Correlation(normValues2);
+                    var prices1 = candles[tickers[i]].Select(x => x.Close).ToList();
+                    var prices2 = candles[tickers[j]].Select(x => x.Close).ToList();
+                    
+                    double correlation = prices1.Correlation(prices2);
 
                     if (!double.IsNaN(correlation))
                         await correlationRepository.AddAsync(new Correlation
@@ -62,17 +63,5 @@ public class StatisticalArbitrationService(
                 }
             }
         }
-    }
-
-    private List<double> GetNormValues(List<double> values)
-    {
-        var delts = new List<double>();
-        for (int i = 1; i < values.Count; i++) delts.Add(Math.Abs(values[i] - values[i - 1]));
-        var ln = delts.Select(Math.Log10).ToList();
-        double average = ln.Average();
-        double stdDev = ln.StdDev();
-        var normValues = ln.Select(x => (x - average) / stdDev).ToList();
-        
-        return normValues;
     }
 }
