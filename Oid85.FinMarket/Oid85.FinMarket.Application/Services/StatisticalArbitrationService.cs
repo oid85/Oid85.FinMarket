@@ -41,17 +41,25 @@ public class StatisticalArbitrationService(
         {
             for (int j = i + 1; j < tickers.Count; j++)
             {
-                var normValues1 = GetNormValues(candles[tickers[i]].Select(x => x.Close).ToList());
-                var normValues2 = GetNormValues(candles[tickers[j]].Select(x => x.Close).ToList());
-                double correlation = normValues1.Correlation(normValues2);
+                try
+                {
+                    var normValues1 = GetNormValues(candles[tickers[i]].Select(x => x.Close).ToList());
+                    var normValues2 = GetNormValues(candles[tickers[j]].Select(x => x.Close).ToList());
+                    double correlation = normValues1.Correlation(normValues2);
 
-                await correlationRepository.AddAsync(
-                    new Correlation
-                    {
-                        Ticker1 = tickers[i],
-                        Ticker2 = tickers[j],
-                        Value = correlation
-                    });
+                    if (!double.IsNaN(correlation))
+                        await correlationRepository.AddAsync(new Correlation
+                        {
+                            Ticker1 = tickers[i], 
+                            Ticker2 = tickers[j], 
+                            Value = correlation
+                        });
+                }
+                
+                catch (Exception exception)
+                {
+
+                }
             }
         }
     }
@@ -59,8 +67,8 @@ public class StatisticalArbitrationService(
     private List<double> GetNormValues(List<double> values)
     {
         var delts = new List<double>();
-        for (int i = 1; i < values.Count; i++) delts.Add(values[i] - values[i - 1]);
-        var ln = delts.Select(x => Math.Log(x)).ToList();
+        for (int i = 1; i < values.Count; i++) delts.Add(Math.Abs(values[i] - values[i - 1]));
+        var ln = delts.Select(Math.Log10).ToList();
         double average = ln.Average();
         double stdDev = ln.StdDev();
         var normValues = ln.Select(x => (x - average) / stdDev).ToList();
