@@ -13,7 +13,8 @@ public class JobService(
     ISectorIndexService sectorIndexService,
     IMarketEventService marketEventService,
     ISendService sendService,
-    IAlgoService algoService) 
+    IAlgoService algoService,
+    IStatisticalArbitrationService statisticalArbitrationService) 
     : IJobService
 {
     /// <inheritdoc />
@@ -35,6 +36,7 @@ public class JobService(
         await SendNotificationsAsync();
         await OptimizeAsync();
         await BacktestAsync();
+        await StatisticalArbitrationAsync();
     }
 
     /// <inheritdoc />
@@ -217,6 +219,21 @@ public class JobService(
             logger.Info(exception, "Ошибка при выполнении метода 'BacktestAsync'");
         }
     }     
+    
+    private async Task StatisticalArbitrationAsync()
+    {
+        try
+        {
+            await statisticalArbitrationService.CalculateCorrelationAsync();
+            
+            logger.Info("Метод 'StatisticalArbitrationAsync' выполнен успешно");
+        }
+        
+        catch (Exception exception)
+        {
+            logger.Info(exception, "Ошибка при выполнении метода 'StatisticalArbitrationAsync'");
+        }
+    }       
     
     private async Task CalculateSectorIndexDailyCandlesAsync()
     {

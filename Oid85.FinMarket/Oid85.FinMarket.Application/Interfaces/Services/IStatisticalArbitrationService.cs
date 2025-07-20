@@ -2,5 +2,8 @@
 
 public interface IStatisticalArbitrationService
 {
-    
+    /// <summary>
+    /// Рассчитать корреляции
+    /// </summary>
+    Task CalculateCorrelationAsync();
 }

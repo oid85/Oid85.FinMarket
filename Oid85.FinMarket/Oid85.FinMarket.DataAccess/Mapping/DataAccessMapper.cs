@@ -1,12 +1,13 @@
 ﻿using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.StatisticalArbitration;
 
 namespace Oid85.FinMarket.DataAccess.Mapping;
 
 public static class DataAccessMapper
 {
-        public static StrategySignalEntity Map(StrategySignal model) =>
+    public static StrategySignalEntity Map(StrategySignal model) =>
         new()
         {
             Ticker = model.Ticker,
@@ -713,4 +714,21 @@ public static class DataAccessMapper
             StockPriceStrength = entity.StockPriceStrength,
             Value = entity.Value
         };
+    
+    public static CorrelationEntity Map(Correlation model) =>
+        new()
+        {
+            Ticker1 = model.Ticker1,
+            Ticker2 = model.Ticker2,
+            Value = model.Value
+        };
+    
+    public static Correlation Map(CorrelationEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            Ticker1 = entity.Ticker1,
+            Ticker2 = entity.Ticker2,
+            Value = entity.Value
+        };    
 }
