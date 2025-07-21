@@ -35,8 +35,8 @@
         /// <summary>
         /// Умножение ряда на константу
         /// </summary>
-        public static List<double> MultConst(this List<double> values, double mult) => 
-            values.Select((x, i) => x * mult).ToList();
+        public static List<double> MultConst(this List<double> values, double constValue) => 
+            values.Select((x, i) => x * constValue).ToList();
 
         /// <summary>
         /// Сложение двух рядов
@@ -53,8 +53,14 @@
         /// <summary>
         /// Деление ряда на константу
         /// </summary>
-        public static List<double> DivConst(this List<double> values, double div) => 
-            values.Select((x, i) => x / div).ToList();
+        public static List<double> DivConst(this List<double> values, double constValue) => 
+            values.Select((x, i) => x / constValue).ToList();
+        
+        /// <summary>
+        /// Добавление константы к ряду
+        /// </summary>
+        public static List<double> AddConst(this List<double> values, double constValue) => 
+            values.Select((x, i) => x + constValue).ToList();        
         
         /// <summary>
         /// Дисперсия
@@ -111,26 +117,34 @@
         /// <summary>
         /// Корреляция по формуле Пирсона
         /// </summary>
-        public static double Correlation(this List<double> values, List<double> pairValues)
+        public static double Correlation(this List<double> valuesX, List<double> valuesY)
         {
-            if (values.Count != pairValues.Count)
-                return 0;
+            if (valuesX.Count != valuesY.Count)
+                return 0.0;
 
-            double averageX = values.Average();
-            double averageY = pairValues.Average();
+            double averageX = valuesX.Average();
+            double averageY = valuesY.Average();
 
             double sum = 0.0;
-            double sumX2 = 0.0;
-            double sumY2 = 0.0;
+            double sumX = 0.0;
+            double sumY = 0.0;
 
-            for (int i = 0; i < values.Count; i++)
+            for (int i = 0; i < valuesX.Count; i++)
             {
-                sum += (values[i] - averageX) * (pairValues[i] - averageY);
-                sumX2 += (values[i] - averageX) * (values[i] - averageX);
-                sumY2 += (pairValues[i] - averageY) * (pairValues[i] - averageY);
+                sum += (valuesX[i] - averageX) * (valuesY[i] - averageY);
+                sumX += (valuesX[i] - averageX) * (valuesX[i] - averageX);
+                sumY += (valuesY[i] - averageY) * (valuesY[i] - averageY);
             }
 
-            return sum / (Math.Sqrt(sumX2 * sumY2));
-        }        
+            return sum / Math.Sqrt(sumX * sumY);
+        }    
+        
+        /// <summary>
+        /// Коэффициенты регрессии
+        /// </summary>
+        public static double[] RegressionCoefficients(this List<double> funcValues, List<List<double>> argValues)
+        {
+            return [];
+        }          
     }
 }
