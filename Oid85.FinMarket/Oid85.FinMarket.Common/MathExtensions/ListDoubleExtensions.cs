@@ -8,9 +8,6 @@
         /// <summary>
         /// Сдвиг вправо
         /// </summary>
-        /// <param name="values"></param>
-        /// <param name="shift"></param>
-        /// <returns></returns>
         public static List<double> Shift(this List<double> values, int shift)
         {
             var result = new List<double>();
@@ -27,154 +24,110 @@
         /// <summary>
         /// Инициализация коллекции нулями
         /// </summary>
-        public static List<double> InitValues(this List<double> list, int n)
+        public static List<double> InitValues(this List<double> values, int n)
         {
             for (int i = 0; i < n; i++)
-                list.Add(0.0);
+                values.Add(0.0);
 
-            return list;
+            return values;
         }
-
-        /// <summary>
-        /// Произведение всех членов
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public static double Mult(this List<double> list) => 
-            list.Aggregate(1.0, (current, t) => current * t);
-
-        /// <summary>
-        /// Умножение двух рядов
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="mult"></param>
-        /// <returns></returns>
-        public static List<double>? Mult(this List<double> list, List<double> mult) => 
-            list.Count() != mult.Count() ? null : list.Select((t, i) => t * mult[i]).ToList();
-
+        
         /// <summary>
         /// Умножение ряда на константу
         /// </summary>
-        /// <param name="list"></param>
-        /// <param name="mult"></param>
-        /// <returns></returns>
-        public static List<double> MultConst(this List<double> list, double mult) => 
-            list.Select((t, i) => t * mult).ToList();
+        public static List<double> MultConst(this List<double> values, double mult) => 
+            values.Select((x, i) => x * mult).ToList();
 
         /// <summary>
         /// Сложение двух рядов
         /// </summary>
-        /// <param name="list"></param>
-        /// <param name="add"></param>
-        /// <returns></returns>
-        public static List<double>? Add(this List<double> list, List<double> add) => 
-            list.Count != add.Count ? null : list.Select((t, i) => t + add[i]).ToList();
-
-        /// <summary>
-        /// Добавление константу к каждому элементу ряда
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="add"></param>
-        /// <returns></returns>
-        public static List<double> AddConst(this List<double> list, double add) => 
-            list.Select((t, i) => t + add).ToList();
+        public static List<double>? Add(this List<double> values, List<double> add) => 
+            values.Count != add.Count ? null : values.Select((x, i) => x + add[i]).ToList();
 
         /// <summary>
         /// Вычитание из одного ряда другого
         /// </summary>
-        /// <param name="list"></param>
-        /// <param name="sub"></param>
-        /// <returns></returns>
-        public static List<double>? Sub(this List<double> list, List<double> sub) => 
-            list.Count != sub.Count ? null : list.Select((t, i) => t - sub[i]).ToList();
-
-        /// <summary>
-        /// Вычитание константы из каждого элемента
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="sub"></param>
-        /// <returns></returns>
-        public static List<double> SubConst(this List<double> list, double sub) => 
-            list.Select((t, i) => t - sub).ToList();
-
-        /// <summary>
-        /// Деление одного ряда на другой
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="div"></param>
-        /// <returns></returns>
-        public static List<double>? Div(this List<double> list, List<double> div) => 
-            list.Count != div.Count ? null : list.Select((t, i) => t / div[i]).ToList();
+        public static List<double>? Sub(this List<double> values, List<double> sub) => 
+            values.Count != sub.Count ? null : values.Select((x, i) => x - sub[i]).ToList();
 
         /// <summary>
         /// Деление ряда на константу
         /// </summary>
-        /// <param name="list"></param>
-        /// <param name="div"></param>
-        /// <returns></returns>
-        public static List<double> DivConst(this List<double> list, double div) => 
-            list.Select((t, i) => t / div).ToList();
-
-        /// <summary>
-        /// Возведение ряда в степень
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="pow"></param>
-        /// <returns></returns>
-        public static List<double> Pow(this List<double> list, double pow) => 
-            list.Select(t => System.Math.Pow(t, pow)).ToList();
+        public static List<double> DivConst(this List<double> values, double div) => 
+            values.Select((x, i) => x / div).ToList();
         
         /// <summary>
         /// Дисперсия
         /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public static double Variance(this List<double> list)
+        public static double Variance(this List<double> values)
         {
-            double average = list.Average();
-            double sum = list.Sum(t => (t - average) * (t - average));
-            return sum / (list.Count - 1);
+            double average = values.Average();
+            double sum = values.Sum(x => (x - average) * (x - average));
+            return sum / (values.Count - 1);
         }
         
         /// <summary>
         /// Стандартное отклонение
         /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public static double StdDev(this List<double> list) => 
-            Math.Sqrt(list.Variance());
+        public static double StdDev(this List<double> values) => 
+            Math.Sqrt(values.Variance());
+
+        /// <summary>
+        /// Логарифмирование ряда (натуральным логарифмом)
+        /// </summary>
+        public static List<double> Log(this List<double> values)
+        {
+            var result = new List<double>();
+
+            for (int i = 0; i < values.Count; i++)
+                if (values[i] > 0)
+                    result.Add(Math.Log(values[i]));
+
+                else
+                    result.Add(0);
+            
+            return result;
+        }
+        
+        /// <summary>
+        /// Приращения (разность текущего и предыдущего значений)
+        /// </summary>
+        public static List<double> Increments(this List<double> values)
+        {
+            var result = new List<double> { 0.0 };
+
+            for (int i = 1; i < values.Count; i++)
+                result.Add(values[i] - values[i - 1]);
+            
+            return result;
+        }        
         
         /// <summary>
         /// Размах
         /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public static double Range(this List<double> list) => 
-            list.Max() - list.Min();
+        public static double Range(this List<double> values) => 
+            values.Max() - values.Min();
         
         /// <summary>
         /// Корреляция по формуле Пирсона
         /// </summary>
-        /// <param name="list"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public static double Correlation(this List<double> list, List<double> values)
+        public static double Correlation(this List<double> values, List<double> pairValues)
         {
-            if (list.Count != values.Count)
+            if (values.Count != pairValues.Count)
                 return 0;
 
-            double averageX = list.Average();
-            double averageY = values.Average();
+            double averageX = values.Average();
+            double averageY = pairValues.Average();
 
             double sum = 0.0;
             double sumX2 = 0.0;
             double sumY2 = 0.0;
 
-            for (int i = 0; i < list.Count; i++)
+            for (int i = 0; i < values.Count; i++)
             {
-                sum += (list[i] - averageX) * (values[i] - averageY);
-                sumX2 += (list[i] - averageX) * (list[i] - averageX);
-                sumY2 += (values[i] - averageY) * (values[i] - averageY);
+                sum += (values[i] - averageX) * (pairValues[i] - averageY);
+                sumX2 += (values[i] - averageX) * (values[i] - averageX);
+                sumY2 += (pairValues[i] - averageY) * (pairValues[i] - averageY);
             }
 
             return sum / (Math.Sqrt(sumX2 * sumY2));
