@@ -210,7 +210,7 @@ public class AlgoService(
         foreach (var ticker in tickersInStrategiSignals)
         {
             if (!tickersInBacktestResults.Contains(ticker))
-                await strategySignalRepository.UpdatePositionAsync(ticker, 0, 0.0, 0, 0.0);
+                await strategySignalRepository.UpdatePositionAsync(ticker, 0, 0, 0.0, 0, 0.0);
         }
 
         foreach (var ticker in tickersInBacktestResults)
@@ -218,7 +218,7 @@ public class AlgoService(
             try
             {
                 if (!tickersInStrategiSignals.Contains(ticker))
-                    await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountSignals = 0, LastPrice = 0.0, PositionCost = 0.0, PositionSize = 0 });
+                    await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountStrategies = 0, CountSignals = 0, LastPrice = 0.0, PositionCost = 0.0, PositionSize = 0 });
                 
                 int countSignals = 0;
                 double positionSize = 0.0;
@@ -265,7 +265,9 @@ public class AlgoService(
                     lastPrice = (await futureRepository.GetAsync(ticker))!.LastPrice;
                 }
 
-                await strategySignalRepository.UpdatePositionAsync(ticker, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
+                int countStrategies = backtestResults.Count(x => x.Ticker == ticker);
+                
+                await strategySignalRepository.UpdatePositionAsync(ticker, countStrategies, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
             }
             
             catch (Exception exception)

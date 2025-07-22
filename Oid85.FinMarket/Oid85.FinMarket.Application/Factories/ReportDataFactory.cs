@@ -8,6 +8,7 @@ using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
+using Telegram.Bot.Types;
 
 namespace Oid85.FinMarket.Application.Factories;
 
@@ -780,7 +781,7 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "", "Тикер", "Наименование", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция (юнит), руб", ""]);
+            ["№", "", "Тикер", "Наименование", "Стратегий", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция (юнит), руб", ""]);
 
         reportData.Title = "Сигналы";
         
@@ -796,6 +797,7 @@ public class ReportDataFactory(
             GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),
+            GetString(string.Empty),
             GetString(string.Empty),            
             GetNumber(strategySignals.Sum(x => x.PositionCost))
         ]); 
@@ -805,7 +807,13 @@ public class ReportDataFactory(
             count++;
             
             var instrument = await instrumentRepository.GetAsync(strategySignal.Ticker);
-            string instrumentName = instrument?.Name ?? string.Empty;           
+            string instrumentName = instrument?.Name ?? string.Empty;
+
+            double percent = 0.0;
+            if (strategySignal.CountStrategies != 0)
+                percent = (double) strategySignal.CountSignals / (double) strategySignal.CountStrategies * 100.0;
+
+            string color = ColorHelper.GreenScale(percent);
             
             reportData.Data.Add(
             [
@@ -813,7 +821,8 @@ public class ReportDataFactory(
                 GetTicker(strategySignal.Ticker),
                 GetString(strategySignal.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentName)),
-                GetNumber(strategySignal.CountSignals),
+                GetNumber(strategySignal.CountStrategies),
+                GetString($"{strategySignal.CountSignals} ({(double) strategySignal.CountSignals / (double) strategySignal.CountStrategies * 100.0:N2} %)", color),
                 GetNumber(strategySignal.LastPrice),
                 GetNumber(strategySignal.PositionSize),
                 GetNumber(strategySignal.PositionCost),

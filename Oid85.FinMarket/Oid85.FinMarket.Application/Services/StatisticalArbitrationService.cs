@@ -1,4 +1,6 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using System.Diagnostics;
+using System.Text.Json;
+using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Common.MathExtensions;
@@ -36,17 +38,21 @@ public class StatisticalArbitrationService(
             ..shares.Select(x => x.Ticker),
             ..futures.Select(x => x.Ticker)
         ];
-
+        
         for (int i = 0; i < tickers.Count; i++)
         {
             for (int j = i + 1; j < tickers.Count; j++)
             {
                 try
                 {
-                    var prices1 = candles[tickers[i]].Select(x => x.Close).ToList();
-                    var prices2 = candles[tickers[j]].Select(x => x.Close).ToList();
+                    if (candles[tickers[i]].Count == 0 || candles[tickers[j]].Count == 0)
+                        continue;
                     
-                    if (prices1.Count != prices2.Count) continue;
+                    // Получаем свечи и синхронизируем массивы по дате
+                    var syncCandles = SyncCandles(candles[tickers[i]], candles[tickers[j]]);
+                    
+                    var prices1 = syncCandles.Candles1.Select(x => x.Close).ToList();
+                    var prices2 = syncCandles.Candles2.Select(x => x.Close).ToList();
                     
                     // Логарифмируем
                     var logValues1 = prices1.Log();
@@ -66,22 +72,35 @@ public class StatisticalArbitrationService(
                     
                     // Расчет корреляции
                     double correlation = incrementValues1.Correlation(incrementValues2);
-
-                    if (double.IsNaN(correlation)) continue;
                     
-                    await correlationRepository.AddAsync(new Correlation
+                    var correlationModel = new Correlation
                     {
-                        Ticker1 = tickers[i], 
-                        Ticker2 = tickers[j], 
+                        Ticker1 = tickers[i],
+                        Ticker2 = tickers[j],
                         Value = correlation
-                    });
+                    };
+                    
+                    await correlationRepository.AddAsync(correlationModel);
                 }
                 
                 catch (Exception exception)
                 {
-
+                    
                 }
             }
         }
+    }
+
+    private (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
+    {
+        var dates1 = candles1.Select(x => x.Date).ToList();
+        var dates2 = candles2.Select(x => x.Date).ToList();
+        
+        var dates = dates1.Intersect(dates2).ToList();
+
+        var resultCanles1 = candles1.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
+        var resultCanles2 = candles2.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
+        
+        return (resultCanles1, resultCanles2);
     }
 }

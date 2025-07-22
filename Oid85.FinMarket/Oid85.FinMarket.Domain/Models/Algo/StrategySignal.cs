@@ -13,6 +13,11 @@ public class StrategySignal
     public int CountSignals { get; set; }
 
     /// <summary>
+    /// Количество стратегий
+    /// </summary>
+    public int CountStrategies { get; set; }
+    
+    /// <summary>
     /// Размер позиции
     /// </summary>
     public double PositionCost { get; set; }
@@ -25,5 +30,5 @@ public class StrategySignal
     /// <summary>
     /// Цена инструмента
     /// </summary>
-    public double LastPrice { get; set; } 
+    public double LastPrice { get; set; }
 }
