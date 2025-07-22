@@ -46,15 +46,35 @@ public class StatisticalArbitrationService(
                     var prices1 = candles[tickers[i]].Select(x => x.Close).ToList();
                     var prices2 = candles[tickers[j]].Select(x => x.Close).ToList();
                     
-                    double correlation = prices1.Correlation(prices2);
+                    if (prices1.Count != prices2.Count) continue;
+                    
+                    // Логарифмируем
+                    var logValues1 = prices1.Log();
+                    var logValues2 = prices2.Log();
+                    
+                    // Центрируем
+                    var centeringValues1 = logValues1.Centering();
+                    var centeringValues2 = logValues2.Centering();
 
-                    if (!double.IsNaN(correlation))
-                        await correlationRepository.AddAsync(new Correlation
-                        {
-                            Ticker1 = tickers[i], 
-                            Ticker2 = tickers[j], 
-                            Value = correlation
-                        });
+                    // Делим на стандартное отклонение
+                    var divStdValues1 = centeringValues1.DivConst(centeringValues1.StdDev());
+                    var divStdValues2 = centeringValues2.DivConst(centeringValues2.StdDev());
+                    
+                    // Приращения
+                    var incrementValues1 = divStdValues1.Increments();
+                    var incrementValues2 = divStdValues2.Increments();
+                    
+                    // Расчет корреляции
+                    double correlation = incrementValues1.Correlation(incrementValues2);
+
+                    if (double.IsNaN(correlation)) continue;
+                    
+                    await correlationRepository.AddAsync(new Correlation
+                    {
+                        Ticker1 = tickers[i], 
+                        Ticker2 = tickers[j], 
+                        Value = correlation
+                    });
                 }
                 
                 catch (Exception exception)

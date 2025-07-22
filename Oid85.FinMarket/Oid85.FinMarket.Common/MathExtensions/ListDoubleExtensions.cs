@@ -140,6 +140,15 @@
         }    
         
         /// <summary>
+        /// Центрирование
+        /// </summary>
+        public static List<double> Centering(this List<double> values)
+        {
+            double average = values.Average();
+            return values.Select(x => x - average).ToList();
+        }         
+        
+        /// <summary>
         /// Коэффициенты регрессии
         /// </summary>
         public static double[] RegressionCoefficients(this List<double> funcValues, List<List<double>> argValues)
