@@ -91,6 +91,12 @@ public class StatisticalArbitrationService(
         }
     }
 
+    /// <inheritdoc />
+    public async Task CalculateRegressionTailsAsync()
+    {
+        
+    }
+
     private (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
     {
         var dates1 = candles1.Select(x => x.Date).ToList();

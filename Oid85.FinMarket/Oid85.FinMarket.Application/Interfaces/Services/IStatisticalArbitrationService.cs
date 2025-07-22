@@ -6,4 +6,9 @@ public interface IStatisticalArbitrationService
     /// Рассчитать корреляции
     /// </summary>
     Task CalculateCorrelationAsync();
+    
+    /// <summary>
+    /// Рассчитать хвосты регрессии
+    /// </summary>
+    Task CalculateRegressionTailsAsync();
 }
