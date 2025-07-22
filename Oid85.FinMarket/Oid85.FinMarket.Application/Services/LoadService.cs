@@ -1,6 +1,7 @@
 ﻿using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.External.Tinkoff;
 
@@ -147,7 +148,7 @@ public class LoadService(
 
     public async Task LoadFutureDailyCandlesAsync()
     {
-        var instruments = await tickerListUtilService.GetAllFuturesInTickerListsAsync();
+        var instruments = await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist);
 
         foreach (var instrument in instruments)
         {
