@@ -9,7 +9,6 @@
     <PackageReference Include="Accord.Statistics" />
     <PackageReference Include="Hangfire" />
     <PackageReference Include="Hangfire.InMemory" />
-    <PackageReference Include="MathNet.Numerics" />
     <PackageReference Include="NLog.Targets.Seq" />
     <PackageReference Include="Skender.Stock.Indicators" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
