@@ -4,8 +4,6 @@ using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.StatisticalArbitration;
 using Accord.Statistics.Models.Regression.Linear;
-using MathNet.Numerics.LinearAlgebra;
-using Newtonsoft.Json;
 using NLog;
 using Oid85.FinMarket.Common.Utils;
 
