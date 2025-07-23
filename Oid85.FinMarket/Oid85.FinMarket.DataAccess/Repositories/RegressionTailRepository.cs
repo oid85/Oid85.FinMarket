@@ -67,4 +67,10 @@ public class RegressionTailRepository(
             .Select(DataAccessMapper.Map)
             .ToList();
     }
+
+    public async Task DeleteAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await context.RegressionTailEntities.ExecuteDeleteAsync();
+    }
 }

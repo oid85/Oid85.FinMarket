@@ -17,6 +17,7 @@ public class DebugController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Debug()
     {
+        await service.CalculateCorrelationAsync();
         await service.CalculateRegressionTailsAsync();
             
         return Ok();

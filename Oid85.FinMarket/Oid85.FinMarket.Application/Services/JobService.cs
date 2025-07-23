@@ -225,6 +225,7 @@ public class JobService(
         try
         {
             await statisticalArbitrageService.CalculateCorrelationAsync();
+            await statisticalArbitrageService.CalculateRegressionTailsAsync();
             
             logger.Info("Метод 'StatisticalArbitrationAsync' выполнен успешно");
         }

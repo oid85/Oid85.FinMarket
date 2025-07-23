@@ -44,10 +44,7 @@ public class StatisticalArbitrageService(
         ];
 
         // Очистим таблицу
-        var correlations = await correlationRepository.GetAllAsync();
-        
-        foreach (var correlation in correlations)
-            await correlationRepository.UpdateAsync(correlation.Ticker1, correlation.Ticker2, 0.0);
+        await correlationRepository.DeleteAsync();
         
         for (int i = 0; i < tickers.Count; i++)
         {
@@ -55,7 +52,11 @@ public class StatisticalArbitrageService(
             {
                 try
                 {
-                    if (candles[tickers[i]].Count == 0 || candles[tickers[j]].Count == 0)
+                    // Если свечей мало
+                    if (candles[tickers[i]].Count < 10)
+                        continue;
+                    
+                    if (candles[tickers[j]].Count < 10)
                         continue;
                     
                     // Получаем свечи и синхронизируем массивы по дате
@@ -83,6 +84,18 @@ public class StatisticalArbitrageService(
                     // Расчет корреляции
                     double correlation = incrementValues1.Correlation(incrementValues2);
                     
+                    if (Math.Abs(correlation - 1.0) < double.Epsilon)
+                        continue;
+                    
+                    if (Math.Abs(correlation + 1.0) < double.Epsilon)
+                        continue;
+                   
+                    if (correlation == 0.0)
+                        continue;
+                    
+                    if (Math.Abs(correlation) < 0.8)
+                        continue;
+                    
                     var correlationModel = new Correlation
                     {
                         Ticker1 = tickers[i],
@@ -104,8 +117,7 @@ public class StatisticalArbitrageService(
     /// <inheritdoc />
     public async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync()
     {
-        var correlations = (await correlationRepository.GetAllAsync())
-            .Where(x => x.Value is >= 0.8 and < 1.0).ToList();
+        var correlations = (await correlationRepository.GetAllAsync()).ToList();
         
         var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
         var to = DateOnly.FromDateTime(DateTime.Today);
@@ -155,6 +167,9 @@ public class StatisticalArbitrageService(
                 logger.Error(exception, "Ошибка расчета остатков регрессии. {ticker1}, {ticker2}", correlation.Ticker1, correlation.Ticker2);
             }
         }
+        
+        // Очистим таблицу
+        await regressionTailRepository.DeleteAsync();
         
         // Сохраняем хвосты
         foreach (var tail in tails)

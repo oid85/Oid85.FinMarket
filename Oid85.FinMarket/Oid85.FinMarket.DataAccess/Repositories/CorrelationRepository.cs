@@ -63,4 +63,10 @@ public class CorrelationRepository(
             .Select(DataAccessMapper.Map)
             .ToList();
     }
+
+    public async Task DeleteAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        await context.CorrelationEntities.ExecuteDeleteAsync();
+    }
 }
