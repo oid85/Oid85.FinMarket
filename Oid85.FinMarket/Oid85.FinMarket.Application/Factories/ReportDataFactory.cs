@@ -8,7 +8,6 @@ using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.ResourceStore;
-using Telegram.Bot.Types;
 
 namespace Oid85.FinMarket.Application.Factories;
 

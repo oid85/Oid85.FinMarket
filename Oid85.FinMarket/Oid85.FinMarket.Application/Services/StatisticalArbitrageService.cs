@@ -1,25 +1,26 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using Oid85.FinMarket.Application.Interfaces.Repositories;
+﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Common.MathExtensions;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.StatisticalArbitration;
+using Accord.Statistics.Models.Regression.Linear;
+using NLog;
 
 namespace Oid85.FinMarket.Application.Services;
 
-public class StatisticalArbitrationService(
+public class StatisticalArbitrageService(
     ITickerListUtilService tickerListUtilService,
     IDailyCandleRepository dailyCandleRepository,
-    ICorrelationRepository correlationRepository) 
-    : IStatisticalArbitrationService
+    ICorrelationRepository correlationRepository,
+    ILogger logger) 
+    : IStatisticalArbitrageService
 {
     /// <inheritdoc />
     public async Task CalculateCorrelationAsync()
     {
-        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.StatisticalArbitrationShares);
-        var futures = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.StatisticalArbitrationFutures))
+        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.StatisticalArbitrageShares);
+        var futures = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.StatisticalArbitrageFutures))
             .Where(x => x.ExpirationDate > DateOnly.FromDateTime(DateTime.Today)).ToList();
         
         var candles = new Dictionary<string, List<DailyCandle>>();
@@ -38,6 +39,12 @@ public class StatisticalArbitrationService(
             ..shares.Select(x => x.Ticker),
             ..futures.Select(x => x.Ticker)
         ];
+
+        // Очистим таблицу
+        var correlations = await correlationRepository.GetAllAsync();
+        
+        foreach (var correlation in correlations)
+            await correlationRepository.UpdateAsync(correlation.Ticker1, correlation.Ticker2, 0.0);
         
         for (int i = 0; i < tickers.Count; i++)
         {
@@ -85,16 +92,74 @@ public class StatisticalArbitrationService(
                 
                 catch (Exception exception)
                 {
-                    
+                    logger.Error(exception, "Ошибка расчета корреляции. {ticker1}, {ticker2}", tickers[i], tickers[j]);
                 }
             }
         }
     }
 
     /// <inheritdoc />
-    public async Task CalculateRegressionTailsAsync()
+    public async Task<Dictionary<string, List<RegressionTail>>> CalculateRegressionTailsAsync()
     {
+        var tails = new Dictionary<string, List<RegressionTail>>();
         
+        var correlations = (await correlationRepository.GetAllAsync())
+            .Where(x => x.Value is >= 0.8 and < 1.0).ToList();
+        
+        var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
+        var to = DateOnly.FromDateTime(DateTime.Today);
+        
+        foreach (var correlation in correlations)
+        {
+            try
+            {
+                // Получаем и синхронизируем свечи
+                var candles1 = await dailyCandleRepository.GetAsync(correlation.Ticker1, from, to);
+                var candles2 = await dailyCandleRepository.GetAsync(correlation.Ticker2, from, to);
+                var syncCandles = SyncCandles(candles1, candles2);
+            
+                // Declare some sample test data.
+                double[] inputs = syncCandles.Candles2.Select(x => x.Close).ToArray();
+                double[] outputs = syncCandles.Candles1.Select(x => x.Close).ToArray();
+
+                // Use Ordinary Least Squares to learn the regression
+                var ols = new OrdinaryLeastSquares();
+
+                // Use OLS to learn the simple linear regression
+                SimpleLinearRegression regression = ols.Learn(inputs, outputs);
+
+                // We can also extract the slope and the intercept term for the line
+                double slope = regression.Slope;
+                double intercept = regression.Intercept;
+            
+                // Расчет хвостов
+                for (int i = 0; i < syncCandles.Candles1.Count; i++)
+                {
+                    double y = slope * syncCandles.Candles2[i].Close + intercept;
+                    double tailValue = syncCandles.Candles1[i].Close - y;
+
+                    string key = $"{correlation.Ticker1},{correlation.Ticker2}";
+                
+                    if (!tails.ContainsKey(key))
+                        tails.Add(key, []);
+                
+                    tails[key].Add(new RegressionTail
+                    {
+                        Ticker1 = correlation.Ticker1,
+                        Ticker2 = correlation.Ticker2,
+                        Date = candles1[i].Date,
+                        Tail = tailValue
+                    });
+                }
+            }
+            
+            catch (Exception exception)
+            {
+                logger.Error(exception, "Ошибка расчета остатков регрессии. {ticker1}, {ticker2}", correlation.Ticker1, correlation.Ticker2);
+            }
+        }
+        
+        return tails;
     }
 
     private (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)

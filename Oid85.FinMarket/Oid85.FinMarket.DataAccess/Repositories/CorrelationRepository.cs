@@ -2,7 +2,6 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Mapping;
-using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.Domain.Models.StatisticalArbitration;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;

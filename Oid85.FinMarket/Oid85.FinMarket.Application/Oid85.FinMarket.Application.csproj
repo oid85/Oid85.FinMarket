@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Accord.Math" />
+    <PackageReference Include="Accord.Statistics" />
     <PackageReference Include="Hangfire" />
     <PackageReference Include="Hangfire.InMemory" />
     <PackageReference Include="NLog.Targets.Seq" />

@@ -1,0 +1,29 @@
+﻿namespace Oid85.FinMarket.Domain.Models.StatisticalArbitration;
+
+public class RegressionTail
+{
+    /// <summary>
+    /// Id
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
+    /// Дата
+    /// </summary>
+    public DateOnly Date { get; set; }
+    
+    /// <summary>
+    /// Тикер инструмента 1
+    /// </summary>
+    public string Ticker1 { get; set; } = string.Empty; 
+    
+    /// <summary>
+    /// Тикер инструмента 2
+    /// </summary>
+    public string Ticker2 { get; set; } = string.Empty; 
+    
+    /// <summary>
+    /// Хвост
+    /// </summary>
+    public double Tail { get; set; }
+}
