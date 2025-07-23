@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.DataAccess.Entities;
+﻿using System.Text.Json;
+using Oid85.FinMarket.DataAccess.Entities;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.Domain.Models.StatisticalArbitration;
@@ -732,5 +733,24 @@ public static class DataAccessMapper
             Ticker1 = entity.Ticker1,
             Ticker2 = entity.Ticker2,
             Value = entity.Value
+        };    
+    
+    public static RegressionTailEntity Map(RegressionTail model) =>
+        new()
+        {
+            Ticker1 = model.Ticker1,
+            Ticker2 = model.Ticker2,
+            Tails = JsonSerializer.Serialize(model.Tails),
+            IsStationary = model.IsStationary
+        };
+    
+    public static RegressionTail Map(RegressionTailEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            Ticker1 = entity.Ticker1,
+            Ticker2 = entity.Ticker2,
+            Tails = JsonSerializer.Deserialize<List<double>>(entity.Tails) ?? [],
+            IsStationary = entity.IsStationary
         };    
 }

@@ -29,6 +29,7 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<AssetReportEventEntity> AssetReportEventEntities { get; set; }
     public DbSet<FearGreedIndexEntity> FearGreedIndexEntities { get; set; }
     public DbSet<CorrelationEntity> CorrelationEntities { get; set; }
+    public DbSet<RegressionTailEntity> RegressionTailEntities { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

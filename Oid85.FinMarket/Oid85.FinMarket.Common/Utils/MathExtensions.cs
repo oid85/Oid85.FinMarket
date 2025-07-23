@@ -1,9 +1,9 @@
-﻿namespace Oid85.FinMarket.Common.MathExtensions
+﻿namespace Oid85.FinMarket.Common.Utils
 {
     /// <summary>
-    /// Математические операции над рядами чисел
+    /// Математические операции
     /// </summary>
-    public static class ListDoubleExtensions
+    public static class MathExtensions
     {
         /// <summary>
         /// Сдвиг вправо

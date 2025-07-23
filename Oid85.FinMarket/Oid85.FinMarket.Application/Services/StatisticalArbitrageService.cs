@@ -1,11 +1,13 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Common.MathExtensions;
 using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.StatisticalArbitration;
 using Accord.Statistics.Models.Regression.Linear;
+using MathNet.Numerics.LinearAlgebra;
+using Newtonsoft.Json;
 using NLog;
+using Oid85.FinMarket.Common.Utils;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -13,6 +15,7 @@ public class StatisticalArbitrageService(
     ITickerListUtilService tickerListUtilService,
     IDailyCandleRepository dailyCandleRepository,
     ICorrelationRepository correlationRepository,
+    IRegressionTailRepository regressionTailRepository,
     ILogger logger) 
     : IStatisticalArbitrageService
 {
@@ -99,15 +102,15 @@ public class StatisticalArbitrageService(
     }
 
     /// <inheritdoc />
-    public async Task<Dictionary<string, List<RegressionTail>>> CalculateRegressionTailsAsync()
+    public async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync()
     {
-        var tails = new Dictionary<string, List<RegressionTail>>();
-        
         var correlations = (await correlationRepository.GetAllAsync())
             .Where(x => x.Value is >= 0.8 and < 1.0).ToList();
         
         var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
         var to = DateOnly.FromDateTime(DateTime.Today);
+        
+        var tails = new Dictionary<string, RegressionTail>();
         
         foreach (var correlation in correlations)
         {
@@ -141,15 +144,9 @@ public class StatisticalArbitrageService(
                     string key = $"{correlation.Ticker1},{correlation.Ticker2}";
                 
                     if (!tails.ContainsKey(key))
-                        tails.Add(key, []);
+                        tails.Add(key, new RegressionTail { Ticker1 = correlation.Ticker1, Ticker2 = correlation.Ticker2 });
                 
-                    tails[key].Add(new RegressionTail
-                    {
-                        Ticker1 = correlation.Ticker1,
-                        Ticker2 = correlation.Ticker2,
-                        Date = candles1[i].Date,
-                        Tail = tailValue
-                    });
+                    tails[key].Tails.Add(tailValue);
                 }
             }
             
@@ -159,10 +156,14 @@ public class StatisticalArbitrageService(
             }
         }
         
+        // Сохраняем хвосты
+        foreach (var tail in tails)
+            await regressionTailRepository.AddAsync(tail.Value);
+        
         return tails;
     }
 
-    private (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
+    private static (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
     {
         var dates1 = candles1.Select(x => x.Date).ToList();
         var dates2 = candles2.Select(x => x.Date).ToList();

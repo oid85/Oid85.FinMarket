@@ -53,6 +53,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IOptimizationResultRepository, OptimizationResultRepository>();
         services.AddTransient<IStrategySignalRepository, StrategySignalRepository>();
         services.AddTransient<ICorrelationRepository, CorrelationRepository>();
+        services.AddTransient<IRegressionTailRepository, RegressionTailRepository>();
     }
     
     public static async Task ApplyMigrations(this IHost host)

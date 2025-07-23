@@ -1,5 +1,5 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Factories;
-using Oid85.FinMarket.Common.MathExtensions;
+using Oid85.FinMarket.Common.Utils;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Skender.Stock.Indicators;
