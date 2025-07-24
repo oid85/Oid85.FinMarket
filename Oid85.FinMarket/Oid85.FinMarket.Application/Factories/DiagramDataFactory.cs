@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
+using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
@@ -12,7 +13,8 @@ public class DiagramDataFactory(
     IInstrumentRepository instrumentRepository,
     IDailyCandleRepository dailyCandleRepository,
     IShareMultiplicatorRepository shareMultiplicatorRepository,
-    IBankMultiplicatorRepository bankMultiplicatorRepository) 
+    IBankMultiplicatorRepository bankMultiplicatorRepository,
+    IStatisticalArbitrageService statisticalArbitrageService) 
     : IDiagramDataFactory
 {
     private async Task<Dictionary<Guid, List<DailyCandle>>> CreateDailyDataDictionaryAsync(
@@ -201,5 +203,28 @@ public class DiagramDataFactory(
         }
         
         return diagramData;
+    }
+
+    public async Task<SimpleDiagramData> CreateSpreadsDiagramDataAsync(DateOnly from, DateOnly to)
+    {
+        var simpleDiagramData = new SimpleDiagramData { Title = "Спреды" };
+        var tails = await statisticalArbitrageService.CalculateRegressionTailsAsync(from, to);
+
+        foreach (var tail in tails.OrderBy(x => x.Key))
+        {
+            var dataPointSeries = new SimpleDataPointSeries { Title = $"Спред '{tail.Key}'" };
+
+            int index = 0;
+            
+            foreach (var tailItem in tail.Value.Tails)
+            {
+                dataPointSeries.Series.Add(new SimpleDataPoint { Date = index.ToString(), Value = tailItem });
+                index++;
+            }
+            
+            simpleDiagramData.Data.Add(dataPointSeries);
+        }
+        
+        return simpleDiagramData;
     }
 }

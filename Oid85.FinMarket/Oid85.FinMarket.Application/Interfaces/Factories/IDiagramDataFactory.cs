@@ -11,4 +11,5 @@ public interface IDiagramDataFactory
     Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(Strategy strategy);
     Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies);
     Task<BacktestResultDiagramData> CreateBacktestResultWithoutPriceDiagramDataAsync(List<Strategy> strategies);
+    Task<SimpleDiagramData> CreateSpreadsDiagramDataAsync(DateOnly from, DateOnly to);
 }

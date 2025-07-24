@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Oid85.FinMarket.Application.Interfaces.Services;
+using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.BacktestResults;
+using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
 using Oid85.FinMarket.Application.Models.Responses;
@@ -13,7 +15,8 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [ApiController]
 public class AlgoController(
     IAlgoService algoService,
-    IAlgoReportService reportService)
+    IAlgoReportService reportService,
+    IAlgoDiagramService diagramService)
     : FinMarketBaseController
 {
     /// <summary>
@@ -137,4 +140,20 @@ public class AlgoController(
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Диаграмма Спред (дневные)
+    /// </summary>
+    [HttpPost("diagram/spreads")]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetSpreadsAsync(
+        [FromBody] DateRangeRequest request) =>
+        GetResponseAsync(
+            () => diagramService.GetSpreadsAsync(request),
+            result => new BaseResponse<SimpleDiagramData>
+            {
+                Result = result
+            });    
 }

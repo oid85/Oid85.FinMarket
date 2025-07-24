@@ -35,7 +35,6 @@ public class JobService(
         await CheckDailyMarketEventsAsync();
         await SendNotificationsAsync();
         await OptimizeAsync();
-        await BacktestAsync();
         await StatisticalArbitrationAsync();
     }
 

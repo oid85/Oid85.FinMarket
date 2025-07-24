@@ -113,12 +113,15 @@ public class StatisticalArbitrageService(
     }
 
     /// <inheritdoc />
-    public async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync()
+    public Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync() =>
+        CalculateRegressionTailsAsync(
+            DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), 
+            DateOnly.FromDateTime(DateTime.Today));
+
+    /// <inheritdoc />
+    public async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync(DateOnly from, DateOnly to)
     {
         var correlations = (await correlationRepository.GetAllAsync()).ToList();
-        
-        var from = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
-        var to = DateOnly.FromDateTime(DateTime.Today);
         
         var tails = new Dictionary<string, RegressionTail>();
         

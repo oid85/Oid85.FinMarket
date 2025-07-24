@@ -267,7 +267,7 @@ public class AlgoService(
 
                 int countStrategies = backtestResults.Count(x => x.Ticker == ticker);
                 
-                await strategySignalRepository.UpdatePositionAsync(ticker, countStrategies, countSignals, positionCost, Convert.ToInt32(positionSize), lastPrice);
+                await strategySignalRepository.UpdatePositionAsync(ticker, countStrategies, Math.Abs(countSignals), Math.Abs(positionCost), Convert.ToInt32(positionSize), lastPrice);
             }
             
             catch (Exception exception)

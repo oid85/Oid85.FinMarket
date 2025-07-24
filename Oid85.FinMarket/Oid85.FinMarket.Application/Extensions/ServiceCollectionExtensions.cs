@@ -48,6 +48,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFuturesDiagramService, FuturesDiagramService>();
         services.AddTransient<ICurrenciesDiagramService, CurrenciesDiagramService>();
         services.AddTransient<IIndexesDiagramService, IndexesDiagramService>();
+        services.AddTransient<IAlgoDiagramService, AlgoDiagramService>();
         
         services.AddTransient<ILoadService, LoadService>();
         services.AddTransient<IImportService, ImportService>();
