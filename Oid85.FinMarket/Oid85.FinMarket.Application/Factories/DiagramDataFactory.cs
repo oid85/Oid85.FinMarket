@@ -222,7 +222,8 @@ public class DiagramDataFactory(
                 index++;
             }
             
-            simpleDiagramData.Data.Add(dataPointSeries);
+            if (dataPointSeries.Series.Count > 10)
+                simpleDiagramData.Data.Add(dataPointSeries);
         }
         
         return simpleDiagramData;
