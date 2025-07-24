@@ -149,11 +149,20 @@
         }         
         
         /// <summary>
-        /// Коэффициенты регрессии
+        /// Z-score
         /// </summary>
-        public static double[] RegressionCoefficients(this List<double> funcValues, List<List<double>> argValues)
+        public static List<double> ZScore(this List<double> values)
         {
-            return [];
+            if (values.Count == 0)
+                return [];
+            
+            var average = values.Average();
+            var stdDev = values.StdDev();
+
+            if (stdDev == 0.0)
+                return [];
+            
+            return values.AddConst(-1 * average).DivConst(stdDev);
         }          
     }
 }

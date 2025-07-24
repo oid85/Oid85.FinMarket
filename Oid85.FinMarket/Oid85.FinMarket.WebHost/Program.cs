@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Hangfire;
 using Oid85.FinMarket.WebHost.Extensions;
 using Oid85.FinMarket.External.Extensions;
@@ -18,6 +19,7 @@ public class Program
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+                options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals;
             });
         
         builder.Services.AddMemoryCache();

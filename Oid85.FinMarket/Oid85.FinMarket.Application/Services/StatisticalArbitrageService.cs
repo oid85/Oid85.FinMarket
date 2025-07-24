@@ -50,13 +50,6 @@ public class StatisticalArbitrageService(
             {
                 try
                 {
-                    // Если свечей мало
-                    if (candles[tickers[i]].Count < 10)
-                        continue;
-                    
-                    if (candles[tickers[j]].Count < 10)
-                        continue;
-                    
                     // Получаем свечи и синхронизируем массивы по дате
                     var syncCandles = SyncCandles(candles[tickers[i]], candles[tickers[j]]);
                     
@@ -82,10 +75,10 @@ public class StatisticalArbitrageService(
                     // Расчет корреляции
                     double correlation = incrementValues1.Correlation(incrementValues2);
                     
-                    if (Math.Abs(correlation - 1.0) < double.Epsilon)
+                    if (Math.Abs(correlation - 1.0) < 0.0001)
                         continue;
                     
-                    if (Math.Abs(correlation + 1.0) < double.Epsilon)
+                    if (Math.Abs(correlation + 1.0) < 0.0001)
                         continue;
                    
                     if (correlation == 0.0)
@@ -121,6 +114,9 @@ public class StatisticalArbitrageService(
     /// <inheritdoc />
     public async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync(DateOnly from, DateOnly to)
     {
+        // Очистим таблицу
+        await regressionTailRepository.DeleteAsync();
+        
         var correlations = (await correlationRepository.GetAllAsync()).ToList();
         
         var tails = new Dictionary<string, RegressionTail>();
@@ -132,6 +128,7 @@ public class StatisticalArbitrageService(
                 // Получаем и синхронизируем свечи
                 var candles1 = await dailyCandleRepository.GetAsync(correlation.Ticker1, from, to);
                 var candles2 = await dailyCandleRepository.GetAsync(correlation.Ticker2, from, to);
+                
                 var syncCandles = SyncCandles(candles1, candles2);
             
                 // Declare some sample test data.
@@ -148,33 +145,34 @@ public class StatisticalArbitrageService(
                 double slope = regression.Slope;
                 double intercept = regression.Intercept;
             
+                string key = $"{correlation.Ticker1},{correlation.Ticker2}";
+                
                 // Расчет хвостов
+                var regressionTails = new List<double>();
+                
                 for (int i = 0; i < syncCandles.Candles1.Count; i++)
                 {
                     double y = slope * syncCandles.Candles2[i].Close + intercept;
                     double tailValue = syncCandles.Candles1[i].Close - y;
-
-                    string key = $"{correlation.Ticker1},{correlation.Ticker2}";
-                
+                    
                     if (!tails.ContainsKey(key))
                         tails.Add(key, new RegressionTail { Ticker1 = correlation.Ticker1, Ticker2 = correlation.Ticker2 });
                 
-                    tails[key].Tails.Add(tailValue);
+                    regressionTails.Add(tailValue);
                 }
+                
+                // Расчитаем Z-score
+                tails[key].Tails = regressionTails.ZScore();
+
+                // Сохраняем хвосты
+                await regressionTailRepository.AddAsync(tails[key]);
             }
-            
+                
             catch (Exception exception)
             {
                 logger.Error(exception, "Ошибка расчета остатков регрессии. {ticker1}, {ticker2}", correlation.Ticker1, correlation.Ticker2);
             }
         }
-        
-        // Очистим таблицу
-        await regressionTailRepository.DeleteAsync();
-        
-        // Сохраняем хвосты
-        foreach (var tail in tails)
-            await regressionTailRepository.AddAsync(tail.Value);
         
         return tails;
     }
