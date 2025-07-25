@@ -19,10 +19,16 @@ public class RegressionTailEntity : AuditableEntity
     public string Ticker2 { get; set; } = string.Empty; 
     
     /// <summary>
-    /// Хвост
+    /// Хвосты
     /// </summary>
-    [Column("tails"), MaxLength(100000)]
+    [Column("tails"), MaxLength(500000)]
     public string Tails { get; set; } = string.Empty; 
+    
+    /// <summary>
+    /// Даты хвостов
+    /// </summary>
+    [Column("dates"), MaxLength(500000)]
+    public string Dates { get; set; } = string.Empty; 
     
     /// <summary>
     /// Признак стационарности

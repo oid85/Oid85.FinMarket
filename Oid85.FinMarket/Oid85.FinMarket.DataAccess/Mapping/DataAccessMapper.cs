@@ -741,6 +741,7 @@ public static class DataAccessMapper
             Ticker1 = model.Ticker1,
             Ticker2 = model.Ticker2,
             Tails = JsonSerializer.Serialize(model.Tails),
+            Dates = JsonSerializer.Serialize(model.Dates),
             IsStationary = model.IsStationary
         };
     
@@ -751,6 +752,7 @@ public static class DataAccessMapper
             Ticker1 = entity.Ticker1,
             Ticker2 = entity.Ticker2,
             Tails = JsonSerializer.Deserialize<List<double>>(entity.Tails) ?? [],
+            Dates = JsonSerializer.Deserialize<List<DateOnly>>(entity.Tails) ?? [],
             IsStationary = entity.IsStationary
         };    
 }

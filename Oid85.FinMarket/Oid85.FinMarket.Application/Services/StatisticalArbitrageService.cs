@@ -149,6 +149,7 @@ public class StatisticalArbitrageService(
                 
                 // Расчет хвостов
                 var regressionTails = new List<double>();
+                var dates = new List<DateOnly>();
                 
                 for (int i = 0; i < syncCandles.Candles1.Count; i++)
                 {
@@ -159,11 +160,14 @@ public class StatisticalArbitrageService(
                         tails.Add(key, new RegressionTail { Ticker1 = correlation.Ticker1, Ticker2 = correlation.Ticker2 });
                 
                     regressionTails.Add(tailValue);
+                    dates.Add(syncCandles.Candles1[i].Date);
                 }
+                
+                tails[key].Dates = dates;
                 
                 // Расчитаем Z-score
                 tails[key].Tails = regressionTails.ZScore();
-
+                
                 // Сохраняем хвосты
                 await regressionTailRepository.AddAsync(tails[key]);
             }

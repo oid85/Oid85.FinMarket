@@ -23,6 +23,11 @@ public class RegressionTail
     public List<double> Tails { get; set; } = new();
     
     /// <summary>
+    /// Даты
+    /// </summary>
+    public List<DateOnly> Dates { get; set; } = new();
+    
+    /// <summary>
     /// Признак стационарности
     /// </summary>
     public bool IsStationary { get; set; } = true;
