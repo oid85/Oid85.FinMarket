@@ -214,13 +214,14 @@ public class DiagramDataFactory(
         {
             var dataPointSeries = new SimpleDataPointSeries { Title = $"Спред '{tail.Ticker1}' vs. '{tail.Ticker2}'" };
 
-            int index = 0;
-            
-            for (int i = 0; i < tail.Tails.Count; i++)
-            {
-                dataPointSeries.Series.Add(new SimpleDataPoint { Date = index.ToString(), Value = tail.Tails[i] });
-                index++;
-            }
+            foreach (var tailItem in tail.Tails
+                         .Where(x => x.Date >= from && x.Date <= to)
+                         .OrderBy(x => x.Date))
+                dataPointSeries.Series.Add(new SimpleDataPoint
+                {
+                    Date = tailItem.Date.ToString(KnownDateTimeFormats.DateISO), 
+                    Value = tailItem.Value
+                });
             
             if (dataPointSeries.Series.Count > 10)
                 simpleDiagramData.Data.Add(dataPointSeries);

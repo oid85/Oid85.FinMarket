@@ -147,22 +147,5 @@
             double average = values.Average();
             return values.Select(x => x - average).ToList();
         }         
-        
-        /// <summary>
-        /// Z-score
-        /// </summary>
-        public static List<double> ZScore(this List<double> values)
-        {
-            if (values.Count == 0)
-                return [];
-            
-            var average = values.Average();
-            var stdDev = values.StdDev();
-
-            if (stdDev == 0.0)
-                return [];
-            
-            return values.AddConst(-1 * average).DivConst(stdDev);
-        }          
     }
 }

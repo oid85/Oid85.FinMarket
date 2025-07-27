@@ -148,8 +148,7 @@ public class StatisticalArbitrageService(
                 string key = $"{correlation.Ticker1},{correlation.Ticker2}";
                 
                 // Расчет хвостов
-                var regressionTails = new List<double>();
-                var dates = new List<DateOnly>();
+                var regressionTails = new List<RegressionTailItem>();
                 
                 for (int i = 0; i < syncCandles.Candles1.Count; i++)
                 {
@@ -159,17 +158,14 @@ public class StatisticalArbitrageService(
                     if (!tails.ContainsKey(key))
                         tails.Add(key, new RegressionTail { Ticker1 = correlation.Ticker1, Ticker2 = correlation.Ticker2 });
                 
-                    regressionTails.Add(tailValue);
-                    dates.Add(syncCandles.Candles1[i].Date);
+                    regressionTails.Add(new RegressionTailItem { Date = syncCandles.Candles1[i].Date, Value = tailValue });
                 }
-                
-                tails[key].Dates = dates;
                 
                 tails[key].Slope = slope;
                 tails[key].Intercept = intercept;
                 
                 // Расчитаем Z-score
-                tails[key].Tails = regressionTails.ZScore();
+                tails[key].Tails = ZScore(regressionTails);
                 
                 // Сохраняем хвосты
                 await regressionTailRepository.AddAsync(tails[key]);
@@ -196,4 +192,31 @@ public class StatisticalArbitrageService(
         
         return (resultCanles1, resultCanles2);
     }
+    
+    /// <summary>
+    /// Z-score
+    /// </summary>
+    public static List<RegressionTailItem> ZScore(List<RegressionTailItem> values)
+    {
+        if (values.Count == 0)
+            return [];
+
+        var dates = values.Select(x => x.Date).ToList();
+        var tailValues = values.Select(x => x.Value).ToList();
+            
+        var average = tailValues.Average();
+        var stdDev = tailValues.StdDev();
+
+        if (stdDev == 0.0)
+            return [];
+            
+        var zScoreValues = tailValues.AddConst(-1 * average).DivConst(stdDev);
+            
+        var result = new List<RegressionTailItem>();
+
+        for (int i = 0; i < dates.Count; i++) 
+            result.Add(new RegressionTailItem{ Date = dates[i], Value = zScoreValues[i] });
+            
+        return result;
+    }    
 }

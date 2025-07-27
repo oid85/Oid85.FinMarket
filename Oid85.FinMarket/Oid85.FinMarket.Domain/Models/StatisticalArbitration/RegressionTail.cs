@@ -20,12 +20,7 @@ public class RegressionTail
     /// <summary>
     /// Хвост
     /// </summary>
-    public List<double> Tails { get; set; } = new();
-    
-    /// <summary>
-    /// Даты
-    /// </summary>
-    public List<DateOnly> Dates { get; set; } = new();
+    public List<RegressionTailItem> Tails { get; set; } = new();
     
     /// <summary>
     /// Признак стационарности

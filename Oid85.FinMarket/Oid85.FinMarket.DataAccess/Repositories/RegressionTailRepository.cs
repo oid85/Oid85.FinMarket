@@ -27,7 +27,7 @@ public class RegressionTailRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(string ticker1, string ticker2, List<double> tails, bool isStationary)
+    public async Task UpdateAsync(string ticker1, string ticker2, List<RegressionTailItem> tails, bool isStationary)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();

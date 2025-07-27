@@ -25,12 +25,6 @@ public class RegressionTailEntity : AuditableEntity
     public string Tails { get; set; } = string.Empty; 
     
     /// <summary>
-    /// Даты хвостов
-    /// </summary>
-    [Column("dates")]
-    public string Dates { get; set; } = string.Empty; 
-    
-    /// <summary>
     /// Признак стационарности
     /// </summary>
     [Column("is_stationary")]

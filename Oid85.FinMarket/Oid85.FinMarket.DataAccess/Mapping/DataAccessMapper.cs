@@ -741,7 +741,6 @@ public static class DataAccessMapper
             Ticker1 = model.Ticker1,
             Ticker2 = model.Ticker2,
             Tails = JsonSerializer.Serialize(model.Tails),
-            Dates = JsonSerializer.Serialize(model.Dates),
             Slope = model.Slope,
             Intercept = model.Intercept,
             IsStationary = model.IsStationary
@@ -753,8 +752,7 @@ public static class DataAccessMapper
             Id = entity.Id,
             Ticker1 = entity.Ticker1,
             Ticker2 = entity.Ticker2,
-            Tails = JsonSerializer.Deserialize<List<double>>(entity.Tails) ?? [],
-            Dates = JsonSerializer.Deserialize<List<DateOnly>>(entity.Dates) ?? [],
+            Tails = JsonSerializer.Deserialize<List<RegressionTailItem>>(entity.Tails) ?? [],
             Slope = entity.Slope,
             Intercept = entity.Intercept,
             IsStationary = entity.IsStationary
