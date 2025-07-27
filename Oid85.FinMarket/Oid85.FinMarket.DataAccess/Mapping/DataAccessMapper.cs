@@ -754,7 +754,7 @@ public static class DataAccessMapper
             Ticker1 = entity.Ticker1,
             Ticker2 = entity.Ticker2,
             Tails = JsonSerializer.Deserialize<List<double>>(entity.Tails) ?? [],
-            Dates = JsonSerializer.Deserialize<List<DateOnly>>(entity.Tails) ?? [],
+            Dates = JsonSerializer.Deserialize<List<DateOnly>>(entity.Dates) ?? [],
             Slope = entity.Slope,
             Intercept = entity.Intercept,
             IsStationary = entity.IsStationary
