@@ -14,7 +14,7 @@ public class DiagramDataFactory(
     IDailyCandleRepository dailyCandleRepository,
     IShareMultiplicatorRepository shareMultiplicatorRepository,
     IBankMultiplicatorRepository bankMultiplicatorRepository,
-    IStatisticalArbitrageService statisticalArbitrageService) 
+    IRegressionTailRepository regressionTailRepository) 
     : IDiagramDataFactory
 {
     private async Task<Dictionary<Guid, List<DailyCandle>>> CreateDailyDataDictionaryAsync(
@@ -208,19 +208,15 @@ public class DiagramDataFactory(
     public async Task<SimpleDiagramData> CreateSpreadsDiagramDataAsync(DateOnly from, DateOnly to)
     {
         var simpleDiagramData = new SimpleDiagramData { Title = "Спреды" };
-        var tails = await statisticalArbitrageService.CalculateRegressionTailsAsync(from, to);
+        var regressionTails = await regressionTailRepository.GetAllAsync();
 
-        foreach (var tail in tails.OrderBy(x => x.Key))
+        foreach (var tail in regressionTails.OrderBy(x => x.Ticker1))
         {
-            var dataPointSeries = new SimpleDataPointSeries { Title = $"Спред '{tail.Key}'" };
-
-            int index = 0;
+            var dataPointSeries = new SimpleDataPointSeries { Title = $"Спред '{tail.Ticker1}' vs. '{tail.Ticker2}'" };
             
-            foreach (var tailItem in tail.Value.Tails)
-            {
-                dataPointSeries.Series.Add(new SimpleDataPoint { Date = index.ToString(), Value = tailItem });
-                index++;
-            }
+            for (int i = 0; i < tail.Dates.Count; i++)
+                if (tail.Dates[i] >= from && tail.Dates[i] <= to)
+                    dataPointSeries.Series.Add(new SimpleDataPoint { Date = tail.Dates[i].ToString(KnownDateTimeFormats.DateISO), Value = tail.Tails[i] });
             
             if (dataPointSeries.Series.Count > 10)
                 simpleDiagramData.Data.Add(dataPointSeries);
