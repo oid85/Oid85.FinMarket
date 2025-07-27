@@ -108,7 +108,7 @@ public class StatisticalArbitrageService(
     /// <inheritdoc />
     public Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync() =>
         CalculateRegressionTailsAsync(
-            DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), 
+            DateOnly.FromDateTime(DateTime.Today.AddYears(-3)), 
             DateOnly.FromDateTime(DateTime.Today));
 
     /// <inheritdoc />
