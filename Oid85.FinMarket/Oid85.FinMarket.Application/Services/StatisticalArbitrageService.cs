@@ -165,6 +165,9 @@ public class StatisticalArbitrageService(
                 
                 tails[key].Dates = dates;
                 
+                tails[key].Slope = slope;
+                tails[key].Intercept = intercept;
+                
                 // Расчитаем Z-score
                 tails[key].Tails = regressionTails.ZScore();
                 

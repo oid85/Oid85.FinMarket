@@ -21,13 +21,13 @@ public class RegressionTailEntity : AuditableEntity
     /// <summary>
     /// Хвосты
     /// </summary>
-    [Column("tails"), MaxLength(500000)]
+    [Column("tails")]
     public string Tails { get; set; } = string.Empty; 
     
     /// <summary>
     /// Даты хвостов
     /// </summary>
-    [Column("dates"), MaxLength(500000)]
+    [Column("dates")]
     public string Dates { get; set; } = string.Empty; 
     
     /// <summary>
@@ -35,4 +35,16 @@ public class RegressionTailEntity : AuditableEntity
     /// </summary>
     [Column("is_stationary")]
     public bool IsStationary { get; set; }
+    
+    /// <summary>
+    /// Наклон
+    /// </summary>
+    [Column("slope")]
+    public double Slope { get; set; } 
+    
+    /// <summary>
+    /// Пересечение
+    /// </summary>
+    [Column("intercept")]
+    public double Intercept { get; set; }
 }

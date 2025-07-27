@@ -31,4 +31,14 @@ public class RegressionTail
     /// Признак стационарности
     /// </summary>
     public bool IsStationary { get; set; } = true;
+    
+    /// <summary>
+    /// Наклон
+    /// </summary>
+    public double Slope { get; set; } 
+    
+    /// <summary>
+    /// Пересечение
+    /// </summary>
+    public double Intercept { get; set; }
 }
