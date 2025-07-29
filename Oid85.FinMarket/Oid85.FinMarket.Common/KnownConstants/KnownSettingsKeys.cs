@@ -10,4 +10,5 @@ public static class KnownSettingsKeys
     public const string ResourceStorePath = "ResourceStore:Path";
     public const string DeployPort = "DeployPort";
     public const string ApplicationSettingsOutputWindowInDays = "ApplicationSettings:OutputWindowInDays";
+    public const string ComputationServiceApiClientBaseAddress = "ComputationServiceApiClient:BaseAddress";
 }

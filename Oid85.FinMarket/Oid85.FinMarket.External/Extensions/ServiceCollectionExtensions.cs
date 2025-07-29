@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
+using Oid85.FinMarket.External.Computation;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.Telegram;
 using Oid85.FinMarket.External.Tinkoff;
@@ -25,6 +26,13 @@ public static class ServiceCollectionExtensions
         services.AddTransient<GetAssetReportEventsService>();
         services.AddTransient<ITelegramService, TelegramService>();
         services.AddTransient<IResourceStoreService, ResourceStoreService>();
+        services.AddTransient<IComputationService, ComputationService>();
+
+        services.AddHttpClient(KnownHttpClients.ComputationServiceApiClient, client =>
+        {
+            string baseUrl = configuration.GetValue<string>(KnownSettingsKeys.ComputationServiceApiClientBaseAddress)!;
+            client.BaseAddress = new Uri(baseUrl);
+        });
         
         services.AddInvestApiClient((_, settings) =>
         {

@@ -6,6 +6,7 @@ using Oid85.FinMarket.Domain.Models.StatisticalArbitration;
 using Accord.Statistics.Models.Regression.Linear;
 using NLog;
 using Oid85.FinMarket.Common.Utils;
+using Oid85.FinMarket.External.Computation;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -14,6 +15,7 @@ public class StatisticalArbitrageService(
     IDailyCandleRepository dailyCandleRepository,
     ICorrelationRepository correlationRepository,
     IRegressionTailRepository regressionTailRepository,
+    IComputationService computationService,
     ILogger logger) 
     : IStatisticalArbitrageService
 {
@@ -167,8 +169,14 @@ public class StatisticalArbitrageService(
                 // Расчитаем Z-score
                 tails[key].Tails = ZScore(regressionTails);
                 
-                // Сохраняем хвосты
-                await regressionTailRepository.AddAsync(tails[key]);
+                // Проверяем на стационарность и сохраняем
+                var isStationary = await computationService.CheckStationaryAsync(
+                    [tails[key].Tails.Select(x => x.Value).ToList()]);
+                
+                if (isStationary[0])
+                    await regressionTailRepository.AddAsync(tails[key]);
+                else
+                    tails.Remove(key);
             }
                 
             catch (Exception exception)
