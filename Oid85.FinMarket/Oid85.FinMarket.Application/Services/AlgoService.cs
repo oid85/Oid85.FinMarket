@@ -11,6 +11,8 @@ using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
+using Tinkoff.InvestApi.V1;
+using Candle = Oid85.FinMarket.Domain.Models.Algo.Candle;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -28,17 +30,17 @@ public class AlgoService(
     ITickerListUtilService tickerListUtilService)
     : IAlgoService
 {
-    public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
-    
-    public ConcurrentDictionary<string, List<Candle>> HourlyCandles { get; set; } = new();
-    
-    public ConcurrentDictionary<Guid, Strategy> StrategyDictionary { get; set; } = new();
-    
     private AlgoConfigResource _algoConfigResource = new();
     
     private List<AlgoStrategyResource> _algoStrategyResources = new();
     
     private bool _isOptimization;
+    
+    public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
+    
+    public ConcurrentDictionary<string, List<Candle>> HourlyCandles { get; set; } = new();
+    
+    public ConcurrentDictionary<Guid, Strategy> StrategyDictionary { get; set; } = new();
     
     public async Task<bool> BacktestAsync()
     {
@@ -69,7 +71,6 @@ public class AlgoService(
                     strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                     strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
                     strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-                    strategy.PercentOfMoney = algoConfigResource.MoneyManagementResource.PercentOfMoney;
                     strategy.Ticker = optimizationResult.Ticker;
 
                     strategy.Candles = algoStrategyResource.Timeframe switch
@@ -116,9 +117,7 @@ public class AlgoService(
             
             await backtestResultRepository.AddAsync(backtestResults);
         }
-        
-        await CalculateStrategySignalsAsync();
-        
+
         return true;
     }
 
@@ -146,12 +145,10 @@ public class AlgoService(
             strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
             strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
             strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-            strategy.PercentOfMoney = algoConfigResource.MoneyManagementResource.PercentOfMoney;
             strategy.Ticker = backtestResult.Ticker;
             strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
             strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
             strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-            strategy.PercentOfMoney = algoConfigResource.MoneyManagementResource.PercentOfMoney;
             strategy.Ticker = backtestResult.Ticker;
 
             strategy.Candles = algoStrategyResource.Timeframe switch
@@ -204,70 +201,110 @@ public class AlgoService(
         
         var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
         
-        var tickersInStrategiSignals = (await strategySignalRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
+        // Добавляем тиекры, если их еще нет в таблице
+        var tickersInStrategySignals = (await strategySignalRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
         var tickersInBacktestResults = backtestResults.Select(x => x.Ticker).Distinct().ToList();
-
-        foreach (var ticker in tickersInStrategiSignals)
+        foreach (var ticker in tickersInStrategySignals)
         {
             if (!tickersInBacktestResults.Contains(ticker))
-                await strategySignalRepository.UpdatePositionAsync(ticker, 0, 0, 0.0, 0, 0.0);
+                await strategySignalRepository.UpdatePositionAsync(
+                    new StrategySignal
+                    {
+                        Ticker = ticker, 
+                        CountStrategies = 0, 
+                        CountSignals = 0, 
+                        PercentSignals = 0, 
+                        LastPrice = 0.0, 
+                        PositionCost = 0.0, 
+                        PositionSize = 0,
+                        PositionPercentPortfolio = 0 
+                    });
         }
 
+        // Расчет для каждого тикера
         foreach (var ticker in tickersInBacktestResults)
         {
             try
             {
-                if (!tickersInStrategiSignals.Contains(ticker))
-                    await strategySignalRepository.AddAsync(new StrategySignal { Ticker = ticker, CountStrategies = 0, CountSignals = 0, LastPrice = 0.0, PositionCost = 0.0, PositionSize = 0 });
+                if (!tickersInStrategySignals.Contains(ticker))
+                    await strategySignalRepository.AddAsync(
+                        new StrategySignal
+                        {
+                            Ticker = ticker, 
+                            CountStrategies = 0, 
+                            CountSignals = 0, 
+                            PercentSignals = 0, 
+                            LastPrice = 0.0, 
+                            PositionCost = 0.0, 
+                            PositionSize = 0,
+                            PositionPercentPortfolio = 0 
+                        });
                 
-                int countSignals = 0;
-                double positionSize = 0.0;
-            
-                foreach (var backtestResult in backtestResults.Where(x => x.Ticker == ticker))
-                {
-                    var enable = algoStrategyResources.Find(x => x.Id == backtestResult.StrategyId)!.Enable;
-                    
-                    if (!enable)
-                        continue;
-                    
-                    if (backtestResult.CurrentPosition > 0)
-                    {
-                        countSignals++;
-                        double positionPrice = backtestResult.CurrentPositionCost / backtestResult.CurrentPosition;
-                        positionSize += algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
-                    }
-
-                    else if (backtestResult.CurrentPosition < 0)
-                    {
-                        countSignals--;
-                        double positionPrice = backtestResult.CurrentPositionCost / backtestResult.CurrentPosition;
-                        positionSize -= algoConfigResource.MoneyManagementResource.UnitSize / positionPrice;
-                    }
-                }
-            
-                double positionCost = countSignals * algoConfigResource.MoneyManagementResource.UnitSize;
+                // Количество сигналов
+                int countSignals = GetCountSignals(ticker);
                 
-                // Применяем плечо и получаем последнюю цену
+                // Количество стратегий
+                int countStrategies = backtestResults.Count(x => x.Ticker == ticker);
+                
+                // Процент сигналов
+                double percentSignals = Convert.ToDouble(countSignals) / Convert.ToDouble(countStrategies) * 100.0;
+                
+                // Количество уникальных тикеров с позицией не равной 0
+                int countUniqueTickersWithSignals = backtestResults
+                    .Where(x => x.CurrentPosition is > 0 or < 0)
+                    .Select(x => x.Ticker).Distinct().Count();
+                
+                // Размер позиции в процентах от портфеля
+                double positionPercentPortfolio = ((algoConfigResource.MoneyManagementResource.Money / countUniqueTickersWithSignals) * (percentSignals / 100.0)) / algoConfigResource.MoneyManagementResource.Money * 100.0;
+                
+                // Размер позиции, руб
+                double positionCost = algoConfigResource.MoneyManagementResource.Money * positionPercentPortfolio / 100.0;
+                
+                // Цена инструмента
+                double lastPrice = await GetLastPriceAsync(ticker);                
+                
+                // Размер позиции, шт
+                double positionSize = 0;
+                
+                if (positionCost != 0.0 && lastPrice != 0.0)
+                    positionSize = positionCost / lastPrice;
+                
+                // Применяем плечо
                 var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
                 var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
 
-                double lastPrice = 0.0;
-                
                 if (sharesTickers.Contains(ticker))
                 {
                     positionSize *= algoConfigResource.MoneyManagementResource.ShareLeverage;
-                    lastPrice = (await shareRepository.GetAsync(ticker))!.LastPrice;
+                    positionCost *= algoConfigResource.MoneyManagementResource.ShareLeverage;
                 }
+
 
                 if (futuresTickers.Contains(ticker))
                 {
                     positionSize *= algoConfigResource.MoneyManagementResource.FutureLeverage;
-                    lastPrice = (await futureRepository.GetAsync(ticker))!.LastPrice;
+                    positionCost *= algoConfigResource.MoneyManagementResource.FutureLeverage;
                 }
 
-                int countStrategies = backtestResults.Count(x => x.Ticker == ticker);
+                // Знак позиции
+                if (countSignals > 0)
+                    positionSize = Math.Abs(positionSize);
                 
-                await strategySignalRepository.UpdatePositionAsync(ticker, countStrategies, Math.Abs(countSignals), Math.Abs(positionCost), Convert.ToInt32(positionSize), lastPrice);
+                else if (countSignals < 0)
+                    positionSize = -1 * Math.Abs(positionSize);
+                
+                await strategySignalRepository.UpdatePositionAsync(
+                    new StrategySignal
+                    {
+                        Ticker = ticker, 
+                        CountStrategies = Math.Abs(countStrategies), 
+                        CountSignals = Math.Abs(countSignals), 
+                        PercentSignals = Math.Abs(percentSignals), 
+                        LastPrice = lastPrice, 
+                        PositionCost = positionCost, 
+                        PositionSize = Convert.ToInt32(positionSize),
+                        PositionPercentPortfolio = positionPercentPortfolio 
+                    });
             }
             
             catch (Exception exception)
@@ -277,6 +314,48 @@ public class AlgoService(
         }
 
         return true;
+        
+        async Task<double> GetLastPriceAsync(string ticker)
+        {
+            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares))
+                .Select(x => x.Ticker).ToList();
+            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures))
+                .Select(x => x.Ticker).ToList();
+            
+            if (sharesTickers.Contains(ticker))
+                return (await shareRepository.GetAsync(ticker))!.LastPrice;
+
+            if (futuresTickers.Contains(ticker))
+                return (await futureRepository.GetAsync(ticker))!.LastPrice;
+
+            return 0.0;
+        }
+        
+        int GetCountSignals(string ticker)
+        {
+            int countSignals = 0;
+            
+            foreach (var backtestResult in backtestResults.Where(x => x.Ticker == ticker))
+            {
+                var enable = algoStrategyResources.Find(x => x.Id == backtestResult.StrategyId)!.Enable;
+                    
+                if (!enable)
+                    continue;
+                    
+                switch (backtestResult.CurrentPosition)
+                {
+                    case > 0:
+                        countSignals++;
+                        break;
+                    
+                    case < 0:
+                        countSignals--;
+                        break;
+                }
+            }
+            
+            return countSignals;
+        }
     }
 
     public async Task<bool> OptimizeAsync()
@@ -310,7 +389,6 @@ public class AlgoService(
                 strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
                 strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-                strategy.PercentOfMoney = algoConfigResource.MoneyManagementResource.PercentOfMoney;
                 strategy.Ticker = ticker;                
                 
                 strategy.Candles = algoStrategyResource.Timeframe switch

@@ -8,22 +8,10 @@ namespace Oid85.FinMarket.External.ResourceStore.Models.Algo;
 public class MoneyManagementResource
 {
     /// <summary>
-    /// Выделенный стратегии капитал
+    /// Выделенный капитал
     /// </summary>
     [JsonPropertyName("money")]
     public double Money { get; set; }
-    
-    /// <summary>
-    /// Процент от капитала для входа в сделку
-    /// </summary>
-    [JsonPropertyName("percentOfMoney")]
-    public double PercentOfMoney { get; set; }
-    
-    /// <summary>
-    /// Размер юнита, руб
-    /// </summary>
-    [JsonPropertyName("unitSize")]
-    public double UnitSize { get; set; }
     
     /// <summary>
     /// Плечо для акций

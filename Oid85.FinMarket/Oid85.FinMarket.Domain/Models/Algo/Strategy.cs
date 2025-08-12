@@ -51,12 +51,10 @@ public class Strategy
     public List<StopLimit?> StopLimits { get; set; } = new();
     
     public List<Position> Positions { get; set; } = new();
-
-    public double PercentOfMoney { get; set; }
     
     public int GetPositionSize(double orderPrice)
     {
-        double money = EndMoney / (100.0 / PercentOfMoney);
+        double money = EndMoney;
         
         if (money <= orderPrice)
             return 0;

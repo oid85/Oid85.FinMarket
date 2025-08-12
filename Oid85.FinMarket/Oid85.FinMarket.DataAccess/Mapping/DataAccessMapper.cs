@@ -14,8 +14,10 @@ public static class DataAccessMapper
             Ticker = model.Ticker,
             CountSignals = model.CountSignals,
             CountStrategies = model.CountStrategies,
+            PercentSignals = model.PercentSignals,
             PositionCost = model.PositionCost,
             PositionSize = model.PositionSize,
+            PositionPercentPortfolio = model.PositionPercentPortfolio,
             LastPrice = model.LastPrice
         };
     
@@ -25,8 +27,10 @@ public static class DataAccessMapper
             Ticker = entity.Ticker,
             CountSignals = entity.CountSignals,
             CountStrategies = entity.CountStrategies,
+            PercentSignals = entity.PercentSignals,
             PositionCost = entity.PositionCost,
             PositionSize = entity.PositionSize,
+            PositionPercentPortfolio = entity.PositionPercentPortfolio,
             LastPrice = entity.LastPrice
         }; 
     

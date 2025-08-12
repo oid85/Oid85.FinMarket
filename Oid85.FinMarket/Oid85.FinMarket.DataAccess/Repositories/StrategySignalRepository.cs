@@ -21,7 +21,7 @@ public class StrategySignalRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdatePositionAsync(string ticker, int countStrategies, int countSignals, double positionCost, int positionSize, double lastPrice)
+    public async Task UpdatePositionAsync(StrategySignal strategySignal)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
@@ -29,13 +29,15 @@ public class StrategySignalRepository(
         try
         {
             await context.StrategySignalEntities
-                .Where(x => x.Ticker == ticker)
+                .Where(x => x.Ticker == strategySignal.Ticker)
                 .ExecuteUpdateAsync(x => x
-                    .SetProperty(entity => entity.CountSignals, countSignals)
-                    .SetProperty(entity => entity.CountStrategies, countStrategies)
-                    .SetProperty(entity => entity.PositionCost, positionCost)
-                    .SetProperty(entity => entity.PositionSize, positionSize)
-                    .SetProperty(entity => entity.LastPrice, lastPrice)
+                    .SetProperty(entity => entity.CountStrategies, strategySignal.CountStrategies)
+                    .SetProperty(entity => entity.CountSignals, strategySignal.CountSignals)
+                    .SetProperty(entity => entity.PercentSignals, strategySignal.PercentSignals)
+                    .SetProperty(entity => entity.LastPrice, strategySignal.LastPrice)
+                    .SetProperty(entity => entity.PositionCost, strategySignal.PositionCost)
+                    .SetProperty(entity => entity.PositionSize, strategySignal.PositionSize)
+                    .SetProperty(entity => entity.PositionPercentPortfolio, strategySignal.PositionPercentPortfolio)
                     .SetProperty(entity => entity.UpdatedAt, DateTime.UtcNow));
             
             await context.SaveChangesAsync();

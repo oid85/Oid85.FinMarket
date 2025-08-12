@@ -12,10 +12,9 @@ public interface IStatisticalArbitrageService
     /// <summary>
     /// Рассчитать хвосты регрессии
     /// </summary>
-    Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync(DateOnly from, DateOnly to);
-    
-    /// <summary>
-    /// Рассчитать хвосты регрессии
-    /// </summary>
     Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync();
+    
+    Task<bool> BacktestAsync();
+    Task<bool> CalculateStrategySignalsAsync();
+    Task<bool> OptimizeAsync();
 }

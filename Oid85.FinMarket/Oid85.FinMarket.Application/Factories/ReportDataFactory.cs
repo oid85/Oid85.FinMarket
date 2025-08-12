@@ -780,7 +780,10 @@ public class ReportDataFactory(
     public async Task<ReportData> CreateStrategySignalsReportDataAsync()
     {
         var reportData = CreateNewReportDataWithHeaders(
-            ["№", "", "Тикер", "Наименование", "Стратегий", "Сигналы", "Тек. цена", "Позиция, шт", "Позиция (юнит), руб", ""]);
+            [
+                "№", "", "Тикер", "Наименование", "Сигналы, шт", "Стратегии, шт", "Сигналы, %", 
+                "Позиция, шт", "Позиция, руб",  "Доля в портфеле, %", "Цена, руб", ""
+            ]);
 
         reportData.Title = "Сигналы";
         
@@ -797,8 +800,10 @@ public class ReportDataFactory(
             GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),
-            GetString(string.Empty),            
-            GetNumber(strategySignals.Sum(x => x.PositionCost))
+            GetString(string.Empty),
+            GetNumber(strategySignals.Sum(x => x.PositionCost)),
+            GetString(string.Empty),
+            GetString(string.Empty)
         ]); 
         
         foreach (var strategySignal in strategySignals.OrderByDescending(x => x.CountSignals))
@@ -820,11 +825,13 @@ public class ReportDataFactory(
                 GetTicker(strategySignal.Ticker),
                 GetString(strategySignal.Ticker),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentName)),
+                GetNumber(strategySignal.CountSignals),
                 GetNumber(strategySignal.CountStrategies),
-                GetString($"{strategySignal.CountSignals} ({(double) strategySignal.CountSignals / (double) strategySignal.CountStrategies * 100.0:N2} %)", color),
-                GetNumber(strategySignal.LastPrice),
+                GetString($"{strategySignal.PercentSignals:N2} %", color),
                 GetNumber(strategySignal.PositionSize),
                 GetNumber(strategySignal.PositionCost),
+                GetString($"{strategySignal.PositionPercentPortfolio:N2} %"),
+                GetNumber(strategySignal.LastPrice),
                 GetBacktestResultByTickerButton(strategySignal.Ticker)
             ]);            
         }

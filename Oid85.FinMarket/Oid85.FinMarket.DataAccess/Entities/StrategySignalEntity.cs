@@ -25,6 +25,12 @@ public class StrategySignalEntity : AuditableEntity
     public int CountStrategies { get; set; }    
     
     /// <summary>
+    /// Процент сигналов
+    /// </summary>
+    [Column("percent_signals")]
+    public double PercentSignals { get; set; }    
+    
+    /// <summary>
     /// Размер позиции, руб
     /// </summary>
     [Column("position_cost")]
@@ -35,6 +41,12 @@ public class StrategySignalEntity : AuditableEntity
     /// </summary>
     [Column("position_size")]
     public int PositionSize { get; set; } 
+    
+    /// <summary>
+    /// Размер позиции в процентах от портфеля
+    /// </summary>
+    [Column("position_percent_portfolio")]
+    public double PositionPercentPortfolio { get; set; }  
     
     /// <summary>
     /// Цена инструмента
