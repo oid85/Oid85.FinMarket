@@ -806,7 +806,7 @@ public class ReportDataFactory(
             GetString(string.Empty)
         ]); 
         
-        foreach (var strategySignal in strategySignals.OrderByDescending(x => x.CountSignals))
+        foreach (var strategySignal in strategySignals.OrderByDescending(x => x.PositionPercentPortfolio))
         {
             count++;
             
