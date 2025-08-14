@@ -116,8 +116,8 @@ public class DiagramDataFactory(
         for (int i = 0; i < diagramData.Data.Series.Count; i++)
         {
             var date = Convert.ToDateTime(diagramData.Data.Series[i].Date);
-            diagramData.Data.Series[i].Equity = equity[date];
-            diagramData.Data.Series[i].Drawdown = -1 * drawdown[date];
+            diagramData.Data.Series[i].Equity = Math.Round(equity[date], 2);
+            diagramData.Data.Series[i].Drawdown = Math.Round(-1 * drawdown[date], 2);
         }
         
         return diagramData;
@@ -136,16 +136,6 @@ public class DiagramDataFactory(
                 Price = strategies[0].Candles[i].Close
             });
         }
-
-        // Добавляем пустые значения справа
-        for (int i = 0; i < 10; i++)
-        {
-            diagramData.Data.Series.Add(new BacktestResultDataPoint
-            {
-                Date = strategies[0].Candles.Last().DateTime.AddDays(i + 1).ToString(KnownDateTimeFormats.DateISO),
-                Price = null
-            });
-        }        
         
         // BuyPrice, SellPrice
         for (int i = 0; i < strategies.Count; i++)
@@ -174,8 +164,8 @@ public class DiagramDataFactory(
             for (int j = 0; j < diagramData.Data.Series.Count; j++)
             {
                 var date = Convert.ToDateTime(diagramData.Data.Series[j].Date);
-                diagramData.Data.Series[j].Equity += equity[date];
-                diagramData.Data.Series[j].Drawdown += -1 * drawdown[date];
+                diagramData.Data.Series[j].Equity += Math.Round(equity[date], 2);
+                diagramData.Data.Series[j].Drawdown += Math.Round(-1 * drawdown[date], 2);
             }
         }
         
@@ -207,8 +197,8 @@ public class DiagramDataFactory(
             for (int j = 0; j < diagramData.Data.Series.Count; j++)
             {
                 var date = Convert.ToDateTime(diagramData.Data.Series[j].Date);
-                diagramData.Data.Series[j].Equity += equity[date];
-                diagramData.Data.Series[j].Drawdown += -1 * drawdown[date];
+                diagramData.Data.Series[j].Equity += Math.Round(equity[date], 2);
+                diagramData.Data.Series[j].Drawdown += Math.Round(-1 * drawdown[date], 2);
             }
         }
         
