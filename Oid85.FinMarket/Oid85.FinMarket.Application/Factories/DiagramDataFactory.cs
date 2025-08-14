@@ -212,15 +212,16 @@ public class DiagramDataFactory(
 
         foreach (var tail in regressionTails.OrderBy(x => x.Ticker1))
         {
-            var dataPointSeries = new SimpleDataPointSeries { Title = $"Спред '{tail.Ticker1}' vs. '{tail.Ticker2}'" };
+            var dataPointSeries = new SimpleDataPointSeries { Title = $"'{tail.Ticker1}' vs. '{tail.Ticker2}'" };
 
             foreach (var tailItem in tail.Tails
                          .Where(x => x.Date >= from && x.Date <= to)
                          .OrderBy(x => x.Date))
+                
                 dataPointSeries.Series.Add(new SimpleDataPoint
                 {
                     Date = tailItem.Date.ToString(KnownDateTimeFormats.DateISO), 
-                    Value = tailItem.Value
+                    Value = Math.Round(tailItem.Value, 2)
                 });
             
             if (dataPointSeries.Series.Count > 10)
