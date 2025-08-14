@@ -137,6 +137,16 @@ public class DiagramDataFactory(
             });
         }
 
+        // Добавляем пустые значения справа
+        for (int i = 0; i < 10; i++)
+        {
+            diagramData.Data.Series.Add(new BacktestResultDataPoint
+            {
+                Date = strategies[0].Candles.Last().DateTime.AddDays(i + 1).ToString(KnownDateTimeFormats.DateISO),
+                Price = null
+            });
+        }        
+        
         // BuyPrice, SellPrice
         for (int i = 0; i < strategies.Count; i++)
         {
