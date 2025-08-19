@@ -32,10 +32,9 @@ public class JobService(
         await CalculateSectorIndexDailyCandlesAsync();
         await AnalyseSectorsAsync();
         await ProcessFeerGreedAsync();
+        await StatisticalArbitrationAsync();
         await CheckDailyMarketEventsAsync();
         await SendNotificationsAsync();
-        await OptimizeAsync();
-        await StatisticalArbitrationAsync();
     }
 
     /// <inheritdoc />

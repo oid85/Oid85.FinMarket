@@ -33,7 +33,7 @@ public class BankMultiplicatorRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateFieldsAsync(BankMultiplicator shareMultiplicator)
+    public async Task UpdateFieldsAsync(BankMultiplicator multiplicator)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
@@ -42,20 +42,20 @@ public class BankMultiplicatorRepository(
         {
             await context.BankMultiplicatorEntities
                 .Where(x => 
-                    x.Ticker == shareMultiplicator.Ticker)
+                    x.Ticker == multiplicator.Ticker)
                 .ExecuteUpdateAsync(x => x
-                        .SetProperty(entity => entity.Name, shareMultiplicator.Name)
-                        .SetProperty(entity => entity.MarketCap, shareMultiplicator.MarketCap)
-                        .SetProperty(entity => entity.NetOperatingIncome, shareMultiplicator.NetOperatingIncome)
-                        .SetProperty(entity => entity.NetIncome, shareMultiplicator.NetIncome)
-                        .SetProperty(entity => entity.DdAo, shareMultiplicator.DdAo)
-                        .SetProperty(entity => entity.DdAp, shareMultiplicator.DdAp)
-                        .SetProperty(entity => entity.DdNetIncome, shareMultiplicator.DdNetIncome)
-                        .SetProperty(entity => entity.Pe, shareMultiplicator.Pe)
-                        .SetProperty(entity => entity.Pb, shareMultiplicator.Pb)
-                        .SetProperty(entity => entity.NetInterestMargin, shareMultiplicator.NetInterestMargin)
-                        .SetProperty(entity => entity.Roe, shareMultiplicator.Roe)
-                        .SetProperty(entity => entity.Roa, shareMultiplicator.Roa));
+                        .SetProperty(entity => entity.Name, multiplicator.Name)
+                        .SetProperty(entity => entity.MarketCap, multiplicator.MarketCap)
+                        .SetProperty(entity => entity.NetOperatingIncome, multiplicator.NetOperatingIncome)
+                        .SetProperty(entity => entity.NetIncome, multiplicator.NetIncome)
+                        .SetProperty(entity => entity.DdAo, multiplicator.DdAo)
+                        .SetProperty(entity => entity.DdAp, multiplicator.DdAp)
+                        .SetProperty(entity => entity.DdNetIncome, multiplicator.DdNetIncome)
+                        .SetProperty(entity => entity.Pe, multiplicator.Pe)
+                        .SetProperty(entity => entity.Pb, multiplicator.Pb)
+                        .SetProperty(entity => entity.NetInterestMargin, multiplicator.NetInterestMargin)
+                        .SetProperty(entity => entity.Roe, multiplicator.Roe)
+                        .SetProperty(entity => entity.Roa, multiplicator.Roa));
             
             await context.SaveChangesAsync();
             await transaction.CommitAsync();

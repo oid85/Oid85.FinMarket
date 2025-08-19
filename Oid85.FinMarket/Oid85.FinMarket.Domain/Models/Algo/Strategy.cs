@@ -88,7 +88,7 @@ public class Strategy
                 return 0;
 
             if (LastActivePosition.IsLong)
-                return LastActivePosition.Quantity;
+                return Math.Abs(LastActivePosition.Quantity);
 
             if (LastActivePosition.IsShort)
                 return -1 * Math.Abs(LastActivePosition.Quantity);
@@ -159,8 +159,15 @@ public class Strategy
             Positions[count - 1].ExitDateTime = trade.DateTime;
             Positions[count - 1].ExitCandleIndex = trade.CandleIndex;
             Positions[count - 1].IsActive = false;
-                
-            var profit = Positions[count - 1].Quantity * (Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice);
+
+            double profit = 0.0;
+            
+            if (Positions[count - 1].IsLong)
+                profit = Math.Abs(Positions[count - 1].Quantity) * (Positions[count - 1].ExitPrice - Positions[count - 1].EntryPrice);
+            
+            if (Positions[count - 1].IsShort)
+                profit = Math.Abs(Positions[count - 1].Quantity) * (Positions[count - 1].EntryPrice - Positions[count - 1].ExitPrice);            
+            
             Positions[count - 1].Profit = profit;
             Positions[count - 1].ProfitPercent = profit / EndMoney * 100.0;
             

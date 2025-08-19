@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Domain.Models.StatisticalArbitration;
+﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
 public class Correlation
 {
