@@ -13,6 +13,7 @@ using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Application.Services.AnalyseServices;
 using Oid85.FinMarket.Application.Services.DiagramServices;
 using Oid85.FinMarket.Application.Services.ReportServices;
+using Oid85.FinMarket.Application.StatisticalArbitrageStrategies;
 using Oid85.FinMarket.Application.Strategies;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models.Algo;
@@ -91,6 +92,9 @@ public static class ServiceCollectionExtensions
         services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxClassicShort>("AdaptivePriceChannelAdxClassicShort");
         services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxMiddleLong>("AdaptivePriceChannelAdxMiddleLong");
         services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxMiddleShort>("AdaptivePriceChannelAdxMiddleShort");
+        
+        services.AddKeyedTransient<StatisticalArbitrageStrategy, CrossStdDevLongShort>("CrossStdDevLongShort");
+        services.AddKeyedTransient<StatisticalArbitrageStrategy, CrossStdDevShortLong>("CrossStdDevShortLong");
     }
     
     public static async Task RegisterHangfireJobs(

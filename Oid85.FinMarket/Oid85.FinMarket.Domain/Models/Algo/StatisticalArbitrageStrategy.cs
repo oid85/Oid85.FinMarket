@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
-public class ArbitrageStrategy
+public class StatisticalArbitrageStrategy
 {
     public Guid StrategyId { get; set; }
     
@@ -49,6 +49,7 @@ public class ArbitrageStrategy
     public bool SignalCloseLongShort { get; set; }
     
     public bool SignalCloseShortLong { get; set; }
+    
     public List<ArbitragePosition> Positions { get; set; } = new();
     
     public (int First, int Second) GetPositionSize((double First, double Second) orderPrice)
@@ -57,9 +58,12 @@ public class ArbitrageStrategy
         
         if (money <= orderPrice.First + orderPrice.Second)
             return (0, 0);
+
+        // По половине капитала для каждой ноги арбитража
+        money /= 2.0;
         
-        int positionSizeFirst = (int) Math.Round(money / 2.0 / orderPrice.First);
-        int positionSizeSecond = (int) Math.Round(money / 2.0 / orderPrice.Second);
+        int positionSizeFirst = (int) Math.Round(money / orderPrice.First);
+        int positionSizeSecond = (int) Math.Round(money / orderPrice.Second);
 
         return (positionSizeFirst, positionSizeSecond);
     }
