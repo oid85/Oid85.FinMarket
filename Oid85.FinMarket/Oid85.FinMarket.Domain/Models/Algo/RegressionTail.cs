@@ -18,7 +18,7 @@ public class RegressionTail
     public string Ticker2 { get; set; } = string.Empty;
 
     /// <summary>
-    /// Хвост
+    /// Хвосты
     /// </summary>
     public List<RegressionTailItem> Tails { get; set; } = new();
     

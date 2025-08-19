@@ -34,7 +34,7 @@ public class StatisticalArbitrageStrategy
     
     public (List<double> First, List<double> Second) LowPrices => (Candles.First.Select(x => x.Low).ToList(), Candles.Second.Select(x => x.Low).ToList());
 
-    public RegressionTail RegressionTail { get; set; } = new();
+    public List<RegressionTailItem> Spreads { get; set; } = [];
     
     public List<ArbitrageGraphPoint> GraphPoints { get; set; } = [];
     
