@@ -11,7 +11,6 @@ using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
-using Tinkoff.InvestApi.V1;
 using Candle = Oid85.FinMarket.Domain.Models.Algo.Candle;
 
 namespace Oid85.FinMarket.Application.Services;
@@ -149,7 +148,6 @@ public class AlgoService(
             strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
             strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
             strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-            strategy.Ticker = backtestResult.Ticker;
 
             strategy.Candles = algoStrategyResource.Timeframe switch
             {
@@ -301,7 +299,7 @@ public class AlgoService(
                         CountSignals = Math.Abs(countSignals), 
                         PercentSignals = Math.Abs(percentSignals), 
                         LastPrice = lastPrice, 
-                        PositionCost = positionCost, 
+                        PositionCost = Math.Abs(positionCost), 
                         PositionSize = Convert.ToInt32(positionSize),
                         PositionPercentPortfolio = positionPercentPortfolio 
                     });

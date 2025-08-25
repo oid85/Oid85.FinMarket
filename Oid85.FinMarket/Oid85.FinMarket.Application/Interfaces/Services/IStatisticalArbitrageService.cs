@@ -15,6 +15,7 @@ public interface IStatisticalArbitrageService
     Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync();
     
     Task<bool> BacktestAsync();
+    Task<(StatisticalArbitrageBacktestResult? backtestResult, StatisticalArbitrageStrategy? strategy)> BacktestAsync(Guid backtestResultId);
     Task<bool> CalculateStrategySignalsAsync();
     Task<bool> OptimizeAsync();
 }

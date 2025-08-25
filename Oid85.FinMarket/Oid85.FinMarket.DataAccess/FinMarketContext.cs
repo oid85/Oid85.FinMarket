@@ -19,9 +19,12 @@ public class FinMarketContext(DbContextOptions<FinMarketContext> options) : DbCo
     public DbSet<DailyCandleEntity> DailyCandleEntities { get; set; }
     public DbSet<HourlyCandleEntity> HourlyCandleEntities { get; set; }
     public DbSet<AnalyseResultEntity> AnalyseResultEntities { get; set; }
+    public DbSet<BacktestResultEntity> BacktestResultEntities { get; set; }
     public DbSet<OptimizationResultEntity> OptimizationResultEntities { get; set; }
     public DbSet<StrategySignalEntity> StrategySignalEntities { get; set; }
-    public DbSet<BacktestResultEntity> BacktestResultEntities { get; set; }
+    public DbSet<StatisticalArbitrageBacktestResultEntity> StatisticalArbitrageBacktestResultEntities { get; set; }
+    public DbSet<StatisticalArbitrageOptimizationResultEntity> StatisticalArbitrageOptimizationResultEntities { get; set; }
+    public DbSet<StatisticalArbitrageStrategySignalEntity> StatisticalArbitrageStrategySignalEntities { get; set; }
     public DbSet<InstrumentEntity> InstrumentEntities { get; set; }
     public DbSet<ForecastTargetEntity> ForecastTargetEntities { get; set; }
     public DbSet<ForecastConsensusEntity> ForecastConsensusEntities { get; set; }

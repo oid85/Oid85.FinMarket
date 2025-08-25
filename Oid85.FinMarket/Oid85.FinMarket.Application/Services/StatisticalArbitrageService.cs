@@ -1,39 +1,837 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Text.Json;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Accord.Statistics.Models.Regression.Linear;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.Utils;
+using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.Computation;
+using Oid85.FinMarket.External.ResourceStore;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Services;
 
 public class StatisticalArbitrageService(
-    ITickerListUtilService tickerListUtilService,
     IDailyCandleRepository dailyCandleRepository,
+    IHourlyCandleRepository hourlyCandleRepository,
+    IResourceStoreService resourceStoreService,
+    IStatisticalArbitrageBacktestResultRepository backtestResultRepository,
+    IStatisticalArbitrageOptimizationResultRepository optimizationResultRepository,
+    IStatisticalArbitrageStrategySignalRepository strategySignalRepository,
+    IShareRepository shareRepository,
+    IFutureRepository futureRepository,
+    IServiceProvider serviceProvider,
     ICorrelationRepository correlationRepository,
     IRegressionTailRepository regressionTailRepository,
     IComputationService computationService,
+    ITickerListUtilService tickerListUtilService,
     ILogger logger)
     : IStatisticalArbitrageService
 {
     private AlgoConfigResource _algoConfigResource = new();
-    
+
+    private List<StatisticalArbitrageStrategyResource> _statisticalArbitrageStrategyResources = new();
+
     private bool _isOptimization;
 
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
-    
-    public ConcurrentDictionary<string, RegressionTail> RegressionTails  { get; set; } = new();
+
+    public ConcurrentDictionary<string, List<Candle>> HourlyCandles { get; set; } = new();
+
+    public ConcurrentDictionary<string, RegressionTail> Spreads { get; set; } = new();
+    public ConcurrentDictionary<Guid, StatisticalArbitrageStrategy> StrategyDictionary { get; set; } = new();
+
+    public async Task<bool> BacktestAsync()
+    {
+        await InitBacktestAsync();
+
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+
+        var optimizationResults =
+            await optimizationResultRepository.GetAsync(algoConfigResource.OptimizationResultFilterResource);
+
+        await backtestResultRepository.InvertDeleteAsync(statisticalArbitrageStrategyResources.Select(x => x.Id).ToList());
+
+        foreach (var (strategyId, strategy) in StrategyDictionary)
+        {
+            await backtestResultRepository.DeleteAsync(strategyId);
+
+            var statisticalArbitrageStrategyResource = statisticalArbitrageStrategyResources.Find(x => x.Id == strategyId);
+
+            if (statisticalArbitrageStrategyResource is null)
+                continue;
+
+            var backtestResults = new List<StatisticalArbitrageBacktestResult>();
+
+            foreach (var optimizationResult in optimizationResults.Where(x => x.StrategyId == strategyId))
+            {
+                try
+                {
+                    strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
+                    strategy.StartMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+                    strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+                    strategy.Ticker = (optimizationResult.TickerFirst, optimizationResult.TickerSecond);
+
+                    var syncCandles = SyncCandles(statisticalArbitrageStrategyResource.Timeframe switch
+                        {
+                            "D" => DailyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
+                            "H" => HourlyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
+                            _ => []
+                        },
+                        
+                        statisticalArbitrageStrategyResource.Timeframe switch
+                        {
+                            "D" => DailyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
+                            "H" => HourlyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
+                            _ => []
+                        });
+                    
+                    strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
+
+                    if (strategy.Candles.First is [])
+                        continue;
+
+                    if (strategy.Candles.Second is [])
+                        continue;
+                    
+                    if (strategy.Candles.First.Count < strategy.StabilizationPeriod + 1)
+                        continue;
+
+                    if (strategy.Candles.Second.Count < strategy.StabilizationPeriod + 1)
+                        continue;
+
+                    var tail = await regressionTailRepository.GetAsync(strategy.Ticker.First, strategy.Ticker.Second);
+                    
+                    if (tail is null)
+                        continue;
+
+                    strategy.Spreads = tail.Tails;
+                    
+                    var parameterSet = JsonSerializer.Deserialize<Dictionary<string, int>>(optimizationResult.StrategyParams);
+
+                    if (parameterSet is null)
+                        continue;
+
+                    strategy.Parameters = parameterSet;
+                    strategy.Positions.Clear();
+                    strategy.EqiutyCurve.Clear();
+                    strategy.DrawdownCurve.Clear();
+                    strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+
+                    strategy.GraphPoints.Clear();
+                    for (int i = 0; i < strategy.Candles.First.Count; i++)
+                        strategy.GraphPoints.Add(new ArbitrageGraphPoint());
+
+                    strategy.Execute();
+
+                    var backtestResult = CreateBacktestResult(strategy);
+                    backtestResults.Add(backtestResult);
+                }
+
+                catch (Exception exception)
+                {
+                    logger.Info($"Бэктест '{optimizationResult.TickerFirst}, {optimizationResult.TickerSecond}', '{optimizationResult.StrategyName}', '{optimizationResult.StrategyParams}'. {exception}");
+                }
+            }
+
+            await backtestResultRepository.AddAsync(backtestResults);
+        }
+
+        return true;
+    }
+
+    public async Task<(StatisticalArbitrageBacktestResult? backtestResult, StatisticalArbitrageStrategy? strategy)> BacktestAsync(Guid backtestResultId)
+    {
+        try
+        {
+            var backtestResult = await backtestResultRepository.GetAsync(backtestResultId);
+
+            if (backtestResult is null)
+                return (null, null);
+
+            await InitBacktestAsync(backtestResult.TickerFirst, backtestResult.TickerSecond, backtestResult.StrategyId);
+
+            var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+            var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+
+            var statisticalArbitrageStrategyResource = statisticalArbitrageStrategyResources.Find(x => x.Id == backtestResult.StrategyId);
+
+            if (statisticalArbitrageStrategyResource is null)
+                return (null, null);
+
+            var strategy = StrategyDictionary[backtestResult.StrategyId];
+
+            strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
+            strategy.StartMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+            strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+            strategy.Ticker = (backtestResult.TickerFirst, backtestResult.TickerSecond);
+            
+            var syncCandles = SyncCandles(statisticalArbitrageStrategyResource.Timeframe switch
+                {
+                    "D" => DailyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
+                    "H" => HourlyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
+                    _ => []
+                },
+                        
+                statisticalArbitrageStrategyResource.Timeframe switch
+                {
+                    "D" => DailyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
+                    "H" => HourlyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
+                    _ => []
+                });
+                    
+            strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
+
+            if (strategy.Candles.First is [])
+                return (null, null);
+
+            if (strategy.Candles.Second is [])
+                return (null, null);
+                    
+            if (strategy.Candles.First.Count < strategy.StabilizationPeriod + 1)
+                return (null, null);
+
+            if (strategy.Candles.Second.Count < strategy.StabilizationPeriod + 1)
+                return (null, null);
+
+            var tail = await regressionTailRepository.GetAsync(strategy.Ticker.First, strategy.Ticker.Second);
+                    
+            if (tail is null)
+                return (null, null);
+
+            strategy.Spreads = tail.Tails;
+            
+            var parameterSet = JsonSerializer.Deserialize<Dictionary<string, int>>(backtestResult.StrategyParams);
+
+            if (parameterSet is null)
+                return (null, null);
+
+            strategy.Parameters = parameterSet;
+            strategy.Positions.Clear();
+            strategy.EqiutyCurve.Clear();
+            strategy.DrawdownCurve.Clear();
+            strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+
+            strategy.GraphPoints.Clear();
+            for (int i = 0; i < strategy.Candles.First.Count; i++)
+                strategy.GraphPoints.Add(new ArbitrageGraphPoint());
+
+            strategy.Execute();
+
+            backtestResult = CreateBacktestResult(strategy);
+
+            return (backtestResult, strategy);
+        }
+
+        catch (Exception exception)
+        {
+            logger.Info($"Бэктест '{backtestResultId}'. {exception}");
+            return (null, null);
+        }
+    }
+
+    public async Task<bool> CalculateStrategySignalsAsync()
+    {
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+
+        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+
+        // Добавляем тикеры, если их еще нет в таблице
+        var tickersInStrategySignals = (await strategySignalRepository.GetAllAsync()).Select(x => $"{x.TickerFirst},{x.TickerSecond}").ToList();
+        var tickersInBacktestResults = backtestResults.Select(x => $"{x.TickerFirst},{x.TickerSecond}").Distinct().ToList();
+        foreach (var tickerPair in tickersInStrategySignals)
+        {
+            if (!tickersInBacktestResults.Contains(tickerPair))
+                await strategySignalRepository.UpdatePositionAsync(
+                    new StatisticalArbitrageStrategySignal
+                    {
+                        TickerFirst = tickerPair.Split(',')[0],
+                        TickerSecond = tickerPair.Split(',')[1],
+                        CountStrategies = 0,
+                        CountSignals = 0,
+                        PercentSignals = 0,
+                        LastPriceFirst = 0.0,
+                        LastPriceSecond = 0.0,
+                        PositionCost = 0.0,
+                        PositionSizeFirst = 0,
+                        PositionSizeSecond = 0,
+                        PositionPercentPortfolio = 0
+                    });
+        }
+
+        // Расчет для каждого тикера
+        foreach (var tickerPair in tickersInBacktestResults)
+        {
+            try
+            {
+                if (!tickersInStrategySignals.Contains(tickerPair))
+                    await strategySignalRepository.AddAsync(
+                        new StatisticalArbitrageStrategySignal
+                        {
+                            TickerFirst = tickerPair.Split(',')[0],
+                            TickerSecond = tickerPair.Split(',')[1],
+                            CountStrategies = 0,
+                            CountSignals = 0,
+                            PercentSignals = 0,
+                            LastPriceFirst = 0.0,
+                            LastPriceSecond = 0.0,
+                            PositionCost = 0.0,
+                            PositionSizeFirst = 0,
+                            PositionSizeSecond = 0,
+                            PositionPercentPortfolio = 0
+                        });
+
+                var backtestResultsByTickerPair = backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair).ToList();
+                
+                // Количество сигналов
+                int countSignals = GetCountSignals(tickerPair);
+
+                // Количество стратегий
+                int countStrategies = backtestResultsByTickerPair.Count;
+
+                // Процент сигналов
+                double percentSignals = Convert.ToDouble(countSignals) / Convert.ToDouble(countStrategies) * 100.0;
+
+                // Количество уникальных тикеров с позицией не равной 0
+                int countUniqueTickersWithSignals = backtestResults
+                    .Where(
+                        x => 
+                            x.CurrentPositionFirst is > 0 or < 0 &&
+                            x.CurrentPositionSecond is > 0 or < 0)
+                    .Select(x => $"{x.TickerFirst},{x.TickerSecond}").Distinct().Count();
+
+                // Размер позиции в процентах от портфеля
+                double positionPercentPortfolio =
+                    ((algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney / countUniqueTickersWithSignals) *
+                     (percentSignals / 100.0)) / algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * 100.0;
+
+                // Размер позиции, руб
+                double positionCost = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * positionPercentPortfolio / 100.0;
+
+                // Цена инструмента
+                (double First, double Second) lastPrice = await GetLastPriceAsync(tickerPair.Split(',')[0], tickerPair.Split(',')[1]);
+
+                // Размер позиции, шт
+                (double First, double Second) positionSize = GetPositionSize(tickerPair);
+                
+                // Применяем плечо
+                var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
+                var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
+
+                if (sharesTickers.Contains(tickerPair.Split(',')[0]))
+                {
+                    positionSize.First *= algoConfigResource.MoneyManagementResource.ShareLeverage;
+                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.ShareLeverage;
+                }
+                
+                if (futuresTickers.Contains(tickerPair.Split(',')[0]))
+                {
+                    positionSize.First *= algoConfigResource.MoneyManagementResource.FutureLeverage;
+                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.FutureLeverage;
+                }
+
+                if (sharesTickers.Contains(tickerPair.Split(',')[1]))
+                {
+                    positionSize.Second *= algoConfigResource.MoneyManagementResource.ShareLeverage;
+                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.ShareLeverage;
+                }
+                
+                if (futuresTickers.Contains(tickerPair.Split(',')[1]))
+                {
+                    positionSize.Second *= algoConfigResource.MoneyManagementResource.FutureLeverage;
+                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.FutureLeverage;
+                }
+
+                await strategySignalRepository.UpdatePositionAsync(
+                    new StatisticalArbitrageStrategySignal
+                    {
+                        TickerFirst = tickerPair.Split(',')[0],
+                        TickerSecond = tickerPair.Split(',')[1],
+                        CountStrategies = Math.Abs(countStrategies),
+                        CountSignals = Math.Abs(countSignals),
+                        PercentSignals = Math.Abs(percentSignals),
+                        LastPriceFirst = lastPrice.First,
+                        LastPriceSecond = lastPrice.Second,
+                        PositionCost = positionCost,
+                        PositionSizeFirst = Convert.ToInt32(positionSize.First),
+                        PositionSizeSecond = Convert.ToInt32(positionSize.Second),
+                        PositionPercentPortfolio = positionPercentPortfolio
+                    });
+            }
+
+            catch (Exception exception)
+            {
+                logger.Error($"Ошибка CalculateStrategySignalsAsync '{tickerPair}', '{exception.Message}'");
+            }
+        }
+
+        return true;
+
+        async Task<(double First, double Second)> GetLastPriceAsync(string tickerFirst, string tickerSecond)
+        {
+            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares))
+                .Select(x => x.Ticker).ToList();
+            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures))
+                .Select(x => x.Ticker).ToList();
+
+            double lastPriceFirst = 0.0;
+            double lastPriceSecond = 0.0;
+            
+            if (sharesTickers.Contains(tickerFirst)) lastPriceFirst = (await shareRepository.GetAsync(tickerFirst))!.LastPrice;
+            if (futuresTickers.Contains(tickerFirst)) lastPriceFirst = (await futureRepository.GetAsync(tickerFirst))!.LastPrice;
+
+            if (sharesTickers.Contains(tickerSecond)) lastPriceSecond = (await shareRepository.GetAsync(tickerSecond))!.LastPrice;
+            if (futuresTickers.Contains(tickerSecond)) lastPriceSecond = (await futureRepository.GetAsync(tickerSecond))!.LastPrice;
+
+            return (lastPriceFirst, lastPriceSecond);
+        }
+
+        (double First, double Second) GetPositionSize(string tickerPair)
+        {
+            double positionSizeFirst = 0.0;
+            double positionSizeSecond = 0.0;
+            
+            foreach (var backtestResult in backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair))
+            {
+                positionSizeFirst += backtestResult.CurrentPositionFirst;
+                positionSizeSecond += backtestResult.CurrentPositionSecond;
+            }
+
+            return (positionSizeFirst, positionSizeSecond);
+        }
+        
+        int GetCountSignals(string tickerPair)
+        {
+            int countSignals = 0;
+
+            foreach (var backtestResult in backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair))
+            {
+                var enable = statisticalArbitrageStrategyResources.Find(x => x.Id == backtestResult.StrategyId)!.Enable;
+
+                if (!enable)
+                    continue;
+
+                if (backtestResult.CurrentPositionFirst != 0.0 && backtestResult.CurrentPositionSecond != 0.0)
+                    countSignals++;
+            }
+
+            return countSignals;
+        }        
+    }
+
+    public async Task<bool> OptimizeAsync()
+    {
+        var sw = Stopwatch.StartNew();
+
+        await InitOptimizationAsync();
+
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+
+        await optimizationResultRepository.InvertDeleteAsync(statisticalArbitrageStrategyResources.Select(x => x.Id).ToList());
+
+        int count = 0;
+
+        foreach (var (strategyId, strategy) in StrategyDictionary)
+        {
+            await optimizationResultRepository.DeleteAsync(strategyId);
+
+            var statisticalArbitrageStrategyResource = statisticalArbitrageStrategyResources.Find(x => x.Id == strategyId);
+
+            if (statisticalArbitrageStrategyResource is null)
+                continue;
+
+            var optimizationResults = new List<StatisticalArbitrageOptimizationResult>();
+
+            var tickerPairs = (await regressionTailRepository.GetAllAsync()).Select(x => $"{x.Ticker1},{x.Ticker2}");
+
+            foreach (var tickerPair in tickerPairs)
+            {
+                strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
+                strategy.StartMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+                strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+                strategy.Ticker = (tickerPair.Split(',')[0], tickerPair.Split(',')[1]);
+
+                var syncCandles = SyncCandles(statisticalArbitrageStrategyResource.Timeframe switch
+                    {
+                        "D" => DailyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
+                        "H" => HourlyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
+                        _ => []
+                    },
+                        
+                    statisticalArbitrageStrategyResource.Timeframe switch
+                    {
+                        "D" => DailyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
+                        "H" => HourlyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
+                        _ => []
+                    });
+                    
+                strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
+
+                if (strategy.Candles.First is [])
+                    continue;
+
+                if (strategy.Candles.Second is [])
+                    continue;
+                    
+                if (strategy.Candles.First.Count < strategy.StabilizationPeriod + 1)
+                    continue;
+
+                if (strategy.Candles.Second.Count < strategy.StabilizationPeriod + 1)
+                    continue;
+                
+                var tail = await regressionTailRepository.GetAsync(strategy.Ticker.First, strategy.Ticker.Second);
+                    
+                if (tail is null)
+                    continue;
+
+                strategy.Spreads = tail.Tails;
+
+                var parameterSets = GetParameterSets(statisticalArbitrageStrategyResource.Params);
+
+                foreach (var parameterSet in parameterSets)
+                {
+                    try
+                    {
+                        if (parameterSet.Count == 0)
+                            continue;
+
+                        strategy.Parameters = parameterSet;
+                        strategy.Positions.Clear();
+                        strategy.EqiutyCurve.Clear();
+                        strategy.DrawdownCurve.Clear();
+                        strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+
+                        strategy.GraphPoints.Clear();
+                        for (int i = 0; i < strategy.Candles.First.Count; i++)
+                            strategy.GraphPoints.Add(new ArbitrageGraphPoint());
+
+                        strategy.Execute();
+
+                        var optimizationResult = CreateOptimizationResult(strategy);
+                        optimizationResults.Add(optimizationResult);
+                    }
+
+                    catch (Exception exception)
+                    {
+                        logger.Info($"Оптимизация '{strategy.Ticker}', '{strategy.StrategyName}', '{JsonSerializer.Serialize(parameterSet)}'. {exception}");
+                    }
+                }
+            }
+
+            await optimizationResultRepository.AddAsync(optimizationResults);
+
+            count++;
+
+            logger.Info($"Оптимизация '{strategy.StrategyName}' закончена. {count} из {StrategyDictionary.Count}");
+        }
+
+        sw.Stop();
+
+        logger.Info($"Оптимизация закончена за {sw.Elapsed.TotalMinutes:N2} минут");
+
+        return true;
+    }
+
+    private static List<Dictionary<string, int>> GetParameterSets(List<StrategyParamResource> strategyParams)
+    {
+        var result = new List<Dictionary<string, int>>();
+
+        switch (strategyParams.Count)
+        {
+            case 1:
+                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step)
+                    result.Add(
+                        new Dictionary<string, int>
+                        {
+                            [strategyParams[0].Name] = paramValue1
+                        });
+
+                return result;
+
+            case 2:
+                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step)
+                for (int paramValue2 = strategyParams[1].Min; paramValue2 <= strategyParams[1].Max; paramValue2 += strategyParams[1].Step)
+                    result.Add(
+                        new Dictionary<string, int>
+                        {
+                            [strategyParams[0].Name] = paramValue1,
+                            [strategyParams[1].Name] = paramValue2
+                        });
+
+                return result;
+
+            case 3:
+                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step)
+                for (int paramValue2 = strategyParams[1].Min; paramValue2 <= strategyParams[1].Max; paramValue2 += strategyParams[1].Step)
+                for (int paramValue3 = strategyParams[2].Min; paramValue3 <= strategyParams[2].Max; paramValue3 += strategyParams[2].Step)
+                    result.Add(
+                        new Dictionary<string, int>
+                        {
+                            [strategyParams[0].Name] = paramValue1,
+                            [strategyParams[1].Name] = paramValue2,
+                            [strategyParams[2].Name] = paramValue3
+                        });
+
+                return result;
+        }
+
+        throw new Exception("Количество параметров больше 3. Оптимизация выполняться не будет");
+    }
+
+    private static StatisticalArbitrageOptimizationResult CreateOptimizationResult(StatisticalArbitrageStrategy strategy)
+    {
+        var json = JsonSerializer.Serialize(strategy.Parameters);
+
+        var result = new StatisticalArbitrageOptimizationResult
+        {
+            StrategyId = strategy.StrategyId,
+            StartDate = strategy.StartDate,
+            EndDate = strategy.EndDate,
+            Timeframe = strategy.Timeframe,
+            TickerFirst = strategy.Ticker.First,
+            TickerSecond = strategy.Ticker.Second,
+            StrategyDescription = strategy.StrategyDescription,
+            StrategyName = strategy.StrategyName,
+            StrategyParams = json,
+            StrategyParamsHash = ConvertHelper.Md5Encode(json),
+            NumberPositions = strategy.NumberPositions,
+            CurrentPositionFirst = strategy.CurrentPosition.First,
+            CurrentPositionSecond = strategy.CurrentPosition.Second,
+            CurrentPositionCost = strategy.CurrentPositionCost,
+            ProfitFactor = strategy.ProfitFactor,
+            RecoveryFactor = strategy.RecoveryFactor,
+            NetProfit = strategy.NetProfit,
+            AverageProfit = strategy.AverageNetProfit,
+            AverageProfitPercent = strategy.AverageNetProfitPercent,
+            Drawdown = strategy.Drawdown,
+            MaxDrawdown = strategy.MaxDrawdown,
+            MaxDrawdownPercent = strategy.MaxDrawdownPercent,
+            WinningPositions = strategy.WinningPositions,
+            WinningTradesPercent = strategy.WinningTradesPercent,
+            StartMoney = strategy.StartMoney,
+            EndMoney = strategy.EndMoney,
+            TotalReturn = strategy.TotalReturn,
+            AnnualYieldReturn = strategy.AnnualYieldReturn
+        };
+
+        return result;
+    }
+
+    private static StatisticalArbitrageBacktestResult CreateBacktestResult(StatisticalArbitrageStrategy strategy)
+    {
+        var json = JsonSerializer.Serialize(strategy.Parameters);
+
+        var result = new StatisticalArbitrageBacktestResult
+        {
+            StrategyId = strategy.StrategyId,
+            StartDate = strategy.StartDate,
+            EndDate = strategy.EndDate,
+            Timeframe = strategy.Timeframe,
+            TickerFirst = strategy.Ticker.First,
+            TickerSecond = strategy.Ticker.Second,
+            StrategyDescription = strategy.StrategyDescription,
+            StrategyName = strategy.StrategyName,
+            StrategyParams = json,
+            StrategyParamsHash = ConvertHelper.Md5Encode(json),
+            NumberPositions = strategy.NumberPositions,
+            CurrentPositionFirst = strategy.CurrentPosition.First,
+            CurrentPositionSecond = strategy.CurrentPosition.Second,
+            CurrentPositionCost = strategy.CurrentPositionCost,
+            ProfitFactor = strategy.ProfitFactor,
+            RecoveryFactor = strategy.RecoveryFactor,
+            NetProfit = strategy.NetProfit,
+            AverageProfit = strategy.AverageNetProfit,
+            AverageProfitPercent = strategy.AverageNetProfitPercent,
+            Drawdown = strategy.Drawdown,
+            MaxDrawdown = strategy.MaxDrawdown,
+            MaxDrawdownPercent = strategy.MaxDrawdownPercent,
+            WinningPositions = strategy.WinningPositions,
+            WinningTradesPercent = strategy.WinningTradesPercent,
+            StartMoney = strategy.StartMoney,
+            EndMoney = strategy.EndMoney,
+            TotalReturn = strategy.TotalReturn,
+            AnnualYieldReturn = strategy.AnnualYieldReturn
+        };
+
+        return result;
+    }
+
+    private async Task InitBacktestAsync(string? ticker1 = null, string? ticker2 = null, Guid? strategyId = null)
+    {
+        _isOptimization = false;
+
+        // Читаем настройки из ресурсов
+        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        _statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+
+        await InitDailyCandlesAsync(ticker1, ticker2);
+        await InitHourlyCandlesAsync(ticker1, ticker2);
+
+        InitStrategies(strategyId);
+    }
+
+    private async Task InitOptimizationAsync()
+    {
+        _isOptimization = true;
+
+        // Читаем настройки из ресурсов
+        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        _statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+
+        await InitDailyCandlesAsync();
+        await InitHourlyCandlesAsync();
+
+        InitStrategies();
+    }
+
+    private void InitStrategies(Guid? strategyId = null)
+    {
+        var algoStrategyResources = strategyId is null
+            ? _statisticalArbitrageStrategyResources
+            : _statisticalArbitrageStrategyResources.Where(x => x.Id == strategyId);
+
+        foreach (var algoStrategyResource in algoStrategyResources)
+        {
+            var strategy = serviceProvider.GetRequiredKeyedService<StatisticalArbitrageStrategy>(algoStrategyResource.Name);
+
+            strategy.StrategyId = algoStrategyResource.Id;
+            strategy.Timeframe = algoStrategyResource.Timeframe;
+            strategy.StrategyDescription = algoStrategyResource.Description;
+            strategy.StrategyName = algoStrategyResource.Name;
+
+            StrategyDictionary.TryAdd(algoStrategyResource.Id, strategy);
+        }
+    }
+
+    private async Task InitDailyCandlesAsync(string? ticker1 = null, string? ticker2 = null)
+    {
+        var dates = GetDailyDates();
+
+        var tickers = ticker1 is null || ticker2 is null ? await GetAllTickers() : [ticker1, ticker2];
+
+        foreach (string instrumentTicker in tickers)
+        {
+            var candles = (await dailyCandleRepository.GetAsync(instrumentTicker, dates.From, dates.To))
+                .Select(AlgoMapper.Map).ToList();
+
+            if (candles.Count == 0)
+                continue;
+
+            for (int i = 0; i < candles.Count; i++)
+                candles[i].Index = i;
+
+            DailyCandles.TryAdd(instrumentTicker, candles);
+        }
+    }
+
+    private async Task InitHourlyCandlesAsync(string? ticker1 = null, string? ticker2 = null)
+    {
+        var dates = GetHourlyDates();
+
+        var tickers = ticker1 is null || ticker2 is null ? await GetAllTickers() : [ticker1, ticker2];
+
+        foreach (string instrumentTicker in tickers)
+        {
+            var candles = (await hourlyCandleRepository.GetAsync(instrumentTicker, dates.From, dates.To))
+                .Select(AlgoMapper.Map).ToList();
+
+            if (candles.Count == 0)
+                continue;
+
+            for (int i = 0; i < candles.Count; i++)
+                candles[i].Index = i;
+
+            HourlyCandles.TryAdd(instrumentTicker, candles);
+        }
+    }
+
+    private async Task<List<string>> GetAllTickers()
+    {
+        var tails = await regressionTailRepository.GetAllAsync();
+        
+        var tickers = new List<string>();
+        
+        tickers.AddRange(tails.Select(x => x.Ticker1).ToList());
+        tickers.AddRange(tails.Select(x => x.Ticker2).ToList());
+        
+        return tickers.Distinct().ToList();
+    }
+
+    private (DateOnly From, DateOnly To) GetDailyDates()
+    {
+        DateOnly from;
+        DateOnly to;
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        if (_isOptimization)
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.DailyStabilizationPeriodInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
+
+            to = today.AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
+        }
+
+        else
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.DailyStabilizationPeriodInDays);
+
+            to = today;
+        }
+
+        return (from, to);
+    }
+
+    private (DateOnly From, DateOnly To) GetHourlyDates()
+    {
+        DateOnly from;
+        DateOnly to;
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        if (_isOptimization)
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.HourlyStabilizationPeriodInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
+
+            to = today.AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
+        }
+
+        else
+        {
+            from = today
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
+                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.HourlyStabilizationPeriodInDays);
+
+            to = today;
+        }
+
+        return (from, to);
+    }
 
     /// <inheritdoc />
     public async Task CalculateCorrelationAsync()
     {
-        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.StatisticalArbitrageShares);
-        var futures = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.StatisticalArbitrageFutures))
+        var shares =
+            await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.StatisticalArbitrageShares);
+        var futures =
+            (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.StatisticalArbitrageFutures))
             .Where(x => x.ExpirationDate > DateOnly.FromDateTime(DateTime.Today)).ToList();
 
         var candles = new Dictionary<string, List<DailyCandle>>();
@@ -123,24 +921,6 @@ public class StatisticalArbitrageService(
             DateOnly.FromDateTime(DateTime.Today.AddYears(-3)),
             DateOnly.FromDateTime(DateTime.Today));
 
-    /// <inheritdoc />
-    public async Task<bool> BacktestAsync()
-    {
-        return true;
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> CalculateStrategySignalsAsync()
-    {
-        return true;
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> OptimizeAsync()
-    {
-        return true;
-    }
-
     private async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync(DateOnly from, DateOnly to)
     {
         // Очистим таблицу
@@ -226,12 +1006,26 @@ public class StatisticalArbitrageService(
 
         var dates = dates1.Intersect(dates2).ToList();
 
-        var resultCanles1 = candles1.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
-        var resultCanles2 = candles2.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
+        var resultCandles1 = candles1.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
+        var resultCandles2 = candles2.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
 
-        return (resultCanles1, resultCanles2);
+        return (resultCandles1, resultCandles2);
     }
 
+    private static (List<Candle> Candles1, List<Candle> Candles2) SyncCandles(List<Candle> candles1,
+        List<Candle> candles2)
+    {
+        var dates1 = candles1.Select(x => x.DateTime.Date).ToList();
+        var dates2 = candles2.Select(x => x.DateTime.Date).ToList();
+
+        var dates = dates1.Intersect(dates2).ToList();
+
+        var resultCandles1 = candles1.Where(x => dates.Contains(x.DateTime.Date)).OrderBy(x => x.DateTime.Date).ToList();
+        var resultCandles2 = candles2.Where(x => dates.Contains(x.DateTime.Date)).OrderBy(x => x.DateTime.Date).ToList();
+
+        return (resultCandles1, resultCandles2);
+    }    
+    
     /// <summary>
     /// Z-score
     /// </summary>

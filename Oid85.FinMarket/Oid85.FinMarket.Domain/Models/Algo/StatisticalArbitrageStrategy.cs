@@ -21,8 +21,8 @@ public class StatisticalArbitrageStrategy
     public DateOnly EndDate => DateOnly.FromDateTime(Candles.First.Last().DateTime);
     
     public Dictionary<string, int> Parameters { get; set; } = new();
-    
-    public int StabilizationPeriod { get; set; }
+
+    public int StabilizationPeriod { get; set; } = 1;
     
     public (List<Candle> First, List<Candle> Second) Candles { get; set; } = (new(), new());
     

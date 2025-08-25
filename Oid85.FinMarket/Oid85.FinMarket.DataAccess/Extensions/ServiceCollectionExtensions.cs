@@ -52,6 +52,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IBacktestResultRepository, BacktestResultRepository>();
         services.AddTransient<IOptimizationResultRepository, OptimizationResultRepository>();
         services.AddTransient<IStrategySignalRepository, StrategySignalRepository>();
+        services.AddTransient<IStatisticalArbitrageBacktestResultRepository, StatisticalArbitrageBacktestResultRepository>();
+        services.AddTransient<IStatisticalArbitrageOptimizationResultRepository, StatisticalArbitrageOptimizationResultRepository>();
+        services.AddTransient<IStatisticalArbitrageStrategySignalRepository, StatisticalArbitrageStrategySignalRepository>();
         services.AddTransient<ICorrelationRepository, CorrelationRepository>();
         services.AddTransient<IRegressionTailRepository, RegressionTailRepository>();
     }

@@ -191,6 +191,12 @@ public class ResourceStoreService(
             Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
                 "algo", "strategies.json")) ?? [];
 
+    /// <inheritdoc />
+    public async Task<List<StatisticalArbitrageStrategyResource>> GetStatisticalArbitrageStrategiesAsync() =>
+        await ReadAsync<List<StatisticalArbitrageStrategyResource>>(
+            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                "algo", "statisticalArbitrageStrategy.json")) ?? [];
+
     public async Task<List<string[]>> GetCsvAsync(string path) => 
         !File.Exists(Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!, path)) ? [] 
             : (await File.ReadAllLinesAsync(

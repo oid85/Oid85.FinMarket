@@ -68,6 +68,19 @@ public class RegressionTailRepository(
             .ToList();
     }
 
+    public async Task<RegressionTail?> GetAsync(string ticker1, string ticker2)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        var entity = await context.RegressionTailEntities
+            .FirstOrDefaultAsync(
+                x => 
+                    x.Ticker1 == ticker1 &&
+                    x.Ticker2 == ticker2);
+        
+        return entity is null ? null : DataAccessMapper.Map(entity);
+    }
+
     public async Task DeleteAsync()
     {
         await using var context = await contextFactory.CreateDbContextAsync();

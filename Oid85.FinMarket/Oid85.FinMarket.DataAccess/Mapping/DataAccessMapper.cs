@@ -7,6 +7,172 @@ namespace Oid85.FinMarket.DataAccess.Mapping;
 
 public static class DataAccessMapper
 {
+        public static StatisticalArbitrageStrategySignalEntity Map(StatisticalArbitrageStrategySignal model) =>
+        new()
+        {
+            TickerFirst = model.TickerFirst,
+            TickerSecond = model.TickerSecond,
+            CountSignals = model.CountSignals,
+            CountStrategies = model.CountStrategies,
+            PercentSignals = model.PercentSignals,
+            PositionCost = model.PositionCost,
+            PositionSizeFirst = model.PositionSizeFirst,
+            PositionSizeSecond = model.PositionSizeSecond,
+            PositionPercentPortfolio = model.PositionPercentPortfolio,
+            LastPriceFirst = model.LastPriceFirst,
+            LastPriceSecond = model.LastPriceSecond
+        };
+    
+    public static StatisticalArbitrageStrategySignal Map(StatisticalArbitrageStrategySignalEntity entity) =>
+        new()
+        {
+            TickerFirst = entity.TickerFirst,
+            TickerSecond = entity.TickerSecond,
+            CountSignals = entity.CountSignals,
+            CountStrategies = entity.CountStrategies,
+            PercentSignals = entity.PercentSignals,
+            PositionCost = entity.PositionCost,
+            PositionSizeFirst = entity.PositionSizeFirst,
+            PositionSizeSecond = entity.PositionSizeSecond,
+            PositionPercentPortfolio = entity.PositionPercentPortfolio,
+            LastPriceFirst = entity.LastPriceFirst,
+            LastPriceSecond = entity.LastPriceSecond
+        }; 
+    
+    public static StatisticalArbitrageOptimizationResultEntity Map(StatisticalArbitrageOptimizationResult model) =>
+        new()
+        {
+            StartDate = model.StartDate,
+            EndDate = model.EndDate,
+            TickerFirst = model.TickerFirst,
+            TickerSecond = model.TickerSecond,
+            Timeframe = model.Timeframe,
+            StrategyId = model.StrategyId,
+            StrategyDescription = model.StrategyDescription,
+            StrategyName = model.StrategyName,
+            StrategyParams = model.StrategyParams,
+            StrategyParamsHash = model.StrategyParamsHash,
+            NumberPositions = model.NumberPositions,
+            CurrentPositionFirst = model.CurrentPositionFirst,
+            CurrentPositionSecond = model.CurrentPositionSecond,
+            CurrentPositionCost = model.CurrentPositionCost,
+            ProfitFactor = model.ProfitFactor,
+            RecoveryFactor = model.RecoveryFactor,
+            NetProfit = model.NetProfit,
+            AverageProfit = model.AverageProfit,
+            AverageProfitPercent = model.AverageProfitPercent,
+            Drawdown = model.Drawdown,
+            MaxDrawdown = model.MaxDrawdown,
+            MaxDrawdownPercent = model.MaxDrawdownPercent,
+            WinningPositions = model.WinningPositions,
+            WinningTradesPercent = model.WinningTradesPercent,
+            StartMoney = model.StartMoney,
+            EndMoney = model.EndMoney,
+            TotalReturn = model.TotalReturn,
+            AnnualYieldReturn = model.AnnualYieldReturn
+        };
+    
+    public static StatisticalArbitrageOptimizationResult Map(StatisticalArbitrageOptimizationResultEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            StartDate = entity.StartDate,
+            EndDate = entity.EndDate,
+            TickerFirst = entity.TickerFirst,
+            TickerSecond = entity.TickerSecond,
+            Timeframe = entity.Timeframe,
+            StrategyId = entity.StrategyId,
+            StrategyDescription = entity.StrategyDescription,
+            StrategyName = entity.StrategyName,
+            StrategyParams = entity.StrategyParams,
+            StrategyParamsHash = entity.StrategyParamsHash,
+            NumberPositions = entity.NumberPositions,
+            CurrentPositionFirst = entity.CurrentPositionFirst,
+            CurrentPositionSecond = entity.CurrentPositionSecond,
+            CurrentPositionCost = entity.CurrentPositionCost,
+            ProfitFactor = entity.ProfitFactor,
+            RecoveryFactor = entity.RecoveryFactor,
+            NetProfit = entity.NetProfit,
+            AverageProfit = entity.AverageProfit,
+            AverageProfitPercent = entity.AverageProfitPercent,
+            Drawdown = entity.Drawdown,
+            MaxDrawdown = entity.MaxDrawdown,
+            MaxDrawdownPercent = entity.MaxDrawdownPercent,
+            WinningPositions = entity.WinningPositions,
+            WinningTradesPercent = entity.WinningTradesPercent,
+            StartMoney = entity.StartMoney,
+            EndMoney = entity.EndMoney,
+            TotalReturn = entity.TotalReturn,
+            AnnualYieldReturn = entity.AnnualYieldReturn
+        };    
+    
+    public static StatisticalArbitrageBacktestResultEntity Map(StatisticalArbitrageBacktestResult model) =>
+        new()
+        {
+            StartDate = model.StartDate,
+            EndDate = model.EndDate,
+            TickerFirst = model.TickerFirst,
+            TickerSecond = model.TickerSecond,
+            Timeframe = model.Timeframe,
+            StrategyId = model.StrategyId,
+            StrategyDescription = model.StrategyDescription,
+            StrategyName = model.StrategyName,
+            StrategyParams = model.StrategyParams,
+            StrategyParamsHash = model.StrategyParamsHash,
+            NumberPositions = model.NumberPositions,
+            CurrentPositionFirst = model.CurrentPositionFirst,
+            CurrentPositionSecond = model.CurrentPositionSecond,
+            CurrentPositionCost = model.CurrentPositionCost,
+            ProfitFactor = model.ProfitFactor,
+            RecoveryFactor = model.RecoveryFactor,
+            NetProfit = model.NetProfit,
+            AverageProfit = model.AverageProfit,
+            AverageProfitPercent = model.AverageProfitPercent,
+            Drawdown = model.Drawdown,
+            MaxDrawdown = model.MaxDrawdown,
+            MaxDrawdownPercent = model.MaxDrawdownPercent,
+            WinningPositions = model.WinningPositions,
+            WinningTradesPercent = model.WinningTradesPercent,
+            StartMoney = model.StartMoney,
+            EndMoney = model.EndMoney,
+            TotalReturn = model.TotalReturn,
+            AnnualYieldReturn = model.AnnualYieldReturn
+        };
+    
+    public static StatisticalArbitrageBacktestResult Map(StatisticalArbitrageBacktestResultEntity entity) =>
+        new()
+        {
+            Id = entity.Id,
+            StartDate = entity.StartDate,
+            EndDate = entity.EndDate,
+            TickerFirst = entity.TickerFirst,
+            TickerSecond = entity.TickerSecond,
+            Timeframe = entity.Timeframe,
+            StrategyId = entity.StrategyId,
+            StrategyDescription = entity.StrategyDescription,
+            StrategyName = entity.StrategyName,
+            StrategyParams = entity.StrategyParams,
+            StrategyParamsHash = entity.StrategyParamsHash,
+            NumberPositions = entity.NumberPositions,
+            CurrentPositionFirst = entity.CurrentPositionFirst,
+            CurrentPositionSecond = entity.CurrentPositionSecond,
+            CurrentPositionCost = entity.CurrentPositionCost,
+            ProfitFactor = entity.ProfitFactor,
+            RecoveryFactor = entity.RecoveryFactor,
+            NetProfit = entity.NetProfit,
+            AverageProfit = entity.AverageProfit,
+            AverageProfitPercent = entity.AverageProfitPercent,
+            Drawdown = entity.Drawdown,
+            MaxDrawdown = entity.MaxDrawdown,
+            MaxDrawdownPercent = entity.MaxDrawdownPercent,
+            WinningPositions = entity.WinningPositions,
+            WinningTradesPercent = entity.WinningTradesPercent,
+            StartMoney = entity.StartMoney,
+            EndMoney = entity.EndMoney,
+            TotalReturn = entity.TotalReturn,
+            AnnualYieldReturn = entity.AnnualYieldReturn
+        }; 
+    
     public static StrategySignalEntity Map(StrategySignal model) =>
         new()
         {

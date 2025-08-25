@@ -22,7 +22,7 @@ public class Strategy
     
     public Dictionary<string, int> Parameters { get; set; } = new();
     
-    public int StabilizationPeriod { get; set; }
+    public int StabilizationPeriod { get; set; } = 1;
     
     public List<Candle> Candles { get; set; } = new();  
     
