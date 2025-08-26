@@ -676,7 +676,8 @@ public class StatisticalArbitrageService(
 
         await InitDailyCandlesAsync(ticker1, ticker2);
         await InitHourlyCandlesAsync(ticker1, ticker2);
-
+        await InitSpreadsAsync(ticker1, ticker2);
+        
         InitStrategies(strategyId);
     }
 
@@ -690,6 +691,7 @@ public class StatisticalArbitrageService(
 
         await InitDailyCandlesAsync();
         await InitHourlyCandlesAsync();
+        await InitSpreadsAsync();
 
         InitStrategies();
     }
@@ -755,6 +757,21 @@ public class StatisticalArbitrageService(
         }
     }
 
+    private async Task InitSpreadsAsync(string? ticker1 = null, string? ticker2 = null)
+    {
+        var tails = ticker1 is null || ticker2 is null 
+            ? await regressionTailRepository.GetAllAsync()
+            : (await regressionTailRepository.GetAllAsync()).Where(x => x.Ticker1 == ticker1 && x.Ticker2 == ticker2);
+
+        foreach (var tail in tails)
+        {
+            if (tail.Tails.Count == 0)
+                continue;
+
+            Spreads.TryAdd($"{tail.Ticker1},{tail.Ticker2}", tail);
+        }
+    }    
+    
     private async Task<List<string>> GetAllTickers()
     {
         var tails = await regressionTailRepository.GetAllAsync();

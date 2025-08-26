@@ -24,7 +24,7 @@ public class StatisticalArbitrageStrategy
 
     public int StabilizationPeriod { get; set; } = 1;
     
-    public (List<Candle> First, List<Candle> Second) Candles { get; set; } = (new(), new());
+    public (List<Candle> First, List<Candle> Second) Candles { get; set; } = ([], []);
     
     public (List<double> First, List<double> Second) OpenPrices => (Candles.First.Select(x => x.Open).ToList(), Candles.Second.Select(x => x.Open).ToList());
     
