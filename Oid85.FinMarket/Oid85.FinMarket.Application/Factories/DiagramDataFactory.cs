@@ -1,6 +1,5 @@
 ﻿using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
-using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;

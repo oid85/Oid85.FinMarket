@@ -6,16 +6,13 @@ using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
 using Accord.Statistics.Models.Regression.Linear;
-using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using Oid85.FinMarket.Application.Helpers;
-using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.Utils;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.Computation;
 using Oid85.FinMarket.External.ResourceStore;
-using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
 namespace Oid85.FinMarket.Application.Services;
 
@@ -28,7 +25,6 @@ public class AlgoStatisticalArbitrageService(
     IStatisticalArbitrageStrategySignalRepository strategySignalRepository,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
-    IServiceProvider serviceProvider,
     ICorrelationRepository correlationRepository,
     IRegressionTailRepository regressionTailRepository,
     IComputationService computationService,
@@ -36,10 +32,6 @@ public class AlgoStatisticalArbitrageService(
     AlgoHelper algoHelper)
     : IAlgoStatisticalArbitrageService
 {
-    private AlgoConfigResource _algoConfigResource = new();
-
-    private List<StatisticalArbitrageStrategyResource> _statisticalArbitrageStrategyResources = new();
-
     private bool _isOptimization;
 
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
@@ -78,17 +70,9 @@ public class AlgoStatisticalArbitrageService(
                     strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
                     strategy.Ticker = (optimizationResult.TickerFirst, optimizationResult.TickerSecond);
 
-                    var syncCandles = SyncCandles(statisticalArbitrageStrategyResource.Timeframe switch
-                        {
-                            "D" => DailyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
-                            _ => []
-                        },
-                        
-                        statisticalArbitrageStrategyResource.Timeframe switch
-                        {
-                            "D" => DailyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
-                            _ => []
-                        });
+                    var syncCandles = SyncCandles(
+                        DailyCandles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
+                        DailyCandles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
                     strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
 
@@ -170,17 +154,9 @@ public class AlgoStatisticalArbitrageService(
             strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
             strategy.Ticker = (backtestResult.TickerFirst, backtestResult.TickerSecond);
             
-            var syncCandles = SyncCandles(statisticalArbitrageStrategyResource.Timeframe switch
-                {
-                    "D" => DailyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
-                    _ => []
-                },
-                        
-                statisticalArbitrageStrategyResource.Timeframe switch
-                {
-                    "D" => DailyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
-                    _ => []
-                });
+            var syncCandles = SyncCandles(
+                DailyCandles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
+                DailyCandles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
             strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
 
@@ -455,17 +431,9 @@ public class AlgoStatisticalArbitrageService(
                 strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
                 strategy.Ticker = (tickerPair.Split(',')[0], tickerPair.Split(',')[1]);
 
-                var syncCandles = SyncCandles(statisticalArbitrageStrategyResource.Timeframe switch
-                    {
-                        "D" => DailyCandles.TryGetValue(strategy.Ticker.First, out var candles) ? candles : [],
-                        _ => []
-                    },
-                        
-                    statisticalArbitrageStrategyResource.Timeframe switch
-                    {
-                        "D" => DailyCandles.TryGetValue(strategy.Ticker.Second, out var candles) ? candles : [],
-                        _ => []
-                    });
+                var syncCandles = SyncCandles(
+                    DailyCandles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
+                    DailyCandles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
                 strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
 
@@ -537,11 +505,7 @@ public class AlgoStatisticalArbitrageService(
     private async Task InitBacktestAsync(string? ticker1 = null, string? ticker2 = null, Guid? strategyId = null)
     {
         _isOptimization = false;
-
-        // Читаем настройки из ресурсов
-        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        _statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
-
+        
         await InitDailyCandlesAsync(ticker1, ticker2);
         await InitSpreadsAsync(ticker1, ticker2);
         
@@ -551,10 +515,6 @@ public class AlgoStatisticalArbitrageService(
     private async Task InitOptimizationAsync()
     {
         _isOptimization = true;
-
-        // Читаем настройки из ресурсов
-        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        _statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
 
         await InitDailyCandlesAsync();
         await InitSpreadsAsync();

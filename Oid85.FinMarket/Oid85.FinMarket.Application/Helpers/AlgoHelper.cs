@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;

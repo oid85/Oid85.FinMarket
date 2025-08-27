@@ -1,17 +1,14 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
-using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 using Candle = Oid85.FinMarket.Domain.Models.Algo.Candle;
 
 namespace Oid85.FinMarket.Application.Services;
@@ -25,15 +22,10 @@ public class AlgoService(
     IStrategySignalRepository strategySignalRepository,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
-    IServiceProvider serviceProvider,
     ITickerListUtilService tickerListUtilService,
     AlgoHelper algoHelper)
     : IAlgoService
 {
-    private AlgoConfigResource _algoConfigResource = new();
-    
-    private List<AlgoStrategyResource> _algoStrategyResources = new();
-    
     private bool _isOptimization;
     
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
@@ -71,11 +63,7 @@ public class AlgoService(
                     strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
                     strategy.Ticker = optimizationResult.Ticker;
 
-                    strategy.Candles = algoStrategyResource.Timeframe switch
-                    {
-                        "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
-                        _ => []
-                    };
+                    strategy.Candles = DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                     if (strategy.Candles is [])
                         continue;
@@ -144,11 +132,7 @@ public class AlgoService(
             strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
             strategy.Ticker = backtestResult.Ticker;
 
-            strategy.Candles = algoStrategyResource.Timeframe switch
-            {
-                "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
-                _ => []
-            };
+            strategy.Candles = DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
             if (strategy.Candles is [])
                 return (null, null);
@@ -383,11 +367,7 @@ public class AlgoService(
                 strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.Ticker = ticker;                
                 
-                strategy.Candles = algoStrategyResource.Timeframe switch
-                {
-                    "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
-                    _ => []
-                };
+                strategy.Candles = DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                 if (strategy.Candles is [])
                     continue;
@@ -446,10 +426,6 @@ public class AlgoService(
     {
         _isOptimization = false;
         
-        // Читаем настройки из ресурсов
-        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        _algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
-        
         await InitDailyCandlesAsync(ticker);
 
         StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies(strategyId));
@@ -459,10 +435,6 @@ public class AlgoService(
     {
         _isOptimization = true;
         
-        // Читаем настройки из ресурсов
-        _algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        _algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
-
         await InitDailyCandlesAsync();
 
         StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies());
