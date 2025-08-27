@@ -105,6 +105,7 @@ public static class ServiceCollectionExtensions
         await using var scope = scopeFactory.CreateAsyncScope();
         var jobService = scope.ServiceProvider.GetRequiredService<IJobService>();
         
+        RegisterJob(KnownJobs.LoadDailyCandles, () => jobService.LoadDailyCandles());
         RegisterJob(KnownJobs.EarlyInTheDay, () => jobService.EarlyInTheDay());
         RegisterJob(KnownJobs.Every15Minutes, () => jobService.Every15Minutes());
         RegisterJob(KnownJobs.Every10Minutes, () => jobService.Every10Minutes());

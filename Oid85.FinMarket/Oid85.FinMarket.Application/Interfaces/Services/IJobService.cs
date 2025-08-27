@@ -6,6 +6,12 @@
 public interface IJobService
 {
     /// <summary>
+    /// Загрузка дневных свечей
+    /// </summary>
+    /// <returns></returns>
+    Task LoadDailyCandles();
+    
+    /// <summary>
     /// В начале дня
     /// </summary>
     /// <returns></returns>

@@ -18,6 +18,12 @@ public class JobService(
     : IJobService
 {
     /// <inheritdoc />
+    public async Task LoadDailyCandles()
+    {
+        await LoadDailyCandlesAsync();
+    }
+
+    /// <inheritdoc />
     public async Task EarlyInTheDay()
     {
         await LoadInstrumentsAsync();
@@ -25,7 +31,6 @@ public class JobService(
         await LoadAssetReportEventsAsync();
         await LoadBondCouponsAsync();
         await LoadDividendInfosAsync();
-        await LoadDailyCandlesAsync();
         await ImportAsync();        
         await LoadForecastsAsync();
         await AnalyseAsync();
