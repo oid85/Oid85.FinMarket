@@ -14,7 +14,7 @@ public class JobService(
     IMarketEventService marketEventService,
     ISendService sendService,
     IAlgoService algoService,
-    IStatisticalArbitrageService statisticalArbitrageService) 
+    IAlgoStatisticalArbitrageService algoStatisticalArbitrageService) 
     : IJobService
 {
     /// <inheritdoc />
@@ -227,8 +227,8 @@ public class JobService(
     {
         try
         {
-            await statisticalArbitrageService.CalculateCorrelationAsync();
-            await statisticalArbitrageService.CalculateRegressionTailsAsync();
+            await algoStatisticalArbitrageService.CalculateCorrelationAsync();
+            await algoStatisticalArbitrageService.CalculateRegressionTailsAsync();
             
             logger.Info("Метод 'StatisticalArbitrationAsync' выполнен успешно");
         }

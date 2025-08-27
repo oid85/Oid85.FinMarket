@@ -8,7 +8,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/debug")]
 [ApiController]
 public class DebugController(
-    ILoadService service) 
+    IAlgoStatisticalArbitrageService service) 
     : FinMarketBaseController
 {
     [HttpGet("debug")]
@@ -17,7 +17,7 @@ public class DebugController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Debug()
     {
-        await service.LoadFuturesAsync();
+        await service.OptimizeAsync();
             
         return Ok();
     }

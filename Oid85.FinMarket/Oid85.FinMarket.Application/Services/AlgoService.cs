@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.Helpers;
@@ -18,7 +19,6 @@ namespace Oid85.FinMarket.Application.Services;
 public class AlgoService(
     ILogger logger,
     IDailyCandleRepository dailyCandleRepository,
-    IHourlyCandleRepository hourlyCandleRepository,
     IResourceStoreService resourceStoreService,
     IBacktestResultRepository backtestResultRepository,
     IOptimizationResultRepository optimizationResultRepository,
@@ -26,7 +26,8 @@ public class AlgoService(
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
     IServiceProvider serviceProvider,
-    ITickerListUtilService tickerListUtilService)
+    ITickerListUtilService tickerListUtilService,
+    AlgoHelper algoHelper)
     : IAlgoService
 {
     private AlgoConfigResource _algoConfigResource = new();
@@ -36,8 +37,6 @@ public class AlgoService(
     private bool _isOptimization;
     
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
-    
-    public ConcurrentDictionary<string, List<Candle>> HourlyCandles { get; set; } = new();
     
     public ConcurrentDictionary<Guid, Strategy> StrategyDictionary { get; set; } = new();
     
@@ -75,7 +74,6 @@ public class AlgoService(
                     strategy.Candles = algoStrategyResource.Timeframe switch
                     {
                         "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
-                        "H" => HourlyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
                         _ => []
                     };
 
@@ -104,7 +102,7 @@ public class AlgoService(
                     
                     strategy.Execute();
 
-                    var backtestResult = CreateBacktestResult(strategy);
+                    var backtestResult = AlgoMapper.MapToBacktestResult(strategy);
                     backtestResults.Add(backtestResult);
                 }
                 
@@ -145,14 +143,10 @@ public class AlgoService(
             strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
             strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
             strategy.Ticker = backtestResult.Ticker;
-            strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-            strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
-            strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
 
             strategy.Candles = algoStrategyResource.Timeframe switch
             {
                 "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
-                "H" => HourlyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
                 _ => []
             };
 
@@ -180,7 +174,7 @@ public class AlgoService(
             
             strategy.Execute();
 
-            backtestResult = CreateBacktestResult(strategy);
+            backtestResult = AlgoMapper.MapToBacktestResult(strategy);
             
             return (backtestResult, strategy);
         }
@@ -392,7 +386,6 @@ public class AlgoService(
                 strategy.Candles = algoStrategyResource.Timeframe switch
                 {
                     "D" => DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
-                    "H" => HourlyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [],
                     _ => []
                 };
 
@@ -402,7 +395,7 @@ public class AlgoService(
                 if (strategy.Candles.Count < strategy.StabilizationPeriod + 1)
                     continue;
                 
-                var parameterSets = GetParameterSets(algoStrategyResource.Params);
+                var parameterSets = algoHelper.GetParameterSets(algoStrategyResource.Params);
                 
                 foreach (var parameterSet in parameterSets)
                 {
@@ -424,7 +417,7 @@ public class AlgoService(
                         
                         strategy.Execute();
 
-                        var optimizationResult = CreateOptimizationResult(strategy);
+                        var optimizationResult = AlgoMapper.MapToOptimizationResult(strategy);
                         optimizationResults.Add(optimizationResult);
                     }
                     
@@ -448,126 +441,6 @@ public class AlgoService(
         
         return true;
     }
-
-    private static List<Dictionary<string, int>> GetParameterSets(List<StrategyParamResource> strategyParams)
-    {
-        var result = new List<Dictionary<string, int>>();
-        
-        switch (strategyParams.Count)
-        {
-            case 1:
-                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step) 
-                    result.Add(
-                        new Dictionary<string, int>
-                        {
-                            [strategyParams[0].Name] = paramValue1
-                        });
-
-                return result;
-            
-            case 2:
-                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step) 
-                for (int paramValue2 = strategyParams[1].Min; paramValue2 <= strategyParams[1].Max; paramValue2 += strategyParams[1].Step) 
-                    result.Add(
-                        new Dictionary<string, int>
-                        {
-                            [strategyParams[0].Name] = paramValue1,
-                            [strategyParams[1].Name] = paramValue2
-                        });
-
-                return result;
-            
-            case 3:
-                for (int paramValue1 = strategyParams[0].Min; paramValue1 <= strategyParams[0].Max; paramValue1 += strategyParams[0].Step) 
-                for (int paramValue2 = strategyParams[1].Min; paramValue2 <= strategyParams[1].Max; paramValue2 += strategyParams[1].Step)
-                for (int paramValue3 = strategyParams[2].Min; paramValue3 <= strategyParams[2].Max; paramValue3 += strategyParams[2].Step)
-                    result.Add(
-                        new Dictionary<string, int>
-                        {
-                            [strategyParams[0].Name] = paramValue1,
-                            [strategyParams[1].Name] = paramValue2,
-                            [strategyParams[2].Name] = paramValue3
-                        });
-                
-                return result;     
-        }
-
-        throw new Exception("Количество параметров больше 3. Оптимизация выполняться не будет");
-    }
-
-    private static OptimizationResult CreateOptimizationResult(Strategy strategy)
-    {
-        var json = JsonSerializer.Serialize(strategy.Parameters);
-        
-        var result = new OptimizationResult
-        {
-            StrategyId = strategy.StrategyId,
-            StartDate = strategy.StartDate,
-            EndDate = strategy.EndDate,
-            Timeframe  = strategy.Timeframe,
-            Ticker  = strategy.Ticker,
-            StrategyDescription  = strategy.StrategyDescription,
-            StrategyName  = strategy.StrategyName,
-            StrategyParams  = json,
-            StrategyParamsHash = ConvertHelper.Md5Encode(json),
-            NumberPositions  = strategy.NumberPositions,
-            CurrentPosition  = strategy.CurrentPosition,
-            CurrentPositionCost  = strategy.CurrentPositionCost,
-            ProfitFactor  = strategy.ProfitFactor,
-            RecoveryFactor  = strategy.RecoveryFactor,
-            NetProfit  = strategy.NetProfit,
-            AverageProfit  = strategy.AverageNetProfit,
-            AverageProfitPercent  = strategy.AverageNetProfitPercent,
-            Drawdown  = strategy.Drawdown,
-            MaxDrawdown  = strategy.MaxDrawdown,
-            MaxDrawdownPercent  = strategy.MaxDrawdownPercent,
-            WinningPositions  = strategy.WinningPositions,
-            WinningTradesPercent  = strategy.WinningTradesPercent,
-            StartMoney  = strategy.StartMoney,
-            EndMoney  = strategy.EndMoney,
-            TotalReturn  = strategy.TotalReturn,
-            AnnualYieldReturn  = strategy.AnnualYieldReturn
-        };
-        
-        return result;
-    }    
-    
-    private static BacktestResult CreateBacktestResult(Strategy strategy)
-    {
-        var json = JsonSerializer.Serialize(strategy.Parameters);
-        
-        var result = new BacktestResult
-        {
-            StrategyId = strategy.StrategyId,
-            StartDate = strategy.StartDate,
-            EndDate = strategy.EndDate,
-            Timeframe  = strategy.Timeframe,
-            Ticker  = strategy.Ticker,
-            StrategyDescription  = strategy.StrategyDescription,
-            StrategyName  = strategy.StrategyName,
-            StrategyParams  = json,
-            StrategyParamsHash = ConvertHelper.Md5Encode(json),
-            NumberPositions  = strategy.NumberPositions,
-            CurrentPosition  = strategy.CurrentPosition,
-            CurrentPositionCost  = strategy.CurrentPositionCost,
-            ProfitFactor  = strategy.ProfitFactor,
-            RecoveryFactor  = strategy.RecoveryFactor,
-            NetProfit  = strategy.NetProfit,
-            AverageProfit  = strategy.AverageNetProfit,
-            AverageProfitPercent  = strategy.AverageNetProfitPercent,
-            Drawdown  = strategy.Drawdown,
-            MaxDrawdown  = strategy.MaxDrawdown,
-            MaxDrawdownPercent  = strategy.MaxDrawdownPercent,
-            WinningPositions  = strategy.WinningPositions,
-            WinningTradesPercent  = strategy.WinningTradesPercent,
-            StartMoney  = strategy.StartMoney,
-            EndMoney  = strategy.EndMoney,
-            TotalReturn  = strategy.TotalReturn,
-            AnnualYieldReturn  = strategy.AnnualYieldReturn
-        };
-        
-        return result;
-    }    
     
     private async Task InitBacktestAsync(string? ticker = null, Guid? strategyId = null)
     {
@@ -578,9 +451,8 @@ public class AlgoService(
         _algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
         
         await InitDailyCandlesAsync(ticker);
-        await InitHourlyCandlesAsync(ticker);
-        
-        InitStrategies(strategyId);
+
+        StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies(strategyId));
     }
     
     private async Task InitOptimizationAsync()
@@ -592,35 +464,15 @@ public class AlgoService(
         _algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
 
         await InitDailyCandlesAsync();
-        await InitHourlyCandlesAsync();
-        
-        InitStrategies();
-    }
 
-    private void InitStrategies(Guid? strategyId = null)
-    {
-        var algoStrategyResources = strategyId is null 
-            ? _algoStrategyResources 
-            : _algoStrategyResources.Where(x => x.Id == strategyId);
-        
-        foreach (var algoStrategyResource in algoStrategyResources)
-        {
-            var strategy = serviceProvider.GetRequiredKeyedService<Strategy>(algoStrategyResource.Name);
-                
-            strategy.StrategyId = algoStrategyResource.Id;
-            strategy.Timeframe = algoStrategyResource.Timeframe;
-            strategy.StrategyDescription = algoStrategyResource.Description;
-            strategy.StrategyName = algoStrategyResource.Name;
-                
-            StrategyDictionary.TryAdd(algoStrategyResource.Id, strategy);
-        }
+        StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies());
     }
 
     private async Task InitDailyCandlesAsync(string? ticker = null)
     {
-        var dates = GetDailyDates();
+        var dates = await GetDatesAsync();
 
-        var tickers = ticker is null ? await GetAllTickers() : [ticker];
+        var tickers = ticker is null ? await algoHelper.GetAllTickersForAlgoAsync() : [ticker];
         
         foreach (string instrumentTicker in tickers)
         {
@@ -636,98 +488,11 @@ public class AlgoService(
             DailyCandles.TryAdd(instrumentTicker, candles);
         }
     }
-
-    private async Task InitHourlyCandlesAsync(string? ticker = null)
-    {
-        var dates = GetHourlyDates();
-        
-        var tickers = ticker is null ? await GetAllTickers() : [ticker];
-        
-        foreach (string instrumentTicker in tickers)
-        {
-            var candles = (await hourlyCandleRepository.GetAsync(instrumentTicker, dates.From, dates.To))
-                .Select(AlgoMapper.Map).ToList();
-
-            if (candles.Count == 0)
-                continue;
-            
-            for (int i = 0; i < candles.Count; i++)
-                candles[i].Index = i;            
-            
-            HourlyCandles.TryAdd(instrumentTicker, candles);
-        }
-    }
-
-    private async Task<List<string>> GetAllTickers()
-    {
-        var tickers = new List<string>();
-
-        foreach (var algoStrategyResource in _algoStrategyResources)
-        {
-            var tickersInTickerList = (await resourceStoreService.GetTickerListAsync(algoStrategyResource.TickerList)).Tickers;
-
-            foreach (var ticker in tickersInTickerList.Where(ticker => !tickers.Contains(ticker))) 
-                tickers.Add(ticker);
-        }
-        
-        return tickers;
-    }
-
-    private (DateOnly From, DateOnly To) GetDailyDates()
-    {
-        DateOnly from;
-        DateOnly to;
-        
-        var today = DateOnly.FromDateTime(DateTime.Today);
-        
-        if (_isOptimization)
-        {
-            from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.DailyStabilizationPeriodInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
-            
-            to = today.AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
-        }
-
-        else
-        {
-            from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.DailyStabilizationPeriodInDays);
-            
-            to = today;
-        }
-
-        return (from, to);
-    }
     
-    private (DateOnly From, DateOnly To) GetHourlyDates()
+    private async Task<(DateOnly From, DateOnly To)> GetDatesAsync()
     {
-        DateOnly from;
-        DateOnly to;
-        
-        var today = DateOnly.FromDateTime(DateTime.Today);
-        
         if (_isOptimization)
-        {
-            from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.HourlyStabilizationPeriodInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
-            
-            to = today.AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestShiftInDays);
-        }
-
-        else
-        {
-            from = today
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.BacktestWindowInDays)
-                .AddDays(-1 * _algoConfigResource.PeriodConfigResource.HourlyStabilizationPeriodInDays);
-            
-            to = today;
-        }
-        
-        return (from, to);
+            return await algoHelper.GetOptimizationDatesAsync();
+        return await algoHelper.GetBacktestDatesAsync();
     }
 }

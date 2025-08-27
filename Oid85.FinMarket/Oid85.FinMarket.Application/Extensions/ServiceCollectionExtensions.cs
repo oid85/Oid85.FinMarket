@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<HurstAnalyseService>();
         
         services.AddTransient<ColorHelper>();
+        services.AddTransient<AlgoHelper>();
         
         services.AddTransient<ISharesReportService, SharesReportService>();
         services.AddTransient<IIndexesReportService, IndexesReportService>();
@@ -63,7 +64,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISectorIndexService, SectorIndexService>();
         
         services.AddTransient<IAlgoService, AlgoService>();
-        services.AddTransient<IStatisticalArbitrageService, StatisticalArbitrageService>();
+        services.AddTransient<IAlgoStatisticalArbitrageService, AlgoStatisticalArbitrageService>();
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();

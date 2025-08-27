@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.Application.Interfaces.Services;
 
-public interface IStatisticalArbitrageService
+public interface IAlgoStatisticalArbitrageService
 {
     /// <summary>
     /// Рассчитать корреляции
