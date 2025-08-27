@@ -79,7 +79,7 @@ public class DiagramDataFactory(
 
     public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(Strategy strategy)
     {
-        var diagramData = new BacktestResultDiagramData { Title = $"{strategy.StrategyName}"};
+        var diagramData = new BacktestResultDiagramData { Title = $"{strategy.StrategyName} {strategy.Candles.First().DateTime.ToString(KnownDateTimeFormats.DateISO)} - {strategy.Candles.Last().DateTime.ToString(KnownDateTimeFormats.DateISO)}"};
 
         // Price, Filter, Indicator, ChannelBands
         for (int i = 0; i < strategy.Candles.Count; i++)
@@ -125,7 +125,7 @@ public class DiagramDataFactory(
 
     public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies)
     {
-        var diagramData = new BacktestResultDiagramData();
+        var diagramData = new BacktestResultDiagramData { Title = $"Бэктест стратегий {strategies[0].Candles.First().DateTime.ToString(KnownDateTimeFormats.DateISO)} - {strategies[0].Candles.Last().DateTime.ToString(KnownDateTimeFormats.DateISO)}" };
         
         // Price
         for (int i = 0; i < strategies[0].Candles.Count; i++)
@@ -174,7 +174,7 @@ public class DiagramDataFactory(
 
     public async Task<BacktestResultDiagramData> CreateBacktestResultWithoutPriceDiagramDataAsync(List<Strategy> strategies)
     {
-        var diagramData = new BacktestResultDiagramData();
+        var diagramData = new BacktestResultDiagramData { Title = $"Бэктест портфеля стратегий" };
         
         // Date
         for (int i = 0; i < strategies[0].Candles.Count; i++)
@@ -212,11 +212,17 @@ public class DiagramDataFactory(
 
         foreach (var tail in regressionTails.OrderBy(x => x.Ticker1))
         {
-            var dataPointSeries = new SimpleDataPointSeries { Title = $"'{tail.Ticker1}' vs. '{tail.Ticker2}'" };
+            var tailItems = tail.Tails
+                .Where(x => x.Date >= from && x.Date <= to)
+                .OrderBy(x => x.Date)
+                .ToList();
 
-            foreach (var tailItem in tail.Tails
-                         .Where(x => x.Date >= from && x.Date <= to)
-                         .OrderBy(x => x.Date))
+            if (!tailItems.Any())
+                continue;
+            
+            var dataPointSeries = new SimpleDataPointSeries { Title = $"'{tail.Ticker1}' vs. '{tail.Ticker2}' {tailItems.First().Date.ToString(KnownDateTimeFormats.DateISO)} - {tailItems.Last().Date.ToString(KnownDateTimeFormats.DateISO)}" };
+            
+            foreach (var tailItem in tailItems)
                 
                 dataPointSeries.Series.Add(new SimpleDataPoint
                 {
