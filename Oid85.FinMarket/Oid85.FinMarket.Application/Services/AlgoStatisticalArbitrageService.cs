@@ -32,8 +32,6 @@ public class AlgoStatisticalArbitrageService(
     AlgoHelper algoHelper)
     : IAlgoStatisticalArbitrageService
 {
-    private bool _isOptimization;
-
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
 
     public ConcurrentDictionary<string, RegressionTail> Spreads { get; set; } = new();
@@ -504,9 +502,7 @@ public class AlgoStatisticalArbitrageService(
     
     private async Task InitBacktestAsync(string? ticker1 = null, string? ticker2 = null, Guid? strategyId = null)
     {
-        _isOptimization = false;
-        
-        await InitDailyCandlesAsync(ticker1, ticker2);
+        await InitDailyCandlesAsync(false, ticker1, ticker2);
         await InitSpreadsAsync(ticker1, ticker2);
         
         StrategyDictionary = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies(strategyId));
@@ -514,17 +510,15 @@ public class AlgoStatisticalArbitrageService(
 
     private async Task InitOptimizationAsync()
     {
-        _isOptimization = true;
-
-        await InitDailyCandlesAsync();
+        await InitDailyCandlesAsync(true);
         await InitSpreadsAsync();
 
         StrategyDictionary = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies());
     }
 
-    private async Task InitDailyCandlesAsync(string? ticker1 = null, string? ticker2 = null)
+    private async Task InitDailyCandlesAsync(bool isOptimization, string? ticker1 = null, string? ticker2 = null)
     {
-        var dates = await GetDatesAsync();
+        var dates = await GetDatesAsync(isOptimization);
 
         var tickers = ticker1 is null || ticker2 is null 
             ? await algoHelper.GetAllTickersForStatisticalArbitrageAsync() 
@@ -560,13 +554,9 @@ public class AlgoStatisticalArbitrageService(
         }
     }    
     
-    private async Task<(DateOnly From, DateOnly To)> GetDatesAsync()
-    {
-        if (_isOptimization)
-            return await algoHelper.GetOptimizationDatesAsync();
-        return await algoHelper.GetBacktestDatesAsync();
-    }
-    
+    private async Task<(DateOnly From, DateOnly To)> GetDatesAsync(bool isOptimization) => 
+        isOptimization ? await algoHelper.GetOptimizationDatesAsync() : await algoHelper.GetBacktestDatesAsync();
+
     /// <inheritdoc />
     public async Task CalculateCorrelationAsync()
     {
@@ -659,9 +649,7 @@ public class AlgoStatisticalArbitrageService(
 
     /// <inheritdoc />
     public Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync() =>
-        CalculateRegressionTailsAsync(
-            DateOnly.FromDateTime(DateTime.Today.AddYears(-3)),
-            DateOnly.FromDateTime(DateTime.Today));
+        CalculateRegressionTailsAsync(DateOnly.FromDateTime(DateTime.Today.AddYears(-5)), DateOnly.FromDateTime(DateTime.Today));
 
     private async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync(DateOnly from, DateOnly to)
     {

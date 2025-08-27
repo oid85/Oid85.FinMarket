@@ -26,8 +26,6 @@ public class AlgoService(
     AlgoHelper algoHelper)
     : IAlgoService
 {
-    private bool _isOptimization;
-    
     public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
     
     public ConcurrentDictionary<Guid, Strategy> StrategyDictionary { get; set; } = new();
@@ -424,25 +422,21 @@ public class AlgoService(
     
     private async Task InitBacktestAsync(string? ticker = null, Guid? strategyId = null)
     {
-        _isOptimization = false;
-        
-        await InitDailyCandlesAsync(ticker);
+        await InitDailyCandlesAsync(false, ticker);
 
         StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies(strategyId));
     }
     
     private async Task InitOptimizationAsync()
     {
-        _isOptimization = true;
-        
-        await InitDailyCandlesAsync();
+        await InitDailyCandlesAsync(true);
 
         StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies());
     }
 
-    private async Task InitDailyCandlesAsync(string? ticker = null)
+    private async Task InitDailyCandlesAsync(bool isOptimization, string? ticker = null)
     {
-        var dates = await GetDatesAsync();
+        var dates = await GetDatesAsync(isOptimization);
 
         var tickers = ticker is null ? await algoHelper.GetAllTickersForAlgoAsync() : [ticker];
         
@@ -461,10 +455,6 @@ public class AlgoService(
         }
     }
     
-    private async Task<(DateOnly From, DateOnly To)> GetDatesAsync()
-    {
-        if (_isOptimization)
-            return await algoHelper.GetOptimizationDatesAsync();
-        return await algoHelper.GetBacktestDatesAsync();
-    }
+    private async Task<(DateOnly From, DateOnly To)> GetDatesAsync(bool isOptimization) => 
+        isOptimization ? await algoHelper.GetOptimizationDatesAsync() : await algoHelper.GetBacktestDatesAsync();
 }
