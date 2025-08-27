@@ -801,7 +801,7 @@ public class ReportDataFactory(
             GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),
-            GetNumber(strategySignals.Sum(x => x.PositionCost)),
+            GetNumber(strategySignals.Sum(x => Math.Abs(x.PositionCost))),
             GetString(string.Empty),
             GetString(string.Empty)
         ]); 
