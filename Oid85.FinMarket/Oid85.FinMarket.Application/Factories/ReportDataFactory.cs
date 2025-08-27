@@ -815,7 +815,7 @@ public class ReportDataFactory(
 
             double percent = 0.0;
             if (strategySignal.CountStrategies != 0)
-                percent = (double) strategySignal.CountSignals / (double) strategySignal.CountStrategies * 100.0;
+                percent = Convert.ToDouble(strategySignal.CountSignals) / Convert.ToDouble(strategySignal.CountStrategies) * 100.0;
 
             string color = ColorHelper.GreenScale(percent);
             
