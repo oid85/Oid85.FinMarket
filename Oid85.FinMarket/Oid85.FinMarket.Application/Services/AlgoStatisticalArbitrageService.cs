@@ -649,7 +649,7 @@ public class AlgoStatisticalArbitrageService(
 
     /// <inheritdoc />
     public Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync() =>
-        CalculateRegressionTailsAsync(DateOnly.FromDateTime(DateTime.Today.AddYears(-5)), DateOnly.FromDateTime(DateTime.Today));
+        CalculateRegressionTailsAsync(DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), DateOnly.FromDateTime(DateTime.Today));
 
     private async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync(DateOnly from, DateOnly to)
     {
