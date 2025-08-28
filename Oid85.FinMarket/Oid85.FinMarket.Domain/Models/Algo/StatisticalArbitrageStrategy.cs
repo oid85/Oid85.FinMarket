@@ -51,22 +51,6 @@ public class StatisticalArbitrageStrategy
     public bool SignalCloseShortLong { get; set; }
     
     public List<ArbitragePosition> Positions { get; set; } = new();
-    
-    public (int First, int Second) GetPositionSize((double First, double Second) orderPrice)
-    {
-        double money = EndMoney;
-        
-        if (money <= orderPrice.First + orderPrice.Second)
-            return (0, 0);
-
-        // По половине капитала для каждой ноги арбитража
-        money /= 2.0;
-        
-        int positionSizeFirst = (int) Math.Round(money / orderPrice.First);
-        int positionSizeSecond = (int) Math.Round(money / orderPrice.Second);
-
-        return (positionSizeFirst, positionSizeSecond);
-    }
 
     public ArbitragePosition? LastActivePosition {
         get
@@ -259,9 +243,9 @@ public class StatisticalArbitrageStrategy
     
     public double AnnualYieldReturn => EndMoney > StartMoney ? TotalReturn / ((EndDate.DayNumber - StartDate.DayNumber) / 365.0): 0.0;
     
-    public virtual void Execute()
+    public virtual Task Execute()
     {
-
+        return Task.CompletedTask;
     }
     
     public void InitForParameterSet(Dictionary<string, int> parameterSet, int stabilizationPeriod, double startMoney, double endMoney)

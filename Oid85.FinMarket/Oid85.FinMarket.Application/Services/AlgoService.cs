@@ -267,10 +267,8 @@ public class AlgoService(
         
         async Task<double> GetLastPriceAsync(string ticker)
         {
-            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares))
-                .Select(x => x.Ticker).ToList();
-            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures))
-                .Select(x => x.Ticker).ToList();
+            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
+            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
             
             if (sharesTickers.Contains(ticker))
                 return (await shareRepository.GetAsync(ticker))!.LastPrice;

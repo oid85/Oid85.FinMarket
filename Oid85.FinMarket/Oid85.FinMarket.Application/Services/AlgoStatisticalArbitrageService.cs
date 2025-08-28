@@ -92,7 +92,7 @@ public class AlgoStatisticalArbitrageService(
                         algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
                         algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
 
-                    strategy.Execute();
+                    await strategy.Execute();
                     
                     backtestResults.Add(AlgoMapper.MapToBacktestResult(strategy));
                 }
@@ -162,7 +162,7 @@ public class AlgoStatisticalArbitrageService(
                 algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
                 algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
 
-            strategy.Execute();
+            await strategy.Execute();
             
             return (AlgoMapper.MapToBacktestResult(strategy), strategy);
         }
@@ -315,10 +315,8 @@ public class AlgoStatisticalArbitrageService(
 
         async Task<(double First, double Second)> GetLastPriceAsync(string tickerFirst, string tickerSecond)
         {
-            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares))
-                .Select(x => x.Ticker).ToList();
-            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures))
-                .Select(x => x.Ticker).ToList();
+            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
+            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
 
             double lastPriceFirst = 0.0;
             double lastPriceSecond = 0.0;
@@ -429,7 +427,7 @@ public class AlgoStatisticalArbitrageService(
                             algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
                             algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
 
-                        strategy.Execute();
+                        await strategy.Execute();
                         
                         optimizationResults.Add(AlgoMapper.MapToOptimizationResult(strategy));
                     }
