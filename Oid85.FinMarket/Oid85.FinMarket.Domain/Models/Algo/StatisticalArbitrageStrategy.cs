@@ -263,4 +263,19 @@ public class StatisticalArbitrageStrategy
     {
 
     }
+    
+    public void InitForParameterSet(Dictionary<string, int> parameterSet, int stabilizationPeriod, double startMoney, double endMoney)
+    {
+        Parameters = parameterSet;
+        Positions.Clear();
+        EqiutyCurve.Clear();
+        DrawdownCurve.Clear();
+        StabilizationPeriod = stabilizationPeriod;
+        StartMoney = startMoney;
+        EndMoney = endMoney;
+
+        GraphPoints.Clear();
+        for (int i = 0; i < Candles.First.Count; i++)
+            GraphPoints.Add(new ArbitrageGraphPoint());
+    }
 }

@@ -9,13 +9,13 @@ using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
+using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 using Candle = Oid85.FinMarket.Domain.Models.Algo.Candle;
 
 namespace Oid85.FinMarket.Application.Services;
 
 public class AlgoService(
     ILogger logger,
-    IDailyCandleRepository dailyCandleRepository,
     IResourceStoreService resourceStoreService,
     IBacktestResultRepository backtestResultRepository,
     IOptimizationResultRepository optimizationResultRepository,
@@ -26,13 +26,14 @@ public class AlgoService(
     AlgoHelper algoHelper)
     : IAlgoService
 {
-    public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
+    private ConcurrentDictionary<string, List<Candle>> Candles { get; set; } = new();
+    private ConcurrentDictionary<Guid, Strategy> Strategies { get; set; } = new();
     
-    public ConcurrentDictionary<Guid, Strategy> StrategyDictionary { get; set; } = new();
-    
+    /// <inheritdoc />
     public async Task<bool> BacktestAsync()
     {
-        await InitBacktestAsync();
+        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetAlgoCandlesAsync(false));
+        Strategies = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies());
         
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
@@ -41,7 +42,7 @@ public class AlgoService(
         
         await backtestResultRepository.InvertDeleteAsync(algoStrategyResources.Select(x => x.Id).ToList());
         
-        foreach (var (strategyId, strategy) in StrategyDictionary)
+        foreach (var (strategyId, strategy) in Strategies)
         {
             await backtestResultRepository.DeleteAsync(strategyId);
             
@@ -56,40 +57,26 @@ public class AlgoService(
             {
                 try
                 {
-                    strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-                    strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
-                    strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
                     strategy.Ticker = optimizationResult.Ticker;
-
-                    strategy.Candles = DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
+                    strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                     if (strategy.Candles is [])
                         continue;
 
-                    if (strategy.Candles.Count < strategy.StabilizationPeriod + 1)
-                        continue;
-
-                    var parameterSet =
-                        JsonSerializer.Deserialize<Dictionary<string, int>>(optimizationResult.StrategyParams);
+                    var parameterSet = JsonSerializer.Deserialize<Dictionary<string, int>>(optimizationResult.StrategyParams);
 
                     if (parameterSet is null)
                         continue;
-
-                    strategy.Parameters = parameterSet;
-                    strategy.StopLimits.Clear();
-                    strategy.Positions.Clear();
-                    strategy.EqiutyCurve.Clear();
-                    strategy.DrawdownCurve.Clear();
-                    strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-
-                    strategy.GraphPoints.Clear();
-                    for (int i = 0; i < strategy.Candles.Count; i++)
-                        strategy.GraphPoints.Add(new GraphPoint());
+                    
+                    strategy.InitForParameterSet(
+                        parameterSet, 
+                        algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
+                        algoConfigResource.MoneyManagementResource.Money, 
+                        algoConfigResource.MoneyManagementResource.Money);
                     
                     strategy.Execute();
-
-                    var backtestResult = AlgoMapper.MapToBacktestResult(strategy);
-                    backtestResults.Add(backtestResult);
+                    
+                    backtestResults.Add(AlgoMapper.MapToBacktestResult(strategy));
                 }
                 
                 catch (Exception exception)
@@ -104,6 +91,7 @@ public class AlgoService(
         return true;
     }
 
+    /// <inheritdoc />
     public async Task<(BacktestResult? backtestResult, Strategy? strategy)> BacktestAsync(Guid backtestResultId)
     {
         try
@@ -112,9 +100,10 @@ public class AlgoService(
 
             if (backtestResult is null)
                 return (null, null);
-
-            await InitBacktestAsync(backtestResult.Ticker, backtestResult.StrategyId);
-
+            
+            Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetAlgoCandlesAsync(false, backtestResult.Ticker));
+            Strategies = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies(backtestResult.StrategyId));
+            
             var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
             var algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
 
@@ -123,19 +112,12 @@ public class AlgoService(
             if (algoStrategyResource is null)
                 return (null, null);
 
-            var strategy = StrategyDictionary[backtestResult.StrategyId];
-
-            strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-            strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
-            strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
+            var strategy = Strategies[backtestResult.StrategyId];
+            
             strategy.Ticker = backtestResult.Ticker;
-
-            strategy.Candles = DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
+            strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
             if (strategy.Candles is [])
-                return (null, null);
-
-            if (strategy.Candles.Count < strategy.StabilizationPeriod + 1)
                 return (null, null);
 
             var parameterSet = JsonSerializer.Deserialize<Dictionary<string, int>>(backtestResult.StrategyParams);
@@ -143,22 +125,15 @@ public class AlgoService(
             if (parameterSet is null)
                 return (null, null);
 
-            strategy.Parameters = parameterSet;
-            strategy.StopLimits.Clear();
-            strategy.Positions.Clear();
-            strategy.EqiutyCurve.Clear();
-            strategy.DrawdownCurve.Clear();
-            strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-
-            strategy.GraphPoints.Clear();
-            for (int i = 0; i < strategy.Candles.Count; i++)
-                strategy.GraphPoints.Add(new GraphPoint());
+            strategy.InitForParameterSet(
+                parameterSet, 
+                algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
+                algoConfigResource.MoneyManagementResource.Money, 
+                algoConfigResource.MoneyManagementResource.Money);            
             
             strategy.Execute();
-
-            backtestResult = AlgoMapper.MapToBacktestResult(strategy);
             
-            return (backtestResult, strategy);
+            return (AlgoMapper.MapToBacktestResult(strategy), strategy);
         }
         
         catch (Exception exception)
@@ -168,6 +143,7 @@ public class AlgoService(
         }
     }
 
+    /// <inheritdoc />
     public async Task<bool> CalculateStrategySignalsAsync()
     {
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
@@ -332,11 +308,13 @@ public class AlgoService(
         }
     }
 
+    /// <inheritdoc />
     public async Task<bool> OptimizeAsync()
     {
         var sw = Stopwatch.StartNew();
         
-        await InitOptimizationAsync();
+        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetAlgoCandlesAsync(true));
+        Strategies = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies());
         
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var algoStrategyResources = await resourceStoreService.GetAlgoStrategiesAsync();
@@ -345,7 +323,7 @@ public class AlgoService(
 
         int count = 0;
         
-        foreach (var (strategyId, strategy) in StrategyDictionary)
+        foreach (var (strategyId, strategy) in Strategies)
         {
             await optimizationResultRepository.DeleteAsync(strategyId);
             
@@ -360,20 +338,13 @@ public class AlgoService(
             
             foreach (var ticker in tickers)
             {
-                strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-                strategy.StartMoney = algoConfigResource.MoneyManagementResource.Money;
-                strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
                 strategy.Ticker = ticker;                
-                
-                strategy.Candles = DailyCandles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
+                strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                 if (strategy.Candles is [])
                     continue;
                 
-                if (strategy.Candles.Count < strategy.StabilizationPeriod + 1)
-                    continue;
-                
-                var parameterSets = algoHelper.GetParameterSets(algoStrategyResource.Params);
+                var parameterSets = AlgoHelper.GetParameterSets(algoStrategyResource.Params);
                 
                 foreach (var parameterSet in parameterSets)
                 {
@@ -381,22 +352,16 @@ public class AlgoService(
                     {
                         if (parameterSet.Count == 0)
                             continue;
-
-                        strategy.Parameters = parameterSet;
-                        strategy.StopLimits.Clear();
-                        strategy.Positions.Clear();
-                        strategy.EqiutyCurve.Clear();
-                        strategy.DrawdownCurve.Clear();
-                        strategy.EndMoney = algoConfigResource.MoneyManagementResource.Money;
-
-                        strategy.GraphPoints.Clear();
-                        for (int i = 0; i < strategy.Candles.Count; i++)
-                            strategy.GraphPoints.Add(new GraphPoint());
+                        
+                        strategy.InitForParameterSet(
+                            parameterSet, 
+                            algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
+                            algoConfigResource.MoneyManagementResource.Money, 
+                            algoConfigResource.MoneyManagementResource.Money);                        
                         
                         strategy.Execute();
-
-                        var optimizationResult = AlgoMapper.MapToOptimizationResult(strategy);
-                        optimizationResults.Add(optimizationResult);
+                        
+                        optimizationResults.Add(AlgoMapper.MapToOptimizationResult(strategy));
                     }
                     
                     catch (Exception exception)
@@ -410,7 +375,7 @@ public class AlgoService(
 
             count++;
                 
-            logger.Info($"Оптимизация '{strategy.StrategyName}' закончена. {count} из {StrategyDictionary.Count}");
+            logger.Info($"Оптимизация '{strategy.StrategyName}' закончена. {count} из {Strategies.Count}");
         }
         
         sw.Stop();
@@ -419,42 +384,4 @@ public class AlgoService(
         
         return true;
     }
-    
-    private async Task InitBacktestAsync(string? ticker = null, Guid? strategyId = null)
-    {
-        await InitDailyCandlesAsync(false, ticker);
-
-        StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies(strategyId));
-    }
-    
-    private async Task InitOptimizationAsync()
-    {
-        await InitDailyCandlesAsync(true);
-
-        StrategyDictionary = new ConcurrentDictionary<Guid, Strategy>(await algoHelper.GetAlgoStrategies());
-    }
-
-    private async Task InitDailyCandlesAsync(bool isOptimization, string? ticker = null)
-    {
-        var dates = await GetDatesAsync(isOptimization);
-
-        var tickers = ticker is null ? await algoHelper.GetAllTickersForAlgoAsync() : [ticker];
-        
-        foreach (string instrumentTicker in tickers)
-        {
-            var candles = (await dailyCandleRepository.GetAsync(instrumentTicker, dates.From, dates.To))
-                .Select(AlgoMapper.Map).ToList();
-            
-            if (candles.Count == 0)
-                continue;
-
-            for (int i = 0; i < candles.Count; i++)
-                candles[i].Index = i;
-            
-            DailyCandles.TryAdd(instrumentTicker, candles);
-        }
-    }
-    
-    private async Task<(DateOnly From, DateOnly To)> GetDatesAsync(bool isOptimization) => 
-        isOptimization ? await algoHelper.GetOptimizationDatesAsync() : await algoHelper.GetBacktestDatesAsync();
 }

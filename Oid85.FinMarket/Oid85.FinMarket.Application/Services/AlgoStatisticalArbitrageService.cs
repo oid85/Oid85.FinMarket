@@ -5,7 +5,6 @@ using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models;
-using Accord.Statistics.Models.Regression.Linear;
 using NLog;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Common.Utils;
@@ -27,20 +26,21 @@ public class AlgoStatisticalArbitrageService(
     IFutureRepository futureRepository,
     ICorrelationRepository correlationRepository,
     IRegressionTailRepository regressionTailRepository,
-    IComputationService computationService,
     ITickerListUtilService tickerListUtilService,
     AlgoHelper algoHelper)
     : IAlgoStatisticalArbitrageService
 {
-    public ConcurrentDictionary<string, List<Candle>> DailyCandles { get; set; } = new();
+    private ConcurrentDictionary<string, List<Candle>> Candles { get; set; } = new();
+    private ConcurrentDictionary<string, RegressionTail> Spreads { get; set; } = new();
+    private ConcurrentDictionary<Guid, StatisticalArbitrageStrategy> Strategies { get; set; } = new();
 
-    public ConcurrentDictionary<string, RegressionTail> Spreads { get; set; } = new();
-    public ConcurrentDictionary<Guid, StatisticalArbitrageStrategy> StrategyDictionary { get; set; } = new();
-
+    /// <inheritdoc />
     public async Task<bool> BacktestAsync()
     {
-        await InitBacktestAsync();
-
+        Spreads = new ConcurrentDictionary<string, RegressionTail>(await algoHelper.GetSpreadsAsync());
+        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetStatisticalArbitrageCandlesAsync(false));
+        Strategies = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies());
+        
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
 
@@ -48,7 +48,7 @@ public class AlgoStatisticalArbitrageService(
 
         await backtestResultRepository.InvertDeleteAsync(statisticalArbitrageStrategyResources.Select(x => x.Id).ToList());
 
-        foreach (var (strategyId, strategy) in StrategyDictionary)
+        foreach (var (strategyId, strategy) in Strategies)
         {
             await backtestResultRepository.DeleteAsync(strategyId);
 
@@ -63,27 +63,15 @@ public class AlgoStatisticalArbitrageService(
             {
                 try
                 {
-                    strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-                    strategy.StartMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
-                    strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
                     strategy.Ticker = (optimizationResult.TickerFirst, optimizationResult.TickerSecond);
 
-                    var syncCandles = SyncCandles(
-                        DailyCandles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
-                        DailyCandles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
+                    var syncCandles = algoHelper.SyncCandles(
+                        Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
+                        Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
                     strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
 
-                    if (strategy.Candles.First is [])
-                        continue;
-
-                    if (strategy.Candles.Second is [])
-                        continue;
-                    
-                    if (strategy.Candles.First.Count < strategy.StabilizationPeriod + 1)
-                        continue;
-
-                    if (strategy.Candles.Second.Count < strategy.StabilizationPeriod + 1)
+                    if (strategy.Candles.First is [] || strategy.Candles.Second is [])
                         continue;
 
                     var tail = await regressionTailRepository.GetAsync(strategy.Ticker.First, strategy.Ticker.Second);
@@ -98,20 +86,15 @@ public class AlgoStatisticalArbitrageService(
                     if (parameterSet is null)
                         continue;
 
-                    strategy.Parameters = parameterSet;
-                    strategy.Positions.Clear();
-                    strategy.EqiutyCurve.Clear();
-                    strategy.DrawdownCurve.Clear();
-                    strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
-
-                    strategy.GraphPoints.Clear();
-                    for (int i = 0; i < strategy.Candles.First.Count; i++)
-                        strategy.GraphPoints.Add(new ArbitrageGraphPoint());
+                    strategy.InitForParameterSet(
+                        parameterSet, 
+                        algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
+                        algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
+                        algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
 
                     strategy.Execute();
-
-                    var backtestResult = AlgoMapper.MapToBacktestResult(strategy);
-                    backtestResults.Add(backtestResult);
+                    
+                    backtestResults.Add(AlgoMapper.MapToBacktestResult(strategy));
                 }
 
                 catch (Exception exception)
@@ -126,6 +109,7 @@ public class AlgoStatisticalArbitrageService(
         return true;
     }
 
+    /// <inheritdoc />
     public async Task<(StatisticalArbitrageBacktestResult? backtestResult, StatisticalArbitrageStrategy? strategy)> BacktestAsync(Guid backtestResultId)
     {
         try
@@ -134,9 +118,11 @@ public class AlgoStatisticalArbitrageService(
 
             if (backtestResult is null)
                 return (null, null);
-
-            await InitBacktestAsync(backtestResult.TickerFirst, backtestResult.TickerSecond, backtestResult.StrategyId);
-
+            
+            Spreads = new ConcurrentDictionary<string, RegressionTail>(await algoHelper.GetSpreadsAsync(backtestResult.TickerFirst, backtestResult.TickerSecond));
+            Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetStatisticalArbitrageCandlesAsync(false, backtestResult.TickerFirst, backtestResult.TickerSecond));
+            Strategies = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies(backtestResult.StrategyId));
+            
             var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
             var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
 
@@ -145,29 +131,17 @@ public class AlgoStatisticalArbitrageService(
             if (statisticalArbitrageStrategyResource is null)
                 return (null, null);
 
-            var strategy = StrategyDictionary[backtestResult.StrategyId];
-
-            strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-            strategy.StartMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
-            strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
+            var strategy = Strategies[backtestResult.StrategyId];
+            
             strategy.Ticker = (backtestResult.TickerFirst, backtestResult.TickerSecond);
             
-            var syncCandles = SyncCandles(
-                DailyCandles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
-                DailyCandles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
+            var syncCandles = algoHelper.SyncCandles(
+                Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
+                Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
             strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
 
-            if (strategy.Candles.First is [])
-                return (null, null);
-
-            if (strategy.Candles.Second is [])
-                return (null, null);
-                    
-            if (strategy.Candles.First.Count < strategy.StabilizationPeriod + 1)
-                return (null, null);
-
-            if (strategy.Candles.Second.Count < strategy.StabilizationPeriod + 1)
+            if (strategy.Candles.First is [] || strategy.Candles.Second is [] )
                 return (null, null);
 
             var tail = await regressionTailRepository.GetAsync(strategy.Ticker.First, strategy.Ticker.Second);
@@ -182,21 +156,15 @@ public class AlgoStatisticalArbitrageService(
             if (parameterSet is null)
                 return (null, null);
 
-            strategy.Parameters = parameterSet;
-            strategy.Positions.Clear();
-            strategy.EqiutyCurve.Clear();
-            strategy.DrawdownCurve.Clear();
-            strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
-
-            strategy.GraphPoints.Clear();
-            for (int i = 0; i < strategy.Candles.First.Count; i++)
-                strategy.GraphPoints.Add(new ArbitrageGraphPoint());
+            strategy.InitForParameterSet(
+                parameterSet, 
+                algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
+                algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
+                algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
 
             strategy.Execute();
-
-            backtestResult = AlgoMapper.MapToBacktestResult(strategy);
-
-            return (backtestResult, strategy);
+            
+            return (AlgoMapper.MapToBacktestResult(strategy), strategy);
         }
 
         catch (Exception exception)
@@ -206,6 +174,7 @@ public class AlgoStatisticalArbitrageService(
         }
     }
 
+    /// <inheritdoc />
     public async Task<bool> CalculateStrategySignalsAsync()
     {
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
@@ -396,12 +365,15 @@ public class AlgoStatisticalArbitrageService(
         }        
     }
 
+    /// <inheritdoc />
     public async Task<bool> OptimizeAsync()
     {
         var sw = Stopwatch.StartNew();
-
-        await InitOptimizationAsync();
-
+        
+        Spreads = new ConcurrentDictionary<string, RegressionTail>(await algoHelper.GetSpreadsAsync());
+        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetStatisticalArbitrageCandlesAsync(true));
+        Strategies = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies());
+        
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
 
@@ -409,7 +381,7 @@ public class AlgoStatisticalArbitrageService(
 
         int count = 0;
 
-        foreach (var (strategyId, strategy) in StrategyDictionary)
+        foreach (var (strategyId, strategy) in Strategies)
         {
             await optimizationResultRepository.DeleteAsync(strategyId);
 
@@ -424,27 +396,15 @@ public class AlgoStatisticalArbitrageService(
 
             foreach (var tickerPair in tickerPairs)
             {
-                strategy.StabilizationPeriod = algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1;
-                strategy.StartMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
-                strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
                 strategy.Ticker = (tickerPair.Split(',')[0], tickerPair.Split(',')[1]);
 
-                var syncCandles = SyncCandles(
-                    DailyCandles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
-                    DailyCandles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
+                var syncCandles = algoHelper.SyncCandles(
+                    Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
+                    Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
                 strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
 
-                if (strategy.Candles.First is [])
-                    continue;
-
-                if (strategy.Candles.Second is [])
-                    continue;
-                    
-                if (strategy.Candles.First.Count < strategy.StabilizationPeriod + 1)
-                    continue;
-
-                if (strategy.Candles.Second.Count < strategy.StabilizationPeriod + 1)
+                if (strategy.Candles.First is [] || strategy.Candles.Second is [])
                     continue;
                 
                 var tail = await regressionTailRepository.GetAsync(strategy.Ticker.First, strategy.Ticker.Second);
@@ -454,7 +414,7 @@ public class AlgoStatisticalArbitrageService(
 
                 strategy.Spreads = tail.Tails;
 
-                var parameterSets = algoHelper.GetParameterSets(statisticalArbitrageStrategyResource.Params);
+                var parameterSets = AlgoHelper.GetParameterSets(statisticalArbitrageStrategyResource.Params);
 
                 foreach (var parameterSet in parameterSets)
                 {
@@ -463,20 +423,15 @@ public class AlgoStatisticalArbitrageService(
                         if (parameterSet.Count == 0)
                             continue;
 
-                        strategy.Parameters = parameterSet;
-                        strategy.Positions.Clear();
-                        strategy.EqiutyCurve.Clear();
-                        strategy.DrawdownCurve.Clear();
-                        strategy.EndMoney = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney;
-
-                        strategy.GraphPoints.Clear();
-                        for (int i = 0; i < strategy.Candles.First.Count; i++)
-                            strategy.GraphPoints.Add(new ArbitrageGraphPoint());
+                        strategy.InitForParameterSet(
+                            parameterSet, 
+                            algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
+                            algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
+                            algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
 
                         strategy.Execute();
-
-                        var optimizationResult = AlgoMapper.MapToOptimizationResult(strategy);
-                        optimizationResults.Add(optimizationResult);
+                        
+                        optimizationResults.Add(AlgoMapper.MapToOptimizationResult(strategy));
                     }
 
                     catch (Exception exception)
@@ -490,7 +445,7 @@ public class AlgoStatisticalArbitrageService(
 
             count++;
 
-            logger.Info($"Оптимизация '{strategy.StrategyName}' закончена. {count} из {StrategyDictionary.Count}");
+            logger.Info($"Оптимизация '{strategy.StrategyName}' закончена. {count} из {Strategies.Count}");
         }
 
         sw.Stop();
@@ -500,63 +455,6 @@ public class AlgoStatisticalArbitrageService(
         return true;
     }
     
-    private async Task InitBacktestAsync(string? ticker1 = null, string? ticker2 = null, Guid? strategyId = null)
-    {
-        await InitDailyCandlesAsync(false, ticker1, ticker2);
-        await InitSpreadsAsync(ticker1, ticker2);
-        
-        StrategyDictionary = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies(strategyId));
-    }
-
-    private async Task InitOptimizationAsync()
-    {
-        await InitDailyCandlesAsync(true);
-        await InitSpreadsAsync();
-
-        StrategyDictionary = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies());
-    }
-
-    private async Task InitDailyCandlesAsync(bool isOptimization, string? ticker1 = null, string? ticker2 = null)
-    {
-        var dates = await GetDatesAsync(isOptimization);
-
-        var tickers = ticker1 is null || ticker2 is null 
-            ? await algoHelper.GetAllTickersForStatisticalArbitrageAsync() 
-            : [ticker1, ticker2];
-
-        foreach (string instrumentTicker in tickers)
-        {
-            var candles = (await dailyCandleRepository.GetAsync(instrumentTicker, dates.From, dates.To))
-                .Select(AlgoMapper.Map).ToList();
-
-            if (candles.Count == 0)
-                continue;
-
-            for (int i = 0; i < candles.Count; i++)
-                candles[i].Index = i;
-
-            DailyCandles.TryAdd(instrumentTicker, candles);
-        }
-    }
-
-    private async Task InitSpreadsAsync(string? ticker1 = null, string? ticker2 = null)
-    {
-        var tails = ticker1 is null || ticker2 is null 
-            ? await regressionTailRepository.GetAllAsync()
-            : (await regressionTailRepository.GetAllAsync()).Where(x => x.Ticker1 == ticker1 && x.Ticker2 == ticker2);
-
-        foreach (var tail in tails)
-        {
-            if (tail.Tails.Count == 0)
-                continue;
-
-            Spreads.TryAdd($"{tail.Ticker1},{tail.Ticker2}", tail);
-        }
-    }    
-    
-    private async Task<(DateOnly From, DateOnly To)> GetDatesAsync(bool isOptimization) => 
-        isOptimization ? await algoHelper.GetOptimizationDatesAsync() : await algoHelper.GetBacktestDatesAsync();
-
     /// <inheritdoc />
     public async Task CalculateCorrelationAsync()
     {
@@ -593,7 +491,7 @@ public class AlgoStatisticalArbitrageService(
                 try
                 {
                     // Получаем свечи и синхронизируем массивы по дате
-                    var syncCandles = SyncCandles(candles[tickers[i]], candles[tickers[j]]);
+                    var syncCandles = algoHelper.SyncCandles(candles[tickers[i]], candles[tickers[j]]);
 
                     var prices1 = syncCandles.Candles1.Select(x => x.Close).ToList();
                     var prices2 = syncCandles.Candles2.Select(x => x.Close).ToList();
@@ -648,138 +546,6 @@ public class AlgoStatisticalArbitrageService(
     }
 
     /// <inheritdoc />
-    public Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync() =>
-        CalculateRegressionTailsAsync(DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), DateOnly.FromDateTime(DateTime.Today));
-
-    private async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync(DateOnly from, DateOnly to)
-    {
-        // Очистим таблицу
-        await regressionTailRepository.DeleteAsync();
-
-        var correlations = (await correlationRepository.GetAllAsync()).ToList();
-
-        var tails = new Dictionary<string, RegressionTail>();
-
-        foreach (var correlation in correlations)
-        {
-            try
-            {
-                // Получаем и синхронизируем свечи
-                var candles1 = await dailyCandleRepository.GetAsync(correlation.Ticker1, from, to);
-                var candles2 = await dailyCandleRepository.GetAsync(correlation.Ticker2, from, to);
-
-                var syncCandles = SyncCandles(candles1, candles2);
-
-                // Declare some sample test data.
-                double[] inputs = syncCandles.Candles2.Select(x => x.Close).ToArray();
-                double[] outputs = syncCandles.Candles1.Select(x => x.Close).ToArray();
-
-                // Use Ordinary Least Squares to learn the regression
-                var ols = new OrdinaryLeastSquares();
-
-                // Use OLS to learn the simple linear regression
-                SimpleLinearRegression regression = ols.Learn(inputs, outputs);
-
-                // We can also extract the slope and the intercept term for the line
-                double slope = regression.Slope;
-                double intercept = regression.Intercept;
-
-                string key = $"{correlation.Ticker1},{correlation.Ticker2}";
-
-                // Расчет хвостов
-                var regressionTails = new List<RegressionTailItem>();
-
-                for (int i = 0; i < syncCandles.Candles1.Count; i++)
-                {
-                    double y = slope * syncCandles.Candles2[i].Close + intercept;
-                    double tailValue = syncCandles.Candles1[i].Close - y;
-
-                    if (!tails.ContainsKey(key))
-                        tails.Add(key,
-                            new RegressionTail { Ticker1 = correlation.Ticker1, Ticker2 = correlation.Ticker2 });
-
-                    regressionTails.Add(new RegressionTailItem
-                        { Date = syncCandles.Candles1[i].Date, Value = tailValue });
-                }
-
-                tails[key].Slope = slope;
-                tails[key].Intercept = intercept;
-
-                // Расчитаем Z-score
-                tails[key].Tails = ZScore(regressionTails);
-
-                // Проверяем на стационарность и сохраняем
-                var isStationary = await computationService.CheckStationaryAsync(
-                    [tails[key].Tails.Select(x => x.Value).ToList()]);
-
-                if (isStationary[0])
-                    await regressionTailRepository.AddAsync(tails[key]);
-                else
-                    tails.Remove(key);
-            }
-
-            catch (Exception exception)
-            {
-                logger.Error(exception, "Ошибка расчета остатков регрессии. {ticker1}, {ticker2}", correlation.Ticker1,
-                    correlation.Ticker2);
-            }
-        }
-
-        return tails;
-    }
-
-    private static (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1,
-        List<DailyCandle> candles2)
-    {
-        var dates1 = candles1.Select(x => x.Date).ToList();
-        var dates2 = candles2.Select(x => x.Date).ToList();
-
-        var dates = dates1.Intersect(dates2).ToList();
-
-        var resultCandles1 = candles1.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
-        var resultCandles2 = candles2.Where(x => dates.Contains(x.Date)).OrderBy(x => x.Date).ToList();
-
-        return (resultCandles1, resultCandles2);
-    }
-
-    private static (List<Candle> Candles1, List<Candle> Candles2) SyncCandles(List<Candle> candles1,
-        List<Candle> candles2)
-    {
-        var dates1 = candles1.Select(x => x.DateTime.Date).ToList();
-        var dates2 = candles2.Select(x => x.DateTime.Date).ToList();
-
-        var dates = dates1.Intersect(dates2).ToList();
-
-        var resultCandles1 = candles1.Where(x => dates.Contains(x.DateTime.Date)).OrderBy(x => x.DateTime.Date).ToList();
-        var resultCandles2 = candles2.Where(x => dates.Contains(x.DateTime.Date)).OrderBy(x => x.DateTime.Date).ToList();
-
-        return (resultCandles1, resultCandles2);
-    }    
-    
-    /// <summary>
-    /// Z-score
-    /// </summary>
-    public static List<RegressionTailItem> ZScore(List<RegressionTailItem> values)
-    {
-        if (values.Count == 0)
-            return [];
-
-        var dates = values.Select(x => x.Date).ToList();
-        var tailValues = values.Select(x => x.Value).ToList();
-
-        var average = tailValues.Average();
-        var stdDev = tailValues.StdDev();
-
-        if (stdDev == 0.0)
-            return [];
-
-        var zScoreValues = tailValues.AddConst(-1 * average).DivConst(stdDev);
-
-        var result = new List<RegressionTailItem>();
-
-        for (int i = 0; i < dates.Count; i++)
-            result.Add(new RegressionTailItem { Date = dates[i], Value = zScoreValues[i] });
-
-        return result;
-    }
+    public Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync() => 
+        algoHelper.CalculateRegressionTailsAsync(DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), DateOnly.FromDateTime(DateTime.Today));
 }

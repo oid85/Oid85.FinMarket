@@ -9,7 +9,7 @@ public class CrossStdDevShortLong : StatisticalArbitrageStrategy
         // Получаем параметры
         double stdDev = Parameters["StdDev"] / 10.0;
 
-        for (int i = StabilizationPeriod; i < Candles.First.Count - 1; i++)
+        for (int i = 1; i < Candles.First.Count - 1; i++)
         {
             var date = DateOnly.FromDateTime(Candles.First[i].DateTime);
             var spread = Spreads.Find(x => x.Date == date);
