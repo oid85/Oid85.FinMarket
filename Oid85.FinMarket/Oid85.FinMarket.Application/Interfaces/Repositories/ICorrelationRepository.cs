@@ -5,7 +5,7 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 public interface ICorrelationRepository
 {
     Task AddAsync(Correlation correlation);
-    Task UpdateAsync(string ticker1, string ticker2, double value);
+    Task UpdateAsync(string tickerFirst, string tickerSecond, double value);
     Task<List<Correlation>> GetAllAsync();
     Task DeleteAsync();
 }

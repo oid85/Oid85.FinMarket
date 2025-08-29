@@ -68,10 +68,10 @@ public class AlgoStatisticalArbitrageService(
                     strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(optimizationResult.TickerFirst), await algoHelper.GetBasicAssetSize(optimizationResult.TickerSecond));
                     
                     var syncCandles = AlgoHelper.SyncCandles(
-                        Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
-                        Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
+                        Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
+                        Candles.TryGetValue(strategy.Ticker.First, out var secondCandles) ? secondCandles : []);
                     
-                    strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
+                    strategy.Candles = (syncCandles.First, syncCandles.Second);
 
                     if (strategy.Candles.First is [] || strategy.Candles.Second is [])
                         continue;
@@ -140,10 +140,10 @@ public class AlgoStatisticalArbitrageService(
             strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(backtestResult.TickerFirst), await algoHelper.GetBasicAssetSize(backtestResult.TickerSecond));
             
             var syncCandles = AlgoHelper.SyncCandles(
-                Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
-                Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
+                Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
+                Candles.TryGetValue(strategy.Ticker.First, out var secondCandles) ? secondCandles : []);
                     
-            strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
+            strategy.Candles = (syncCandles.First, syncCandles.Second);
 
             if (strategy.Candles.First is [] || strategy.Candles.Second is [] )
                 return (null, null);
@@ -200,9 +200,12 @@ public class AlgoStatisticalArbitrageService(
         {
             try
             {
+                string tickerFirst = tickerPair.Split(',')[0];
+                string tickerSecond = tickerPair.Split(',')[1];
+                
                 if (!tickersInStrategySignals.Contains(tickerPair))
                     await strategySignalRepository.AddAsync(
-                        new StatisticalArbitrageStrategySignal(tickerPair.Split(',')[0], tickerPair.Split(',')[1]));
+                        new StatisticalArbitrageStrategySignal(tickerFirst, tickerSecond));
 
                 var backtestResultsByTickerPair = backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair).ToList();
                 
@@ -229,7 +232,7 @@ public class AlgoStatisticalArbitrageService(
                 double positionCost = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * positionPercentPortfolio / 100.0;
 
                 // Цена инструмента
-                (double First, double Second) lastPrice = await GetLastPriceAsync(tickerPair.Split(',')[0], tickerPair.Split(',')[1]);
+                (double First, double Second) lastPrice = await GetLastPriceAsync(tickerFirst, tickerSecond);
 
                 // Размер позиции, шт
                 (double First, double Second) positionSize = GetPositionSize(tickerPair);
@@ -238,25 +241,25 @@ public class AlgoStatisticalArbitrageService(
                 var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
                 var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
 
-                if (sharesTickers.Contains(tickerPair.Split(',')[0]))
+                if (sharesTickers.Contains(tickerFirst))
                 {
                     positionSize.First *= algoConfigResource.MoneyManagementResource.ShareLeverage;
                     positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.ShareLeverage;
                 }
                 
-                if (futuresTickers.Contains(tickerPair.Split(',')[0]))
+                if (futuresTickers.Contains(tickerFirst))
                 {
                     positionSize.First *= algoConfigResource.MoneyManagementResource.FutureLeverage;
                     positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.FutureLeverage;
                 }
 
-                if (sharesTickers.Contains(tickerPair.Split(',')[1]))
+                if (sharesTickers.Contains(tickerSecond))
                 {
                     positionSize.Second *= algoConfigResource.MoneyManagementResource.ShareLeverage;
                     positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.ShareLeverage;
                 }
                 
-                if (futuresTickers.Contains(tickerPair.Split(',')[1]))
+                if (futuresTickers.Contains(tickerSecond))
                 {
                     positionSize.Second *= algoConfigResource.MoneyManagementResource.FutureLeverage;
                     positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.FutureLeverage;
@@ -265,8 +268,8 @@ public class AlgoStatisticalArbitrageService(
                 await strategySignalRepository.UpdatePositionAsync(
                     new StatisticalArbitrageStrategySignal
                     {
-                        TickerFirst = tickerPair.Split(',')[0],
-                        TickerSecond = tickerPair.Split(',')[1],
+                        TickerFirst = tickerFirst,
+                        TickerSecond = tickerSecond,
                         CountStrategies = Math.Abs(countStrategies),
                         CountSignals = Math.Abs(countSignals),
                         PercentSignals = Math.Abs(percentSignals),
@@ -364,19 +367,22 @@ public class AlgoStatisticalArbitrageService(
 
             var optimizationResults = new List<StatisticalArbitrageOptimizationResult>();
 
-            var tickerPairs = (await regressionTailRepository.GetAllAsync()).Select(x => $"{x.Ticker1},{x.Ticker2}");
+            var tickerPairs = (await regressionTailRepository.GetAllAsync()).Select(x => $"{x.TickerFirst},{x.TickerSecond}");
 
             foreach (var tickerPair in tickerPairs)
             {
-                strategy.Ticker = (tickerPair.Split(',')[0], tickerPair.Split(',')[1]);
-                strategy.IsFuture = (await algoHelper.IsFuture(tickerPair.Split(',')[0]), await algoHelper.IsFuture(tickerPair.Split(',')[1]));
-                strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(tickerPair.Split(',')[0]), await algoHelper.GetBasicAssetSize(tickerPair.Split(',')[1]));
+                string tickerFirst = tickerPair.Split(',')[0];
+                string tickerSecond = tickerPair.Split(',')[1];
+                
+                strategy.Ticker = (tickerFirst, tickerSecond);
+                strategy.IsFuture = (await algoHelper.IsFuture(tickerFirst), await algoHelper.IsFuture(tickerSecond));
+                strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(tickerFirst), await algoHelper.GetBasicAssetSize(tickerSecond));
                 
                 var syncCandles = AlgoHelper.SyncCandles(
-                    Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
-                    Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
+                    Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
+                    Candles.TryGetValue(strategy.Ticker.First, out var secondCandles) ? secondCandles : []);
                     
-                strategy.Candles = (syncCandles.Candles1, syncCandles.Candles2);
+                strategy.Candles = (syncCandles.First, syncCandles.Second);
 
                 if (strategy.Candles.First is [] || strategy.Candles.Second is [])
                     continue;
@@ -432,10 +438,8 @@ public class AlgoStatisticalArbitrageService(
     /// <inheritdoc />
     public async Task CalculateCorrelationAsync()
     {
-        var shares =
-            await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.StatisticalArbitrageShares);
-        var futures =
-            (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.StatisticalArbitrageFutures))
+        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.StatisticalArbitrageShares);
+        var futures = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.StatisticalArbitrageFutures))
             .Where(x => x.ExpirationDate > DateOnly.FromDateTime(DateTime.Today)).ToList();
 
         var candles = new Dictionary<string, List<DailyCandle>>();
@@ -467,27 +471,27 @@ public class AlgoStatisticalArbitrageService(
                     // Получаем свечи и синхронизируем массивы по дате
                     var syncCandles = AlgoHelper.SyncCandles(candles[tickers[i]], candles[tickers[j]]);
 
-                    var prices1 = syncCandles.Candles1.Select(x => x.Close).ToList();
-                    var prices2 = syncCandles.Candles2.Select(x => x.Close).ToList();
+                    var firstPrices = syncCandles.First.Select(x => x.Close).ToList();
+                    var secondPrices = syncCandles.Second.Select(x => x.Close).ToList();
 
                     // Логарифмируем
-                    var logValues1 = prices1.Log();
-                    var logValues2 = prices2.Log();
+                    var firstLogValues = firstPrices.Log();
+                    var secondLogValues = secondPrices.Log();
 
                     // Центрируем
-                    var centeringValues1 = logValues1.Centering();
-                    var centeringValues2 = logValues2.Centering();
+                    var firstCenteringValues = firstLogValues.Centering();
+                    var secondCenteringValues = secondLogValues.Centering();
 
                     // Делим на стандартное отклонение
-                    var divStdValues1 = centeringValues1.DivConst(centeringValues1.StdDev());
-                    var divStdValues2 = centeringValues2.DivConst(centeringValues2.StdDev());
+                    var firstDivStdValues = firstCenteringValues.DivConst(firstCenteringValues.StdDev());
+                    var secondDivStdValues = secondCenteringValues.DivConst(secondCenteringValues.StdDev());
 
                     // Приращения
-                    var incrementValues1 = divStdValues1.Increments();
-                    var incrementValues2 = divStdValues2.Increments();
+                    var firstIncrementValues = firstDivStdValues.Increments();
+                    var secondIncrementValues = secondDivStdValues.Increments();
 
                     // Расчет корреляции
-                    double correlation = incrementValues1.Correlation(incrementValues2);
+                    double correlation = firstIncrementValues.Correlation(secondIncrementValues);
 
                     if (Math.Abs(correlation - 1.0) < 0.0001)
                         continue;
@@ -503,8 +507,8 @@ public class AlgoStatisticalArbitrageService(
 
                     var correlationModel = new Correlation
                     {
-                        Ticker1 = tickers[i],
-                        Ticker2 = tickers[j],
+                        TickerFirst = tickers[i],
+                        TickerSecond = tickers[j],
                         Value = correlation
                     };
 
@@ -513,7 +517,7 @@ public class AlgoStatisticalArbitrageService(
 
                 catch (Exception exception)
                 {
-                    logger.Error(exception, "Ошибка расчета корреляции. {ticker1}, {ticker2}", tickers[i], tickers[j]);
+                    logger.Error(exception, "Ошибка расчета корреляции. {tickerFirst}, {tickerSecond}", tickers[i], tickers[j]);
                 }
             }
         }

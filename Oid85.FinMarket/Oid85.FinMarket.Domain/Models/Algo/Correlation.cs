@@ -10,12 +10,12 @@ public class Correlation
     /// <summary>
     /// Тикер инструмента 1
     /// </summary>
-    public string Ticker1 { get; set; } = string.Empty; 
+    public string TickerFirst { get; set; } = string.Empty; 
     
     /// <summary>
     /// Тикер инструмента 2
     /// </summary>
-    public string Ticker2 { get; set; } = string.Empty; 
+    public string TickerSecond { get; set; } = string.Empty; 
     
     /// <summary>
     /// Значение корреляции

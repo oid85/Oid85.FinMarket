@@ -16,17 +16,17 @@ public class CorrelationRepository(
         await using var context = await contextFactory.CreateDbContextAsync();
 
         if (!await context.CorrelationEntities.AnyAsync(x =>
-                x.Ticker1 == correlation.Ticker1 &&
-                x.Ticker2 == correlation.Ticker2))
+                x.TickerFirst == correlation.TickerFirst &&
+                x.TickerSecond == correlation.TickerSecond))
             await context.CorrelationEntities.AddAsync(DataAccessMapper.Map(correlation));
 
         else
-            await UpdateAsync(correlation.Ticker1, correlation.Ticker2, correlation.Value); 
+            await UpdateAsync(correlation.TickerFirst, correlation.TickerSecond, correlation.Value); 
         
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(string ticker1, string ticker2, double value)
+    public async Task UpdateAsync(string tickerFirst, string tickerSecond, double value)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
@@ -35,8 +35,8 @@ public class CorrelationRepository(
         {
             await context.CorrelationEntities
                 .Where(x => 
-                    x.Ticker1 == ticker1 && 
-                    x.Ticker2 == ticker2)
+                    x.TickerFirst == tickerFirst && 
+                    x.TickerSecond == tickerSecond)
                 .ExecuteUpdateAsync(x => x
                     .SetProperty(entity => entity.Value, value)
                     .SetProperty(entity => entity.UpdatedAt, DateTime.UtcNow));
@@ -57,7 +57,7 @@ public class CorrelationRepository(
         await using var context = await contextFactory.CreateDbContextAsync();
         return (await context.CorrelationEntities
                 .Where(x => !x.IsDeleted)
-                .OrderBy(x => x.Ticker1)
+                .OrderBy(x => x.TickerFirst)
                 .AsNoTracking()
                 .ToListAsync())
             .Select(DataAccessMapper.Map)

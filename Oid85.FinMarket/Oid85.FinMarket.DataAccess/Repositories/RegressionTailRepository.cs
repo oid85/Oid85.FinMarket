@@ -17,17 +17,17 @@ public class RegressionTailRepository(
         await using var context = await contextFactory.CreateDbContextAsync();
 
         if (!await context.RegressionTailEntities.AnyAsync(x =>
-                x.Ticker1 == regressionTail.Ticker1 &&
-                x.Ticker2 == regressionTail.Ticker2))
+                x.TickerFirst == regressionTail.TickerFirst &&
+                x.TickerSecond == regressionTail.TickerSecond))
             await context.RegressionTailEntities.AddAsync(DataAccessMapper.Map(regressionTail));
 
         else
-            await UpdateAsync(regressionTail.Ticker1, regressionTail.Ticker2, regressionTail.Tails, regressionTail.IsStationary); 
+            await UpdateAsync(regressionTail.TickerFirst, regressionTail.TickerSecond, regressionTail.Tails, regressionTail.IsStationary); 
         
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(string ticker1, string ticker2, List<RegressionTailItem> tails, bool isStationary)
+    public async Task UpdateAsync(string tickerFirst, string tickerSecond, List<RegressionTailItem> tails, bool isStationary)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
@@ -38,8 +38,8 @@ public class RegressionTailRepository(
             
             await context.RegressionTailEntities
                 .Where(x => 
-                    x.Ticker1 == ticker1 && 
-                    x.Ticker2 == ticker2)
+                    x.TickerFirst == tickerFirst && 
+                    x.TickerSecond == tickerSecond)
                 .ExecuteUpdateAsync(x => x
                     .SetProperty(entity => entity.Tails, json)
                     .SetProperty(entity => entity.IsStationary, isStationary)
@@ -61,22 +61,22 @@ public class RegressionTailRepository(
         await using var context = await contextFactory.CreateDbContextAsync();
         return (await context.RegressionTailEntities
                 .Where(x => !x.IsDeleted)
-                .OrderBy(x => x.Ticker1)
+                .OrderBy(x => x.TickerFirst)
                 .AsNoTracking()
                 .ToListAsync())
             .Select(DataAccessMapper.Map)
             .ToList();
     }
 
-    public async Task<RegressionTail?> GetAsync(string ticker1, string ticker2)
+    public async Task<RegressionTail?> GetAsync(string tickerFirst, string tickerSecond)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
         var entity = await context.RegressionTailEntities
             .FirstOrDefaultAsync(
                 x => 
-                    x.Ticker1 == ticker1 &&
-                    x.Ticker2 == ticker2);
+                    x.TickerFirst == tickerFirst &&
+                    x.TickerSecond == tickerSecond);
         
         return entity is null ? null : DataAccessMapper.Map(entity);
     }

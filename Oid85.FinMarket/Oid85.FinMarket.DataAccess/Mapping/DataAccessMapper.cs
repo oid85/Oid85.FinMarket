@@ -890,8 +890,8 @@ public static class DataAccessMapper
     public static CorrelationEntity Map(Correlation model) =>
         new()
         {
-            Ticker1 = model.Ticker1,
-            Ticker2 = model.Ticker2,
+            TickerFirst = model.TickerFirst,
+            TickerSecond = model.TickerSecond,
             Value = model.Value
         };
     
@@ -899,16 +899,16 @@ public static class DataAccessMapper
         new()
         {
             Id = entity.Id,
-            Ticker1 = entity.Ticker1,
-            Ticker2 = entity.Ticker2,
+            TickerFirst = entity.TickerFirst,
+            TickerSecond = entity.TickerSecond,
             Value = entity.Value
         };    
     
     public static RegressionTailEntity Map(RegressionTail model) =>
         new()
         {
-            Ticker1 = model.Ticker1,
-            Ticker2 = model.Ticker2,
+            TickerFirst = model.TickerFirst,
+            TickerSecond = model.TickerSecond,
             Tails = JsonSerializer.Serialize(model.Tails),
             Slope = model.Slope,
             Intercept = model.Intercept,
@@ -919,8 +919,8 @@ public static class DataAccessMapper
         new()
         {
             Id = entity.Id,
-            Ticker1 = entity.Ticker1,
-            Ticker2 = entity.Ticker2,
+            TickerFirst = entity.TickerFirst,
+            TickerSecond = entity.TickerSecond,
             Tails = JsonSerializer.Deserialize<List<RegressionTailItem>>(entity.Tails) ?? [],
             Slope = entity.Slope,
             Intercept = entity.Intercept,

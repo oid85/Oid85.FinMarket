@@ -209,7 +209,7 @@ public class DiagramDataFactory(
         var simpleDiagramData = new SimpleDiagramData { Title = "Спреды" };
         var regressionTails = await regressionTailRepository.GetAllAsync();
 
-        foreach (var tail in regressionTails.OrderBy(x => x.Ticker1))
+        foreach (var tail in regressionTails.OrderBy(x => x.TickerFirst))
         {
             var tailItems = tail.Tails
                 .Where(x => x.Date >= from && x.Date <= to)
@@ -219,7 +219,7 @@ public class DiagramDataFactory(
             if (!tailItems.Any())
                 continue;
             
-            var dataPointSeries = new SimpleDataPointSeries { Title = $"'{tail.Ticker1}' vs. '{tail.Ticker2}' {tailItems.First().Date.ToString(KnownDateTimeFormats.DateISO)} - {tailItems.Last().Date.ToString(KnownDateTimeFormats.DateISO)}" };
+            var dataPointSeries = new SimpleDataPointSeries { Title = $"'{tail.TickerFirst}' vs. '{tail.TickerSecond}' {tailItems.First().Date.ToString(KnownDateTimeFormats.DateISO)} - {tailItems.Last().Date.ToString(KnownDateTimeFormats.DateISO)}" };
             
             foreach (var tailItem in tailItems)
                 

@@ -88,8 +88,8 @@ public class AlgoHelper(
         
         List<string> tickers = 
                 [
-                    ..tails.Select(x => x.Ticker1).ToList(),
-                    ..tails.Select(x => x.Ticker2).ToList()
+                    ..tails.Select(x => x.TickerFirst).ToList(),
+                    ..tails.Select(x => x.TickerSecond).ToList()
                 ];
         
         return tickers.Distinct().ToList();
@@ -221,7 +221,7 @@ public class AlgoHelper(
     {
         var tails = ticker1 is null || ticker2 is null 
             ? await regressionTailRepository.GetAllAsync()
-            : (await regressionTailRepository.GetAllAsync()).Where(x => x.Ticker1 == ticker1 && x.Ticker2 == ticker2);
+            : (await regressionTailRepository.GetAllAsync()).Where(x => x.TickerFirst == ticker1 && x.TickerSecond == ticker2);
 
         var spreads = new Dictionary<string, RegressionTail>();
         
@@ -230,7 +230,7 @@ public class AlgoHelper(
             if (tail.Tails.Count == 0)
                 continue;
 
-            spreads.TryAdd($"{tail.Ticker1},{tail.Ticker2}", tail);
+            spreads.TryAdd($"{tail.TickerFirst},{tail.TickerSecond}", tail);
         }
 
         return spreads;
@@ -316,7 +316,7 @@ public class AlgoHelper(
     /// <summary>
     /// Синхронизация свечей
     /// </summary>
-    public static (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
+    public static (List<DailyCandle> First, List<DailyCandle> Second) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
     {
         var dates1 = candles1.Select(x => x.Date).ToList();
         var dates2 = candles2.Select(x => x.Date).ToList();
@@ -332,7 +332,7 @@ public class AlgoHelper(
     /// <summary>
     /// Синхронизация свечей
     /// </summary>
-    public static (List<Candle> Candles1, List<Candle> Candles2) SyncCandles(List<Candle> candles1, List<Candle> candles2)
+    public static (List<Candle> First, List<Candle> Second) SyncCandles(List<Candle> candles1, List<Candle> candles2)
     {
         var dates1 = candles1.Select(x => x.DateTime.Date).ToList();
         var dates2 = candles2.Select(x => x.DateTime.Date).ToList();
@@ -363,12 +363,12 @@ public class AlgoHelper(
             {
                 // Получаем и синхронизируем свечи
                 var syncCandles = SyncCandles(
-                    await dailyCandleRepository.GetAsync(correlation.Ticker1, from, to), 
-                    await dailyCandleRepository.GetAsync(correlation.Ticker2, from, to));
+                    await dailyCandleRepository.GetAsync(correlation.TickerFirst, from, to), 
+                    await dailyCandleRepository.GetAsync(correlation.TickerSecond, from, to));
 
                 // Declare some sample test data.
-                double[] inputs = syncCandles.Candles2.Select(x => x.Close).ToArray();
-                double[] outputs = syncCandles.Candles1.Select(x => x.Close).ToArray();
+                double[] inputs = syncCandles.Second.Select(x => x.Close).ToArray();
+                double[] outputs = syncCandles.First.Select(x => x.Close).ToArray();
 
                 // Use Ordinary Least Squares to learn the regression
                 var ols = new OrdinaryLeastSquares();
@@ -380,21 +380,21 @@ public class AlgoHelper(
                 double slope = regression.Slope;
                 double intercept = regression.Intercept;
 
-                string key = $"{correlation.Ticker1},{correlation.Ticker2}";
+                string key = $"{correlation.TickerFirst},{correlation.TickerSecond}";
 
                 // Расчет хвостов
                 var regressionTails = new List<RegressionTailItem>();
 
-                for (int i = 0; i < syncCandles.Candles1.Count; i++)
+                for (int i = 0; i < syncCandles.First.Count; i++)
                 {
-                    double y = slope * syncCandles.Candles2[i].Close + intercept;
-                    double tailValue = syncCandles.Candles1[i].Close - y;
+                    double y = slope * syncCandles.Second[i].Close + intercept;
+                    double tailValue = syncCandles.First[i].Close - y;
 
                     if (!tails.ContainsKey(key))
-                        tails.Add(key, new RegressionTail { Ticker1 = correlation.Ticker1, Ticker2 = correlation.Ticker2 });
+                        tails.Add(key, new RegressionTail { TickerFirst = correlation.TickerFirst, TickerSecond = correlation.TickerSecond });
 
                     regressionTails.Add(new RegressionTailItem
-                        { Date = syncCandles.Candles1[i].Date, Value = tailValue });
+                        { Date = syncCandles.First[i].Date, Value = tailValue });
                 }
 
                 tails[key].Slope = slope;
@@ -415,7 +415,7 @@ public class AlgoHelper(
 
             catch (Exception exception)
             {
-                logger.Error(exception, "Ошибка расчета остатков регрессии. {ticker1}, {ticker2}", correlation.Ticker1, correlation.Ticker2);
+                logger.Error(exception, "Ошибка расчета остатков регрессии. {tickerFirst}, {tickerSecond}", correlation.TickerFirst, correlation.TickerSecond);
             }
         }
 

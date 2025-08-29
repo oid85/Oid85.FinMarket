@@ -9,14 +9,14 @@ public class RegressionTailEntity : AuditableEntity
     /// <summary>
     /// Тикер инструмента 1
     /// </summary>
-    [Column("ticker1"), MaxLength(20)]
-    public string Ticker1 { get; set; } = string.Empty; 
+    [Column("ticker_first"), MaxLength(20)]
+    public string TickerFirst { get; set; } = string.Empty; 
     
     /// <summary>
     /// Тикер инструмента 2
     /// </summary>
-    [Column("ticker2"), MaxLength(20)]
-    public string Ticker2 { get; set; } = string.Empty; 
+    [Column("ticker_second"), MaxLength(20)]
+    public string TickerSecond { get; set; } = string.Empty; 
     
     /// <summary>
     /// Хвосты
