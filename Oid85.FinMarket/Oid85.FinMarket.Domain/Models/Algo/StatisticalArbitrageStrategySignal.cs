@@ -2,6 +2,26 @@
 
 public class StatisticalArbitrageStrategySignal
 {
+    public StatisticalArbitrageStrategySignal()
+    {
+        
+    }
+    
+    public StatisticalArbitrageStrategySignal(string tickerFirst, string tickerSecond)
+    {
+        TickerFirst = tickerFirst;
+        TickerSecond = tickerSecond;
+        CountStrategies = 0;
+        CountSignals = 0;
+        PercentSignals = 0;
+        LastPriceFirst = 0.0;
+        LastPriceSecond = 0.0;
+        PositionCost = 0.0;
+        PositionSizeFirst = 0;
+        PositionSizeSecond = 0;
+        PositionPercentPortfolio = 0;
+    }
+    
     /// <summary>
     /// Тикер инструмента
     /// </summary>

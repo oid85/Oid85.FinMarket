@@ -189,25 +189,11 @@ public class AlgoStatisticalArbitrageService(
         // Добавляем тикеры, если их еще нет в таблице
         var tickersInStrategySignals = (await strategySignalRepository.GetAllAsync()).Select(x => $"{x.TickerFirst},{x.TickerSecond}").ToList();
         var tickersInBacktestResults = backtestResults.Select(x => $"{x.TickerFirst},{x.TickerSecond}").Distinct().ToList();
+        
         foreach (var tickerPair in tickersInStrategySignals)
-        {
             if (!tickersInBacktestResults.Contains(tickerPair))
                 await strategySignalRepository.UpdatePositionAsync(
-                    new StatisticalArbitrageStrategySignal
-                    {
-                        TickerFirst = tickerPair.Split(',')[0],
-                        TickerSecond = tickerPair.Split(',')[1],
-                        CountStrategies = 0,
-                        CountSignals = 0,
-                        PercentSignals = 0,
-                        LastPriceFirst = 0.0,
-                        LastPriceSecond = 0.0,
-                        PositionCost = 0.0,
-                        PositionSizeFirst = 0,
-                        PositionSizeSecond = 0,
-                        PositionPercentPortfolio = 0
-                    });
-        }
+                    new StatisticalArbitrageStrategySignal(tickerPair.Split(',')[0], tickerPair.Split(',')[1]));
 
         // Расчет для каждого тикера
         foreach (var tickerPair in tickersInBacktestResults)
@@ -216,20 +202,7 @@ public class AlgoStatisticalArbitrageService(
             {
                 if (!tickersInStrategySignals.Contains(tickerPair))
                     await strategySignalRepository.AddAsync(
-                        new StatisticalArbitrageStrategySignal
-                        {
-                            TickerFirst = tickerPair.Split(',')[0],
-                            TickerSecond = tickerPair.Split(',')[1],
-                            CountStrategies = 0,
-                            CountSignals = 0,
-                            PercentSignals = 0,
-                            LastPriceFirst = 0.0,
-                            LastPriceSecond = 0.0,
-                            PositionCost = 0.0,
-                            PositionSizeFirst = 0,
-                            PositionSizeSecond = 0,
-                            PositionPercentPortfolio = 0
-                        });
+                        new StatisticalArbitrageStrategySignal(tickerPair.Split(',')[0], tickerPair.Split(',')[1]));
 
                 var backtestResultsByTickerPair = backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair).ToList();
                 
@@ -244,16 +217,13 @@ public class AlgoStatisticalArbitrageService(
 
                 // Количество уникальных тикеров с позицией не равной 0
                 int countUniqueTickersWithSignals = backtestResults
-                    .Where(
-                        x => 
-                            x.CurrentPositionFirst is > 0 or < 0 &&
-                            x.CurrentPositionSecond is > 0 or < 0)
+                    .Where(x => x.CurrentPositionFirst is > 0 or < 0 && x.CurrentPositionSecond is > 0 or < 0)
                     .Select(x => $"{x.TickerFirst},{x.TickerSecond}").Distinct().Count();
 
                 // Размер позиции в процентах от портфеля
                 double positionPercentPortfolio =
-                    ((algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney / countUniqueTickersWithSignals) *
-                     (percentSignals / 100.0)) / algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * 100.0;
+                    algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney / countUniqueTickersWithSignals *
+                    (percentSignals / 100.0) / algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * 100.0;
 
                 // Размер позиции, руб
                 double positionCost = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * positionPercentPortfolio / 100.0;

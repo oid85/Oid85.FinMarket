@@ -160,21 +160,9 @@ public class AlgoService(
         var tickersInBacktestResults = backtestResults.Select(x => x.Ticker).Distinct().ToList();
         
         foreach (var ticker in tickersInStrategySignals)
-        {
             if (!tickersInBacktestResults.Contains(ticker))
                 await strategySignalRepository.UpdatePositionAsync(
-                    new StrategySignal
-                    {
-                        Ticker = ticker, 
-                        CountStrategies = 0, 
-                        CountSignals = 0, 
-                        PercentSignals = 0, 
-                        LastPrice = 0.0, 
-                        PositionCost = 0.0, 
-                        PositionSize = 0,
-                        PositionPercentPortfolio = 0 
-                    });
-        }
+                    new StrategySignal(ticker));
 
         // Расчет для каждого тикера
         foreach (var ticker in tickersInBacktestResults)
@@ -183,17 +171,7 @@ public class AlgoService(
             {
                 if (!tickersInStrategySignals.Contains(ticker))
                     await strategySignalRepository.AddAsync(
-                        new StrategySignal
-                        {
-                            Ticker = ticker, 
-                            CountStrategies = 0, 
-                            CountSignals = 0, 
-                            PercentSignals = 0, 
-                            LastPrice = 0.0, 
-                            PositionCost = 0.0, 
-                            PositionSize = 0,
-                            PositionPercentPortfolio = 0 
-                        });
+                        new StrategySignal(ticker));
                 
                 // Количество сигналов
                 int countSignals = GetCountSignals(ticker);

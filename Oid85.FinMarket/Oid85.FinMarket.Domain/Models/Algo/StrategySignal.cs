@@ -2,6 +2,23 @@
 
 public class StrategySignal
 {
+    public StrategySignal()
+    {
+        
+    }
+    
+    public StrategySignal(string ticker)
+    {
+        Ticker = ticker;
+        CountStrategies = 0;
+        CountSignals = 0;
+        PercentSignals = 0;
+        LastPrice = 0.0;
+        PositionCost = 0.0;
+        PositionSize = 0;
+        PositionPercentPortfolio = 0;
+    }
+    
     /// <summary>
     /// Тикер инструмента
     /// </summary>
