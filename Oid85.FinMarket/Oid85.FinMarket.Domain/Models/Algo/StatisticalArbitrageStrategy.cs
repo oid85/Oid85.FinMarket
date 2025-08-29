@@ -9,6 +9,12 @@ public class StatisticalArbitrageStrategy
     public double EndMoney { get; set; }
 
     public (string First, string Second) Ticker { get; set; } = (string.Empty, string.Empty);
+
+    public (bool First, bool Second) IsFuture { get; set; } = (false, false);
+    
+    public (double First, double Second) BasicAssetSize { get; set; } = (1.0, 1.0);
+    
+    public (double First, double Second) Leverage { get; set; } = (1.0, 1.0);
     
     public string Timeframe { get; set; } = string.Empty;
     
@@ -52,6 +58,33 @@ public class StatisticalArbitrageStrategy
     
     public List<ArbitragePosition> Positions { get; set; } = new();
 
+    public (int First, int Second) GetPositionSize((double First, double Second) orderPrice)
+    {
+        if (EndMoney <= orderPrice.First + orderPrice.Second)
+            return (0, 0);
+
+        double money = EndMoney / 2.0;
+        
+        (int First, int Second) positionSize = (0, 0);
+
+        if (IsFuture.First)
+            positionSize.First = orderPrice.First == 0.0 || BasicAssetSize.First == 0.0 ? 0 : Convert.ToInt32(money / (orderPrice.First * BasicAssetSize.First) * Leverage.First);
+
+        else
+            positionSize.First = orderPrice.First == 0.0 ? 0 : Convert.ToInt32(money / orderPrice.First * Leverage.First);
+        
+        if (IsFuture.Second)
+            positionSize.Second = orderPrice.Second == 0.0 || BasicAssetSize.Second == 0.0 ? 0 : Convert.ToInt32(money / (orderPrice.Second * BasicAssetSize.Second) * Leverage.Second);
+
+        else
+            positionSize.Second = orderPrice.Second == 0.0 ? 0 : Convert.ToInt32(money / orderPrice.Second * Leverage.Second);      
+        
+        if (positionSize.First == 0 || positionSize.Second == 0)
+            return (0, 0);
+        
+        return positionSize;
+    }    
+    
     public ArbitragePosition? LastActivePosition {
         get
         {

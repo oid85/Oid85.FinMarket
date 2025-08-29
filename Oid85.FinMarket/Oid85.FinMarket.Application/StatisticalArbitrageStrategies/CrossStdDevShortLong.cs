@@ -1,11 +1,8 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Services;
-using Oid85.FinMarket.Domain.Models.Algo;
+﻿using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.Application.StatisticalArbitrageStrategies;
 
-public class CrossStdDevShortLong(
-    IMoneyManagementService moneyManagementService)
-    : StatisticalArbitrageStrategy
+public class CrossStdDevShortLong : StatisticalArbitrageStrategy
 {
     public override async Task Execute()
     {
@@ -30,7 +27,7 @@ public class CrossStdDevShortLong(
             var orderPrice = (Candles.First[i].Close, Candles.Second[i].Close);
 
             // Расчет размера позиции
-            var positionSize = await moneyManagementService.GetPositionSizeAsync(Ticker, orderPrice, (EndMoney / 2.0, EndMoney / 2.0));
+            var positionSize = GetPositionSize(orderPrice);
                 
             if (LastActivePosition is null)
             {

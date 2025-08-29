@@ -10,6 +10,12 @@ public class Strategy
     
     public string Ticker { get; set; } = string.Empty;
     
+    public bool IsFuture { get; set; }
+    
+    public double BasicAssetSize { get; set; } = 1.0;
+    
+    public double Leverage { get; set; } = 1.0;
+    
     public string Timeframe { get; set; } = string.Empty;
     
     public string StrategyDescription { get; set; } = string.Empty;
@@ -54,15 +60,13 @@ public class Strategy
     
     public int GetPositionSize(double orderPrice)
     {
-        double money = EndMoney;
-        
-        if (money <= orderPrice)
+        if (EndMoney <= orderPrice)
             return 0;
         
-        int positionSize = (int) Math.Round(money / orderPrice);
+        if (IsFuture)
+            return orderPrice == 0.0 || BasicAssetSize == 0.0 ? 0 : Convert.ToInt32(EndMoney / (orderPrice * BasicAssetSize) * Leverage);
         
-        
-        return positionSize;
+        return orderPrice == 0.0 ? 0 : Convert.ToInt32(EndMoney / orderPrice * Leverage);        
     }
 
     public Position? LastActivePosition {
