@@ -316,7 +316,7 @@ public class AlgoHelper(
     /// <summary>
     /// Синхронизация свечей
     /// </summary>
-    public (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
+    public static (List<DailyCandle> Candles1, List<DailyCandle> Candles2) SyncCandles(List<DailyCandle> candles1, List<DailyCandle> candles2)
     {
         var dates1 = candles1.Select(x => x.Date).ToList();
         var dates2 = candles2.Select(x => x.Date).ToList();
@@ -332,7 +332,7 @@ public class AlgoHelper(
     /// <summary>
     /// Синхронизация свечей
     /// </summary>
-    public (List<Candle> Candles1, List<Candle> Candles2) SyncCandles(List<Candle> candles1, List<Candle> candles2)
+    public static (List<Candle> Candles1, List<Candle> Candles2) SyncCandles(List<Candle> candles1, List<Candle> candles2)
     {
         var dates1 = candles1.Select(x => x.DateTime.Date).ToList();
         var dates2 = candles2.Select(x => x.DateTime.Date).ToList();
@@ -426,11 +426,11 @@ public class AlgoHelper(
     /// Признак фьючерса
     /// </summary>
     /// <param name="ticker">Тикер инструмента</param>
-    private async Task<bool> IsFuture(string ticker) => (await futureRepository.GetAllAsync()).Select(x => x.Ticker).Contains(ticker);
+    public async Task<bool> IsFuture(string ticker) => await futureRepository.GetAsync(ticker) is not null;
 
     /// <summary>
     /// Получить размер основного актива
     /// </summary>
     /// <param name="ticker">Тикер инструмента</param>
-    private async Task<double> GetBasicAssetSize(string ticker) => (await futureRepository.GetAsync(ticker))?.BasicAssetSize ?? 1.0;
+    public async Task<double> GetBasicAssetSize(string ticker) => (await futureRepository.GetAsync(ticker))?.BasicAssetSize ?? 1.0;
 }

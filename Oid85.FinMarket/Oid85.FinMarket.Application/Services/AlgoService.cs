@@ -58,6 +58,8 @@ public class AlgoService(
                 try
                 {
                     strategy.Ticker = optimizationResult.Ticker;
+                    strategy.IsFuture = await algoHelper.IsFuture(optimizationResult.Ticker);
+                    strategy.BasicAssetSize = await algoHelper.GetBasicAssetSize(optimizationResult.Ticker);
                     strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                     if (strategy.Candles is [])
@@ -115,6 +117,8 @@ public class AlgoService(
             var strategy = Strategies[backtestResult.StrategyId];
             
             strategy.Ticker = backtestResult.Ticker;
+            strategy.IsFuture = await algoHelper.IsFuture(backtestResult.Ticker);
+            strategy.BasicAssetSize = await algoHelper.GetBasicAssetSize(backtestResult.Ticker);
             strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
             if (strategy.Candles is [])
@@ -154,6 +158,7 @@ public class AlgoService(
         // Добавляем тиекры, если их еще нет в таблице
         var tickersInStrategySignals = (await strategySignalRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
         var tickersInBacktestResults = backtestResults.Select(x => x.Ticker).Distinct().ToList();
+        
         foreach (var ticker in tickersInStrategySignals)
         {
             if (!tickersInBacktestResults.Contains(ticker))
@@ -336,7 +341,9 @@ public class AlgoService(
             
             foreach (var ticker in tickers)
             {
-                strategy.Ticker = ticker;                
+                strategy.Ticker = ticker;
+                strategy.IsFuture = await algoHelper.IsFuture(ticker);
+                strategy.BasicAssetSize = await algoHelper.GetBasicAssetSize(ticker);
                 strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                 if (strategy.Candles is [])

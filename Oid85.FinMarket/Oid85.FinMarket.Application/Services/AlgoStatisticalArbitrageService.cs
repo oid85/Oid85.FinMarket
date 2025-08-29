@@ -64,8 +64,10 @@ public class AlgoStatisticalArbitrageService(
                 try
                 {
                     strategy.Ticker = (optimizationResult.TickerFirst, optimizationResult.TickerSecond);
-
-                    var syncCandles = algoHelper.SyncCandles(
+                    strategy.IsFuture = (await algoHelper.IsFuture(optimizationResult.TickerFirst), await algoHelper.IsFuture(optimizationResult.TickerSecond));
+                    strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(optimizationResult.TickerFirst), await algoHelper.GetBasicAssetSize(optimizationResult.TickerSecond));
+                    
+                    var syncCandles = AlgoHelper.SyncCandles(
                         Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
                         Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
@@ -134,8 +136,10 @@ public class AlgoStatisticalArbitrageService(
             var strategy = Strategies[backtestResult.StrategyId];
             
             strategy.Ticker = (backtestResult.TickerFirst, backtestResult.TickerSecond);
+            strategy.IsFuture = (await algoHelper.IsFuture(backtestResult.TickerFirst), await algoHelper.IsFuture(backtestResult.TickerSecond));
+            strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(backtestResult.TickerFirst), await algoHelper.GetBasicAssetSize(backtestResult.TickerSecond));
             
-            var syncCandles = algoHelper.SyncCandles(
+            var syncCandles = AlgoHelper.SyncCandles(
                 Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
                 Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
@@ -395,8 +399,10 @@ public class AlgoStatisticalArbitrageService(
             foreach (var tickerPair in tickerPairs)
             {
                 strategy.Ticker = (tickerPair.Split(',')[0], tickerPair.Split(',')[1]);
-
-                var syncCandles = algoHelper.SyncCandles(
+                strategy.IsFuture = (await algoHelper.IsFuture(tickerPair.Split(',')[0]), await algoHelper.IsFuture(tickerPair.Split(',')[1]));
+                strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(tickerPair.Split(',')[0]), await algoHelper.GetBasicAssetSize(tickerPair.Split(',')[1]));
+                
+                var syncCandles = AlgoHelper.SyncCandles(
                     Candles.TryGetValue(strategy.Ticker.First, out var candles1) ? candles1 : [], 
                     Candles.TryGetValue(strategy.Ticker.First, out var candles2) ? candles2 : []);
                     
@@ -489,7 +495,7 @@ public class AlgoStatisticalArbitrageService(
                 try
                 {
                     // Получаем свечи и синхронизируем массивы по дате
-                    var syncCandles = algoHelper.SyncCandles(candles[tickers[i]], candles[tickers[j]]);
+                    var syncCandles = AlgoHelper.SyncCandles(candles[tickers[i]], candles[tickers[j]]);
 
                     var prices1 = syncCandles.Candles1.Select(x => x.Close).ToList();
                     var prices2 = syncCandles.Candles2.Select(x => x.Close).ToList();
