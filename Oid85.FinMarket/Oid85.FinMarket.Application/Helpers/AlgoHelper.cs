@@ -19,7 +19,8 @@ public class AlgoHelper(
     IRegressionTailRepository regressionTailRepository,
     IDailyCandleRepository dailyCandleRepository,
     ICorrelationRepository correlationRepository,
-    IComputationService computationService)
+    IComputationService computationService,
+    IFutureRepository futureRepository)
 {
     /// <summary>
     /// Получить даты для оптимизации
@@ -420,4 +421,16 @@ public class AlgoHelper(
 
         return tails;
     }
+    
+    /// <summary>
+    /// Признак фьючерса
+    /// </summary>
+    /// <param name="ticker">Тикер инструмента</param>
+    private async Task<bool> IsFuture(string ticker) => (await futureRepository.GetAllAsync()).Select(x => x.Ticker).Contains(ticker);
+
+    /// <summary>
+    /// Получить размер основного актива
+    /// </summary>
+    /// <param name="ticker">Тикер инструмента</param>
+    private async Task<double> GetBasicAssetSize(string ticker) => (await futureRepository.GetAsync(ticker))?.BasicAssetSize ?? 1.0;
 }
