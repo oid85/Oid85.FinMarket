@@ -64,14 +64,6 @@ public static class ServiceCollectionExtensions
             
         services.AddHangfireServer();
     }
-        
-    public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
-        where TService : class
-        where TImplementation : class, TService
-    {
-        services.AddTransient<TService, TImplementation>();
-        services.AddSingleton<Func<TService>>(x => () => x.GetService<TService>()!);
-    }
 
     private static string GetXmlCommentsPath()
     {

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.External.ResourceStore.Models;
@@ -8,7 +9,8 @@ namespace Oid85.FinMarket.External.ResourceStore;
 
 /// <inheritdoc />
 public class ResourceStoreService(
-    IConfiguration configuration) 
+    IConfiguration configuration,
+    IMemoryCache memoryCache) 
     : IResourceStoreService
 {
     /// <inheritdoc />
@@ -180,22 +182,57 @@ public class ResourceStoreService(
                 "tickerLists", $"{tickerListName}.json")) ?? new();
 
     /// <inheritdoc />
-    public async Task<AlgoConfigResource> GetAlgoConfigAsync() =>
-        await ReadAsync<AlgoConfigResource>(
-            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "algo", "config.json")) ?? new();
+    public async Task<AlgoConfigResource> GetAlgoConfigAsync()
+    {
+        string key = $"{nameof(ResourceStoreService)}|{nameof(AlgoConfigResource)}";
+
+        if (!memoryCache.TryGetValue(key, out AlgoConfigResource? result))
+        {
+            result = await ReadAsync<AlgoConfigResource>(
+                Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                    "algo", "config.json")) ?? new();
+            
+            memoryCache.Set(key, result, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)));
+        }
+        
+
+        return result ?? new();
+    }
 
     /// <inheritdoc />
-    public async Task<List<AlgoStrategyResource>> GetAlgoStrategiesAsync() =>
-        await ReadAsync<List<AlgoStrategyResource>>(
-            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "algo", "strategies.json")) ?? [];
+    public async Task<List<AlgoStrategyResource>> GetAlgoStrategiesAsync()
+    {
+        string key = $"{nameof(ResourceStoreService)}|{nameof(AlgoStrategyResource)}";
+
+        if (!memoryCache.TryGetValue(key, out List<AlgoStrategyResource>? result))
+        {
+            result = await ReadAsync<List<AlgoStrategyResource>>(
+                Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                    "algo", "strategies.json")) ?? [];
+            
+            memoryCache.Set(key, result, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)));
+        }
+        
+
+        return result ?? new();
+    }
 
     /// <inheritdoc />
-    public async Task<List<StatisticalArbitrageStrategyResource>> GetStatisticalArbitrageStrategiesAsync() =>
-        await ReadAsync<List<StatisticalArbitrageStrategyResource>>(
-            Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                "algo", "statisticalArbitrageStrategy.json")) ?? [];
+    public async Task<List<StatisticalArbitrageStrategyResource>> GetStatisticalArbitrageStrategiesAsync()
+    {
+        string key = $"{nameof(ResourceStoreService)}|{nameof(StatisticalArbitrageStrategyResource)}";
+
+        if (!memoryCache.TryGetValue(key, out List<StatisticalArbitrageStrategyResource>? result))
+        {
+            result = await ReadAsync<List<StatisticalArbitrageStrategyResource>>(
+                Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
+                    "algo", "statisticalArbitrageStrategy.json")) ?? [];
+            
+            memoryCache.Set(key, result, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)));
+        }
+
+        return result ?? new();
+    }
 
     public async Task<List<string[]>> GetCsvAsync(string path) => 
         !File.Exists(Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!, path)) ? [] 
