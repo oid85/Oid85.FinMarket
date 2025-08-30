@@ -45,7 +45,8 @@ public class JobService(
     /// <inheritdoc />
     public async Task Every15Minutes()
     {
-
+        await LoadDailyCandlesAsync();
+        await StatisticalArbitrationAsync();
     }
 
     /// <inheritdoc />

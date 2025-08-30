@@ -14,15 +14,22 @@ public class DailyCandleRepository(
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
-        var completedCandles = candles
-            .Where(x => x.IsComplete).ToList();
+        // Удалим незавершенные свечи
+        var instrumentIds = candles.Select(x => x.InstrumentId).Distinct();
+
+        foreach (var instrumentId in instrumentIds) 
+            await context.DailyCandleEntities
+                .Where(x => x.InstrumentId == instrumentId && x.IsComplete)
+                .ExecuteDeleteAsync();
         
-        if (completedCandles is [])
+        await context.SaveChangesAsync();
+        
+        if (candles is [])
             return;
 
         var entities = new List<DailyCandleEntity>();
         
-        foreach (var candle in completedCandles)
+        foreach (var candle in candles)
             if (!await context.DailyCandleEntities
                     .AnyAsync(x => 
                         x.InstrumentId == candle.InstrumentId
