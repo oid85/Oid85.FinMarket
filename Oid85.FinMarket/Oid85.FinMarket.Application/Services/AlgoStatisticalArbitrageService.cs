@@ -524,6 +524,11 @@ public class AlgoStatisticalArbitrageService(
     }
 
     /// <inheritdoc />
-    public Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync() => 
-        algoHelper.CalculateRegressionTailsAsync(DateOnly.FromDateTime(DateTime.Today.AddYears(-1)), DateOnly.FromDateTime(DateTime.Today));
+    public async Task<Dictionary<string, RegressionTail>> CalculateRegressionTailsAsync()
+    {
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        return await algoHelper.CalculateRegressionTailsAsync(
+            DateOnly.FromDateTime(DateTime.Today.AddDays(-1 * algoConfigResource.PeriodConfigResource.CalculateRegressionTailsPeriodInDays)), 
+            DateOnly.FromDateTime(DateTime.Today));
+    }
 }

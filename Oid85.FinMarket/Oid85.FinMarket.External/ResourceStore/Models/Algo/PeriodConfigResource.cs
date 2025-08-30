@@ -42,4 +42,10 @@ public class PeriodConfigResource
     /// </summary>
     [JsonPropertyName("hourlyStabilizationPeriodInDays")]
     public int HourlyStabilizationPeriodInDays { get; set; }
+    
+    /// <summary>
+    /// Период расчета хвостов регрессии в днях
+    /// </summary>
+    [JsonPropertyName("calculateRegressionTailsPeriodInDays")]
+    public int CalculateRegressionTailsPeriodInDays { get; set; }
 }
