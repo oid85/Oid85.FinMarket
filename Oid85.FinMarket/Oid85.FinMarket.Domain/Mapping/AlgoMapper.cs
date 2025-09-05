@@ -114,11 +114,11 @@ public static class AlgoMapper
         return result;
     } 
     
-    public static StatisticalArbitrageOptimizationResult MapToOptimizationResult(StatisticalArbitrageStrategy strategy)
+    public static PairArbitrageOptimizationResult MapToOptimizationResult(PairArbitrageStrategy strategy)
     {
         var json = JsonSerializer.Serialize(strategy.Parameters);
 
-        var result = new StatisticalArbitrageOptimizationResult
+        var result = new PairArbitrageOptimizationResult
         {
             StrategyId = strategy.StrategyId,
             StartDate = strategy.StartDate,
@@ -153,11 +153,11 @@ public static class AlgoMapper
         return result;
     }
 
-    public static StatisticalArbitrageBacktestResult MapToBacktestResult(StatisticalArbitrageStrategy strategy)
+    public static PairArbitrageBacktestResult MapToBacktestResult(PairArbitrageStrategy strategy)
     {
         var json = JsonSerializer.Serialize(strategy.Parameters);
 
-        var result = new StatisticalArbitrageBacktestResult
+        var result = new PairArbitrageBacktestResult
         {
             StrategyId = strategy.StrategyId,
             StartDate = strategy.StartDate,

@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
-public class ArbitrageGraphPoint
+public class PairArbitrageGraphPoint
 {
     public double? PriceFirst { get; set; } = null;
     public double? PriceSecond { get; set; } = null;

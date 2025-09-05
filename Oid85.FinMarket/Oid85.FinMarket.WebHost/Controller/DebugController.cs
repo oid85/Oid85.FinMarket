@@ -8,7 +8,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/debug")]
 [ApiController]
 public class DebugController(
-    IAlgoStatisticalArbitrageService service) 
+    IAlgoPairArbitrageService service) 
     : FinMarketBaseController
 {
     [HttpGet("debug")]

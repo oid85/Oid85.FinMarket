@@ -7,7 +7,7 @@ namespace Oid85.FinMarket.DataAccess.Mapping;
 
 public static class DataAccessMapper
 {
-        public static StatisticalArbitrageStrategySignalEntity Map(StatisticalArbitrageStrategySignal model) =>
+        public static PairArbitrageStrategySignalEntity Map(PairArbitrageStrategySignal model) =>
         new()
         {
             TickerFirst = model.TickerFirst,
@@ -23,7 +23,7 @@ public static class DataAccessMapper
             LastPriceSecond = model.LastPriceSecond
         };
     
-    public static StatisticalArbitrageStrategySignal Map(StatisticalArbitrageStrategySignalEntity entity) =>
+    public static PairArbitrageStrategySignal Map(PairArbitrageStrategySignalEntity entity) =>
         new()
         {
             TickerFirst = entity.TickerFirst,
@@ -39,7 +39,7 @@ public static class DataAccessMapper
             LastPriceSecond = entity.LastPriceSecond
         }; 
     
-    public static StatisticalArbitrageOptimizationResultEntity Map(StatisticalArbitrageOptimizationResult model) =>
+    public static PairArbitrageOptimizationResultEntity Map(PairArbitrageOptimizationResult model) =>
         new()
         {
             StartDate = model.StartDate,
@@ -72,7 +72,7 @@ public static class DataAccessMapper
             AnnualYieldReturn = model.AnnualYieldReturn
         };
     
-    public static StatisticalArbitrageOptimizationResult Map(StatisticalArbitrageOptimizationResultEntity entity) =>
+    public static PairArbitrageOptimizationResult Map(PairArbitrageOptimizationResultEntity entity) =>
         new()
         {
             Id = entity.Id,
@@ -106,7 +106,7 @@ public static class DataAccessMapper
             AnnualYieldReturn = entity.AnnualYieldReturn
         };    
     
-    public static StatisticalArbitrageBacktestResultEntity Map(StatisticalArbitrageBacktestResult model) =>
+    public static PairArbitrageBacktestResultEntity Map(PairArbitrageBacktestResult model) =>
         new()
         {
             StartDate = model.StartDate,
@@ -139,7 +139,7 @@ public static class DataAccessMapper
             AnnualYieldReturn = model.AnnualYieldReturn
         };
     
-    public static StatisticalArbitrageBacktestResult Map(StatisticalArbitrageBacktestResultEntity entity) =>
+    public static PairArbitrageBacktestResult Map(PairArbitrageBacktestResultEntity entity) =>
         new()
         {
             Id = entity.Id,

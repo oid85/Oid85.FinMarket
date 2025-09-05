@@ -12,4 +12,7 @@ public interface IDiagramDataFactory
     Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies);
     Task<BacktestResultDiagramData> CreateBacktestResultWithoutPriceDiagramDataAsync(List<Strategy> strategies);
     Task<SimpleDiagramData> CreateSpreadsDiagramDataAsync(DateOnly from, DateOnly to);
+    Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(PairArbitrageStrategy strategy);
+    Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(List<PairArbitrageStrategy> strategies);
+    Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultWithoutPriceDiagramDataAsync(List<PairArbitrageStrategy> strategies);
 }

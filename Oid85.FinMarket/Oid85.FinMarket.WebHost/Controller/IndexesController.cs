@@ -15,27 +15,9 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [ApiController]
 public class IndexesController(
     IIndexesReportService reportService,
-    IIndexesDiagramService diagramService,
-    ITickerListUtilService tickerListUtilService) 
+    IIndexesDiagramService diagramService) 
     : FinMarketBaseController
 {
-    /// <summary>
-    /// Получить тикеры индексов из листа наблюдения
-    /// </summary>
-    [HttpGet("watch-list-tickers")]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetIndexesWatchListAsync() =>
-        await GetResponseAsync(
-            async () => (await tickerListUtilService.GetFinIndexesByTickerListAsync(KnownTickerLists.IndexesWatchlist))
-                .Select(x => x.Ticker)
-                .ToList(),
-            result => new BaseResponse<List<string>>
-            {
-                Result = result
-            });
-    
     /// <summary>
     /// Отчет Сводный анализ
     /// </summary>

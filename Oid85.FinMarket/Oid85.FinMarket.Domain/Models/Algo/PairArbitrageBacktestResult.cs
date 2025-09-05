@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
-public class StatisticalArbitrageOptimizationResult
+public class PairArbitrageBacktestResult
 {
     /// <summary>
     /// Id
@@ -45,7 +45,7 @@ public class StatisticalArbitrageOptimizationResult
     /// <summary>
     /// Наименование стратегии
     /// </summary>
-    public string StrategyName { get; set; } = string.Empty;    
+    public string StrategyName { get; set; } = string.Empty;
     
     /// <summary>
     /// Параметры стратегии
@@ -70,12 +70,12 @@ public class StatisticalArbitrageOptimizationResult
     /// <summary>
     /// Текущая позиция
     /// </summary>
-    public int CurrentPositionSecond { get; set; }    
+    public int CurrentPositionSecond { get; set; }  
     
     /// <summary>
     /// Текущая позиция (стоимость)
     /// </summary>
-    public double CurrentPositionCost { get; set; }   
+    public double CurrentPositionCost { get; set; }
     
     /// <summary>
     /// Profit Factor

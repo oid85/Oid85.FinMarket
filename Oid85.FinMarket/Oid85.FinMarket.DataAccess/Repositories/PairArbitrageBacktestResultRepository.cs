@@ -6,28 +6,28 @@ using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class StatisticalArbitrageOptimizationResultRepository(
+public class PairArbitrageBacktestResultRepository(
     IDbContextFactory<FinMarketContext> contextFactory)
-    : IStatisticalArbitrageOptimizationResultRepository
+    : IPairArbitrageBacktestResultRepository
 {
-    public async Task AddAsync(List<StatisticalArbitrageOptimizationResult> optimizationResults)
+    public async Task AddAsync(List<PairArbitrageBacktestResult> backtestResults)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
-        if (optimizationResults is [])
+        if (backtestResults is [])
             return;
 
-        var entities = optimizationResults.Select(DataAccessMapper.Map);
+        var entities = backtestResults.Select(DataAccessMapper.Map);
         
-        await context.StatisticalArbitrageOptimizationResultEntities.AddRangeAsync(entities);
+        await context.PairArbitrageBacktestResultEntities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<StatisticalArbitrageOptimizationResult>> GetAsync(OptimizationResultFilterResource filter)
+    public async Task<List<PairArbitrageBacktestResult>> GetAsync(BacktestResultFilterResource filter)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
-        var queryableEntities = context.StatisticalArbitrageOptimizationResultEntities.AsQueryable();
+        var queryableEntities = context.PairArbitrageBacktestResultEntities.AsQueryable();
         
         queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= filter.MinProfitFactor);
         queryableEntities = queryableEntities.Where(x => x.RecoveryFactor >= filter.MinRecoveryFactor);
@@ -43,15 +43,27 @@ public class StatisticalArbitrageOptimizationResultRepository(
         return models;
     }
 
+    public async Task<PairArbitrageBacktestResult?> GetAsync(Guid backtestResultId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        var entity = await context.PairArbitrageBacktestResultEntities
+            .Where(x => !x.IsDeleted)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == backtestResultId);
+        
+        return entity is null ? null : DataAccessMapper.Map(entity);
+    }
+
     public async Task DeleteAsync(Guid strategyId)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        await context.StatisticalArbitrageOptimizationResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
+        await context.PairArbitrageBacktestResultEntities.Where(x => x.StrategyId == strategyId).ExecuteDeleteAsync();
     }
 
     public async Task InvertDeleteAsync(List<Guid> strategyIds)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        await context.StatisticalArbitrageOptimizationResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
+        await context.PairArbitrageBacktestResultEntities.Where(x => !strategyIds.Contains(x.StrategyId)).ExecuteDeleteAsync();
     }
 }

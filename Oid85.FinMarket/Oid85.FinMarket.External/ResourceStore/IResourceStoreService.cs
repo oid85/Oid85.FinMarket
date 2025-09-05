@@ -159,9 +159,9 @@ public interface IResourceStoreService
     Task<List<AlgoStrategyResource>> GetAlgoStrategiesAsync();
     
     /// <summary>
-    /// Получить список стратегий Статистического арбитража
+    /// Получить список стратегий Парного арбитража
     /// </summary>
-    Task<List<StatisticalArbitrageStrategyResource>> GetStatisticalArbitrageStrategiesAsync();
+    Task<List<PairArbitrageStrategyResource>> GetPairArbitrageStrategiesAsync();
     
     /// <summary>
     /// Получить csv

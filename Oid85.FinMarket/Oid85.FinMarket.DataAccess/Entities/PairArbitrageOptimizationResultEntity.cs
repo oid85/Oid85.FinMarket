@@ -4,7 +4,7 @@ using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
 
-public class StatisticalArbitrageBacktestResultEntity : AuditableEntity
+public class PairArbitrageOptimizationResultEntity : AuditableEntity
 {
     /// <summary>
     /// Начало периода
@@ -82,7 +82,7 @@ public class StatisticalArbitrageBacktestResultEntity : AuditableEntity
     /// Текущая позиция
     /// </summary>
     [Column("current_position_second")]
-    public int CurrentPositionSecond { get; set; }       
+    public int CurrentPositionSecond { get; set; } 
     
     /// <summary>
     /// Текущая позиция (стоимость)

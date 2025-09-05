@@ -64,6 +64,17 @@ public class DiagramDataFactory(
     {
         var multiplicators = await shareMultiplicatorRepository.GetAsync(instrumentIds);
         var diagramData = new BubbleDiagramData { Title = "MCap, P/E, NetDebt/EBITDA" };
+
+        foreach (var multiplicator in multiplicators)
+        {
+            diagramData.Series.Add(new BubbleDataPoint()
+            {
+                Name = multiplicator.Ticker,
+                X = multiplicator.Pe,
+                Y = multiplicator.NetDebtEbitda,
+                R = multiplicator.MarketCap
+            });
+        }
         
         return diagramData;
     }
@@ -72,6 +83,17 @@ public class DiagramDataFactory(
     {
         var multiplicators = await bankMultiplicatorRepository.GetAsync(instrumentIds);
         var diagramData = new BubbleDiagramData { Title = "MCap, P/E, P/B" };
+        
+        foreach (var multiplicator in multiplicators)
+        {
+            diagramData.Series.Add(new BubbleDataPoint()
+            {
+                Name = multiplicator.Ticker,
+                X = multiplicator.Pe,
+                Y = multiplicator.Pb,
+                R = multiplicator.MarketCap
+            });
+        }
         
         return diagramData;
     }
@@ -234,5 +256,20 @@ public class DiagramDataFactory(
         }
         
         return simpleDiagramData;
+    }
+
+    public async Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(PairArbitrageStrategy strategy)
+    {
+
+    }
+
+    public async Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(List<PairArbitrageStrategy> strategies)
+    {
+
+    }
+
+    public async Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultWithoutPriceDiagramDataAsync(List<PairArbitrageStrategy> strategies)
+    {
+
     }
 }

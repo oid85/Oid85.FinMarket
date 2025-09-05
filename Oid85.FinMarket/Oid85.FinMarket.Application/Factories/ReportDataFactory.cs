@@ -27,6 +27,8 @@ public class ReportDataFactory(
     IAssetReportEventRepository assetReportEventRepository,
     IStrategySignalRepository strategySignalRepository,
     IBacktestResultRepository backtestResultRepository,
+    IPairArbitrageStrategySignalRepository pairArbitrageStrategySignalRepository,
+    IPairArbitrageBacktestResultRepository pairArbitrageBacktestResultRepository,
     IResourceStoreService resourceStoreService,
     ColorHelper colorHelper,
     IMarketEventRepository marketEventRepository,
@@ -156,6 +158,9 @@ public class ReportDataFactory(
     
     private static ReportParameter GetBacktestResultByTickerButton(string value, string color = KnownColors.White) =>
         new (KnownDisplayTypes.BacktestResultByTickerButton, value, color);    
+    
+    private static ReportParameter GetBacktestResultByTickersButton(string value, string color = KnownColors.White) =>
+        new (KnownDisplayTypes.BacktestResultByTickerButton, value, color);     
     
     public async Task<ReportData> CreateReportDataAsync(
         List<Guid> instrumentIds, string analyseType, DateOnly from, DateOnly to)
@@ -921,5 +926,96 @@ public class ReportDataFactory(
         ]); 
         
         return reportData;
+    }
+
+    public async Task<ReportData> CreatePairArbitrageStrategySignalsReportDataAsync()
+    {
+        var reportData = CreateNewReportDataWithHeaders(
+            [
+                "№", "", "", "Тикер", "Тикер", "Наименование", "Наименование", "Сигналы, шт", "Стратегии, шт", "Сигналы, %", 
+                "Позиция, шт", "Позиция, шт", "Позиция, руб",  "Доля в портфеле, %", "Цена, руб", "Цена, руб", ""
+            ]);
+
+        reportData.Title = "Сигналы";
+        
+        var strategySignals = await pairArbitrageStrategySignalRepository.GetAllAsync();
+
+        int count = 0;
+        
+        reportData.Data.Add(
+        [
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetNumber(strategySignals.Sum(x => Math.Abs(x.PositionCost))),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty),
+            GetString(string.Empty)
+        ]); 
+        
+        foreach (var strategySignal in strategySignals.OrderByDescending(x => x.PositionPercentPortfolio))
+        {
+            count++;
+            
+            var instrumentFirst = await instrumentRepository.GetAsync(strategySignal.TickerFirst);
+            var instrumentSecond = await instrumentRepository.GetAsync(strategySignal.TickerSecond);
+            
+            string instrumentNameFirst = instrumentFirst?.Name ?? string.Empty;
+            string instrumentNameSecond = instrumentSecond?.Name ?? string.Empty;
+
+            double percent = 0.0;
+            if (strategySignal.CountStrategies != 0)
+                percent = Convert.ToDouble(strategySignal.CountSignals) / Convert.ToDouble(strategySignal.CountStrategies) * 100.0;
+
+            string color = ColorHelper.GreenScale(percent);
+            
+            reportData.Data.Add(
+            [
+                GetNumber(count),
+                GetTicker(strategySignal.TickerFirst),
+                GetTicker(strategySignal.TickerSecond),
+                GetString(strategySignal.TickerFirst),
+                GetString(strategySignal.TickerSecond),
+                GetString(normalizeService.NormalizeInstrumentName(instrumentNameFirst)),
+                GetString(normalizeService.NormalizeInstrumentName(instrumentNameSecond)),
+                GetNumber(strategySignal.CountSignals),
+                GetNumber(strategySignal.CountStrategies),
+                GetString($"{strategySignal.PercentSignals:N2} %", color),
+                GetNumber(strategySignal.PositionSizeFirst),
+                GetNumber(strategySignal.PositionSizeSecond),
+                GetNumber(strategySignal.PositionCost),
+                GetString($"{strategySignal.PositionPercentPortfolio:N2} %"),
+                GetNumber(strategySignal.LastPriceFirst),
+                GetNumber(strategySignal.LastPriceSecond),
+                GetBacktestResultByTickersButton($"{strategySignal.TickerFirst},{strategySignal.TickerSecond}")
+            ]);            
+        }
+        
+        return reportData;
+    }
+
+    public async Task<ReportData> CreateGroupByTickerPairArbitrageStrategySignalsReportDataAsync()
+    {
+        
+    }
+
+    public async Task<ReportData> CreatePairArbitrageBacktestResultsReportDataAsync(string ticker, string strategyName)
+    {
+
+    }
+
+    public async Task<ReportData> CreatePairArbitrageBacktestResultReportDataAsync(Guid backtestResultId)
+    {
+
     }
 }

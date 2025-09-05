@@ -1,8 +1,8 @@
 ﻿using Oid85.FinMarket.Domain.Models.Algo;
 
-namespace Oid85.FinMarket.Application.StatisticalArbitrageStrategies;
+namespace Oid85.FinMarket.Application.PairArbitrageStrategies;
 
-public class CrossStdDevLongShort : StatisticalArbitrageStrategy
+public class CrossStdDevLongShort : PairArbitrageStrategy
 {
     public override async Task Execute()
     {

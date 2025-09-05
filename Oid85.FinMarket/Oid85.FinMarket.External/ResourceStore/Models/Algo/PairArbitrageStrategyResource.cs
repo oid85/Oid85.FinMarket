@@ -5,7 +5,7 @@ namespace Oid85.FinMarket.External.ResourceStore.Models.Algo;
 /// <summary>
 /// Настройки стратегии
 /// </summary>
-public class StatisticalArbitrageStrategyResource
+public class PairArbitrageStrategyResource
 {
     /// <summary>
     /// Идентификатор стратегии

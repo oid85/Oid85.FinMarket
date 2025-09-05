@@ -4,7 +4,7 @@ using Oid85.FinMarket.DataAccess.Entities.Base;
 
 namespace Oid85.FinMarket.DataAccess.Entities;
 
-public class StatisticalArbitrageStrategySignalEntity : AuditableEntity
+public class PairArbitrageStrategySignalEntity : AuditableEntity
 {
     /// <summary>
     /// Тикер инструмента

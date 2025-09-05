@@ -26,20 +26,20 @@ public class MoneyManagementResource
     public double FutureLeverage { get; set; }
     
     /// <summary>
-    /// Выделенный капитал для стратегий статистического арбитража
+    /// Выделенный капитал для стратегий парного арбитража
     /// </summary>
-    [JsonPropertyName("statisticalArbitrageMoney")]
-    public double StatisticalArbitrageMoney { get; set; }   
+    [JsonPropertyName("pairArbitrageMoney")]
+    public double PairArbitrageMoney { get; set; }   
     
     /// <summary>
-    /// Плечо для акций для стратегий статистического арбитража
+    /// Плечо для акций для стратегий парного арбитража
     /// </summary>
-    [JsonPropertyName("statisticalArbitrageShareLeverage")]
-    public double StatisticalArbitrageShareLeverage { get; set; }
+    [JsonPropertyName("pairArbitrageShareLeverage")]
+    public double PairArbitrageShareLeverage { get; set; }
     
     /// <summary>
-    /// Плечо для фьючерсов для стратегий статистического арбитража
+    /// Плечо для фьючерсов для стратегий парного арбитража
     /// </summary>
-    [JsonPropertyName("statisticalArbitrageFutureLeverage")]
-    public double StatisticalArbitrageFutureLeverage { get; set; }
+    [JsonPropertyName("pairArbitrageFutureLeverage")]
+    public double PairArbitrageFutureLeverage { get; set; }
 }

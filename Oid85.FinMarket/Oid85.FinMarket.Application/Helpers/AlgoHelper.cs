@@ -80,9 +80,9 @@ public class AlgoHelper(
     }    
     
     /// <summary>
-    /// Получить тикеры для Статистического арбитража
+    /// Получить тикеры для Парного арбитража
     /// </summary>
-    private async Task<List<string>> GetAllTickersForStatisticalArbitrageAsync()
+    private async Task<List<string>> GetAllTickersForPairArbitrageAsync()
     {
         var tails = await regressionTailRepository.GetAllAsync();
         
@@ -123,20 +123,20 @@ public class AlgoHelper(
     }
     
     /// <summary>
-    /// Получить стратегии для Статистического арбитража
+    /// Получить стратегии для Парного арбитража
     /// </summary>
     /// <param name="strategyId">Id стратегии</param>
-    public async Task<Dictionary<Guid, StatisticalArbitrageStrategy>> GetStatisticalArbitrageStrategies(Guid? strategyId = null)
+    public async Task<Dictionary<Guid, PairArbitrageStrategy>> GetPairArbitrageStrategies(Guid? strategyId = null)
     {
         var algoStrategyResources = strategyId is null
             ? await resourceStoreService.GetAlgoStrategiesAsync() 
             : (await resourceStoreService.GetAlgoStrategiesAsync()).Where(x => x.Id == strategyId);
 
-        var strategyDictionary = new Dictionary<Guid, StatisticalArbitrageStrategy>();        
+        var strategyDictionary = new Dictionary<Guid, PairArbitrageStrategy>();        
         
         foreach (var algoStrategyResource in algoStrategyResources)
         {
-            var strategy = serviceProvider.GetRequiredKeyedService<StatisticalArbitrageStrategy>(algoStrategyResource.Name);
+            var strategy = serviceProvider.GetRequiredKeyedService<PairArbitrageStrategy>(algoStrategyResource.Name);
 
             strategy.StrategyId = algoStrategyResource.Id;
             strategy.Timeframe = algoStrategyResource.Timeframe;
@@ -180,17 +180,17 @@ public class AlgoHelper(
     }
     
     /// <summary>
-    /// Получение свечей для Статистического арбитража
+    /// Получение свечей для Парного арбитража
     /// </summary>
     /// <param name="isOptimization">Признак выполнения процесса оптимизации</param>
     /// <param name="ticker1">Тикер первого инструмента</param>
     /// <param name="ticker2">Тикер второго инструмента</param>
-    public async Task<Dictionary<string, List<Candle>>> GetStatisticalArbitrageCandlesAsync(bool isOptimization, string? ticker1 = null, string? ticker2 = null)
+    public async Task<Dictionary<string, List<Candle>>> GetPairArbitrageCandlesAsync(bool isOptimization, string? ticker1 = null, string? ticker2 = null)
     {
         var dates = isOptimization ? await GetOptimizationDatesAsync() : await GetBacktestDatesAsync();
 
         var tickers = ticker1 is null || ticker2 is null 
-            ? await GetAllTickersForStatisticalArbitrageAsync() 
+            ? await GetAllTickersForPairArbitrageAsync() 
             : [ticker1, ticker2];
 
         var result = new Dictionary<string, List<Candle>>();

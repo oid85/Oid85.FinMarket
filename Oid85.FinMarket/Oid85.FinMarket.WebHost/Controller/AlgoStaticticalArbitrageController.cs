@@ -11,11 +11,12 @@ using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
 
-[Route("api/algo")]
+[Route("api/algo-statictical-arbitrage")]
 [ApiController]
-public class AlgoController(
-    IAlgoService algoService,
-    IAlgoReportService reportService)
+public class AlgoStaticticalArbitrageController(
+    IAlgoPairArbitrageService algoService,
+    IAlgoPairArbitrageReportService reportService,
+    IAlgoPairArbitrageDiagramService diagramService)
     : FinMarketBaseController
 {
     /// <summary>
@@ -139,4 +140,35 @@ public class AlgoController(
             {
                 Result = result
             });
+    
+    /// <summary>
+    /// Получить сигналы стратегий (группировка по тикеру)
+    /// </summary>
+    [HttpPost("group-by-ticker-strategy-signals")]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<ReportData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetGroupByTickerStrategySignalsAsync() =>
+        GetResponseAsync(
+            reportService.GetGroupByTickerStrategySignalsAsync,
+            result => new BaseResponse<ReportData>
+            {
+                Result = result
+            });    
+    
+    /// <summary>
+    /// Диаграмма Спред (дневные)
+    /// </summary>
+    [HttpPost("spreads")]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<SimpleDiagramData>), StatusCodes.Status500InternalServerError)]
+    public Task<IActionResult> GetSpreadsAsync(
+        [FromBody] DateRangeRequest request) =>
+        GetResponseAsync(
+            () => diagramService.GetSpreadsAsync(request),
+            result => new BaseResponse<SimpleDiagramData>
+            {
+                Result = result
+            });     
 }

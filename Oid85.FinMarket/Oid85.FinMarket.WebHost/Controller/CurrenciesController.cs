@@ -15,27 +15,9 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [ApiController]
 public class CurrenciesController(
     ICurrenciesReportService reportService,
-    ICurrenciesDiagramService diagramService,
-    ITickerListUtilService tickerListUtilService) 
+    ICurrenciesDiagramService diagramService) 
     : FinMarketBaseController
 {
-    /// <summary>
-    /// Получить тикеры валют из листа наблюдения
-    /// </summary>
-    [HttpGet("watch-list-tickers")]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetCurrenciesWatchListAsync() =>
-        await GetResponseAsync(
-            async () => (await tickerListUtilService.GetCurrenciesByTickerListAsync(KnownTickerLists.CurrenciesWatchlist))
-                .Select(x => x.Ticker)
-                .ToList(),
-            result => new BaseResponse<List<string>>
-            {
-                Result = result
-            });
-    
     /// <summary>
     /// Отчет Сводный анализ
     /// </summary>

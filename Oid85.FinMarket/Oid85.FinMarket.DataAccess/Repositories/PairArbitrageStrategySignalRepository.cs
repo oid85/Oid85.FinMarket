@@ -6,32 +6,32 @@ using Oid85.FinMarket.Domain.Models.Algo;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 
-public class StatisticalArbitrageStrategySignalRepository(
+public class PairArbitrageStrategySignalRepository(
     ILogger logger,
     IDbContextFactory<FinMarketContext> contextFactory)
-    : IStatisticalArbitrageStrategySignalRepository
+    : IPairArbitrageStrategySignalRepository
 {
-    public async Task AddAsync(StatisticalArbitrageStrategySignal strategySignal)
+    public async Task AddAsync(PairArbitrageStrategySignal strategySignal)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
-        if (!await context.StatisticalArbitrageStrategySignalEntities.AnyAsync(
+        if (!await context.PairArbitrageStrategySignalEntities.AnyAsync(
                 x => 
                     x.TickerFirst == strategySignal.TickerFirst && 
                     x.TickerSecond == strategySignal.TickerSecond))
-            await context.StatisticalArbitrageStrategySignalEntities.AddAsync(DataAccessMapper.Map(strategySignal));
+            await context.PairArbitrageStrategySignalEntities.AddAsync(DataAccessMapper.Map(strategySignal));
         
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdatePositionAsync(StatisticalArbitrageStrategySignal strategySignal)
+    public async Task UpdatePositionAsync(PairArbitrageStrategySignal strategySignal)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         await using var transaction = await context.Database.BeginTransactionAsync();
         
         try
         {
-            await context.StatisticalArbitrageStrategySignalEntities
+            await context.PairArbitrageStrategySignalEntities
                 .Where(x => 
                     x.TickerFirst == strategySignal.TickerFirst && 
                     x.TickerSecond == strategySignal.TickerSecond)
@@ -58,10 +58,10 @@ public class StatisticalArbitrageStrategySignalRepository(
         }
     }
 
-    public async Task<List<StatisticalArbitrageStrategySignal>> GetAllAsync()
+    public async Task<List<PairArbitrageStrategySignal>> GetAllAsync()
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        return (await context.StatisticalArbitrageStrategySignalEntities
+        return (await context.PairArbitrageStrategySignalEntities
                 .Where(x => !x.IsDeleted)
                 .OrderBy(x => x.TickerFirst)
                 .AsNoTracking()

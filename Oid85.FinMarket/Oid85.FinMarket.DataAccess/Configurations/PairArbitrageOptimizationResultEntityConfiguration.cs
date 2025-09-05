@@ -5,13 +5,13 @@ using Oid85.FinMarket.DataAccess.Entities;
 
 namespace Oid85.FinMarket.DataAccess.Configurations;
 
-internal class StatisticalArbitrageOptimizationResultEntityConfiguration : EntityConfigurationBase<StatisticalArbitrageOptimizationResultEntity>
+internal class PairArbitrageOptimizationResultEntityConfiguration : EntityConfigurationBase<PairArbitrageOptimizationResultEntity>
 {
-    public override void Configure(EntityTypeBuilder<StatisticalArbitrageOptimizationResultEntity> builder)
+    public override void Configure(EntityTypeBuilder<PairArbitrageOptimizationResultEntity> builder)
     {
         base.Configure(builder);
         
-        builder.ToTable("statistical_arbitrage_optimization_results", KnownDatabaseSchemas.Default);
+        builder.ToTable("pair_arbitrage_optimization_results", KnownDatabaseSchemas.Default);
         
         builder
             .Property(x => x.StrategyParams)

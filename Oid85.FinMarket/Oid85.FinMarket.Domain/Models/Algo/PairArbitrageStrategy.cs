@@ -1,6 +1,6 @@
 ﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
-public class StatisticalArbitrageStrategy
+public class PairArbitrageStrategy
 {
     public Guid StrategyId { get; set; }
     
@@ -42,7 +42,7 @@ public class StatisticalArbitrageStrategy
 
     public List<RegressionTailItem> Spreads { get; set; } = [];
     
-    public List<ArbitrageGraphPoint> GraphPoints { get; set; } = [];
+    public List<PairArbitrageGraphPoint> GraphPoints { get; set; } = [];
     
     public bool SignalLongShort { get; set; }
     
@@ -293,6 +293,6 @@ public class StatisticalArbitrageStrategy
 
         GraphPoints.Clear();
         for (int i = 0; i < Candles.First.Count; i++)
-            GraphPoints.Add(new ArbitrageGraphPoint());
+            GraphPoints.Add(new PairArbitrageGraphPoint());
     }
 }

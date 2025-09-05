@@ -15,49 +15,49 @@ using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services;
 
-public class AlgoStatisticalArbitrageService(
+public class AlgoPairArbitrageService(
     ILogger logger,
     IDailyCandleRepository dailyCandleRepository,
     IResourceStoreService resourceStoreService,
-    IStatisticalArbitrageBacktestResultRepository backtestResultRepository,
-    IStatisticalArbitrageOptimizationResultRepository optimizationResultRepository,
-    IStatisticalArbitrageStrategySignalRepository strategySignalRepository,
+    IPairArbitrageBacktestResultRepository backtestResultRepository,
+    IPairArbitrageOptimizationResultRepository optimizationResultRepository,
+    IPairArbitrageStrategySignalRepository strategySignalRepository,
     IShareRepository shareRepository,
     IFutureRepository futureRepository,
     ICorrelationRepository correlationRepository,
     IRegressionTailRepository regressionTailRepository,
     ITickerListUtilService tickerListUtilService,
     AlgoHelper algoHelper)
-    : IAlgoStatisticalArbitrageService
+    : IAlgoPairArbitrageService
 {
     private ConcurrentDictionary<string, List<Candle>> Candles { get; set; } = new();
     private ConcurrentDictionary<string, RegressionTail> Spreads { get; set; } = new();
-    private ConcurrentDictionary<Guid, StatisticalArbitrageStrategy> Strategies { get; set; } = new();
+    private ConcurrentDictionary<Guid, PairArbitrageStrategy> Strategies { get; set; } = new();
 
     /// <inheritdoc />
     public async Task<bool> BacktestAsync()
     {
         Spreads = new ConcurrentDictionary<string, RegressionTail>(await algoHelper.GetSpreadsAsync());
-        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetStatisticalArbitrageCandlesAsync(false));
-        Strategies = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies());
+        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetPairArbitrageCandlesAsync(false));
+        Strategies = new ConcurrentDictionary<Guid, PairArbitrageStrategy>(await algoHelper.GetPairArbitrageStrategies());
         
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+        var pairArbitrageStrategyResources = await resourceStoreService.GetPairArbitrageStrategiesAsync();
 
         var optimizationResults = await optimizationResultRepository.GetAsync(algoConfigResource.OptimizationResultFilterResource);
 
-        await backtestResultRepository.InvertDeleteAsync(statisticalArbitrageStrategyResources.Select(x => x.Id).ToList());
+        await backtestResultRepository.InvertDeleteAsync(pairArbitrageStrategyResources.Select(x => x.Id).ToList());
 
         foreach (var (strategyId, strategy) in Strategies)
         {
             await backtestResultRepository.DeleteAsync(strategyId);
 
-            var statisticalArbitrageStrategyResource = statisticalArbitrageStrategyResources.Find(x => x.Id == strategyId);
+            var pairArbitrageStrategyResource = pairArbitrageStrategyResources.Find(x => x.Id == strategyId);
 
-            if (statisticalArbitrageStrategyResource is null)
+            if (pairArbitrageStrategyResource is null)
                 continue;
 
-            var backtestResults = new List<StatisticalArbitrageBacktestResult>();
+            var backtestResults = new List<PairArbitrageBacktestResult>();
 
             foreach (var optimizationResult in optimizationResults.Where(x => x.StrategyId == strategyId))
             {
@@ -91,8 +91,8 @@ public class AlgoStatisticalArbitrageService(
                     strategy.InitForParameterSet(
                         parameterSet, 
                         algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
-                        algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
-                        algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
+                        algoConfigResource.MoneyManagementResource.PairArbitrageMoney, 
+                        algoConfigResource.MoneyManagementResource.PairArbitrageMoney); 
 
                     await strategy.Execute();
                     
@@ -112,7 +112,7 @@ public class AlgoStatisticalArbitrageService(
     }
 
     /// <inheritdoc />
-    public async Task<(StatisticalArbitrageBacktestResult? backtestResult, StatisticalArbitrageStrategy? strategy)> BacktestAsync(Guid backtestResultId)
+    public async Task<(PairArbitrageBacktestResult? backtestResult, PairArbitrageStrategy? strategy)> BacktestAsync(Guid backtestResultId)
     {
         try
         {
@@ -122,15 +122,15 @@ public class AlgoStatisticalArbitrageService(
                 return (null, null);
             
             Spreads = new ConcurrentDictionary<string, RegressionTail>(await algoHelper.GetSpreadsAsync(backtestResult.TickerFirst, backtestResult.TickerSecond));
-            Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetStatisticalArbitrageCandlesAsync(false, backtestResult.TickerFirst, backtestResult.TickerSecond));
-            Strategies = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies(backtestResult.StrategyId));
+            Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetPairArbitrageCandlesAsync(false, backtestResult.TickerFirst, backtestResult.TickerSecond));
+            Strategies = new ConcurrentDictionary<Guid, PairArbitrageStrategy>(await algoHelper.GetPairArbitrageStrategies(backtestResult.StrategyId));
             
             var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-            var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+            var pairArbitrageStrategyResources = await resourceStoreService.GetPairArbitrageStrategiesAsync();
 
-            var statisticalArbitrageStrategyResource = statisticalArbitrageStrategyResources.Find(x => x.Id == backtestResult.StrategyId);
+            var pairArbitrageStrategyResource = pairArbitrageStrategyResources.Find(x => x.Id == backtestResult.StrategyId);
 
-            if (statisticalArbitrageStrategyResource is null)
+            if (pairArbitrageStrategyResource is null)
                 return (null, null);
 
             var strategy = Strategies[backtestResult.StrategyId];
@@ -163,8 +163,8 @@ public class AlgoStatisticalArbitrageService(
             strategy.InitForParameterSet(
                 parameterSet, 
                 algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
-                algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
-                algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
+                algoConfigResource.MoneyManagementResource.PairArbitrageMoney, 
+                algoConfigResource.MoneyManagementResource.PairArbitrageMoney); 
 
             await strategy.Execute();
             
@@ -182,7 +182,7 @@ public class AlgoStatisticalArbitrageService(
     public async Task<bool> CalculateStrategySignalsAsync()
     {
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+        var pairArbitrageStrategyResources = await resourceStoreService.GetPairArbitrageStrategiesAsync();
 
         var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
 
@@ -193,7 +193,7 @@ public class AlgoStatisticalArbitrageService(
         foreach (var tickerPair in tickersInStrategySignals)
             if (!tickersInBacktestResults.Contains(tickerPair))
                 await strategySignalRepository.UpdatePositionAsync(
-                    new StatisticalArbitrageStrategySignal(tickerPair.Split(',')[0], tickerPair.Split(',')[1]));
+                    new PairArbitrageStrategySignal(tickerPair.Split(',')[0], tickerPair.Split(',')[1]));
 
         // Расчет для каждого тикера
         foreach (var tickerPair in tickersInBacktestResults)
@@ -205,7 +205,7 @@ public class AlgoStatisticalArbitrageService(
                 
                 if (!tickersInStrategySignals.Contains(tickerPair))
                     await strategySignalRepository.AddAsync(
-                        new StatisticalArbitrageStrategySignal(tickerFirst, tickerSecond));
+                        new PairArbitrageStrategySignal(tickerFirst, tickerSecond));
 
                 var backtestResultsByTickerPair = backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair).ToList();
                 
@@ -225,11 +225,11 @@ public class AlgoStatisticalArbitrageService(
 
                 // Размер позиции в процентах от портфеля
                 double positionPercentPortfolio =
-                    algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney / countUniqueTickersWithSignals *
-                    (percentSignals / 100.0) / algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * 100.0;
+                    algoConfigResource.MoneyManagementResource.PairArbitrageMoney / countUniqueTickersWithSignals *
+                    (percentSignals / 100.0) / algoConfigResource.MoneyManagementResource.PairArbitrageMoney * 100.0;
 
                 // Размер позиции, руб
-                double positionCost = algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney * positionPercentPortfolio / 100.0;
+                double positionCost = algoConfigResource.MoneyManagementResource.PairArbitrageMoney * positionPercentPortfolio / 100.0;
 
                 // Цена инструмента
                 (double First, double Second) lastPrice = await GetLastPriceAsync(tickerFirst, tickerSecond);
@@ -266,7 +266,7 @@ public class AlgoStatisticalArbitrageService(
                 }
 
                 await strategySignalRepository.UpdatePositionAsync(
-                    new StatisticalArbitrageStrategySignal
+                    new PairArbitrageStrategySignal
                     {
                         TickerFirst = tickerFirst,
                         TickerSecond = tickerSecond,
@@ -327,7 +327,7 @@ public class AlgoStatisticalArbitrageService(
 
             foreach (var backtestResult in backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair))
             {
-                var enable = statisticalArbitrageStrategyResources.Find(x => x.Id == backtestResult.StrategyId)!.Enable;
+                var enable = pairArbitrageStrategyResources.Find(x => x.Id == backtestResult.StrategyId)!.Enable;
 
                 if (!enable)
                     continue;
@@ -346,13 +346,13 @@ public class AlgoStatisticalArbitrageService(
         var sw = Stopwatch.StartNew();
         
         Spreads = new ConcurrentDictionary<string, RegressionTail>(await algoHelper.GetSpreadsAsync());
-        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetStatisticalArbitrageCandlesAsync(true));
-        Strategies = new ConcurrentDictionary<Guid, StatisticalArbitrageStrategy>(await algoHelper.GetStatisticalArbitrageStrategies());
+        Candles = new ConcurrentDictionary<string, List<Candle>>(await algoHelper.GetPairArbitrageCandlesAsync(true));
+        Strategies = new ConcurrentDictionary<Guid, PairArbitrageStrategy>(await algoHelper.GetPairArbitrageStrategies());
         
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        var statisticalArbitrageStrategyResources = await resourceStoreService.GetStatisticalArbitrageStrategiesAsync();
+        var pairArbitrageStrategyResources = await resourceStoreService.GetPairArbitrageStrategiesAsync();
 
-        await optimizationResultRepository.InvertDeleteAsync(statisticalArbitrageStrategyResources.Select(x => x.Id).ToList());
+        await optimizationResultRepository.InvertDeleteAsync(pairArbitrageStrategyResources.Select(x => x.Id).ToList());
 
         int count = 0;
 
@@ -360,12 +360,12 @@ public class AlgoStatisticalArbitrageService(
         {
             await optimizationResultRepository.DeleteAsync(strategyId);
 
-            var statisticalArbitrageStrategyResource = statisticalArbitrageStrategyResources.Find(x => x.Id == strategyId);
+            var pairArbitrageStrategyResource = pairArbitrageStrategyResources.Find(x => x.Id == strategyId);
 
-            if (statisticalArbitrageStrategyResource is null)
+            if (pairArbitrageStrategyResource is null)
                 continue;
 
-            var optimizationResults = new List<StatisticalArbitrageOptimizationResult>();
+            var optimizationResults = new List<PairArbitrageOptimizationResult>();
 
             var tickerPairs = (await regressionTailRepository.GetAllAsync()).Select(x => $"{x.TickerFirst},{x.TickerSecond}");
 
@@ -394,7 +394,7 @@ public class AlgoStatisticalArbitrageService(
 
                 strategy.Spreads = tail.Tails;
 
-                var parameterSets = AlgoHelper.GetParameterSets(statisticalArbitrageStrategyResource.Params);
+                var parameterSets = AlgoHelper.GetParameterSets(pairArbitrageStrategyResource.Params);
 
                 foreach (var parameterSet in parameterSets)
                 {
@@ -406,8 +406,8 @@ public class AlgoStatisticalArbitrageService(
                         strategy.InitForParameterSet(
                             parameterSet, 
                             algoConfigResource.PeriodConfigResource.StabilizationPeriodInCandles + 1, 
-                            algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney, 
-                            algoConfigResource.MoneyManagementResource.StatisticalArbitrageMoney); 
+                            algoConfigResource.MoneyManagementResource.PairArbitrageMoney, 
+                            algoConfigResource.MoneyManagementResource.PairArbitrageMoney); 
 
                         await strategy.Execute();
                         
@@ -438,8 +438,8 @@ public class AlgoStatisticalArbitrageService(
     /// <inheritdoc />
     public async Task CalculateCorrelationAsync()
     {
-        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.StatisticalArbitrageShares);
-        var futures = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.StatisticalArbitrageFutures))
+        var shares = await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.PairArbitrageShares);
+        var futures = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.PairArbitrageFutures))
             .Where(x => x.ExpirationDate > DateOnly.FromDateTime(DateTime.Today)).ToList();
 
         var candles = new Dictionary<string, List<DailyCandle>>();

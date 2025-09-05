@@ -14,7 +14,7 @@ public class JobService(
     IMarketEventService marketEventService,
     ISendService sendService,
     IAlgoService algoService,
-    IAlgoStatisticalArbitrageService algoStatisticalArbitrageService) 
+    IAlgoPairArbitrageService algoPairArbitrageService) 
     : IJobService
 {
     /// <inheritdoc />
@@ -37,7 +37,7 @@ public class JobService(
         await CalculateSectorIndexDailyCandlesAsync();
         await AnalyseSectorsAsync();
         await ProcessFeerGreedAsync();
-        await StatisticalArbitrationAsync();
+        await PairArbitrationAsync();
         await CheckDailyMarketEventsAsync();
         await SendNotificationsAsync();
     }
@@ -45,7 +45,7 @@ public class JobService(
     /// <inheritdoc />
     public async Task Every15Minutes()
     {
-        await StatisticalArbitrationAsync();
+        await PairArbitrationAsync();
     }
 
     /// <inheritdoc />
@@ -223,21 +223,21 @@ public class JobService(
         }
     }     
     
-    private async Task StatisticalArbitrationAsync()
+    private async Task PairArbitrationAsync()
     {
         try
         {
             await loadService.LoadShareDailyCandlesAsync();
             await loadService.LoadFutureDailyCandlesAsync();
-            await algoStatisticalArbitrageService.CalculateCorrelationAsync();
-            await algoStatisticalArbitrageService.CalculateRegressionTailsAsync();
+            await algoPairArbitrageService.CalculateCorrelationAsync();
+            await algoPairArbitrageService.CalculateRegressionTailsAsync();
             
-            logger.Info("Метод 'StatisticalArbitrationAsync' выполнен успешно");
+            logger.Info("Метод 'PairArbitrationAsync' выполнен успешно");
         }
         
         catch (Exception exception)
         {
-            logger.Info(exception, "Ошибка при выполнении метода 'StatisticalArbitrationAsync'");
+            logger.Info(exception, "Ошибка при выполнении метода 'PairArbitrationAsync'");
         }
     }       
     

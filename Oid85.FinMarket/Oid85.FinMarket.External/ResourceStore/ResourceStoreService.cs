@@ -218,15 +218,15 @@ public class ResourceStoreService(
     }
 
     /// <inheritdoc />
-    public async Task<List<StatisticalArbitrageStrategyResource>> GetStatisticalArbitrageStrategiesAsync()
+    public async Task<List<PairArbitrageStrategyResource>> GetPairArbitrageStrategiesAsync()
     {
-        string key = $"{nameof(ResourceStoreService)}|{nameof(StatisticalArbitrageStrategyResource)}";
+        string key = $"{nameof(ResourceStoreService)}|{nameof(PairArbitrageStrategyResource)}";
 
-        if (!memoryCache.TryGetValue(key, out List<StatisticalArbitrageStrategyResource>? result))
+        if (!memoryCache.TryGetValue(key, out List<PairArbitrageStrategyResource>? result))
         {
-            result = await ReadAsync<List<StatisticalArbitrageStrategyResource>>(
+            result = await ReadAsync<List<PairArbitrageStrategyResource>>(
                 Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                    "algo", "statisticalArbitrageStrategy.json")) ?? [];
+                    "algo", "pairArbitrageStrategy.json")) ?? [];
             
             memoryCache.Set(key, result, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)));
         }

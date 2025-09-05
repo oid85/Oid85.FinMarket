@@ -18,4 +18,8 @@ public interface IReportDataFactory
     Task<ReportData> CreateStrategySignalsReportDataAsync();
     Task<ReportData> CreateBacktestResultsReportDataAsync(string ticker, string strategyName);
     Task<ReportData> CreateBacktestResultReportDataAsync(Guid backtestResultId);
+    Task<ReportData> CreatePairArbitrageStrategySignalsReportDataAsync();
+    Task<ReportData> CreateGroupByTickerPairArbitrageStrategySignalsReportDataAsync();
+    Task<ReportData> CreatePairArbitrageBacktestResultsReportDataAsync(string ticker, string strategyName);
+    Task<ReportData> CreatePairArbitrageBacktestResultReportDataAsync(Guid backtestResultId);
 }

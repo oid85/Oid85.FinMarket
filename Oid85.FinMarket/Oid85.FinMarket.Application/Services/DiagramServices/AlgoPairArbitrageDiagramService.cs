@@ -5,7 +5,10 @@ using Oid85.FinMarket.Application.Models.Requests;
 
 namespace Oid85.FinMarket.Application.Services.DiagramServices;
 
-public class AlgoDiagramService : IAlgoDiagramService
+public class AlgoPairArbitrageDiagramService(
+    IDiagramDataFactory diagramDataFactory) 
+    : IAlgoPairArbitrageDiagramService
 {
-
+    public Task<SimpleDiagramData> GetSpreadsAsync(DateRangeRequest request) =>
+        diagramDataFactory.CreateSpreadsDiagramDataAsync(request.From, request.To);
 }

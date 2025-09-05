@@ -1,13 +1,13 @@
 ﻿namespace Oid85.FinMarket.Domain.Models.Algo;
 
-public class StatisticalArbitrageStrategySignal
+public class PairArbitrageStrategySignal
 {
-    public StatisticalArbitrageStrategySignal()
+    public PairArbitrageStrategySignal()
     {
         
     }
     
-    public StatisticalArbitrageStrategySignal(string tickerFirst, string tickerSecond)
+    public PairArbitrageStrategySignal(string tickerFirst, string tickerSecond)
     {
         TickerFirst = tickerFirst;
         TickerSecond = tickerSecond;

@@ -15,44 +15,9 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [ApiController]
 public class BondsController(
     IBondsReportService reportService,
-    IBondsDiagramService diagramService,
-    ITickerListUtilService tickerListUtilService) 
+    IBondsDiagramService diagramService) 
     : FinMarketBaseController
 {
-    /// <summary>
-    /// Получить тикеры облигаций из листа наблюдения
-    /// </summary>
-    [HttpGet("watch-list-tickers")]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetBondsWatchListAsync() =>
-        await GetResponseAsync(
-            async () => (await tickerListUtilService.GetBondsByTickerListAsync(KnownTickerLists.BondsWatchlist))
-                .Select(x => x.Ticker)
-                .ToList(),
-            result => new BaseResponse<List<string>>
-            {
-                Result = result
-            });
-    
-    /// <summary>
-    /// Получить тикеры отфильтрованных облигаций
-    /// </summary>
-    [HttpGet("filter-list-tickers")]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetBondsFilterListAsync() =>
-        await GetResponseAsync(
-            async () => (await tickerListUtilService.GetBondsByFilter())
-                .Select(x => x.Ticker)
-                .ToList(),
-            result => new BaseResponse<List<string>>
-            {
-                Result = result
-            });
-
     /// <summary>
     /// Отчет Сводный анализ
     /// </summary>

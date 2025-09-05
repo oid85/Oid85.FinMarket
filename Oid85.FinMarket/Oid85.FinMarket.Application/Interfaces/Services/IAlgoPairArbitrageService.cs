@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.Application.Interfaces.Services;
 
-public interface IAlgoStatisticalArbitrageService
+public interface IAlgoPairArbitrageService
 {
     /// <summary>
     /// Рассчитать корреляции
@@ -22,7 +22,7 @@ public interface IAlgoStatisticalArbitrageService
     /// <summary>
     /// Выполнить бэктест по Id
     /// </summary>
-    Task<(StatisticalArbitrageBacktestResult? backtestResult, StatisticalArbitrageStrategy? strategy)> BacktestAsync(Guid backtestResultId);
+    Task<(PairArbitrageBacktestResult? backtestResult, PairArbitrageStrategy? strategy)> BacktestAsync(Guid backtestResultId);
     
     /// <summary>
     /// Рассчитать сигналы

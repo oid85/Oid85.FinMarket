@@ -9,11 +9,11 @@ using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
+using Oid85.FinMarket.Application.PairArbitrageStrategies;
 using Oid85.FinMarket.Application.Services;
 using Oid85.FinMarket.Application.Services.AnalyseServices;
 using Oid85.FinMarket.Application.Services.DiagramServices;
 using Oid85.FinMarket.Application.Services.ReportServices;
-using Oid85.FinMarket.Application.StatisticalArbitrageStrategies;
 using Oid85.FinMarket.Application.Strategies;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models.Algo;
@@ -44,6 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ICurrenciesReportService, CurrenciesReportService>();
         services.AddTransient<IBondsReportService, BondsReportService>();
         services.AddTransient<IAlgoReportService, AlgoReportService>();
+        services.AddTransient<IAlgoPairArbitrageReportService, AlgoPairArbitrageReportService>();
         
         services.AddTransient<ISharesDiagramService, SharesDiagramService>();
         services.AddTransient<IBondsDiagramService, BondsDiagramService>();
@@ -51,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ICurrenciesDiagramService, CurrenciesDiagramService>();
         services.AddTransient<IIndexesDiagramService, IndexesDiagramService>();
         services.AddTransient<IAlgoDiagramService, AlgoDiagramService>();
+        services.AddTransient<IAlgoPairArbitrageDiagramService, AlgoPairArbitrageDiagramService>();
         
         services.AddTransient<ILoadService, LoadService>();
         services.AddTransient<IImportService, ImportService>();
@@ -64,7 +66,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISectorIndexService, SectorIndexService>();
         
         services.AddTransient<IAlgoService, AlgoService>();
-        services.AddTransient<IAlgoStatisticalArbitrageService, AlgoStatisticalArbitrageService>();
+        services.AddTransient<IAlgoPairArbitrageService, AlgoPairArbitrageService>();
         
         services.AddTransient<ITelegramMessageFactory, TelegramMessageFactory>();
         services.AddTransient<IReportDataFactory, ReportDataFactory>();
@@ -94,8 +96,8 @@ public static class ServiceCollectionExtensions
         services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxMiddleLong>("AdaptivePriceChannelAdxMiddleLong");
         services.AddKeyedTransient<Strategy, AdaptivePriceChannelAdxMiddleShort>("AdaptivePriceChannelAdxMiddleShort");
         
-        services.AddKeyedTransient<StatisticalArbitrageStrategy, CrossStdDevLongShort>("CrossStdDevLongShort");
-        services.AddKeyedTransient<StatisticalArbitrageStrategy, CrossStdDevShortLong>("CrossStdDevShortLong");
+        services.AddKeyedTransient<PairArbitrageStrategy, CrossStdDevLongShort>("CrossStdDevLongShort");
+        services.AddKeyedTransient<PairArbitrageStrategy, CrossStdDevShortLong>("CrossStdDevShortLong");
     }
     
     public static async Task RegisterHangfireJobs(

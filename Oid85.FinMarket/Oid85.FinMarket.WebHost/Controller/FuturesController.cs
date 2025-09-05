@@ -15,27 +15,9 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [ApiController]
 public class FuturesController(
     IFuturesReportService reportService,
-    IFuturesDiagramService diagramService,
-    ITickerListUtilService tickerListUtilService) 
+    IFuturesDiagramService diagramService) 
     : FinMarketBaseController
 {
-    /// <summary>
-    /// Получить тикеры фьючерсов из листа наблюдения
-    /// </summary>
-    [HttpGet("watch-list-tickers")]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<List<string>>), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetFuturesWatchListAsync() =>
-        await GetResponseAsync(
-            async () => (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.FuturesWatchlist))
-                .Select(x => x.Ticker)
-                .ToList(),
-            result => new BaseResponse<List<string>>
-            {
-                Result = result
-            });
-    
     /// <summary>
     /// Отчет Сводный анализ
     /// </summary>

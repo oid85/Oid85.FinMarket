@@ -50,6 +50,6 @@ public static class KnownTickerLists
     public const string AlgoShares = "algo/shares";
     public const string AlgoFutures = "algo/futures";
     
-    public const string StatisticalArbitrageShares = "statisticalArbitrage/shares";
-    public const string StatisticalArbitrageFutures = "statisticalArbitrage/futures";
+    public const string PairArbitrageShares = "pairArbitrage/shares";
+    public const string PairArbitrageFutures = "pairArbitrage/futures";
 }
