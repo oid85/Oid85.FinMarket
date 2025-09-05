@@ -44,7 +44,7 @@ public class AlgoPairArbitrageService(
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var pairArbitrageStrategyResources = await resourceStoreService.GetPairArbitrageStrategiesAsync();
 
-        var optimizationResults = await optimizationResultRepository.GetAsync(algoConfigResource.OptimizationResultFilterResource);
+        var optimizationResults = await optimizationResultRepository.GetAsync(algoConfigResource.PairArbitrageOptimizationResultFilterResource);
 
         await backtestResultRepository.InvertDeleteAsync(pairArbitrageStrategyResources.Select(x => x.Id).ToList());
 
@@ -184,7 +184,7 @@ public class AlgoPairArbitrageService(
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
         var pairArbitrageStrategyResources = await resourceStoreService.GetPairArbitrageStrategiesAsync();
 
-        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.PairArbitrageBacktestResultFilterResource);
 
         // Добавляем тикеры, если их еще нет в таблице
         var tickersInStrategySignals = (await strategySignalRepository.GetAllAsync()).Select(x => $"{x.TickerFirst},{x.TickerSecond}").ToList();

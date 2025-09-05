@@ -23,18 +23,20 @@ public class PairArbitrageOptimizationResultRepository(
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<PairArbitrageOptimizationResult>> GetAsync(OptimizationResultFilterResource filter)
+    public async Task<List<PairArbitrageOptimizationResult>> GetAsync(PairArbitrageOptimizationResultFilterResource filter)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         
         var queryableEntities = context.PairArbitrageOptimizationResultEntities.AsQueryable();
         
+        /*
         queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= filter.MinProfitFactor);
         queryableEntities = queryableEntities.Where(x => x.RecoveryFactor >= filter.MinRecoveryFactor);
         queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent >= filter.MinWinningTradesPercent);
         queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent <= filter.MaxWinningTradesPercent);
         queryableEntities = queryableEntities.Where(x => x.AnnualYieldReturn >= filter.MinAnnualYieldReturn);
         queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent <= filter.MaxDrawdownPercent);
+        */
         
         var entities = await queryableEntities.AsNoTracking().ToListAsync();
         

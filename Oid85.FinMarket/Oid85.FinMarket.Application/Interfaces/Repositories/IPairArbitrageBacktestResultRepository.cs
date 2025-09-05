@@ -6,7 +6,7 @@ namespace Oid85.FinMarket.Application.Interfaces.Repositories;
 public interface IPairArbitrageBacktestResultRepository
 {
     Task AddAsync(List<PairArbitrageBacktestResult> backtestResults);
-    Task<List<PairArbitrageBacktestResult>> GetAsync(BacktestResultFilterResource filter);
+    Task<List<PairArbitrageBacktestResult>> GetAsync(PairArbitrageBacktestResultFilterResource filter);
     Task<PairArbitrageBacktestResult?> GetAsync(Guid backtestResultId);
     Task DeleteAsync(Guid strategyId);
     Task InvertDeleteAsync(List<Guid> strategyIds);

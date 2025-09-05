@@ -9,7 +9,7 @@ public interface IAlgoPairArbitrageReportService
     Task<ReportData> GetStrategySignalsAsync();
     Task<ReportData> GetGroupByTickerStrategySignalsAsync();
     Task<ReportData> GetBacktestResultsAsync(TickerStrategyRequest request);
-    Task<BacktestResultData> GetBacktestResultByIdAsync(IdRequest request);
-    Task<BacktestResultData> GetBacktestResultByTickerAsync(TickerRequest request);
-    Task<BacktestResultData> GetBacktestResultPortfolioAsync();
+    Task<PairArbitrageBacktestResultData> GetBacktestResultByIdAsync(IdRequest request);
+    Task<PairArbitrageBacktestResultData> GetBacktestResultByTickerAsync(TickerRequest request);
+    Task<PairArbitrageBacktestResultData> GetBacktestResultPortfolioAsync();
 }

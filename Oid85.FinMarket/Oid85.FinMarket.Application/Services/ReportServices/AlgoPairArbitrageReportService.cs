@@ -27,11 +27,11 @@ public class AlgoPairArbitrageReportService(
     public Task<ReportData> GetBacktestResultsAsync(TickerStrategyRequest request) =>
         reportDataFactory.CreatePairArbitrageBacktestResultsReportDataAsync(request.Ticker, request.StrategyName);
 
-    public async Task<BacktestResultData> GetBacktestResultByIdAsync(IdRequest request)
+    public async Task<PairArbitrageBacktestResultData> GetBacktestResultByIdAsync(IdRequest request)
     {
         var result = await algoService.BacktestAsync(request.Id);
 
-        var backtestResultData = new BacktestResultData
+        var backtestResultData = new PairArbitrageBacktestResultData
         {
             ReportData = await reportDataFactory.CreatePairArbitrageBacktestResultReportDataAsync(request.Id),
             DiagramData = await diagramDataFactory.CreatePairArbitrageBacktestResultDiagramDataAsync(result.strategy!)
@@ -42,10 +42,10 @@ public class AlgoPairArbitrageReportService(
         return backtestResultData;
     }
 
-    public async Task<BacktestResultData> GetBacktestResultByTickerAsync(TickerRequest request)
+    public async Task<PairArbitrageBacktestResultData> GetBacktestResultByTickerAsync(TickerRequest request)
     {
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.PairArbitrageBacktestResultFilterResource);
 
         var strategies = new List<PairArbitrageStrategy>();
         
@@ -55,7 +55,7 @@ public class AlgoPairArbitrageReportService(
             strategies.Add(result.strategy!);
         }
 
-        var backtestResultData = new BacktestResultData
+        var backtestResultData = new PairArbitrageBacktestResultData
         {
             DiagramData = await diagramDataFactory.CreatePairArbitrageBacktestResultDiagramDataAsync(strategies)
         };
@@ -65,10 +65,10 @@ public class AlgoPairArbitrageReportService(
         return backtestResultData;
     }
 
-    public async Task<BacktestResultData> GetBacktestResultPortfolioAsync()
+    public async Task<PairArbitrageBacktestResultData> GetBacktestResultPortfolioAsync()
     {
         var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
-        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.BacktestResultFilterResource);
+        var backtestResults = await backtestResultRepository.GetAsync(algoConfigResource.PairArbitrageBacktestResultFilterResource);
 
         var strategies = new List<PairArbitrageStrategy>();
         
@@ -78,7 +78,7 @@ public class AlgoPairArbitrageReportService(
             strategies.Add(result.strategy!);
         }
 
-        var backtestResultData = new BacktestResultData
+        var backtestResultData = new PairArbitrageBacktestResultData
         {
             DiagramData = await diagramDataFactory.CreatePairArbitrageBacktestResultWithoutPriceDiagramDataAsync(strategies)
         };

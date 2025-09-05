@@ -16,10 +16,10 @@ public interface IReportDataFactory
     Task<ReportData> CreateAssetReportEventsReportDataAsync(List<Guid> instrumentIds);
     Task<ReportData> CreateFearGreedIndexReportDataAsync(DateOnly from, DateOnly to);
     Task<ReportData> CreateStrategySignalsReportDataAsync();
-    Task<ReportData> CreateBacktestResultsReportDataAsync(string ticker, string strategyName);
-    Task<ReportData> CreateBacktestResultReportDataAsync(Guid backtestResultId);
     Task<ReportData> CreatePairArbitrageStrategySignalsReportDataAsync();
-    Task<ReportData> CreateGroupByTickerPairArbitrageStrategySignalsReportDataAsync();
+    Task<ReportData> CreateBacktestResultsReportDataAsync(string ticker, string strategyName);
     Task<ReportData> CreatePairArbitrageBacktestResultsReportDataAsync(string ticker, string strategyName);
+    Task<ReportData> CreateBacktestResultReportDataAsync(Guid backtestResultId);
     Task<ReportData> CreatePairArbitrageBacktestResultReportDataAsync(Guid backtestResultId);
+    Task<ReportData> CreateGroupByTickerPairArbitrageStrategySignalsReportDataAsync();
 }

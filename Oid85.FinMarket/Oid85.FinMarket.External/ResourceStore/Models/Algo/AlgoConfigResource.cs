@@ -30,4 +30,16 @@ public class AlgoConfigResource
     /// </summary>
     [JsonPropertyName("backtestResultFilter")]
     public BacktestResultFilterResource BacktestResultFilterResource { get; set; } = new();
+    
+    /// <summary>
+    /// Фильтр результатов оптимизации
+    /// </summary>
+    [JsonPropertyName("pairArbitrageOptimizationResultFilter")]
+    public PairArbitrageOptimizationResultFilterResource PairArbitrageOptimizationResultFilterResource { get; set; } = new();
+    
+    /// <summary>
+    /// Фильтр результатов бэктеста
+    /// </summary>
+    [JsonPropertyName("pairArbitrageBacktestResultFilter")]
+    public PairArbitrageBacktestResultFilterResource PairArbitrageBacktestResultFilterResource { get; set; } = new();
 }

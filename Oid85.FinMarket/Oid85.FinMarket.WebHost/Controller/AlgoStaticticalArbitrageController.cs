@@ -83,14 +83,14 @@ public class AlgoStaticticalArbitrageController(
     /// Получить бэктест по id
     /// </summary>
     [HttpPost("backtest-result-by-id")]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetBacktestResultByIdAsync(
         [FromBody] IdRequest request) =>
         GetResponseAsync(
             () => reportService.GetBacktestResultByIdAsync(request),
-            result => new BaseResponse<BacktestResultData>
+            result => new BaseResponse<PairArbitrageBacktestResultData>
             {
                 Result = result
             });    
@@ -99,14 +99,14 @@ public class AlgoStaticticalArbitrageController(
     /// Получить бэктест по тикеру
     /// </summary>
     [HttpPost("backtest-result-by-ticker")]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetBacktestResultByTickerAsync(
         [FromBody] TickerRequest request) =>
         GetResponseAsync(
             () => reportService.GetBacktestResultByTickerAsync(request),
-            result => new BaseResponse<BacktestResultData>
+            result => new BaseResponse<PairArbitrageBacktestResultData>
             {
                 Result = result
             });     
@@ -115,13 +115,13 @@ public class AlgoStaticticalArbitrageController(
     /// Получить бэктест портфеля
     /// </summary>
     [HttpPost("backtest-result-portfolio")]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(BaseResponse<BacktestResultData>), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(BaseResponse<PairArbitrageBacktestResultData>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> GetBacktestResultPortfolioAsync() =>
         GetResponseAsync(
             () => reportService.GetBacktestResultPortfolioAsync(),
-            result => new BaseResponse<BacktestResultData>
+            result => new BaseResponse<PairArbitrageBacktestResultData>
             {
                 Result = result
             });     

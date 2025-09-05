@@ -144,6 +144,11 @@ public class DiagramDataFactory(
         return diagramData;
     }
 
+    public async Task<PairArbitrageBacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(PairArbitrageStrategy strategy)
+    {
+
+    }
+    
     public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies)
     {
         var diagramData = new BacktestResultDiagramData { Title = $"Бэктест стратегий {strategies[0].Candles.First().DateTime.ToString(KnownDateTimeFormats.DateISO)} - {strategies[0].Candles.Last().DateTime.ToString(KnownDateTimeFormats.DateISO)}" };
@@ -193,6 +198,11 @@ public class DiagramDataFactory(
         return diagramData;
     }
 
+    public async Task<PairArbitrageBacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(List<PairArbitrageStrategy> strategies)
+    {
+
+    }    
+    
     public async Task<BacktestResultDiagramData> CreateBacktestResultWithoutPriceDiagramDataAsync(List<Strategy> strategies)
     {
         var diagramData = new BacktestResultDiagramData { Title = $"Бэктест портфеля стратегий" };
@@ -226,6 +236,11 @@ public class DiagramDataFactory(
         return diagramData;
     }
 
+    public async Task<PairArbitrageBacktestResultDiagramData> CreatePairArbitrageBacktestResultWithoutPriceDiagramDataAsync(List<PairArbitrageStrategy> strategies)
+    {
+
+    }    
+    
     public async Task<SimpleDiagramData> CreateSpreadsDiagramDataAsync(DateOnly from, DateOnly to)
     {
         var simpleDiagramData = new SimpleDiagramData { Title = "Спреды" };
@@ -256,20 +271,5 @@ public class DiagramDataFactory(
         }
         
         return simpleDiagramData;
-    }
-
-    public async Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(PairArbitrageStrategy strategy)
-    {
-
-    }
-
-    public async Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(List<PairArbitrageStrategy> strategies)
-    {
-
-    }
-
-    public async Task<BacktestResultDiagramData> CreatePairArbitrageBacktestResultWithoutPriceDiagramDataAsync(List<PairArbitrageStrategy> strategies)
-    {
-
     }
 }
