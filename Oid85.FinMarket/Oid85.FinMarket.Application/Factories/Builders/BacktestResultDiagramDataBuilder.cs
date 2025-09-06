@@ -86,29 +86,44 @@ public class BacktestResultDiagramDataBuilder
     public static BacktestResultDiagramData SetLongPositions(BacktestResultDiagramData diagramData, List<Strategy> strategies)
     {
         for (int i = 0; i < strategies.Count; i++)
-        {
             for (int j = 0; j < strategies[i].Positions.Count; j++)
-            {
                 if (strategies[i].Positions[j].IsLong)
                 {
                     diagramData.Data.Series[strategies[i].Positions[j].EntryCandleIndex].BuyPrice = strategies[i].Positions[j].EntryPrice;
-                
+                    
                     if (!strategies[i].Positions[j].IsActive)
                         diagramData.Data.Series[strategies[i].Positions[j].ExitCandleIndex].SellPrice = strategies[i].Positions[j].ExitPrice;
-                }                
-            }
-        }        
+                }        
         
         return diagramData;
     }    
     
     public static BacktestResultDiagramData SetShortPositions(BacktestResultDiagramData diagramData, Strategy strategy)
     {
+        for (int i = 0; i < strategy.Positions.Count; i++)
+            if (strategy.Positions[i].IsShort)
+            {
+                diagramData.Data.Series[strategy.Positions[i].EntryCandleIndex].SellPrice = strategy.Positions[i].EntryPrice;
+                
+                if (!strategy.Positions[i].IsActive)
+                    diagramData.Data.Series[strategy.Positions[i].ExitCandleIndex].BuyPrice = strategy.Positions[i].ExitPrice;
+            }
+        
         return diagramData;
     }
     
     public static BacktestResultDiagramData SetShortPositions(BacktestResultDiagramData diagramData, List<Strategy> strategies)
     {
+        for (int i = 0; i < strategies.Count; i++)
+            for (int j = 0; j < strategies[i].Positions.Count; j++)
+                if (strategies[i].Positions[j].IsShort)
+                {
+                    diagramData.Data.Series[strategies[i].Positions[j].EntryCandleIndex].SellPrice = strategies[i].Positions[j].EntryPrice;
+                        
+                    if (!strategies[i].Positions[j].IsActive)
+                        diagramData.Data.Series[strategies[i].Positions[j].ExitCandleIndex].BuyPrice = strategies[i].Positions[j].ExitPrice;
+                }        
+        
         return diagramData;
     }    
     
