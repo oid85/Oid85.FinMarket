@@ -927,10 +927,46 @@ public class ReportDataFactory(
             "№", "", "Тикер", "Наименование", "Позиция, шт"
         ]);
 
-        reportData.Title = "Сигналы";
+        reportData.Title = "Сигналы (груп. по тикеру)";
         
         var strategySignals = await pairArbitrageStrategySignalRepository.GetAllAsync();
 
+        List<string> tickers = 
+        [
+            ..strategySignals.Select(x => x.TickerFirst),
+            ..strategySignals.Select(x => x.TickerSecond)
+        ];
+        
+        int count = 0;
+        
+        foreach (var ticker in tickers.Distinct())
+        {
+            var instrument = await instrumentRepository.GetAsync(ticker);
+            string instrumentName = instrument?.Name ?? string.Empty;
+            
+            int positionSize = 0;
+            
+            foreach (var strategySignal in strategySignals)
+            {
+                if (strategySignal.TickerFirst == ticker)
+                    positionSize += strategySignal.PositionSizeFirst;  
+                
+                if (strategySignal.TickerSecond == ticker)
+                    positionSize += strategySignal.PositionSizeSecond;
+            }
+
+            count++;
+            
+            reportData.Data.Add(
+            [
+                GetNumber(count),
+                GetTicker(ticker),
+                GetString(ticker),
+                GetString(normalizeService.NormalizeInstrumentName(instrumentName)),
+                GetNumber(positionSize)
+            ]);
+        }
+        
         return reportData;
     }
     
