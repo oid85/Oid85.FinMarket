@@ -1,4 +1,5 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Factories;
+﻿using Oid85.FinMarket.Application.Factories.Builders;
+using Oid85.FinMarket.Application.Interfaces.Factories;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Common.Helpers;
@@ -67,7 +68,7 @@ public class DiagramDataFactory(
 
         foreach (var multiplicator in multiplicators)
         {
-            diagramData.Series.Add(new BubbleDataPoint()
+            diagramData.Series.Add(new BubbleDataPoint
             {
                 Name = multiplicator.Ticker,
                 X = multiplicator.Pe,
@@ -86,7 +87,7 @@ public class DiagramDataFactory(
         
         foreach (var multiplicator in multiplicators)
         {
-            diagramData.Series.Add(new BubbleDataPoint()
+            diagramData.Series.Add(new BubbleDataPoint
             {
                 Name = multiplicator.Ticker,
                 X = multiplicator.Pe,
@@ -97,148 +98,108 @@ public class DiagramDataFactory(
         
         return diagramData;
     }
-
+    
     public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(Strategy strategy)
     {
-        var diagramData = new BacktestResultDiagramData { Title = $"{strategy.StrategyName} {strategy.Candles.First().DateTime.ToString(KnownDateTimeFormats.DateISO)} - {strategy.Candles.Last().DateTime.ToString(KnownDateTimeFormats.DateISO)}"};
+        var diagramData = new BacktestResultDiagramData
+        {
+            Title = $"{strategy.StrategyName} {strategy.Candles.First().DateTime.ToString(KnownDateTimeFormats.DateISO)} - {strategy.Candles.Last().DateTime.ToString(KnownDateTimeFormats.DateISO)}"
+        };
 
-        // Price, Filter, Indicator, ChannelBands
-        for (int i = 0; i < strategy.Candles.Count; i++)
-        {
-            diagramData.Data.Series.Add(new BacktestResultDataPoint
-            {
-                Date = strategy.Candles[i].DateTime.ToString("dd.MM.yyyy"),
-                Price = strategy.Candles[i].Close,
-                Filter = strategy.GraphPoints[i].Filter,
-                Indicator = strategy.GraphPoints[i].Indicator,
-                ChannelBands = strategy.GraphPoints[i].ChannelBands,
-            });
-        }
-
-        // BuyPrice, SellPrice
-        for (int i = 0; i < strategy.Positions.Count; i++)
-        {
-            if (strategy.Positions[i].IsLong)
-            {
-                diagramData.Data.Series[strategy.Positions[i].EntryCandleIndex].BuyPrice = strategy.Positions[i].EntryPrice;
-                
-                if (!strategy.Positions[i].IsActive)
-                    diagramData.Data.Series[strategy.Positions[i].ExitCandleIndex].SellPrice = strategy.Positions[i].ExitPrice;
-            }
-        }
-        
-        // Equity, Drawdown
-        var from = strategy.Candles.First().DateTime;
-        var to = strategy.Candles.Last().DateTime;
-        
-        var equity = strategy.EqiutyCurve.Expand(from, to);
-        var drawdown = strategy.DrawdownCurve.Expand(from, to);
-        
-        for (int i = 0; i < diagramData.Data.Series.Count; i++)
-        {
-            var date = Convert.ToDateTime(diagramData.Data.Series[i].Date);
-            diagramData.Data.Series[i].Equity = Math.Round(equity[date], 2);
-            diagramData.Data.Series[i].Drawdown = Math.Round(-1 * drawdown[date], 2);
-        }
+        diagramData = BacktestResultDiagramDataBuilder.SetDates(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetPrices(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetFilters(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetIndicators(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetChannelBands(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetLongPositions(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetShortPositions(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetEquity(diagramData, strategy);
+        diagramData = BacktestResultDiagramDataBuilder.SetDrawdown(diagramData, strategy);
         
         return diagramData;
     }
 
     public async Task<PairArbitrageBacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(PairArbitrageStrategy strategy)
     {
+        var diagramData = new PairArbitrageBacktestResultDiagramData
+        {
+            Title = $"{strategy.StrategyName} {strategy.Spreads.First().Date.ToString(KnownDateTimeFormats.DateISO)} - {strategy.Spreads.Last().Date.ToString(KnownDateTimeFormats.DateISO)}"
+        };
 
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetDates(diagramData, strategy);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetFirstPrices(diagramData, strategy);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetSecondPrices(diagramData, strategy);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetSpreads(diagramData, strategy);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetLongShortPositions(diagramData, strategy);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetShortLongPositions(diagramData, strategy);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetEquity(diagramData, strategy);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetDrawdown(diagramData, strategy);
+        
+        return diagramData;
     }
     
     public async Task<BacktestResultDiagramData> CreateBacktestResultDiagramDataAsync(List<Strategy> strategies)
     {
-        var diagramData = new BacktestResultDiagramData { Title = $"Бэктест стратегий {strategies[0].Candles.First().DateTime.ToString(KnownDateTimeFormats.DateISO)} - {strategies[0].Candles.Last().DateTime.ToString(KnownDateTimeFormats.DateISO)}" };
+        var diagramData = new BacktestResultDiagramData
+        {
+            Title = $"Бэктест стратегий {strategies[0].Candles.First().DateTime.ToString(KnownDateTimeFormats.DateISO)} - {strategies[0].Candles.Last().DateTime.ToString(KnownDateTimeFormats.DateISO)}"
+        };
         
-        // Price
-        for (int i = 0; i < strategies[0].Candles.Count; i++)
-        {
-            diagramData.Data.Series.Add(new BacktestResultDataPoint
-            {
-                Date = strategies[0].Candles[i].DateTime.ToString(KnownDateTimeFormats.DateISO),
-                Price = strategies[0].Candles[i].Close
-            });
-        }
-        
-        // BuyPrice, SellPrice
-        for (int i = 0; i < strategies.Count; i++)
-        {
-            for (int j = 0; j < strategies[i].Positions.Count; j++)
-            {
-                if (strategies[i].Positions[j].IsLong)
-                {
-                    diagramData.Data.Series[strategies[i].Positions[j].EntryCandleIndex].BuyPrice = strategies[i].Positions[j].EntryPrice;
-                
-                    if (!strategies[i].Positions[j].IsActive)
-                        diagramData.Data.Series[strategies[i].Positions[j].ExitCandleIndex].SellPrice = strategies[i].Positions[j].ExitPrice;
-                }                
-            }
-        }
-
-        // Equity, Drawdown
-        var from = strategies[0].Candles.First().DateTime;
-        var to = strategies[0].Candles.Last().DateTime;
-
-        for (int i = 0; i < strategies.Count; i++)
-        {
-            var equity = strategies[i].EqiutyCurve.Expand(from, to);
-            var drawdown = strategies[i].DrawdownCurve.Expand(from, to);
-
-            for (int j = 0; j < diagramData.Data.Series.Count; j++)
-            {
-                var date = Convert.ToDateTime(diagramData.Data.Series[j].Date);
-                diagramData.Data.Series[j].Equity += Math.Round(equity[date], 2);
-                diagramData.Data.Series[j].Drawdown += Math.Round(-1 * drawdown[date], 2);
-            }
-        }
+        diagramData = BacktestResultDiagramDataBuilder.SetDates(diagramData, strategies);
+        diagramData = BacktestResultDiagramDataBuilder.SetPrices(diagramData, strategies);
+        diagramData = BacktestResultDiagramDataBuilder.SetLongPositions(diagramData, strategies);
+        diagramData = BacktestResultDiagramDataBuilder.SetShortPositions(diagramData, strategies);
+        diagramData = BacktestResultDiagramDataBuilder.SetEquity(diagramData, strategies);
+        diagramData = BacktestResultDiagramDataBuilder.SetDrawdown(diagramData, strategies);
         
         return diagramData;
     }
 
     public async Task<PairArbitrageBacktestResultDiagramData> CreatePairArbitrageBacktestResultDiagramDataAsync(List<PairArbitrageStrategy> strategies)
     {
-
+        var diagramData = new PairArbitrageBacktestResultDiagramData
+        {
+            Title = $"Бэктест стратегий {strategies[0].Spreads.First().Date.ToString(KnownDateTimeFormats.DateISO)} - {strategies[0].Spreads.Last().Date.ToString(KnownDateTimeFormats.DateISO)}"
+        };
+        
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetDates(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetFirstPrices(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetSecondPrices(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetSpreads(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetLongShortPositions(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetShortLongPositions(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetEquity(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetDrawdown(diagramData, strategies);
+        
+        return diagramData;
     }    
     
     public async Task<BacktestResultDiagramData> CreateBacktestResultWithoutPriceDiagramDataAsync(List<Strategy> strategies)
     {
-        var diagramData = new BacktestResultDiagramData { Title = $"Бэктест портфеля стратегий" };
+        var diagramData = new BacktestResultDiagramData
+        {
+            Title = $"Бэктест портфеля стратегий"
+        };
         
-        // Date
-        for (int i = 0; i < strategies[0].Candles.Count; i++)
-        {
-            diagramData.Data.Series.Add(new BacktestResultDataPoint
-            {
-                Date = strategies[0].Candles[i].DateTime.ToString(KnownDateTimeFormats.DateISO)
-            });
-        }
-
-        // Equity, Drawdown
-        var from = strategies[0].Candles.First().DateTime;
-        var to = strategies[0].Candles.Last().DateTime;
-
-        for (int i = 0; i < strategies.Count; i++)
-        {
-            var equity = strategies[i].EqiutyCurve.Expand(from, to);
-            var drawdown = strategies[i].DrawdownCurve.Expand(from, to);
-
-            for (int j = 0; j < diagramData.Data.Series.Count; j++)
-            {
-                var date = Convert.ToDateTime(diagramData.Data.Series[j].Date);
-                diagramData.Data.Series[j].Equity += Math.Round(equity[date], 2);
-                diagramData.Data.Series[j].Drawdown += Math.Round(-1 * drawdown[date], 2);
-            }
-        }
+        diagramData = BacktestResultDiagramDataBuilder.SetDates(diagramData, strategies);
+        diagramData = BacktestResultDiagramDataBuilder.SetEquity(diagramData, strategies);
+        diagramData = BacktestResultDiagramDataBuilder.SetDrawdown(diagramData, strategies);
         
         return diagramData;
     }
 
     public async Task<PairArbitrageBacktestResultDiagramData> CreatePairArbitrageBacktestResultWithoutPriceDiagramDataAsync(List<PairArbitrageStrategy> strategies)
     {
-
+        var diagramData = new PairArbitrageBacktestResultDiagramData
+        {
+            Title = $"Бэктест портфеля стратегий"
+        };
+        
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetDates(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetEquity(diagramData, strategies);
+        diagramData = PairArbitrageBacktestResultDiagramDataBuilder.SetDrawdown(diagramData, strategies);
+        
+        return diagramData;
     }    
     
     public async Task<SimpleDiagramData> CreateSpreadsDiagramDataAsync(DateOnly from, DateOnly to)
