@@ -939,7 +939,7 @@ public class ReportDataFactory(
         
         int count = 0;
         
-        foreach (var ticker in tickers.Distinct())
+        foreach (var ticker in tickers.Distinct().OrderBy(x => x))
         {
             var instrument = await instrumentRepository.GetAsync(ticker);
             string instrumentName = instrument?.Name ?? string.Empty;
