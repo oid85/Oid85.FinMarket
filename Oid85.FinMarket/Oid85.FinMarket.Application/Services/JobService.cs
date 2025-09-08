@@ -14,7 +14,7 @@ public class JobService(
     IMarketEventService marketEventService,
     ISendService sendService,
     IAlgoService algoService,
-    IAlgoPairArbitrageService algoPairArbitrageService) 
+    IPairArbitrageService pairArbitrageService) 
     : IJobService
 {
     /// <inheritdoc />
@@ -229,8 +229,8 @@ public class JobService(
         {
             await loadService.LoadShareDailyCandlesAsync();
             await loadService.LoadFutureDailyCandlesAsync();
-            await algoPairArbitrageService.CalculateCorrelationAsync();
-            await algoPairArbitrageService.CalculateRegressionTailsAsync();
+            await pairArbitrageService.CalculateCorrelationAsync();
+            await pairArbitrageService.CalculateRegressionTailsAsync();
             
             logger.Info("Метод 'PairArbitrationAsync' выполнен успешно");
         }

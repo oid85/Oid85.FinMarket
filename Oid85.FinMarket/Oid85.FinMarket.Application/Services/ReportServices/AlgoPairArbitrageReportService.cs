@@ -13,7 +13,7 @@ namespace Oid85.FinMarket.Application.Services.ReportServices;
 public class AlgoPairArbitrageReportService(
     IReportDataFactory reportDataFactory,
     IDiagramDataFactory diagramDataFactory,
-    IAlgoPairArbitrageService algoService,
+    IPairArbitrageService service,
     IPairArbitrageBacktestResultRepository backtestResultRepository,
     IResourceStoreService resourceStoreService) 
     : IAlgoPairArbitrageReportService
@@ -29,7 +29,7 @@ public class AlgoPairArbitrageReportService(
 
     public async Task<PairArbitrageBacktestResultData> GetBacktestResultByIdAsync(IdRequest request)
     {
-        var result = await algoService.BacktestAsync(request.Id);
+        var result = await service.BacktestAsync(request.Id);
 
         var backtestResultData = new PairArbitrageBacktestResultData
         {
@@ -51,7 +51,7 @@ public class AlgoPairArbitrageReportService(
         
         foreach (var backtestResult in backtestResults.Where(x => request.Ticker == $"{x.TickerFirst},{x.TickerSecond}"))
         {
-            var result = await algoService.BacktestAsync(backtestResult.Id);
+            var result = await service.BacktestAsync(backtestResult.Id);
             strategies.Add(result.strategy!);
         }
 
@@ -74,7 +74,7 @@ public class AlgoPairArbitrageReportService(
         
         foreach (var backtestResult in backtestResults)
         {
-            var result = await algoService.BacktestAsync(backtestResult.Id);
+            var result = await service.BacktestAsync(backtestResult.Id);
             strategies.Add(result.strategy!);
         }
 

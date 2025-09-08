@@ -29,14 +29,12 @@ public class PairArbitrageBacktestResultRepository(
         
         var queryableEntities = context.PairArbitrageBacktestResultEntities.AsQueryable();
         
-        /*
-        queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= filter.MinProfitFactor);
-        queryableEntities = queryableEntities.Where(x => x.RecoveryFactor >= filter.MinRecoveryFactor);
+        // queryableEntities = queryableEntities.Where(x => x.ProfitFactor >= filter.MinProfitFactor);
+        // queryableEntities = queryableEntities.Where(x => x.RecoveryFactor >= filter.MinRecoveryFactor);
         queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent >= filter.MinWinningTradesPercent);
         queryableEntities = queryableEntities.Where(x => x.WinningTradesPercent <= filter.MaxWinningTradesPercent);
         queryableEntities = queryableEntities.Where(x => x.AnnualYieldReturn >= filter.MinAnnualYieldReturn);
-        queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent <= filter.MaxDrawdownPercent);
-        */
+        // queryableEntities = queryableEntities.Where(x => x.MaxDrawdownPercent <= filter.MaxDrawdownPercent);
         
         var entities = await queryableEntities.AsNoTracking().ToListAsync();
         

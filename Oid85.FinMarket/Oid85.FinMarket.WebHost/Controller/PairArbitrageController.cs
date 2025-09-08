@@ -14,7 +14,7 @@ namespace Oid85.FinMarket.WebHost.Controller;
 [Route("api/pair-arbitrage")]
 [ApiController]
 public class PairArbitrageController(
-    IAlgoPairArbitrageService algoService,
+    IPairArbitrageService service,
     IAlgoPairArbitrageReportService reportService,
     IAlgoPairArbitrageDiagramService diagramService)
     : FinMarketBaseController
@@ -28,7 +28,7 @@ public class PairArbitrageController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> RunOptimizationAsync() =>
         GetResponseAsync(
-            algoService.OptimizeAsync,
+            service.OptimizeAsync,
             result => new BaseResponse<bool>
             {
                 Result = result
@@ -43,7 +43,7 @@ public class PairArbitrageController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> RunBacktestAsync() =>
         GetResponseAsync(
-            algoService.BacktestAsync,
+            service.BacktestAsync,
             result => new BaseResponse<bool>
             {
                 Result = result
@@ -58,7 +58,7 @@ public class PairArbitrageController(
     [ProducesResponseType(typeof(BaseResponse<bool>), StatusCodes.Status500InternalServerError)]
     public Task<IActionResult> CalculateStrategySignalsAsync() =>
         GetResponseAsync(
-            algoService.CalculateStrategySignalsAsync,
+            service.CalculateStrategySignalsAsync,
             result => new BaseResponse<bool>
             {
                 Result = result

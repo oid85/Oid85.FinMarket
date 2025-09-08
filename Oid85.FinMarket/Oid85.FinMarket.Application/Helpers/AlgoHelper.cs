@@ -128,22 +128,22 @@ public class AlgoHelper(
     /// <param name="strategyId">Id стратегии</param>
     public async Task<Dictionary<Guid, PairArbitrageStrategy>> GetPairArbitrageStrategies(Guid? strategyId = null)
     {
-        var algoStrategyResources = strategyId is null
-            ? await resourceStoreService.GetAlgoStrategiesAsync() 
-            : (await resourceStoreService.GetAlgoStrategiesAsync()).Where(x => x.Id == strategyId);
+        var pairArbitrageStrategyResources = strategyId is null
+            ? await resourceStoreService.GetPairArbitrageStrategiesAsync() 
+            : (await resourceStoreService.GetPairArbitrageStrategiesAsync()).Where(x => x.Id == strategyId);
 
         var strategyDictionary = new Dictionary<Guid, PairArbitrageStrategy>();        
         
-        foreach (var algoStrategyResource in algoStrategyResources)
+        foreach (var pairArbitrageStrategyResource in pairArbitrageStrategyResources)
         {
-            var strategy = serviceProvider.GetRequiredKeyedService<PairArbitrageStrategy>(algoStrategyResource.Name);
+            var strategy = serviceProvider.GetRequiredKeyedService<PairArbitrageStrategy>(pairArbitrageStrategyResource.Name);
 
-            strategy.StrategyId = algoStrategyResource.Id;
-            strategy.Timeframe = algoStrategyResource.Timeframe;
-            strategy.StrategyDescription = algoStrategyResource.Description;
-            strategy.StrategyName = algoStrategyResource.Name;
+            strategy.StrategyId = pairArbitrageStrategyResource.Id;
+            strategy.Timeframe = pairArbitrageStrategyResource.Timeframe;
+            strategy.StrategyDescription = pairArbitrageStrategyResource.Description;
+            strategy.StrategyName = pairArbitrageStrategyResource.Name;
 
-            strategyDictionary.TryAdd(algoStrategyResource.Id, strategy);
+            strategyDictionary.TryAdd(pairArbitrageStrategyResource.Id, strategy);
         }
         
         return strategyDictionary;

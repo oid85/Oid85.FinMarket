@@ -2,7 +2,7 @@
 
 namespace Oid85.FinMarket.Application.Interfaces.Services;
 
-public interface IAlgoPairArbitrageService
+public interface IPairArbitrageService
 {
     /// <summary>
     /// Рассчитать корреляции

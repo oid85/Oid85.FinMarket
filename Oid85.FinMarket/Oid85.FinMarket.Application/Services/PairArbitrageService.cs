@@ -15,7 +15,7 @@ using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services;
 
-public class AlgoPairArbitrageService(
+public class PairArbitrageService(
     ILogger logger,
     IDailyCandleRepository dailyCandleRepository,
     IResourceStoreService resourceStoreService,
@@ -28,7 +28,7 @@ public class AlgoPairArbitrageService(
     IRegressionTailRepository regressionTailRepository,
     ITickerListUtilService tickerListUtilService,
     AlgoHelper algoHelper)
-    : IAlgoPairArbitrageService
+    : IPairArbitrageService
 {
     private ConcurrentDictionary<string, List<Candle>> Candles { get; set; } = new();
     private ConcurrentDictionary<string, RegressionTail> Spreads { get; set; } = new();
