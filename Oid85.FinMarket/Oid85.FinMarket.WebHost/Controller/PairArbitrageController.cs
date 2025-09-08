@@ -11,9 +11,9 @@ using Oid85.FinMarket.WebHost.Controller.Base;
 
 namespace Oid85.FinMarket.WebHost.Controller;
 
-[Route("api/algo-statictical-arbitrage")]
+[Route("api/pair-arbitrage")]
 [ApiController]
-public class AlgoStaticticalArbitrageController(
+public class PairArbitrageController(
     IAlgoPairArbitrageService algoService,
     IAlgoPairArbitrageReportService reportService,
     IAlgoPairArbitrageDiagramService diagramService)
