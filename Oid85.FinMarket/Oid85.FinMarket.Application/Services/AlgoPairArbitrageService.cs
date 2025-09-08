@@ -66,6 +66,7 @@ public class AlgoPairArbitrageService(
                     strategy.Ticker = (optimizationResult.TickerFirst, optimizationResult.TickerSecond);
                     strategy.IsFuture = (await algoHelper.IsFuture(optimizationResult.TickerFirst), await algoHelper.IsFuture(optimizationResult.TickerSecond));
                     strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(optimizationResult.TickerFirst), await algoHelper.GetBasicAssetSize(optimizationResult.TickerSecond));
+                    strategy.Leverage = await algoHelper.GetPairArbitrageLeverage(optimizationResult.TickerFirst, optimizationResult.TickerSecond);
                     
                     var syncCandles = AlgoHelper.SyncCandles(
                         Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
@@ -138,6 +139,7 @@ public class AlgoPairArbitrageService(
             strategy.Ticker = (backtestResult.TickerFirst, backtestResult.TickerSecond);
             strategy.IsFuture = (await algoHelper.IsFuture(backtestResult.TickerFirst), await algoHelper.IsFuture(backtestResult.TickerSecond));
             strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(backtestResult.TickerFirst), await algoHelper.GetBasicAssetSize(backtestResult.TickerSecond));
+            strategy.Leverage = await algoHelper.GetPairArbitrageLeverage(backtestResult.TickerFirst, backtestResult.TickerSecond);
             
             var syncCandles = AlgoHelper.SyncCandles(
                 Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
@@ -377,6 +379,7 @@ public class AlgoPairArbitrageService(
                 strategy.Ticker = (tickerFirst, tickerSecond);
                 strategy.IsFuture = (await algoHelper.IsFuture(tickerFirst), await algoHelper.IsFuture(tickerSecond));
                 strategy.BasicAssetSize = (await algoHelper.GetBasicAssetSize(tickerFirst), await algoHelper.GetBasicAssetSize(tickerSecond));
+                strategy.Leverage = await algoHelper.GetPairArbitrageLeverage(tickerFirst, tickerSecond);
                 
                 var syncCandles = AlgoHelper.SyncCandles(
                     Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 

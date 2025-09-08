@@ -433,4 +433,35 @@ public class AlgoHelper(
     /// </summary>
     /// <param name="ticker">Тикер инструмента</param>
     public async Task<double> GetBasicAssetSize(string ticker) => (await futureRepository.GetAsync(ticker))?.BasicAssetSize ?? 1.0;
+
+    /// <summary>
+    /// Размер плеча
+    /// </summary>
+    /// <param name="ticker">Тикер инструмента</param>
+    public async Task<double> GetLeverage(string ticker)
+    {
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+
+        return await IsFuture(ticker)
+            ? algoConfigResource.MoneyManagementResource.FutureLeverage
+            : algoConfigResource.MoneyManagementResource.ShareLeverage;
+    }
+
+    /// <summary>
+    /// Размер плеча для парного арбитража
+    /// </summary>
+    public async Task<(double First, double Second)> GetPairArbitrageLeverage(string tickerFirst, string tickerSecond)
+    {
+        var algoConfigResource = await resourceStoreService.GetAlgoConfigAsync();
+        
+        var leverageFirst =  await IsFuture(tickerFirst)
+            ? algoConfigResource.MoneyManagementResource.PairArbitrageFutureLeverage
+            : algoConfigResource.MoneyManagementResource.PairArbitrageShareLeverage;
+        
+        var leverageSecond =  await IsFuture(tickerSecond)
+            ? algoConfigResource.MoneyManagementResource.PairArbitrageFutureLeverage
+            : algoConfigResource.MoneyManagementResource.PairArbitrageShareLeverage;        
+        
+        return (leverageFirst, leverageSecond);
+    }
 }

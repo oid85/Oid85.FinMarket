@@ -60,6 +60,7 @@ public class AlgoService(
                     strategy.Ticker = optimizationResult.Ticker;
                     strategy.IsFuture = await algoHelper.IsFuture(optimizationResult.Ticker);
                     strategy.BasicAssetSize = await algoHelper.GetBasicAssetSize(optimizationResult.Ticker);
+                    strategy.Leverage = await algoHelper.GetLeverage(optimizationResult.Ticker);
                     strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                     if (strategy.Candles is [])
@@ -119,6 +120,7 @@ public class AlgoService(
             strategy.Ticker = backtestResult.Ticker;
             strategy.IsFuture = await algoHelper.IsFuture(backtestResult.Ticker);
             strategy.BasicAssetSize = await algoHelper.GetBasicAssetSize(backtestResult.Ticker);
+            strategy.Leverage = await algoHelper.GetLeverage(backtestResult.Ticker);
             strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
             if (strategy.Candles is [])
@@ -322,6 +324,7 @@ public class AlgoService(
                 strategy.Ticker = ticker;
                 strategy.IsFuture = await algoHelper.IsFuture(ticker);
                 strategy.BasicAssetSize = await algoHelper.GetBasicAssetSize(ticker);
+                strategy.Leverage = await algoHelper.GetLeverage(ticker);
                 strategy.Candles = Candles.TryGetValue(strategy.Ticker, out var candles) ? candles : [];
 
                 if (strategy.Candles is [])

@@ -19,7 +19,7 @@ public class DailyCandleRepository(
 
         foreach (var instrumentId in instrumentIds) 
             await context.DailyCandleEntities
-                .Where(x => x.InstrumentId == instrumentId && x.IsComplete)
+                .Where(x => x.InstrumentId == instrumentId && !x.IsComplete)
                 .ExecuteDeleteAsync();
         
         await context.SaveChangesAsync();
