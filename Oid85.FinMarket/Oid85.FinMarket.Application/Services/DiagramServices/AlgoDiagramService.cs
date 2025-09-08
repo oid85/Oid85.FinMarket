@@ -1,7 +1,4 @@
-﻿using Oid85.FinMarket.Application.Interfaces.Factories;
-using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
-using Oid85.FinMarket.Application.Models.Diagrams;
-using Oid85.FinMarket.Application.Models.Requests;
+﻿using Oid85.FinMarket.Application.Interfaces.Services.DiagramServices;
 
 namespace Oid85.FinMarket.Application.Services.DiagramServices;
 

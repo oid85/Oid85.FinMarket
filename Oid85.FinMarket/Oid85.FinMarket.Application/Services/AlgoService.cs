@@ -9,7 +9,6 @@ using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
-using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 using Candle = Oid85.FinMarket.Domain.Models.Algo.Candle;
 
 namespace Oid85.FinMarket.Application.Services;

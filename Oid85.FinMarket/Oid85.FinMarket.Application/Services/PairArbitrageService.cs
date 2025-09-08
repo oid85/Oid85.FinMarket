@@ -10,7 +10,6 @@ using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Common.Utils;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
-using Oid85.FinMarket.External.Computation;
 using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services;
@@ -70,7 +69,7 @@ public class PairArbitrageService(
                     
                     var syncCandles = AlgoHelper.SyncCandles(
                         Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
-                        Candles.TryGetValue(strategy.Ticker.First, out var secondCandles) ? secondCandles : []);
+                        Candles.TryGetValue(strategy.Ticker.Second, out var secondCandles) ? secondCandles : []);
                     
                     strategy.Candles = (syncCandles.First, syncCandles.Second);
 
@@ -143,7 +142,7 @@ public class PairArbitrageService(
             
             var syncCandles = AlgoHelper.SyncCandles(
                 Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
-                Candles.TryGetValue(strategy.Ticker.First, out var secondCandles) ? secondCandles : []);
+                Candles.TryGetValue(strategy.Ticker.Second, out var secondCandles) ? secondCandles : []);
                     
             strategy.Candles = (syncCandles.First, syncCandles.Second);
 
@@ -383,7 +382,7 @@ public class PairArbitrageService(
                 
                 var syncCandles = AlgoHelper.SyncCandles(
                     Candles.TryGetValue(strategy.Ticker.First, out var firstCandles) ? firstCandles : [], 
-                    Candles.TryGetValue(strategy.Ticker.First, out var secondCandles) ? secondCandles : []);
+                    Candles.TryGetValue(strategy.Ticker.Second, out var secondCandles) ? secondCandles : []);
                     
                 strategy.Candles = (syncCandles.First, syncCandles.Second);
 
@@ -419,7 +418,7 @@ public class PairArbitrageService(
 
                     catch (Exception exception)
                     {
-                        logger.Info($"Оптимизация '{strategy.Ticker}', '{strategy.StrategyName}', '{JsonSerializer.Serialize(parameterSet)}'. {exception}");
+                        logger.Info($"Оптимизация '{strategy.Ticker.First},{strategy.Ticker.Second}', '{strategy.StrategyName}', '{JsonSerializer.Serialize(parameterSet)}'. {exception}");
                     }
                 }
             }
