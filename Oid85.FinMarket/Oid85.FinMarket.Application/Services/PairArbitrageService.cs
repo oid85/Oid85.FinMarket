@@ -225,9 +225,12 @@ public class PairArbitrageService(
                     .Select(x => $"{x.TickerFirst},{x.TickerSecond}").Distinct().Count();
 
                 // Размер позиции в процентах от портфеля
-                double positionPercentPortfolio =
-                    algoConfigResource.MoneyManagementResource.PairArbitrageMoney / countUniqueTickersWithSignals *
-                    (percentSignals / 100.0) / algoConfigResource.MoneyManagementResource.PairArbitrageMoney * 100.0;
+                double positionPercentPortfolio = 0.0;
+                
+                if (countUniqueTickersWithSignals != 0 || percentSignals != 0.0)
+                    positionPercentPortfolio =
+                        algoConfigResource.MoneyManagementResource.PairArbitrageMoney / countUniqueTickersWithSignals *
+                        (percentSignals / 100.0) / algoConfigResource.MoneyManagementResource.PairArbitrageMoney * 100.0;
 
                 // Размер позиции, руб
                 double positionCost = algoConfigResource.MoneyManagementResource.PairArbitrageMoney * positionPercentPortfolio / 100.0;
