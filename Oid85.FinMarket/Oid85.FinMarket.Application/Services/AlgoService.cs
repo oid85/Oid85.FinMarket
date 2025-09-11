@@ -197,11 +197,14 @@ public class AlgoService(
                 // Цена инструмента
                 double lastPrice = await GetLastPriceAsync(ticker);                
                 
+                // Размер основного актива
+                double basicAssetSize = await GetBasicAssetSizeAsync(ticker);                
+                
                 // Размер позиции, шт
                 double positionSize = 0;
                 
                 if (positionCost != 0.0 && lastPrice != 0.0)
-                    positionSize = positionCost / lastPrice;
+                    positionSize = positionCost / (lastPrice * basicAssetSize);
                 
                 // Применяем плечо
                 var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
@@ -212,8 +215,7 @@ public class AlgoService(
                     positionSize *= algoConfigResource.MoneyManagementResource.ShareLeverage;
                     positionCost *= algoConfigResource.MoneyManagementResource.ShareLeverage;
                 }
-
-
+                
                 if (futuresTickers.Contains(ticker))
                 {
                     positionSize *= algoConfigResource.MoneyManagementResource.FutureLeverage;
@@ -261,6 +263,20 @@ public class AlgoService(
                 return (await futureRepository.GetAsync(ticker))!.LastPrice;
 
             return 0.0;
+        }
+        
+        async Task<double> GetBasicAssetSizeAsync(string ticker)
+        {
+            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
+            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
+            
+            if (sharesTickers.Contains(ticker))
+                return 1.0;
+
+            if (futuresTickers.Contains(ticker))
+                return (await futureRepository.GetAsync(ticker))!.BasicAssetSize;
+
+            return 1.0;
         }
         
         int GetCountSignals(string ticker)
