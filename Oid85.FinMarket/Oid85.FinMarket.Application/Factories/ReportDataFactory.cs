@@ -848,7 +848,7 @@ public class ReportDataFactory(
     {
         var reportData = CreateNewReportDataWithHeaders(
             [
-                "№", "", "", "Тикер", "Тикер", "Наименование", "Наименование", "Сигналы, шт", "Стратегии, шт", "Сигналы, %", 
+                "№", "Тикер", "Тикер", "Наименование", "Наименование", "Сигналы, шт", "Стратегии, шт", "Сигналы, %", 
                 "Позиция, шт", "Позиция, шт", "Позиция, руб",  "Доля в портфеле, %", "Цена, руб", "Цена, руб", ""
             ]);
 
@@ -860,8 +860,6 @@ public class ReportDataFactory(
         
         reportData.Data.Add(
         [
-            GetString(string.Empty),
-            GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),
             GetString(string.Empty),
@@ -898,8 +896,6 @@ public class ReportDataFactory(
             reportData.Data.Add(
             [
                 GetNumber(count),
-                GetTicker(strategySignal.TickerFirst),
-                GetTicker(strategySignal.TickerSecond),
                 GetString(strategySignal.TickerFirst),
                 GetString(strategySignal.TickerSecond),
                 GetString(normalizeService.NormalizeInstrumentName(instrumentNameFirst)),

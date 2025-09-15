@@ -6,6 +6,7 @@ public interface IShareRepository
 {
     Task AddAsync(List<Share> shares);
     Task UpdateLastPricesAsync(Guid instrumentId, double lastPrice);
+    Task<List<Share>> GetAllAsync();
     Task<List<Share>> GetAsync(List<string> tickers);
     Task<Share?> GetAsync(string ticker);
     Task<Share?> GetAsync(Guid instrumentId);

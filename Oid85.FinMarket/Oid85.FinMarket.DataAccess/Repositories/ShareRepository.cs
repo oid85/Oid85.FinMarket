@@ -52,7 +52,20 @@ public class ShareRepository(
             logger.Error(exception);
         }
     }
-    
+
+    public async Task<List<Share>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+
+        return (await context.ShareEntities
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.Ticker)
+                .AsNoTracking()
+                .ToListAsync())
+            .Select(DataAccessMapper.Map)
+            .ToList();
+    }
+
     public async Task<List<Share>> GetAsync(List<string> tickers)
     {
         await using var context = await contextFactory.CreateDbContextAsync();

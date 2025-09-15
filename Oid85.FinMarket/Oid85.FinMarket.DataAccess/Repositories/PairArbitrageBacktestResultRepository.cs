@@ -43,6 +43,19 @@ public class PairArbitrageBacktestResultRepository(
         return models;
     }
 
+    public async Task<List<PairArbitrageBacktestResult>> GetAllAsync()
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+
+        var queryableEntities = context.PairArbitrageBacktestResultEntities.AsQueryable();
+
+        var entities = await queryableEntities.AsNoTracking().ToListAsync();
+
+        var models = entities.Select(DataAccessMapper.Map).ToList();
+
+        return models;
+    }
+
     public async Task<PairArbitrageBacktestResult?> GetAsync(Guid backtestResultId)
     {
         await using var context = await contextFactory.CreateDbContextAsync();

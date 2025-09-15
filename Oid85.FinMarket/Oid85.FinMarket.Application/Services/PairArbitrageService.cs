@@ -219,18 +219,15 @@ public class PairArbitrageService(
                 // Процент сигналов
                 double percentSignals = Convert.ToDouble(countSignals) / Convert.ToDouble(countStrategies) * 100.0;
 
-                // Количество уникальных тикеров с позицией не равной 0
-                int countUniqueTickersWithSignals = backtestResults
-                    .Where(x => x.CurrentPositionFirst is > 0 or < 0 && x.CurrentPositionSecond is > 0 or < 0)
+                // Количество уникальных пар тикеров
+                int countUniqueTickers = backtestResults.Where(x => x.NumberPositions > 0)
                     .Select(x => $"{x.TickerFirst},{x.TickerSecond}").Distinct().Count();
 
                 // Размер позиции в процентах от портфеля
                 double positionPercentPortfolio = 0.0;
                 
-                if (countUniqueTickersWithSignals != 0 || percentSignals != 0.0)
-                    positionPercentPortfolio =
-                        algoConfigResource.MoneyManagementResource.PairArbitrageMoney / countUniqueTickersWithSignals *
-                        (percentSignals / 100.0) / algoConfigResource.MoneyManagementResource.PairArbitrageMoney * 100.0;
+                if (countUniqueTickers != 0 || percentSignals != 0.0)
+                    positionPercentPortfolio = (100.0 / countUniqueTickers) * (percentSignals / 100.0);
 
                 // Размер позиции, руб
                 double positionCost = algoConfigResource.MoneyManagementResource.PairArbitrageMoney * positionPercentPortfolio / 100.0;
@@ -239,34 +236,38 @@ public class PairArbitrageService(
                 (double First, double Second) lastPrice = await GetLastPriceAsync(tickerFirst, tickerSecond);
 
                 // Размер позиции, шт
-                (double First, double Second) positionSize = GetPositionSize(tickerPair);
-                
+                (double First, double Second) positionSize = GetPositionSize(positionCost, lastPrice);
+
+                // Определяем знак позиции
+                if (backtestResultsByTickerPair.Sum(x => x.CurrentPositionFirst) < 0) positionSize.First *= -1.0;
+                if (backtestResultsByTickerPair.Sum(x => x.CurrentPositionSecond) < 0) positionSize.Second *= -1.0;
+
                 // Применяем плечо
-                var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
-                var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
+                var sharesTickers = (await shareRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
+                var futuresTickers = (await futureRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
 
                 if (sharesTickers.Contains(tickerFirst))
                 {
                     positionSize.First *= algoConfigResource.MoneyManagementResource.ShareLeverage;
-                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.ShareLeverage;
+                    positionCost = (positionCost / 2.0) + (positionCost / 2.0) * algoConfigResource.MoneyManagementResource.ShareLeverage;
                 }
                 
                 if (futuresTickers.Contains(tickerFirst))
                 {
                     positionSize.First *= algoConfigResource.MoneyManagementResource.FutureLeverage;
-                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.FutureLeverage;
+                    positionCost = (positionCost / 2.0) + (positionCost / 2.0) * algoConfigResource.MoneyManagementResource.FutureLeverage;
                 }
 
                 if (sharesTickers.Contains(tickerSecond))
                 {
                     positionSize.Second *= algoConfigResource.MoneyManagementResource.ShareLeverage;
-                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.ShareLeverage;
+                    positionCost = (positionCost / 2.0) + (positionCost / 2.0) * algoConfigResource.MoneyManagementResource.ShareLeverage;
                 }
                 
                 if (futuresTickers.Contains(tickerSecond))
                 {
                     positionSize.Second *= algoConfigResource.MoneyManagementResource.FutureLeverage;
-                    positionCost = 0.5 * positionCost + 0.5 * positionCost * algoConfigResource.MoneyManagementResource.FutureLeverage;
+                    positionCost = (positionCost / 2.0) + (positionCost / 2.0) * algoConfigResource.MoneyManagementResource.FutureLeverage;
                 }
 
                 await strategySignalRepository.UpdatePositionAsync(
@@ -296,8 +297,8 @@ public class PairArbitrageService(
 
         async Task<(double First, double Second)> GetLastPriceAsync(string tickerFirst, string tickerSecond)
         {
-            var sharesTickers = (await tickerListUtilService.GetSharesByTickerListAsync(KnownTickerLists.AlgoShares)).Select(x => x.Ticker).ToList();
-            var futuresTickers = (await tickerListUtilService.GetFuturesByTickerListAsync(KnownTickerLists.AlgoFutures)).Select(x => x.Ticker).ToList();
+            var sharesTickers = (await shareRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
+            var futuresTickers = (await futureRepository.GetAllAsync()).Select(x => x.Ticker).ToList();
 
             double lastPriceFirst = 0.0;
             double lastPriceSecond = 0.0;
@@ -311,16 +312,12 @@ public class PairArbitrageService(
             return (lastPriceFirst, lastPriceSecond);
         }
 
-        (double First, double Second) GetPositionSize(string tickerPair)
+        (double First, double Second) GetPositionSize(double positionCost, (double First, double Second) lastPrice)
         {
-            double positionSizeFirst = 0.0;
-            double positionSizeSecond = 0.0;
-            
-            foreach (var backtestResult in backtestResults.Where(x => $"{x.TickerFirst},{x.TickerSecond}" == tickerPair))
-            {
-                positionSizeFirst += backtestResult.CurrentPositionFirst;
-                positionSizeSecond += backtestResult.CurrentPositionSecond;
-            }
+            double money = positionCost / 2.0;
+
+            double positionSizeFirst = money / lastPrice.First;
+            double positionSizeSecond = money / lastPrice.Second;
 
             return (positionSizeFirst, positionSizeSecond);
         }

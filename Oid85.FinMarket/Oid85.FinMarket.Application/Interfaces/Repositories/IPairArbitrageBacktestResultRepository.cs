@@ -7,6 +7,7 @@ public interface IPairArbitrageBacktestResultRepository
 {
     Task AddAsync(List<PairArbitrageBacktestResult> backtestResults);
     Task<List<PairArbitrageBacktestResult>> GetAsync(PairArbitrageBacktestResultFilterResource filter);
+    Task<List<PairArbitrageBacktestResult>> GetAllAsync();
     Task<PairArbitrageBacktestResult?> GetAsync(Guid backtestResultId);
     Task DeleteAsync(Guid strategyId);
     Task InvertDeleteAsync(List<Guid> strategyIds);
