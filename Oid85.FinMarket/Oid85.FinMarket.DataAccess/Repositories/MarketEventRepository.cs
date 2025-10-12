@@ -2,7 +2,7 @@
 using NLog;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Mapping;
-using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Domain.Models.Analyse;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;
 

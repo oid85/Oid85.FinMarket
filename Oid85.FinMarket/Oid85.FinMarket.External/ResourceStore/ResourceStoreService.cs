@@ -214,7 +214,7 @@ public class ResourceStoreService(
         }
         
 
-        return result ?? new();
+        return result ?? [];
     }
 
     /// <inheritdoc />
@@ -226,12 +226,12 @@ public class ResourceStoreService(
         {
             result = await ReadAsync<List<PairArbitrageStrategyResource>>(
                 Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!,
-                    "algo", "pairArbitrageStrategy.json")) ?? [];
+                    "algo", "pairArbitrageStrategies.json")) ?? [];
             
             memoryCache.Set(key, result, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)));
         }
 
-        return result ?? new();
+        return result ?? [];
     }
 
     public async Task<List<string[]>> GetCsvAsync(string path) => 
@@ -240,7 +240,7 @@ public class ResourceStoreService(
                 Path.Combine(configuration.GetValue<string>(KnownSettingsKeys.ResourceStorePath)!, path)))
             .Select(line => line.Split(';')).ToList();
 
-    private async Task<T?> ReadAsync<T>(string path)
+    private static async Task<T?> ReadAsync<T>(string path)
     {
         if (!File.Exists(path))
             return default;

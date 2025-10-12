@@ -17,6 +17,7 @@ using Oid85.FinMarket.Application.Services.ReportServices;
 using Oid85.FinMarket.Application.Strategies;
 using Oid85.FinMarket.Common.KnownConstants;
 using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
 
 namespace Oid85.FinMarket.Application.Extensions;
 

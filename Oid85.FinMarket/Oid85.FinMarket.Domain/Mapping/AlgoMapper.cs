@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using Oid85.FinMarket.Common.Helpers;
-using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.Analyse;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
 using Skender.Stock.Indicators;
 
 namespace Oid85.FinMarket.Domain.Mapping;

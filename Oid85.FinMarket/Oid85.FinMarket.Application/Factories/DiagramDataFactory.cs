@@ -4,8 +4,9 @@ using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.Analyse;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
 
 namespace Oid85.FinMarket.Application.Factories;
 

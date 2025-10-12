@@ -1,15 +1,15 @@
 ﻿using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.Models;
 using Tinkoff.InvestApi.V1;
-using Bond = Oid85.FinMarket.Domain.Models.Bond;
-using Currency = Oid85.FinMarket.Domain.Models.Currency;
-using Future = Oid85.FinMarket.Domain.Models.Future;
-using Share = Oid85.FinMarket.Domain.Models.Share;
+using Bond = Oid85.FinMarket.Domain.Models.Analyse.Bond;
+using Currency = Oid85.FinMarket.Domain.Models.Analyse.Currency;
+using Future = Oid85.FinMarket.Domain.Models.Analyse.Future;
+using Share = Oid85.FinMarket.Domain.Models.Analyse.Share;
 using TinkoffShare = Tinkoff.InvestApi.V1.Share;
 using TinkoffFuture = Tinkoff.InvestApi.V1.Future;
 using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
 using TinkoffCurrency = Tinkoff.InvestApi.V1.Currency;
+using Oid85.FinMarket.Domain.Models.Analyse;
 
 namespace Oid85.FinMarket.External.Mapping;
 

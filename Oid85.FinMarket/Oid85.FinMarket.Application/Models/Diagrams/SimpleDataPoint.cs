@@ -2,6 +2,6 @@
 
 public class SimpleDataPoint
 {
-    public string? Date { get; set; }
-    public double? Value { get; set; }
+    public string? Date { get; set; } = null;
+    public double? Value { get; set; } = null;
 }

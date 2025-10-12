@@ -2,7 +2,7 @@
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.Helpers;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Domain.Models.Analyse;
 
 namespace Oid85.FinMarket.Application.Services;
 

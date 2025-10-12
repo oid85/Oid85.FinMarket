@@ -1,6 +1,6 @@
-﻿namespace Oid85.FinMarket.Domain.Models.Algo;
+﻿namespace Oid85.FinMarket.Domain.Models.PairArbitrage;
 
-public struct ArbitrageTrade
+public struct PairArbitrageTrade
 {
     public DateTime DateTime { get; set; }
     public (int First, int Second) Quantity { get; set; }

@@ -1,10 +1,10 @@
 ﻿using NLog;
 using Oid85.FinMarket.Common.Helpers;
-using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Domain.Models.Analyse;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
-using Share = Oid85.FinMarket.Domain.Models.Share;
+using Share = Oid85.FinMarket.Domain.Models.Analyse.Share;
 
 namespace Oid85.FinMarket.External.Tinkoff;
 

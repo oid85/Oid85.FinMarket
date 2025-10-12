@@ -1,5 +1,6 @@
 ﻿using Oid85.FinMarket.Application.Models.Diagrams;
 using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
 
 namespace Oid85.FinMarket.Application.Interfaces.Factories;
 

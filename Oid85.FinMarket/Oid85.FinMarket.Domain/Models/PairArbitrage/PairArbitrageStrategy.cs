@@ -1,4 +1,6 @@
-﻿namespace Oid85.FinMarket.Domain.Models.Algo;
+﻿using Oid85.FinMarket.Domain.Models.Algo;
+
+namespace Oid85.FinMarket.Domain.Models.PairArbitrage;
 
 public class PairArbitrageStrategy
 {
@@ -56,7 +58,7 @@ public class PairArbitrageStrategy
     
     public bool SignalCloseShortLong { get; set; }
     
-    public List<ArbitragePosition> Positions { get; set; } = new();
+    public List<PairArbitragePosition> Positions { get; set; } = new();
 
     public (int First, int Second) GetPositionSize((double First, double Second) orderPrice)
     {
@@ -85,7 +87,7 @@ public class PairArbitrageStrategy
         return positionSize;
     }    
     
-    public ArbitragePosition? LastActivePosition {
+    public PairArbitragePosition? LastActivePosition {
         get
         {
             if (LastPosition is null)
@@ -98,7 +100,7 @@ public class PairArbitrageStrategy
         }
     }
 
-    public ArbitragePosition? LastPosition => Positions.Count == 0 ? null : Positions.Last();
+    public PairArbitragePosition? LastPosition => Positions.Count == 0 ? null : Positions.Last();
     
     public (int First, int Second) CurrentPosition
     {
@@ -135,7 +137,7 @@ public class PairArbitrageStrategy
     }
     
     public void BuySellAtPrice((int First, int Second) quantity, (double First, double Second) price, int candleIndex) =>
-        AddArbitrageTrade(new ArbitrageTrade
+        AddArbitrageTrade(new PairArbitrageTrade
         {
             CandleIndex = candleIndex,
             Quantity = (Math.Abs(quantity.First), -1 * Math.Abs(quantity.Second)),
@@ -144,7 +146,7 @@ public class PairArbitrageStrategy
         });
 
     public void SellBuyAtPrice((int First, int Second) quantity, (double First, double Second) price, int candleIndex) =>
-        AddArbitrageTrade(new ArbitrageTrade
+        AddArbitrageTrade(new PairArbitrageTrade
         {
             CandleIndex = candleIndex,
             Quantity = (-1 * Math.Abs(quantity.First), Math.Abs(quantity.Second)),
@@ -152,13 +154,13 @@ public class PairArbitrageStrategy
             DateTime = Candles.First[candleIndex].DateTime
         });
 
-    private void AddArbitrageTrade(ArbitrageTrade trade)
+    private void AddArbitrageTrade(PairArbitrageTrade trade)
     {
         if (trade.Quantity.First == 0 || trade.Quantity.Second == 0)
             return;
         
         if (LastActivePosition is null)
-            Positions.Add(new ArbitragePosition
+            Positions.Add(new PairArbitragePosition
             {
                 Ticker = (Ticker.First, Ticker.Second),
                 EntryPrice = (trade.Price.First, trade.Price.Second),
@@ -223,7 +225,7 @@ public class PairArbitrageStrategy
         }
     }
     
-    public void CloseAtPrice(ArbitragePosition position, (double First, double Second) price, int candleIndex)
+    public void CloseAtPrice(PairArbitragePosition position, (double First, double Second) price, int candleIndex)
     {
         // Отправляем команды, если длинная позиция
         if (position.IsLongShort)

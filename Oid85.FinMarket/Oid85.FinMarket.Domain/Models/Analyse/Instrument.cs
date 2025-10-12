@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Domain.Models;
+﻿namespace Oid85.FinMarket.Domain.Models.Analyse;
 
 public class Instrument
 {

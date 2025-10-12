@@ -4,13 +4,14 @@ using System.Text.Json;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.Application.Interfaces.Services;
 using Oid85.FinMarket.Common.KnownConstants;
-using Oid85.FinMarket.Domain.Models;
 using NLog;
 using Oid85.FinMarket.Application.Helpers;
 using Oid85.FinMarket.Common.Utils;
 using Oid85.FinMarket.Domain.Mapping;
 using Oid85.FinMarket.Domain.Models.Algo;
 using Oid85.FinMarket.External.ResourceStore;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
+using Oid85.FinMarket.Domain.Models.Analyse;
 
 namespace Oid85.FinMarket.Application.Services;
 

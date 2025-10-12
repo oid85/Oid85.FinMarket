@@ -1,6 +1,6 @@
-﻿namespace Oid85.FinMarket.Domain.Models.Algo;
+﻿namespace Oid85.FinMarket.Domain.Models.PairArbitrage;
 
-public class ArbitragePosition
+public class PairArbitragePosition
 {
     public (string First, string Second) Ticker { get; set; }
     public (double First, double Second) EntryPrice { get; set; }

@@ -2,8 +2,8 @@
 
 public class BubbleDataPoint
 {
-    public string? Name { get; set; }
-    public double? X { get; set; }
-    public double? Y { get; set; }
-    public double? R { get; set; }
+    public string? Name { get; set; } = null;
+    public double? X { get; set; } = null;
+    public double? Y { get; set; } = null;
+    public double? R { get; set; } = null;
 }

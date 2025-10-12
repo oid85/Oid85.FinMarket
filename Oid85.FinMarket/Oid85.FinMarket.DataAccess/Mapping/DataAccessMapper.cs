@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using Oid85.FinMarket.DataAccess.Entities;
-using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.Analyse;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
 
 namespace Oid85.FinMarket.DataAccess.Mapping;
 

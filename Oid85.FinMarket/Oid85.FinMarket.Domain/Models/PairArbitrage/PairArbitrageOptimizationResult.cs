@@ -1,4 +1,4 @@
-﻿namespace Oid85.FinMarket.Domain.Models.Algo;
+﻿namespace Oid85.FinMarket.Domain.Models.PairArbitrage;
 
 public class PairArbitrageOptimizationResult
 {

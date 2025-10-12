@@ -5,7 +5,7 @@ using Oid85.FinMarket.Application.Interfaces.Services.ReportServices;
 using Oid85.FinMarket.Application.Models.BacktestResults;
 using Oid85.FinMarket.Application.Models.Reports;
 using Oid85.FinMarket.Application.Models.Requests;
-using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
 using Oid85.FinMarket.External.ResourceStore;
 
 namespace Oid85.FinMarket.Application.Services.ReportServices;

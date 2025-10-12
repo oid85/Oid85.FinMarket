@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oid85.FinMarket.Application.Interfaces.Repositories;
 using Oid85.FinMarket.DataAccess.Mapping;
-using Oid85.FinMarket.Domain.Models.Algo;
+using Oid85.FinMarket.Domain.Models.PairArbitrage;
 using Oid85.FinMarket.External.ResourceStore.Models.Algo;
 
 namespace Oid85.FinMarket.DataAccess.Repositories;

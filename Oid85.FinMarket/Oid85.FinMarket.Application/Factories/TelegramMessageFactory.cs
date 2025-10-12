@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using Oid85.FinMarket.Application.Interfaces.Factories;
-using Oid85.FinMarket.Domain.Models;
+using Oid85.FinMarket.Domain.Models.Analyse;
 
 namespace Oid85.FinMarket.Application.Factories;
 

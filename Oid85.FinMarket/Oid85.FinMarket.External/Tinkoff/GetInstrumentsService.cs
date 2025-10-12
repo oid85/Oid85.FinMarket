@@ -1,15 +1,15 @@
 ﻿using NLog;
-using Oid85.FinMarket.Domain.Models;
 using Oid85.FinMarket.External.Mapping;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
-using Share = Oid85.FinMarket.Domain.Models.Share;
-using Bond = Oid85.FinMarket.Domain.Models.Bond;
-using Currency = Oid85.FinMarket.Domain.Models.Currency;
-using Future = Oid85.FinMarket.Domain.Models.Future;
+using Share = Oid85.FinMarket.Domain.Models.Analyse.Share;
+using Bond = Oid85.FinMarket.Domain.Models.Analyse.Bond;
+using Currency = Oid85.FinMarket.Domain.Models.Analyse.Currency;
+using Future = Oid85.FinMarket.Domain.Models.Analyse.Future;
 using TinkoffShare = Tinkoff.InvestApi.V1.Share;
 using TinkoffFuture = Tinkoff.InvestApi.V1.Future;
 using TinkoffBond = Tinkoff.InvestApi.V1.Bond;
+using Oid85.FinMarket.Domain.Models.Analyse;
 
 namespace Oid85.FinMarket.External.Tinkoff;
 
